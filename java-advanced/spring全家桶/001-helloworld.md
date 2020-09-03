@@ -52,21 +52,21 @@ C:\WorkSpace\IdeaProjects\spring-learn\001-helloworld>mvn clean package -Dmaven.
 C:\WorkSpace\IdeaProjects\spring-learn\001-helloworld>cd target
 
 C:\WorkSpace\IdeaProjects\spring-learn\001-helloworld\target>dir
- ドライブ C のボリューム ラベルは Windows です
- ボリューム シリアル番号は F64A-4518 です
+ 驱动器 D 中的卷是 Data
+ 卷的序列号是 B8A9-CEA2
 
  C:\WorkSpace\IdeaProjects\spring-learn\001-helloworld\target のディレクトリ
 
-2020/09/03  17:00    <DIR>          .
-2020/09/03  17:00    <DIR>          ..
-2020/09/03  17:00        18,420,367 001-helloworld-0.0.1-SNAPSHOT.jar
-2020/09/03  17:00             2,852 001-helloworld-0.0.1-SNAPSHOT.jar.original
-2020/09/03  17:00    <DIR>          classes
-2020/09/03  17:00    <DIR>          generated-sources
-2020/09/03  17:00    <DIR>          maven-archiver
-2020/09/03  17:00    <DIR>          maven-status
-               2 個のファイル          18,423,219 バイト
-               6 個のディレクトリ  29,920,378,880 バイトの空き領域
+2020/09/03  20:35    <DIR>          .
+2020/09/03  20:35    <DIR>          ..
+2020/09/03  20:35        18,420,374 001-helloworld-0.0.1-SNAPSHOT.jar
+2020/09/03  20:35             2,859 001-helloworld-0.0.1-SNAPSHOT.jar.original
+2020/09/03  20:35    <DIR>          classes
+2020/09/03  20:35    <DIR>          generated-sources
+2020/09/03  20:35    <DIR>          maven-archiver
+2020/09/03  20:35    <DIR>          maven-status
+               2 个文件     18,423,233 字节
+               6 个目录 298,277,195,776 可用字节
 
 C:\WorkSpace\IdeaProjects\spring-learn\001-helloworld\target>java -jar 001-helloworld-0.0.1-SNAPSHOT.jar
 ```
