@@ -10,7 +10,7 @@ Git 属于分布式版本控制系统，而 SVN 属于集中式。
 
 分布式版本控制新建分支、合并分支操作速度非常快，而集中式版本控制新建一个分支相当于复制一份完整代码。
 
-# 中心服务器
+### 中心服务器
 
 中心服务器用来交换每个用户的修改，没有中心服务器也能工作，但是中心服务器能够 24 小时保持开机状态，这样就能更方便的交换修改。
 
@@ -101,6 +101,21 @@ $ ssh-keygen -t rsa -C "youremail@example.com"
 - 自己的敏感信息，比如存放口令的配置文件。
 
 不需要全部自己编写，可以到 [https://github.com/github/gitignore](https://github.com/github/gitignore) 中进行查询。
+
+### git撤销&回滚操作(git reset 和 get revert)
+
+执行add&commit后，但未push:
+- 撤销到commit前版本：git reset --soft HEAD^
+- 撤销到add前版本：git reset --hard HEAD^
+
+commit时注释写错，可用其他方法修改注释：
+git commit --amend
+
+情景1：撤销commit时不小心撤销到add前版本，修改最新版本丢失
+- git reflog
+- git reset --hard <commit_id>
+
+https://cloud.tencent.com/developer/article/1582800
 
 ### Git 命令一览
 
