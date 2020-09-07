@@ -104,18 +104,55 @@ $ ssh-keygen -t rsa -C "youremail@example.com"
 
 ### git撤销&回滚操作(git reset 和 get revert)
 
-执行add&commit后，但未push:
-- 撤销到commit前版本：git reset --soft HEAD^
-- 撤销到add前版本：git reset --hard HEAD^
+##### 情况一：文件已修改，还未执行git add操作(working tree内撤销)
+```shell script
+$ git checkout -- fileName
+$ git checkout *
+```
+##### 情况二：对多个文件执行了git add操作，但只想提交其中一部分文件
+```shell script
+$ git add *
+$ git status
+```
+取消暂存
+```shell script
+$ git reset HEAD <filename>
+```
+##### 情况三：执行了git add操作，撤销对文件的修改（index内回滚）
+```shell script
+# 取消暂存
+git reset HEAD fileName
+# 撤销修改
+git checkout fileName
+```
+##### 情况四：修改的文件已被git commit，但想再次修改不再产生新的commit
+```shell script
+# 修改最后一次提交
+$ git add sample.txt
+$ git commit --amend -m"说明"
+```
+##### 情况五：已在本地进行多次git commit操作，撤销到其中某次commit
+```shell script
+$ git reset [--hard|soft|mixed|merge|keep] [commit|HEAD]
+```
 
-commit时注释写错，可用其他方法修改注释：
-git commit --amend
+##### 情况六：执行add&commit后，但还未push
+```shell script
+# 撤销到commit前版本
+$ git reset --soft HEAD^
+# 撤销到add前版本
+$ git reset --hard HEAD^
+# commit时注释写错，可用其他方法修改注释：
+$ git commit --amend
+```
 
-情景1：撤销commit时不小心撤销到add前版本，修改最新版本丢失
-- git reflog
-- git reset --hard <commit_id>
-
-https://cloud.tencent.com/developer/article/1582800
+##### 情况七：撤销commit时不小心回滚到add前版本，所有修改丢失
+```shell script
+# 查看撤销前版本号
+$ git reflog
+# 恢复回滚前
+$ git reset --hard <commit_id>
+```
 
 ### Git 命令一览
 

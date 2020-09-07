@@ -1,12 +1,12 @@
-###### 1、下载解压
+##### 1、下载解压
 点击[下载地址](https://maven.apache.org/download.cgi)， 下载 apache-maven-3.6.3-bin.zip 并解压。
 
-###### 2、配置环境变量
+##### 2、配置环境变量
 环境变量添加：MAVEN_HOME
 变量值设为：C:\apache\apache-maven-3.6.3
 
 PATH中添加：%MAVEN_HOME%\bin
-###### 3、验证
+##### 3、验证
 CMD中输入：mvn -version
 ```shell
 C:\Users\XXX>mvn -version
@@ -16,7 +16,7 @@ Java version: 1.8.0_151, vendor: Oracle Corporation, runtime: C:\Program Files\J
 Default locale: ja_JP, platform encoding: MS932
 OS name: "windows 10", version: "10.0", arch: "amd64", family: "windows"
 ```
-###### 4、配置settings文件找到conf文件夹中的settings.xml文件
+##### 4、配置settings文件找到conf文件夹中的settings.xml文件
 （1）添加本地仓库
 ```shell
 <localRepository>C:\My_workspace\my_maven_local_repository</localRepository>
@@ -47,7 +47,7 @@ OS name: "windows 10", version: "10.0", arch: "amd64", family: "windows"
         </properties>
   </profile>
 ```
-###### 5、IDEA中Maven的设置
+##### 5、IDEA中Maven的设置
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200728164250370.png)
 
 配置完成。
