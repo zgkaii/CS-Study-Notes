@@ -21,7 +21,7 @@
 
 
 
-# 第一章 Collection集合
+# 一、Collection集合
 
 ## 1.1 集合概述
 
@@ -168,7 +168,7 @@ Iterator迭代器对象在遍历集合时，内部采用指针的方式来跟踪
 
 格式：
 
-~~~java
+~~~shell script
 for(元素的数据类型  变量 : Collection集合or数组){ 
   	//写操作代码
 }
@@ -482,7 +482,7 @@ public class GenericInterface {
 
 举个例子大家理解使用即可：
 
-~~~java
+~~~shell script
 public static void main(String[] args) {
     Collection<Intger> list1 = new ArrayList<Integer>();
     getElement(list1);
@@ -511,7 +511,7 @@ public static void getElement(Collection<?> coll){}
 
 比如：现已知Object类，String 类，Number类，Integer类，其中Number是Integer的父类
 
-~~~java
+~~~shell script
 public static void main(String[] args) {
     Collection<Integer> list1 = new ArrayList<Integer>();
     Collection<String> list2 = new ArrayList<String>();

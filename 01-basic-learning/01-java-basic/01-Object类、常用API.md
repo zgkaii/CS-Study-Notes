@@ -15,6 +15,7 @@
 -[ ] 能够说出Object类的特点
 -[ ] 能够重写Object类的toString方法
 -[ ] 能够重写Object类的equals方法
+-[ ] 能够理解Object类的hashCode方法
 -[ ] 能够使用日期类输出当前日期
 -[ ] 能够使用将日期格式化为字符串的方法
 -[ ] 能够使用将字符串转换成日期的方法
@@ -27,7 +28,7 @@
 -[ ] 能够将字符串转换为对应的基本类型
 -[ ] 能够将基本类型转换为对应的字符串
 
-# 第一章 Object类
+# 一、Object类
 
 ## 1.1 概述
 
@@ -85,7 +86,7 @@ public class Person {
 
 * `public boolean equals(Object obj)`：指示其他某个对象是否与此对象“相等”。
 
-调用成员方法equals并指定参数为另一个对象，则可以判断这两个对象是否是相同的。这里的“相同”有默认和自定义两种方式。
+ Object类中的实例方法，调用成员方法equals并指定参数为另一个对象，则可以判断这两个对象是否是相同的。这里的“相同”有默认和自定义两种方式。
 
 ### 默认地址比较
 
@@ -120,9 +121,16 @@ public class Person {
 
 这段代码充分考虑了对象为空、类型一致等问题，但方法内容并不唯一。大多数IDE都可以自动生成equals方法的代码内容。在IntelliJ IDEA中，可以使用`Code`菜单中的`Generate…`选项，也可以使用快捷键`alt+insert`，并选择`equals() and hashCode()`进行自动代码生成。如下图所示：
 
-> tips：Object类当中的hashCode等其他方法，今后学习。
+## 1.4 hashCode方法
+### 方法摘要
 
-## 1.4 Objects类
+* `public static int hashCode(Object o)`：指示其他某个对象是否与此对象“相等”。
+
+Object类中的native方法 , 获取对象的哈希值，用于确定该对象在哈希表中的索引位置，它实际上是一个int型整数。
+
+### [equals与hashCode详解](https://www.cnblogs.com/qian123/p/5703507.html)
+
+## 1.5 Objects类
 
 在刚才IDEA自动重写equals代码中，使用到了`java.util.Objects`类，那么这个类是什么呢？
 
@@ -134,13 +142,13 @@ public class Person {
 
 我们可以查看一下源码，学习一下：
 
-~~~java
+~~~shell
 public static boolean equals(Object a, Object b) {  
     return (a == b) || (a != null && a.equals(b));  
 }
 ~~~
 
-# 第二章 日期时间类
+# 二、日期时间类
 
 ## 2.1 Date类
 
@@ -288,7 +296,7 @@ public class Demo04DateFormatMethod {
 
 **代码实现：**
 
-```java
+```shell script
 public static void function() throws Exception {
 	System.out.println("请输入出生日期 格式 YYYY-MM-dd");
 	// 获取出生日期,键盘输入
@@ -439,7 +447,7 @@ public class Demo09CalendarMethod {
 > ​     日期是有大小关系的，时间靠后，时间越大。
 >
 
-# 第三章 System类
+# 三、System类
 
 `java.lang.System`类中提供了大量的静态方法，可以获取与系统相关的信息或系统级操作，在System类的API文档中，常用的方法有：
 
@@ -644,21 +652,21 @@ Java提供了两个类型系统，基本类型与引用类型，使用基本类�
 
 基本数值---->包装对象
 
-~~~java
+~~~shell script
 Integer i = new Integer(4);//使用构造函数函数
 Integer iii = Integer.valueOf(4);//使用包装类中的valueOf方法
 ~~~
 
 包装对象---->基本数值
 
-~~~java
+~~~shell script
 int num = i.intValue();
 ~~~
 ## 5.3自动装箱与自动拆箱
 
 由于我们经常要做基本类型与包装类之间的转换，从Java 5（JDK 1.5）开始，基本类型与包装类的装箱、拆箱动作可以自动完成。例如：
 
-```java
+```shell script
 Integer i = 4;//自动装箱。相当于Integer i = Integer.valueOf(4);
 i = i + 5;//等号右边：将i对象转成基本数值(自动拆箱) i.intValue() + 5;
 //加法运算完成后，再次装箱，把基本数值转成对象。
