@@ -7,7 +7,7 @@
 
 
 # AJAX：
-	1. 概念： ASynchronous JavaScript And XML	异步的JavaScript 和 XML
+	1. 概念： ASynchronous JavaScript And XML  意思就是用JavaScript执行异步网络请求。
 		1. 异步和同步：客户端和服务器端相互通信的基础上
 			* 客户端必须等待服务器端的响应。在等待的期间客户端不能做其他操作。
 			* 客户端不需要等待服务器端的响应。在服务器处理请求的过程中，客户端可以进行其他的操作。
