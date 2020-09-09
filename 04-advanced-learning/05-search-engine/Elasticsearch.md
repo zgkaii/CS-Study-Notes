@@ -2817,15 +2817,15 @@ POST _analyze
 
 - wget  [https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v7.6.2/elasticsearch-analysis-ik-7.6.2.zip](https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v7.6.2/elasticsearch-analysis-ik-7.6.2.zip)
 ```shell
-[root@0adeb7852e00 elasticsearch]# pwd
+[root@d30f21ec35fc elasticsearch]# pwd
 /usr/share/elasticsearch
 #下载ik7.6.2
-[root@0adeb7852e00 elasticsearch]# wget https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v7.6.2/elasticsearch-analysis-ik-7.6.2.zip
+[root@d30f21ec35fc elasticsearch]# wget https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v7.6.2/elasticsearch-analysis-ik-7.6.2.zip
 ```
 
 - unzip 下载的文件
 ```shell
-[root@0adeb7852e00 elasticsearch]# unzip elasticsearch-analysis-ik-7.6.2.zip -d ink
+[root@d30f21ec35fc elasticsearch]# unzip elasticsearch-analysis-ik-7.6.2.zip -d ink
 Archive:  elasticsearch-analysis-ik-7.6.2.zip
    creating: ik/config/
   inflating: ik/config/main.dic      
@@ -2847,9 +2847,9 @@ Archive:  elasticsearch-analysis-ik-7.6.2.zip
   inflating: ik/commons-codec-1.9.jar  
   inflating: ik/plugin-descriptor.properties  
   inflating: ik/plugin-security.policy  
-[root@0adeb7852e00 elasticsearch]#
+[root@d30f21ec35fc elasticsearch]#
 #移动到plugins目录下
-[root@0adeb7852e00 elasticsearch]# mv ik plugins/
+[root@d30f21ec35fc elasticsearch]# mv ik plugins/
 ```
 
 - rm -rf *.zip
@@ -2993,6 +2993,43 @@ GET my_index/_analyze
 ```
 ##### （3）自定义词库
 
+- 重新创建elasticsearch容器
+```shell script
+[root@10 ~]# docker ps
+CONTAINER ID        IMAGE                 COMMAND                  CREATED             STATUS              PORTS                                            NAMES
+aecf083b3713        kibana:7.6.2          "/usr/local/bin/dumb…"   8 days ago          Up 33 seconds       0.0.0.0:5601->5601/tcp                           kibana
+d30f21ec35fc        elasticsearch:7.6.2   "/usr/local/bin/dock…"   8 days ago          Up 33 seconds       0.0.0.0:9200->9200/tcp, 0.0.0.0:9300->9300/tcp   elasticsearch
+1a7618bfcd63        redis                 "docker-entrypoint.s…"   5 weeks ago         Up 33 seconds       0.0.0.0:6379->6379/tcp                           redis
+7320c7eda7e7        mysql:5.7             "docker-entrypoint.s…"   5 weeks ago         Up 33 seconds       0.0.0.0:3306->3306/tcp, 33060/tcp                mysql
+[root@10 ~]# free -m
+              total        used        free      shared  buff/cache   available
+Mem:           2845         966        1244           8         634        1718
+Swap:          2047           0        2047
+[root@10 ~]# docker stop d30
+d30
+[root@10 ~]# docker rm d30
+d30
+[root@10 ~]# cd /mydata/
+[root@10 mydata]# ls
+elasticsearch  mysql  redis
+[root@10 mydata]# cd elasticsearch/
+[root@10 elasticsearch]# ls
+config  data  plugins
+[root@10 elasticsearch]# cd data
+[root@10 data]# ls
+nodes
+[root@10 data]# docker run --name elasticsearch -p 9200:9200 -p 9300:9300 \
+> -e  "discovery.type=single-node" \
+> -e ES_JAVA_OPTS="-Xms64m -Xmx512m" \
+> -v /mydata/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml \
+> -v /mydata/elasticsearch/data:/usr/share/elasticsearch/data \
+> -v /mydata/elasticsearch/plugins:/usr/share/elasticsearch/plugins \
+> -d elasticsearch:7.6.2
+d4f2e53d0c3895e75e1411235d7524cd0de97e5b0e2d38235e6951f2d811d05f
+```
+
+- 安装nginx(见附录)
+
 - 修改/usr/share/elasticsearch/plugins/ik/config中的IKAnalyzer.cfg.xml
 /usr/share/elasticsearch/plugins/ik/config
 ```xml
@@ -3005,7 +3042,7 @@ GET my_index/_analyze
 	 <!--用户可以在这里配置自己的扩展停止词字典-->
 	<entry key="ext_stopwords"></entry>
 	<!--用户可以在这里配置远程扩展字典 -->
-	<entry key="remote_ext_dict">http://192.168.137.14/es/fenci.txt</entry> 
+	<entry key="remote_ext_dict">http://192.168.56.10/es/fenci.txt</entry> 
 	<!--用户可以在这里配置远程扩展停止词字典-->
 	<!-- <entry key="remote_ext_stopwords">words_location</entry> -->
 </properties>
@@ -3031,17 +3068,17 @@ GET my_index/_analyze
 ```shell
 POST my_index/_update_by_query?conflicts=proceed
 ```
-[http://192.168.137.14/es/fenci.txt](http://192.168.137.14/es/fenci.txt)，这个是nginx上资源的访问路径
+[http://192.168.56.10/es/fenci.txt](http://192.168.56.10/es/fenci.txt)，这个是nginx上资源的访问路径
 在运行下面实例之前，需要安装nginx（安装方法见安装nginx），然后创建“fenci.txt”文件，内容如下：
 ```shell
-echo "樱桃萨其马，带你甜蜜入夏" > /mydata/nginx/html/fenci.txt
+刘亦菲
 ```
 测试效果：
 ```json
 GET my_index/_analyze
 {
    "analyzer": "ik_max_word", 
-   "text":"樱桃萨其马，带你甜蜜入夏"
+   "text":"刘亦菲爱我"
 }
 ```
 输出结果：
@@ -3049,40 +3086,85 @@ GET my_index/_analyze
 {
   "tokens" : [
     {
-      "token" : "樱桃",
+      "token" : "刘亦菲",
       "start_offset" : 0,
-      "end_offset" : 2,
+      "end_offset" : 3,
       "type" : "CN_WORD",
       "position" : 0
     },
     {
-      "token" : "萨其马",
-      "start_offset" : 2,
+      "token" : "爱我",
+      "start_offset" : 3,
       "end_offset" : 5,
       "type" : "CN_WORD",
       "position" : 1
-    },
-    {
-      "token" : "带你",
-      "start_offset" : 6,
-      "end_offset" : 8,
-      "type" : "CN_WORD",
-      "position" : 2
-    },
-    {
-      "token" : "甜蜜",
-      "start_offset" : 8,
-      "end_offset" : 10,
-      "type" : "CN_WORD",
-      "position" : 3
-    },
-    {
-      "token" : "入夏",
-      "start_offset" : 10,
-      "end_offset" : 12,
-      "type" : "CN_WORD",
-      "position" : 4
     }
   ]
 }
 ```
+## 五、elasticsearch-Rest-Client
+### 1）9300: TCP
+
+- spring-data-elasticsearch:transport-api.jar;
+   - springboot版本不同，ransport-api.jar不同，不能适配es版本
+   - 7.x已经不建议使用，8以后就要废弃
+### 2）9200: HTTP
+
+- jestClient: 非官方，更新慢；
+- RestTemplate：模拟HTTP请求，ES很多操作需要自己封装，麻烦；
+- HttpClient：同上；
+- Elasticsearch-Rest-Client：官方RestClient，封装了ES操作，API层次分明，上手简单；
+最终选择Elasticsearch-Rest-Client（elasticsearch-rest-high-level-client）；
+[https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/java-rest-high.html](https:_www.elastic.co_guide_en_elasticsearch_client_java-rest_current_java-rest-high)
+## 六、附录：安装Nginx
+
+- 随便启动一个nginx实例
+```shell
+docker run -p80:80 --name nginx -d nginx:1.10
+```
+只是为了复制出配置
+```shell
+docker run -p80:80 --name nginx -d nginx:1.10
+```
+
+- 将容器内的配置文件拷贝到/mydata/nginx/conf/ 下
+```shell
+mkdir -p /mydata/nginx/html
+mkdir -p /mydata/nginx/logs
+mkdir -p /mydata/nginx/conf
+docker container cp nginx:/etc/nginx/*  /mydata/nginx/conf/ 
+#由于拷贝完成后会在config中存在一个nginx文件夹，所以需要将它的内容移动到conf中
+mv /mydata/nginx/conf/nginx/* /mydata/nginx/conf/
+rm -rf /mydata/nginx/conf/nginx
+```
+
+- 终止原容器：
+```shell
+docker stop nginx
+```
+
+- 执行命令删除原容器：
+```shell
+docker rm nginx
+```
+
+- 创建新的Nginx，执行以下命令
+```shell
+docker run -p 80:80 --name nginx \
+ -v /mydata/nginx/html:/usr/share/nginx/html \
+ -v /mydata/nginx/logs:/var/log/nginx \
+ -v /mydata/nginx/conf/:/etc/nginx \
+ -d nginx:1.10
+```
+
+- 设置开机启动nginx
+```
+docker update nginx --restart=always
+```
+
+- 创建“/mydata/nginx/html/index.html”文件，测试是否能够正常访问
+```
+echo '<h2>hello nginx!</h2>' >index.html
+```
+
+- 访问：http://nginx所在主机的IP:80/index.html
