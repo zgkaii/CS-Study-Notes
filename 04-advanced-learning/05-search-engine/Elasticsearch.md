@@ -1,5 +1,5 @@
-## 1、ElasticSearch相关概念
-ElasticSearch和MySQL中的概念对应
+## 一、ElasticSearch相关概念
+### 1.1 ElasticSearch和MySQL中的概念比较
 
 |  ElasticSearch   | MySQL  | 
 |  :----:  | :----:  |  
@@ -9,16 +9,17 @@ ElasticSearch和MySQL中的概念对应
 |  Field   | Column |
 |  Mapping   | Schema  |  
 |  Everything is indexed   | Index  |  
-|  GEThttp://…  | select * from …  |  
-|  POSThttp://…   | update table set …  |  
+|  GET http://…  | select * from …  |  
+|  POST http://…   | update table set …  |  
 
-倒排索引
+### 1.2 倒排索引
 
- Kibana
+Elasticsearch 使用一种称为 倒排索引 的结构，它适用于快速的全文搜索。一个倒排索引由文档中所有不重复词的列表构成，对于其中每个词，有一个包含它的文档列表。
 
-## 2、安装elasticsearch
+[倒排索引原理](https://zhuanlan.zhihu.com/p/33671444)
 
-docker中安装elastic search
+## 二、安装elasticsearch
+docker中安装elastic search  
 （1）下载elastic search和kibana
 ```shell
 docker pull elasticsearch:7.6.2
@@ -80,12 +81,12 @@ docker update kibana  --restart=always
 ```
 访问Kibana： [http://192.168.56.10:5601/app/kibana](http://192.168.56.10:5601/app/kibana)
 
-![Kibana](https://img-blog.csdnimg.cn/2020090820261642.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0tBSVpfTEVBUk4=,size_16,color_FFFFFF,t_70#pic_center)
+![Kibana](https://img-blog.csdnimg.cn/2020090820261642.png)
 
-## 2、初步检索
+## 三、初步检索
 
-### 1）_CAT
-（1）GET/_cat/nodes：查看所有节点_  
+### 1. _CAT
+（1） GET/_cat/nodes：查看所有节点_  
 如：[http://192.168.56.10:9200/_cat/nodes](http://192.168.56.10:9200/_cat/nodes) 
 ```
 127.0.0.1 15 88 0 0.06 0.03 0.11 dilm * d30f21ec35fc
@@ -112,7 +113,7 @@ green open .kibana_task_manager_1   wldcIEtbT3uQfH_copflYw 1 0 2 1 26.8kb 26.8kb
 green open .apm-agent-configuration g5iOaK05QrSSmenBQtqupg 1 0 0 0   283b   283b
 green open .kibana_1                2kGHFyKBSCmS8lU1loIqVg 1 0 6 0 22.6kb 22.6kb
 ```
-### 2）索引一个文档
+### 2. 索引一个文档
 保存一个数据，保存在哪个索引的哪个类型下，指定用那个唯一标识
 PUT customer/external/1  在customer索引下的external类型下保存1号数据为
 ```json
@@ -124,7 +125,7 @@ PUT和POST都可以
 POST新增。如果不指定id，会自动生成id。指定id就会修改这个数据，并新增版本号；
 PUT可以新增也可以修改。PUT必须指定id；由于PUT需要指定id，我们一般用来做修改操作，不指定id会报错。
 下面是在postman中的测试数据：
-![](https://img-blog.csdnimg.cn/20200908205137274.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0tBSVpfTEVBUk4=,size_16,color_FFFFFF,t_70#pic_center)
+![](https://img-blog.csdnimg.cn/20200908205137274.png)
 创建数据成功后，显示201 created表示插入记录成功。
 ```json
 {
@@ -162,7 +163,7 @@ PUT可以新增也可以修改。PUT必须指定id；由于PUT需要指定id，�
 
 ![](https://img-blog.csdnimg.cn/20200908210004128.png#pic_center)
 
-#### 3）查看文档
+#### 3. 查看文档
 GET  /customer/external/2  
 [http://192.168.56.10:9200/customer/external/1](http://192.168.56.10:9200/customer/external/1)
 
@@ -196,7 +197,7 @@ GET  /customer/external/2
 ![](https://img-blog.csdnimg.cn/2020090821215485.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0tBSVpfTEVBUk4=,size_16,color_FFFFFF,t_70#pic_center)
 更新成功。
 
-### 4）更新文档
+### 4. 更新文档
 （1）POST更新文档，带有_update
 [http://192.168.56.10:9200/customer/external/2/_update](http://192.168.56.10:9200/customer/external/2/_update)
 ![](https://img-blog.csdnimg.cn/20200908213057639.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0tBSVpfTEVBUk4=,size_16,color_FFFFFF,t_70#pic_center)
@@ -236,7 +237,7 @@ POST更新方式，会对比原来的数据，和原来的相同，则不执行�
 }
 ```
 在更新过程中，重复执行更新操作，数据也能够更新成功，不会和原来的数据进行对比。
-#### 5）删除文档或索引
+### 5.删除文档或索引
 ```
 DELETE customer/external/1
 DELETE customer
@@ -264,7 +265,7 @@ green open .kibana_task_manager_1   wldcIEtbT3uQfH_copflYw 1 0 2 1 26.8kb 26.8kb
 green open .apm-agent-configuration g5iOaK05QrSSmenBQtqupg 1 0 0 0   283b   283b
 green open .kibana_1                2kGHFyKBSCmS8lU1loIqVg 1 0 6 0 22.6kb 22.6kb
 ```
-#### 6）elasticsearch的批量操作——bulk
+### 6.elasticsearch的批量操作——bulk
 语法格式：
 ```text
 {action:{metadata}}\n
@@ -374,7 +375,7 @@ POST /_bulk
   ]
 }
 ```
-### 7）样本测试数据
+### 7.样本测试数据
 准备了一份顾客银行账户信息的虚构的JSON文档样本。每个文档都有下列的schema（模式）。
 ```json
 {
@@ -394,8 +395,8 @@ POST /_bulk
 [https://github.com/elastic/elasticsearch/blob/master/docs/src/test/resources/accounts.json](https://github.com/elastic/elasticsearch/blob/master/docs/src/test/resources/accounts.json) ，导入官方测试数据，
 POST bank/account/_bulk
 
-## 4、进阶检索
-### 1）search Api
+## 四、进阶检索
+### 1.search Api
 ES支持两种基本方式检索；
 
 - 通过REST request uri 发送搜索参数 （uri +检索参数）；
@@ -673,7 +674,7 @@ GET bank/_search?q=*&sort=account_number:asc
 > - `hits.sort` - the document’s sort position (when not sorting by relevance score)
 > - `hits._score` - the document’s relevance score (not applicable when using `match_all`)
 
-### 2）Query DSL
+### 2.Query DSL
 #### （1）基本语法格式
 Elasticsearch提供了一个可以执行查询的Json风格的DSL。这个被称为Query DSL，该查询语言非常全面。
 一个查询语句的典型结构
@@ -717,7 +718,7 @@ query定义如何查询；
 - 除了query参数之外，我们可也传递其他的参数以改变查询结果，如sort，size；
 - from+size限定，完成分页功能；
 - sort排序，多字段排序，会在前序字段相等时后续字段内部排序，否则以前序为准；
-##### （2）返回部分字段
+#### （2）返回部分字段
 ```json
 GET bank/_search
 {
@@ -825,7 +826,7 @@ GET bank/_search
   }
 }
 ```
-##### （3）match匹配查询
+#### （3）match匹配查询
 
 - 基本类型（非字符串），精确控制
 ```json
@@ -2306,10 +2307,10 @@ GET bank/_search
 }
 ```
 
-### 3）、Mapping映射
-##### （1）字段类型
+### 3.Mapping映射
+#### （1）字段类型
 ![](https://cdn.nlark.com/yuque/0/2020/png/512093/1591341331961-b271ecfc-8fa4-4921-a2f3-212607962a32.png#align=left&display=inline&height=400&margin=%5Bobject%20Object%5D&originHeight=400&originWidth=918&status=done&style=none&width=918)
-##### （2）映射
+#### （2）映射
 Mapping(映射)
 Mapping是用来定义一个文档（document），以及它所包含的属性（field）是如何存储和索引的。比如：使用maping来定义：
 
@@ -2415,7 +2416,7 @@ GET bank/_mapping
 - 修改mapping信息
 
 ![](https://cdn.nlark.com/yuque/0/2020/png/512093/1591341332032-85df5e7b-c983-45f1-9c6a-f5c8187d560d.png#align=left&display=inline&height=476&margin=%5Bobject%20Object%5D&originHeight=476&originWidth=954&status=done&style=none&width=954)
-##### （3）新版本改变
+#### （3）新版本改变
 ElasticSearch7-去掉type概念
 
 1. 关系型数据库中两个数据表示是独立的，即使他们里面有相同名称的列也不影响使用，但ES中不是这样的。elasticsearch是基于Lucene开发的搜索引擎，而ES中不同type下名称相同的filed最终在Lucene中的处理方式是一样的。
@@ -2435,7 +2436,7 @@ ElasticSearch7-去掉type概念
 > - Specifying types in requests is no longer supported.
 > - The `include_type_name` parameter is removed.
 
-##### 创建映射
+#### 创建映射
 创建索引并指定映射
 ```json
 PUT /my_index
@@ -2463,7 +2464,7 @@ PUT /my_index
   "index" : "my_index"
 }
 ```
-##### 查看映射
+#### 查看映射
 ```json
 GET /my_index
 ```
@@ -2504,7 +2505,7 @@ GET /my_index
   }
 }
 ```
-###### 添加新的字段映射
+##### 添加新的字段映射
 ```json
 PUT /my_index/_mapping
 {
@@ -2779,14 +2780,14 @@ POST _analyze
   ]
 }
 ```
-##### （1）安装ik分词器
+#### （1）安装ik分词器
 ![](https://cdn.nlark.com/yuque/0/2020/png/512093/1591341332297-3c97edb9-eb4c-4901-bcb5-2e087e172c95.png#align=left&display=inline&height=463&margin=%5Bobject%20Object%5D&originHeight=463&originWidth=1414&status=done&style=none&width=1414)
 所有的语言分词，默认使用的都是“Standard Analyzer”，但是这些分词器针对于中文的分词，并不友好。为此需要安装中文的分词器。
 注意：不能用默认elasticsearch-plugin install xxx.zip 进行自动安装
 [https://github.com/medcl/elasticsearch-analysis-ik/releases/download](https://github.com/medcl/elasticsearch-analysis-ik/releases/download) 对应es版本安装
 在前面安装的elasticsearch时，我们已经将elasticsearch容器的“/usr/share/elasticsearch/plugins”目录，映射到宿主机的“ /mydata/elasticsearch/plugins”目录下，所以比较方便的做法就是下载“/elasticsearch-analysis-ik-7.6.2.zip”文件，然后解压到该文件夹下即可。安装完毕后，需要重启elasticsearch容器。
 如果不嫌麻烦，还可以采用如下的方式。
-###### （1）查看elasticsearch版本号：
+##### （1）查看elasticsearch版本号：
 ```json
 {
 "name": "d30f21ec35fc",
@@ -2806,7 +2807,7 @@ POST _analyze
 "tagline": "You Know, for Search"
 }
 ```
-###### （2）进入es容器内部plugin目录
+##### （2）进入es容器内部plugin目录
 
 - docker exec -it 容器id /bin/bash
 ```shell
