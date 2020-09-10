@@ -116,7 +116,7 @@ GET bank/_search
 {
   "query": {
     "match": {
-      "address": "Mill"
+      "address": "mill"
     }
   },
   "aggs": {
@@ -190,6 +190,13 @@ java实现
     }
 ```
 可以尝试对比打印的条件和执行结果，和前面的ElasticSearch的检索语句和检索结果进行比较；
+```shell script
+年龄：38 ==> 2
+年龄：28 ==> 1
+年龄：32 ==> 1
+平均年龄：34.0
+平均薪资：25208.0
+```
 
 ## 其他
 ### 1. kibana控制台命令
