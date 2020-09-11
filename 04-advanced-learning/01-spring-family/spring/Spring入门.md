@@ -364,8 +364,9 @@ public class AccountServiceImpl implements IAccountService {
 	创建对象时没有明确的限制，可以直接使用默认构造函数  
 弊端：  
 	如果有某个成员必须有值，则获取对象是有可能set方法没有执行。
+
 ```xml
-    <bean id="accountService" class="com.kai.service.impl.AccountServiceImpl">
+   <bean id="accountService" class="com.kai.service.impl.AccountServiceImpl">
         <property name="name" value="zhangsan" ></property>
         <property name="age" value="22"></property>
         <property name="birthday" ref="now"></property>
@@ -402,6 +403,7 @@ public class AccountServiceImpl implements IAccountService {
 * type：用于指定要注入的数据的数据类型，该数据类型也是构造函数中某个或某些参数的类型
 * index：用于指定要注入的数据给构造函数中指定索引位置的参数赋值。索引的位置是从0开始
 * name：用于指定给构造函数中指定名称的参数赋值  
+
 =============以上三个用于指定给构造函数中哪个参数赋值======================
 * value：用于提供基本类型和String类型的数据  
 * ref：用于指定其他的bean类型数据。它指的就是在spring的Ioc核心容器中出现过的bean对象  
