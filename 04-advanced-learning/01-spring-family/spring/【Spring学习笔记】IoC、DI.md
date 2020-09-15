@@ -1,4 +1,4 @@
-### Spring Bean到底是什么？
+### 一、Spring Bean到底是什么？
 Bean是Spring中一个重要的概念。Spring官方文档对bean的解释是：  
 ```
 In Spring, the objects that form the backbone of your application and that are managed by the Spring IoC container are called beans. 
@@ -15,7 +15,7 @@ objects in your application. Beans, and the dependencies among them, are reflect
 * bean由IoC容器管理
 * 实际应用程序中，有很多bean
 
-### 那么，IoC(Inversion Of Control)容器又是什么？
+### 二、IoC(Inversion Of Control)容器又是什么？
 
 当某个 Java 实例需要另一个 Java 实例时，传统的方法是由调用者创建被调用者的实例（例如，使用 new 关键字获得被调用者实例），而使用 Spring 框架后，被调用者的实例不再由调用者创建，而是由具有依赖注入功能的 IOC 容器创建，这称为控制反转。
 
@@ -23,7 +23,7 @@ objects in your application. Beans, and the dependencies among them, are reflect
 * 资源集中管理，实现资源的可配置和易管理。
 * 降低了使用资源双方的依赖程度（耦合度）。
 
-### IoC容器有哪些类别呢？
+### 三、IoC容器有哪些类别呢？
 Spring 提供了以下两种不同类型的容器：
 
 ##### 1.Spring BeanFactory
@@ -36,7 +36,7 @@ Spring 提供了以下两种不同类型的容器：
 
 ![](https://img-blog.csdnimg.cn/20200910173222719.png)  
 
-##### ApplicationContext接口常用实现类：
+##### 3.ApplicationContext接口常用实现类：
 * ClassPathXmlApplicationContext:  
 	从类的根路径下加载配置文件。（推荐使用）
 * FileSystemXmlApplicationContext:   
@@ -97,7 +97,7 @@ save()执行了
 
 从上面的例子中，可知Spring容器在读取到配置文件的信息后，然后就获取到了UserDao实例，然后调用了实例的方法。中间是否还有其它隐藏步骤呢？
 
-![容器与Bean](https://img-blog.csdnimg.cn/20200911130501741.png)  
+![Bean与容器的关系](https://img-blog.csdnimg.cn/20200915131957564.png) 
 
 可见，Spring容器在启动时，先读取应用程序提供的Bean配置信息，并在Spring容器内部建立Bean定义注册表；然后根据注册表加载、实例化Bean,并装配好Bean之间的依赖关系；最后将这些准备就绪的Bean放到Bean缓存池中，以供外层的应用程序进行调用。
 
@@ -106,15 +106,15 @@ save()执行了
 * 应用程序为Spring提供了完备的Bean配置信息。
 * Bean的实现类都已放在应用程序的类路径下。
 
-### 上图中看到，Bean的配置信息不止一种吗？
+### 四、Bean的配置信息如何书写？
 
-是的。Bean的配置信息即是Bean的元数据信息，它主要分为基于XML配置与基于注解配置。但无论以何种方式配置，它都主要包含：
+Bean的配置信息即是Bean的元数据信息，它主要分为基于XML配置与基于注解配置。但无论以何种方式配置，它都主要包含：
 * Bean 的实现类。
 * Bean 的属性信息,如数据源的连接数、用户名、密码等。
 * Bean 的依赖关系,Spring根据依赖关系配置完成Bean之间的装配。
 * Bean 的行为配置,如生命周期范围及生命周期各过程的回调函数等。
 
-##### 基于XML配置
+##### 1.基于XML配置
 通常情况下，Spring都会以XML文件格式作为Spring的配置文件，这种配置方式通过XML文件注册并管理 Bean之间的依赖关系。
 
 XML格式配置文件的根元素是`<beans>`，该元素包含了多个`<bean>`子元素，每一个`<bean>`子元素定义了一个Bean，并描述了该Bean如何被装配到Spring容器中。  
@@ -150,7 +150,7 @@ XML格式配置文件的根元素是`<beans>`，该元素包含了多个`<bean>`
 |	entry 	|	`<map>` 元素的子元素，用于设置一个键值对。其 key 属性指定字符串类型的键值，ref 或 value 子元素指定其值	|
 
 
-##### Bean的作用域
+##### 2.Bean的作用域
 
 |作用域 | 描述|
 | --- | --- |
@@ -165,7 +165,7 @@ XML格式配置文件的根元素是`<beans>`，该元素包含了多个`<bean>`
 <bean id="accountService" class="com.ioc.service.impl.AccountServiceImpl" scope="singleton"></bean>
 ```
 打印对象：
-```java
+```shell script
 System.out.println(ac.getBean("accountService"));
 System.out.println(ac.getBean("accountService"));
 ```
@@ -188,8 +188,8 @@ com.ioc.service.impl.AccountServiceImpl@26be92ad
 com.ioc.service.impl.AccountServiceImpl@4c70fda8
 ```
 
-##### Bean的生命周期
-[详细参考(http://c.biancheng.net/view/4261.html)](http://c.biancheng.net/view/4261.html)
+##### 3.Bean的生命周期
+
 ```java
 public class AccountServiceImpl implements IAccountService {
 
@@ -240,15 +240,15 @@ saveAccount()执行
 saveAccount()执行
 ```
 
-### Bean实例化3种方式
+### 五、Bean实例化方式
 
-##### 构造器实例化
+##### 1.构造器实例化
 在Spring的配置文件中使用bean标签，配以id和class属性之后，且没有其他属性和标签时。采用的就是默认构造函数创建bean对象，此时如果类中没有默认构造函数，则对象无法创建。
 ```xml
 <bean id="accountService" class="com.kai.service.impl.AccountServiceImpl"/>
 ```
 
-##### 静态工厂方式实例化
+##### 2.静态工厂方式实例化
 使用StaticFactory类中的静态方法createAccountService创建对象，并存入spring容器  
 id属性：指定bean的id，用于从容器中获取  
 class属性：指定静态工厂的全限定类名  
@@ -272,7 +272,7 @@ public class StaticFactory {
 <bean id="accountService" class="com.kai.factory.StaticFactory" factory-method="createAccountService"></bean>
 ```
 
-##### 实例工厂方式实例化
+##### 3.实例工厂方式实例化
 
 先把工厂的创建交给spring来管理。然后在使用工厂的bean来调用里面的方法。  
 factory-bean属性：用于指定实例工厂bean的id。  
@@ -296,13 +296,13 @@ public class InstanceFactory {
 <bean id="accountService" factory-bean="instanceFactory" factory-method="createAccountService"></bean>
 ```
 
-### 什么是依赖注入？
+### 六、什么是依赖注入？
 
 之前我们已经知道，将被调用者的实例交由 Spring容器创建，即是控制反转；而Spring容器在创建被调用者的实例时，会自动将调用者需要的对象实例注入给调用者，这样，调用者通过 Spring容器获得被调用者实例，这称为依赖注入。
 
 依赖注入主要有两种实现方式，分别是属性 set方法注入 和 构造方法注入。
 
-##### set方法注入
+##### 1.set方法注入
 ```java
 public class AccountServiceImpl implements IAccountService {
 
@@ -351,7 +351,7 @@ XML配置文件：
     <bean id="now" class="java.util.Date"></bean>
 ```
 
-##### 构造方法注入
+##### 2.构造方法注入
 ```java
 public class AccountServiceImpl implements IAccountService {
 
@@ -397,7 +397,7 @@ public class AccountServiceImpl implements IAccountService {
     <bean id="now" class="java.util.Date"></bean>
 ```
 
-##### 复杂类型的注入/集合类型的注入
+##### 6.复杂类型的注入/集合类型的注入
 ```java
 @Data
 public class AccountServiceImpl3 implements IAccountService {
@@ -465,9 +465,9 @@ map  props
     </bean>
 ```
 
-### 注解装配Bean
+### 七、注解装配Bean
 
-##### 常用注解：
+##### 1.常用注解：
 
 |基于注解配置 | 描述 |
 | --- | --- |
@@ -479,14 +479,14 @@ map  props
 | @Resource | 其作用与Autowired一样。其区别在于@Autowired默认按照Bean类型装配，而@Resource默认按照Bean实例名称进行装配。 |
 | @Qualifier | 与 @Autowired 注解配合使用，会将默认的按 Bean 类型装配修改为按 Bean 的实例名称装配，Bean的实例名称由 @Qualifier 注解的参数指定。 |
 
-下面举一个实例：
-###### 1.创建DAO层接口
+==下面举一个实例：==
+1）创建DAO层接口
 ```java
 public interface UserDao {
     public void save();
 }
 ```
-###### 2.创建 DAO 层接口的实现类
+2）创建 DAO 层接口的实现类
 ```java
 @Repository("userDao")
 public class UserDaoImpl implements UserDao {
@@ -497,14 +497,14 @@ public class UserDaoImpl implements UserDao {
     }
 }
 ```
-###### 3.创建 Service 层接口
+3）创建 Service 层接口
 ```java
 public interface UserService {
 
     public void save();
 }
 ```
-###### 4. 创建 Service 层接口的实现类
+4）创建 Service 层接口的实现类
 ```java
 @Service("userService")
 public class UserServiceImpl implements UserService {
@@ -522,7 +522,7 @@ public class UserServiceImpl implements UserService {
     }
 }
 ```
-###### 5. 创建UserController
+5）创建UserController
 ```java
 @Controller("userController")
 public class UserController {
@@ -539,7 +539,7 @@ public class UserController {
     }
 }
 ```
-###### 6. 创建 Spring 配置文件
+6）创建 Spring 配置文件
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
@@ -555,7 +555,7 @@ public class UserController {
     <context:component-scan base-package="com.kai.annotation"></context:component-scan>
 </beans>
 ```
-###### 7. 创建测试类
+7）创建测试类
 ```java
 public class UserControllerTests {
 
@@ -572,13 +572,13 @@ public class UserControllerTests {
     }
 }
 ```
-###### 8. 运行程序并查看结果
+8）运行程序并查看结果
 ```shell
 数据访问层的save()方法执行了
 业务层的add()方法执行了
 控制层的add()方法执行了
 ```
-Spring管理Bean方式比较：
+### 八、Spring管理Bean方式比较：
 
 | 管理bean | 基于XML配置| 基于注解配置 |
 | --- | --- | --- |
@@ -592,3 +592,62 @@ Spring管理Bean方式比较：
 配置简单，维护方便（我们找到类，就相当于找到了对应的配置）。  
 XML的优势：   
 修改时，不用改源码。不涉及重新编译和部署。
+
+### 九、Spring新注解
+|注解|说明|
+|---|---|
+|@Configuration|用于指定当前类是一个 Spring 配置类，当创建容器时会从该类上加载注解|
+|@ComponentScan|用于指定 Spring 在初始化容器时要扫描的包。 作用和在 Spring 的 xml 配置文件中的 `<context:component-scan base-package="com.kai"/>`一样|
+|@Bean|解只能写在方法上，表明使用此方法创建一个对象，并且放入 spring 容器|
+|@PropertySource|用于加载.properties 文件中的配置|
+|@Import|用于导入其他配置类|
+
+```java
+@Configuration
+@ComponentScan("com.kai")
+@Import({DataSourceConfiguration.class})
+public class SpringConfiguration {
+}
+```
+
+```java
+@PropertySource("classpath:jdbc.properties")
+public class DataSourceConfiguration {
+    @Value("${jdbc.driver}")
+    private String driver;
+    @Value("${jdbc.url}")
+    private String url;
+    @Value("${jdbc.username}")
+    private String username;
+    @Value("${jdbc.password}")
+    private String password;
+```
+
+```java
+@Bean(name="dataSource")
+public DataSource getDataSource() throws PropertyVetoException { 
+    ComboPooledDataSource dataSource = new ComboPooledDataSource(); 
+    dataSource.setDriverClass(driver);
+    dataSource.setJdbcUrl(url);
+    dataSource.setUser(username);
+    dataSource.setPassword(password);
+    return dataSource;
+}
+```
+
+#####  十、Spring 整合 Junit  
+1、导入spring整合junit的jar(坐标)  
+2、使用Junit提供的一个注解把原有的main方法替换了，替换成spring提供的 @Runwith  
+3、告知spring的运行器，spring和ioc创建是基于xml还是注解的，并且说明位置  
+ @ContextConfiguration  
+* locations：指定xml文件的位置，加上classpath关键字，表示在类路径下
+* classes：指定注解类所在地位置
+
+当我们使用spring 5.x版本的时候，要求junit的jar必须是4.12及以上
+
+
+### 参考资料：
+[spring bean是什么](https://www.awaimai.com/2596.html)
+[Spring Bean的生命周期](http://c.biancheng.net/view/4261.html)
+[Spring IoC 详解](https://www.cnblogs.com/wmyskxz/p/8824597.html)
+[Spring思维导图](https://segmentfault.com/a/1190000017348726)

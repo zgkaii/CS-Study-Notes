@@ -11,7 +11,6 @@ is org.springframework.beans.BeanInstantiationException: Failed to instantiate [
 nested exception is java.lang.NoClassDefFoundError: org/aspectj/weaver/reflect/ReflectionWorld$ReflectionWorldException
 
 ```
-
 缺少jar包
 ```xml
         <dependency>
