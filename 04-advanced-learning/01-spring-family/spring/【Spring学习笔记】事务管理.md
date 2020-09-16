@@ -174,8 +174,8 @@ CREATE TABLE account (
     username VARCHAR(20) NOT NULL,
     money INT DEFAULT NULL
 );
-INSERT INTO account VALUES (1,'张三',1000);
-INSERT INTO account VALUES (2,'李四',1000);
+INSERT INTO account VALUES (1,'zhangsan',1000);
+INSERT INTO account VALUES (2,'lisi',1000);
 ```
 ##### 2.引入数据源
 创建c3p0-db.properties 的配置文件
@@ -322,10 +322,12 @@ public class AccountServiceImpl implements AccountService {
         ApplicationContext applicationContext = new ClassPathXmlApplicationContext("XmlBean.xml");
         AccountService accountService = (AccountService) applicationContext
                 .getBean("accountService");
-        accountService.transfer("张三", "李四", 100);
+        accountService.transfer("zhangsan", "lisi", 100);
     }
 ```
-查看测试结果：
+查看测试结果：  
+![](https://img-blog.csdnimg.cn/20200916085600448.png#pic_center)
+
 ### 七、基于Annotation实现事务管理
 ##### 1.创建配置文件AnnotationBean.xml
 ```xml
@@ -400,10 +402,11 @@ public class UserServiceImpl implements UserService {
         ApplicationContext applicationContext = new ClassPathXmlApplicationContext("AnnotationBean.xml");
         UserService userService = (UserService) applicationContext
                 .getBean("userService");
-        userService.transfer("张三", "李四", 100);
+        userService.transfer("zhangsan", "liis", 100);
     }
 ```
-测试结果：
+测试结果：  
+![](https://img-blog.csdnimg.cn/20200916085822632.png#pic_center)
 ### 八、配置数据源
 ##### 1. 配置 C3P0 数据源
 ```xml
