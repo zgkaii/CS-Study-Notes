@@ -219,6 +219,102 @@ Name: archetypeCatalog
 Value: internal  
 ![](https://img-blog.csdnimg.cn/20200916104432764.png#pic_center)
 
+##### 2.常用注解
+1）@RequestParam
+* 作用：把请求中的指定名称的参数传递给控制器中的形参赋值  
+* 属性：  
+value：请求参数中的名称  
+required：请求参数中是否必须提供此参数。默认值：true。表示必须提供，如果不提供将报错。
+```jsp
+<a href="anno/testRequestParam?name=lisi">RequestParam</a>
+```
+```java
+    @RequestMapping("/testRequestParam")
+    public String testRequestParam(@RequestParam(name = "name") String username) {
+        System.out.println("Finished...");
+        System.out.println(username);
+        return "success";
+    }
+```
+2）@RequestBody
+* 作用：用于获取请求体的内容（注意：get方法不可以）
+* 属性：
+required：是否必须有请求体，默认值是true。当取值为 true 时,get 请求方式会报错。如果取值为 false，get 请求得到是 null。
+
+```jsp
+
+```
+```java
+
+```
+4）@PathVaribale
+作用：  
+用于绑定 url 中的占位符。例如：请求 url 中 /delete/{id}，这个{id}就是 url 占位符。  
+url 支持占位符是 spring3.0 之后加入的。是 springmvc 支持 rest 风格 URL 的一个重要标志。  
+属性：  
+value：用于指定 url 中占位符名称。  
+required：是否必须提供占位符。  
+```jsp
+
+```
+```java
+
+```
+5）@RequestHeader
+作用：  
+用于获取请求消息头。
+属性：  
+value：提供消息头名称  
+required：是否必须有此消息头  
+注：  
+在实际开发中一般不怎么用  
+```jsp
+
+```
+```java
+
+```
+6）@CookieValue
+作用：  
+用于把指定 cookie 名称的值传入控制器方法参数。  
+属性：  
+value：指定 cookie 的名称。  
+required：是否必须有此 cookie。  
+```jsp
+
+```
+```java
+
+```
+7）@ModelAttribute
+作用：  
+该注解是 SpringMVC4.3 版本以后新加入的。它可以用于修饰方法和参数。  
+出现在方法上，表示当前方法会在控制器的方法执行之前，先执行。它可以修饰没有返回值的方法，也可以修饰有具体返回值的方法。  
+出现在参数上，获取指定的数据给参数赋值。  
+属性：  
+value：用于获取数据的 key。key 可以是 POJO 的属性名称，也可以是 map 结构的 key。  
+应用场景：  
+当表单提交数据不是完整的实体类数据时，保证没有提交数据的字段使用数据库对象原来的数据。
+例如：  
+我们在编辑一个用户时，用户有一个创建信息字段，该字段的值是不允许被修改的。在提交表单数据是肯定没有此字段的内容，一旦更新会把该字段内容置为 null，此时就可以使用此注解解决问题。
+```jsp
+
+```
+```java
+
+```
+8）@SessionAttribute
+作用：  
+用于多次执行控制器方法间的参数共享。  
+属性：  
+value：用于指定存入的属性名称；  
+type：用于指定存入的数据类型。  
+```jsp
+
+```
+```java
+
+```
 ### 参考资料
 [三层架构与MVC模式](https://www.cnblogs.com/zdxster/p/5305187.html)
 [SpringMVC执行原理](https://blog.csdn.net/GavinLi2588/article/details/78696867)
