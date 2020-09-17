@@ -242,10 +242,19 @@ required：请求参数中是否必须提供此参数。默认值：true。表�
 required：是否必须有请求体，默认值是true。当取值为 true 时,get 请求方式会报错。如果取值为 false，get 请求得到是 null。
 
 ```jsp
-
+    <form action="anno/testRequestBody" method="post">
+        用户姓名：<input type="text" name="username"/><br/>
+        用户年龄：<input type="text" name="age"/><br/>
+        用户年龄：<input type="text" name="sex"/><br/>
+        <input type="submit" value="提交"/>
 ```
 ```java
-
+    @RequestMapping("/testRequestBody")
+    public String testRequestBody(@RequestBody String body) {
+        System.out.println("Finished...");
+        System.out.println(body);
+        return "success";
+    }
 ```
 4）@PathVaribale
 作用：  
@@ -255,10 +264,15 @@ url 支持占位符是 spring3.0 之后加入的。是 springmvc 支持 rest 风
 value：用于指定 url 中占位符名称。  
 required：是否必须提供占位符。  
 ```jsp
-
+    <a href="anno/testPathVariable/10">testPathVariable</a>
 ```
 ```java
-
+    @RequestMapping(value = "/testPathVariable/{sid}")
+    public String testPathVariable(@PathVariable(name = "sid") String id) {
+        System.out.println("Finished...");
+        System.out.println(id);
+        return "success";
+    }
 ```
 5）@RequestHeader
 作用：  
@@ -269,10 +283,17 @@ required：是否必须有此消息头
 注：  
 在实际开发中一般不怎么用  
 ```jsp
-
+    <a href="anno/testRequestHeader">RequestHeader</a>
 ```
 ```java
-
+    @RequestMapping(value = "/testRequestHeader")
+    public String testRequestHeader(@RequestHeader(value = "Accept") String header, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        System.out.println("Finished...");
+        System.out.println(header);
+        // return "success";
+        // response.sendRedirect(request.getContextPath()+"/anno/testCookieValue");
+        return "redirect:/param.jsp";
+    }
 ```
 6）@CookieValue
 作用：  
@@ -281,10 +302,15 @@ required：是否必须有此消息头
 value：指定 cookie 的名称。  
 required：是否必须有此 cookie。  
 ```jsp
-
+    <a href="anno/testCookieValue">CookieValue</a>
 ```
 ```java
-
+    @RequestMapping(value = "/testCookieValue")
+    public String testCookieValue(@CookieValue(value = "JSESSIONID") String cookieValue) {
+        System.out.println("Finished...");
+        System.out.println(cookieValue);
+        return "success";
+    }
 ```
 7）@ModelAttribute
 作用：  
@@ -298,10 +324,35 @@ value：用于获取数据的 key。key 可以是 POJO 的属性名称，也可�
 例如：  
 我们在编辑一个用户时，用户有一个创建信息字段，该字段的值是不允许被修改的。在提交表单数据是肯定没有此字段的内容，一旦更新会把该字段内容置为 null，此时就可以使用此注解解决问题。
 ```jsp
+    ${ msg }
 
+    ${sessionScope}
+```
+```jsp
+    <form action="anno/testModelAttribute" method="post">
+        用户姓名：<input type="text" name="uname"/><br/>
+        用户年龄：<input type="text" name="age"/><br/>
+        <input type="submit" value="提交"/>
+    </form>
 ```
 ```java
+    @RequestMapping(value = "/testModelAttribute")
+    public String testModelAttribute(@ModelAttribute("abc") User user) {
+        System.out.println("testModelAttribute Finished...");
+        System.out.println(user);
+        return "success";
+    }
 
+    @ModelAttribute
+    public void showUser(String name, Map<String, User> map) {
+        System.out.println("showUser Finished...");
+        // 通过用户查询数据库（模拟）
+        User user = new User();
+        user.setName(name);
+        user.setAge(20);
+        user.setDate(new Date());
+        map.put("abc", user);
+    }
 ```
 8）@SessionAttribute
 作用：  
@@ -310,11 +361,85 @@ value：用于获取数据的 key。key 可以是 POJO 的属性名称，也可�
 value：用于指定存入的属性名称；  
 type：用于指定存入的数据类型。  
 ```jsp
-
+    <a href="anno/testSessionAttributes">testSessionAttributes</a>
+    <a href="anno/getSessionAttributes">getSessionAttributes</a>
+    <a href="anno/delSessionAttributes">delSessionAttributes</a>
 ```
 ```java
+    /**
+     * SessionAttributes的注解
+     *
+     * @return
+     */
+    @RequestMapping(value = "/testSessionAttributes")
+    public String testSessionAttributes(Model model) {
+        System.out.println("testSessionAttributes...");
+        // 底层会存储到request域对象中
+        model.addAttribute("msg", "美美");
+        return "success";
+    }
 
+    /**
+     * 获取值
+     *
+     * @param modelMap
+     * @return
+     */
+    @RequestMapping(value = "/getSessionAttributes")
+    public String getSessionAttributes(ModelMap modelMap) {
+        System.out.println("getSessionAttributes...");
+        String msg = (String) modelMap.get("msg");
+        System.out.println(msg);
+        return "success";
+    }
+
+    /**
+     * 清除
+     *
+     * @param status
+     * @return
+     */
+    @RequestMapping(value = "/delSessionAttributes")
+    public String delSessionAttributes(SessionStatus status) {
+        System.out.println("getSessionAttributes...");
+        status.setComplete();
+        return "success";
+    }
 ```
+
+##### 3.REST 风格 URL
+1）什么是 rest：
+REST（英文：Representational State Transfer，简称 REST）描述了一个架构样式的网络系统，
+比如 web 应用程序。它首次出现在 2000 年 Roy Fielding 的博士论文中，他是 HTTP 规范的主要编写者之
+一。在目前主流的三种 Web 服务交互方案中，REST 相比于 SOAP（Simple Object Access protocol，简单
+对象访问协议）以及 XML-RPC 更加简单明了，无论是对 URL 的处理还是对 Payload 的编码，REST 都倾向于用更
+加简单轻量的方法设计和实现。值得注意的是 REST 并没有一个明确的标准，而更像是一种设计的风格。
+它本身并没有什么实用性，其核心价值在于如何设计出符合 REST 风格的网络接口。
+
+2）restful 的优点  
+它结构清晰、符合标准、易于理解、扩展方便，所以正得到越来越多网站的采用。
+3）restful 的特性：  
+资源（Resources）：  
+网络上的一个实体，或者说是网络上的一个具体信息。  
+它可以是一段文本、一张图片、一首歌曲、一种服务，总之就是一个具体的存在。可以用一个 URI（统一
+资源定位符）指向它，每种资源对应一个特定的 URI 。要获取这个资源，访问它的 URI 就可以，因此 URI 即为每一个资源的独一无二的识别符。  
+
+表现层（Representation）：  
+把资源具体呈现出来的形式，叫做它的表现层 （Representation）。  
+比如，文本可以用 txt 格式表现，也可以用 HTML 格式、XML 格式、JSON 格式表现，甚至可以采用二进制格式。  
+
+状态转化（State Transfer）：  
+每发出一个请求，就代表了客户端和服务器的一次交互过程。  
+HTTP 协议，是一个无状态协议，即所有的状态都保存在服务器端。因此，如果客户端想要操作服务器，
+必须通过某种手段，让服务器端发生“状态转化”（State Transfer）。而这种转化是建立在表现层之上的，所以
+就是 “表现层状态转化”。具体说，就是 HTTP 协议里面，四个表示操作方式的动词：GET 、POST 、PUT、
+DELETE。它们分别对应四种基本操作：GET 用来获取资源，POST 用来新建资源，PUT 用来更新资源，DELETE 用来
+删除资源。  
+
+restful 的示例：    
+/account/1 HTTP GET ： 得到 id = 1 的 account  
+/account/1 HTTP DELETE： 删除 id = 1 的 account  
+/account/1 HTTP PUT： 更新 id = 1 的 account   
 ### 参考资料
 [三层架构与MVC模式](https://www.cnblogs.com/zdxster/p/5305187.html)
 [SpringMVC执行原理](https://blog.csdn.net/GavinLi2588/article/details/78696867)
