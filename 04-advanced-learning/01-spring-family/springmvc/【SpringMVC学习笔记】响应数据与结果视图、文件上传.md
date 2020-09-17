@@ -191,7 +191,7 @@ JSON（JavaScript Object Notation, JS 对象标记）是一种轻量级的数据
 
 #### 2.@ResponseBody响应json数据
 
-##### 1.mvc:resources标签配置不过滤
+##### mvc:resources标签配置不过滤
 * location元素表示webapp目录下的包下的所有文件
 * mapping元素表示以/static开头的所有请求路径，如/static/xx 或者/static/a/xx
 ```xml
@@ -200,7 +200,7 @@ JSON（JavaScript Object Notation, JS 对象标记）是一种轻量级的数据
     <mvc:resources location="/images/" mapping="/images/**"/>
     <mvc:resources location="/js/" mapping="/js/**"/>
 ```
-##### 2.使用@RequestBody获取请求体数据
+##### 使用@RequestBody获取请求体数据
 ```jsp
 <script src="js/jquery.min.js"></script>
 
@@ -298,7 +298,182 @@ JSON（JavaScript Object Notation, JS 对象标记）是一种轻量级的数据
 结果：  
 ![](https://img-blog.csdnimg.cn/2020091717200944.png)
 
+### 四、文件上传
+##### 1.传统文件上传
+（1）导入依赖
+```xml
+    <dependency>
+      <groupId>commons-fileupload</groupId>
+      <artifactId>commons-fileupload</artifactId>
+      <version>1.3.1</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.4</version>
+    </dependency>
+```
+（2）编写jsp文件
+```jsp
+    <h3>传统文件上传</h3>
+
+    <form action="/user/fileupload1" method="post" enctype="multipart/form-data">
+        选择文件：<input type="file" name="upload" /><br/>
+        <input type="submit" value="上传" />
+    </form>
+```
+（3） 编写文件上传的Controller控制器
+```java
+    @RequestMapping("/fileupload1")
+    public String fileuoload1(HttpServletRequest request) throws Exception {
+        System.out.println("文件上传...");
+
+        // 使用fileupload组件完成文件上传
+        // 上传的位置
+        String path = request.getSession().getServletContext().getRealPath("/uploads/");
+        // 判断，该路径是否存在
+        File file = new File(path);
+        if(!file.exists()){
+            // 创建该文件夹
+            file.mkdirs();
+        }
+
+        // 解析request对象，获取上传文件项
+        DiskFileItemFactory factory = new DiskFileItemFactory();
+        ServletFileUpload upload = new ServletFileUpload(factory);
+        // 解析request
+        List<FileItem> items = upload.parseRequest(request);
+        // 遍历
+        for(FileItem item:items){
+            // 进行判断，当前item对象是否是上传文件项
+            if(item.isFormField()){
+                // 说明普通表单向
+            }else{
+                // 说明上传文件项
+                // 获取上传文件的名称
+                String filename = item.getName();
+                // 把文件的名称设置唯一值，uuid
+                String uuid = UUID.randomUUID().toString().replace("-", "");
+                filename = uuid+"_"+filename;
+                // 完成文件上传
+                item.write(new File(path,filename));
+                // 删除临时文件
+                item.delete();
+            }
+        }
+        return "success";
+    }
+```
+
+
+
+##### 2. SpringMVC文件上传
+SpringMVC框架提供了MultipartFile对象，该对象表示上传的文件，要求变量名称必须和表单file标签的
+name属性名称相同。
+（1）编写jsp表单
+```jsp
+    <h3>Springmvc文件上传</h3>
+
+    <form action="/user/fileupload2" method="post" enctype="multipart/form-data">
+        选择文件：<input type="file" name="upload" /><br/>
+        <input type="submit" value="上传" />
+    </form>
+```
+（2）编写文件上传的Controller控制器
+```java
+    @RequestMapping("/fileupload2")
+    public String fileuoload2(HttpServletRequest request, MultipartFile upload) throws Exception {
+        System.out.println("springmvc文件上传...");
+
+        // 使用fileupload组件完成文件上传
+        // 上传的位置
+        String path = request.getSession().getServletContext().getRealPath("/uploads/");
+        // 判断，该路径是否存在
+        File file = new File(path);
+        if(!file.exists()){
+            // 创建该文件夹
+            file.mkdirs();
+        }
+
+        // 说明上传文件项
+        // 获取上传文件的名称
+        String filename = upload.getOriginalFilename();
+        // 把文件的名称设置唯一值，uuid
+        String uuid = UUID.randomUUID().toString().replace("-", "");
+        filename = uuid+"_"+filename;
+        // 完成文件上传
+        upload.transferTo(new File(path,filename));
+
+        return "success";
+    }
+```
+（3）配置文件解析器
+```xml
+    <!--配置文件解析器对象-->
+    <bean id="multipartResolver"
+          class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!--- 设置上传文件的最大尺寸为 10MB -->
+        <property name="maxUploadSize" value="10485760" />
+    </bean>
+```
+==注意==  
+文件上传的解析器 id 是固定的（multipartResolver），不能起别的名称，否则无法实现请求参数的绑定。（不光是文件，其他
+字段也将无法绑定）
+##### 3. SpringMVC跨服务器方式文件上传
+备两个 tomcat 服务器，并创建一个用于存放图片的 web 工程。
+（1）导入开发需要的jar包
+```xml
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-core</artifactId>
+      <version>1.18.1</version>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-client</artifactId>
+      <version>1.18.1</version>
+    </dependency>
+
+```
+（2）编写jsp表单
+```jsp
+    <h3>跨服务器文件上传</h3>
+
+    <form action="/user/fileupload3" method="post" enctype="multipart/form-data">
+        选择文件：<input type="file" name="upload" /><br/>
+        <input type="submit" value="上传" />
+    </form>
+```
+（2）编写文件上传的Controller控制器
+```java
+    @RequestMapping("/fileupload3")
+    public String fileuoload3(MultipartFile upload) throws Exception {
+        System.out.println("跨服务器文件上传...");
+
+        // 定义上传文件服务器路径
+        String path = "http://localhost:9090/uploads/";
+
+        // 说明上传文件项
+        // 获取上传文件的名称
+        String filename = upload.getOriginalFilename();
+        // 把文件的名称设置唯一值，uuid
+        String uuid = UUID.randomUUID().toString().replace("-", "");
+        filename = uuid+"_"+filename;
+
+        // 创建客户端的对象
+        Client client = Client.create();
+
+        // 和图片服务器进行连接
+        WebResource webResource = client.resource(path + filename);
+
+        // 上传文件
+        webResource.put(upload.getBytes());
+
+        return "success";
+    }
+```
 
 ### 参考资料
-[HTTP中的重定向和请求转发的区别](https://blog.csdn.net/meiyalei/article/details/2129120)
-[重定向与转发](https://www.liaoxuefeng.com/wiki/1252599548343744/1328761739935778)
+[HTTP中的重定向和请求转发的区别](https://blog.csdn.net/meiyalei/article/details/2129120)  
+[重定向与转发](https://www.liaoxuefeng.com/wiki/1252599548343744/1328761739935778)  
+[Spring MVC 上传文件(upload files)](https://blog.csdn.net/suifeng3051/article/details/51659731)
