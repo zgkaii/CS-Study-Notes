@@ -1,20 +1,16 @@
-## Config约束与Mapper约束
-1.Config:
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE configuration  
-  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"  
-  "http://mybatis.org/dtd/mybatis-3-config.dtd">
-```
+## 【MyBatis学习笔记】入门案例
+### 一、概述
+MyBatis 是一个优秀的基于 java 的持久层框架，它内部封装了 jdbc，使开发者只需要关注 sql 语句本身，
+而不需要花费精力去处理加载驱动、创建连接、创建 statement 等繁杂的过程。  
+MyBatis 通过 xml 或注解的方式将要执行的各种 statement 配置起来，并通过 java 对象和 statement 中
+sql 的动态参数进行映射生成最终执行的 sql 语句，最后由 MyBatis 框架执行 sql 并将结果映射为 java 对象并
+返回。  
+采用 ORM 思想解决了实体和数据库映射的问题，对 jdbc 进行了封装，屏蔽了 jdbc api 底层访问细节，使我
+们不用与 jdbc api 打交道，就可以完成对数据库的持久化操作。  
+为了我们能够更好掌握框架运行的内部过程，并且有更好的体验，下面我们将从自定义 MyBatis 框架开始来
+学习框架。此时我们将会体验框架从无到有的过程体验，也能够很好的综合前面阶段所学的基础。  
 
-2.Mapper:
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper  
-  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
-  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-```
-## 搭建MyBatis开发环境
+### 二、基于xml配置的MyBatis
 ##### 1.创建maven工程
 ```
 GroupId:com.kai
@@ -72,7 +68,7 @@ public interface UserDao {
     List<User> findAll();
 }
 ```
-##### 5.编写持久层接口的映射文件 IUserDao.xml 
+##### 5.编写持久层接口的映射文件 UserDao.xml 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper
@@ -166,9 +162,10 @@ public class MybatisTest {
     }
 }
 ```
-## 基于注解的 mybatis 使用
-##### 1.移除持久层接口的映射文件 IUserDao.xml 
-##### 2. 在持久层接口中添加注解 
+### 三、基于注解配置的MyBatis
+##### 1.移除持久层接口的映射文件
+删除 UserDao.xml 
+##### 2.在持久层接口中添加注解 
 ```java
 public interface UserDao {
     /**
@@ -187,4 +184,55 @@ public interface UserDao {
     </mappers>
 ```
 
-![mybatis](https://img-blog.csdnimg.cn/20200902071539603.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0tBSVpfTEVBUk4=,size_16,color_FFFFFF,t_70#pic_center)
+![mybatis](https://img-blog.csdnimg.cn/20200902071539603.png)
+
+
+
+
+
+
+
+### 附录
+##### 1、Config约束与Mapper约束
+* Config:
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration  
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"  
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+```
+
+* Mapper:
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+```
+
+##### 2.MyBatis配置文件详解
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration><!-- 配置 -->
+    <properties /><!-- 属性 -->
+    <settings /><!-- 全局配置参数 -->
+    <typeAliases /><!-- 类型别名 -->
+    <typeHandlers /><!-- 类型处理器 -->
+    <objectFactory /><!-- 对象工厂 -->
+    <plugins /><!-- 插件 -->
+    <environments><!-- 环境集合属性对象 -->
+        <environment><!-- 环境子属性对象 -->
+            <transactionManager /><!-- 事务管理器 -->
+            <dataSource /><!-- 数据源 -->
+        </environment>
+    </environments>
+    <databaseIdProvider /><!-- 数据库厂商标识 -->
+    <mappers /><!-- 映射器 -->
+</configuration>
+```
+
+### 参考资料
+[Mybatis](https://blog.csdn.net/isea533/category_2092001.html)  
+[MyBatis入门](http://c.biancheng.net/mybatis/)
