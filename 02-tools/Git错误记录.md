@@ -92,4 +92,4 @@ d  -----删除未被添加到git的路径中的文件
 f  -----强制运行   
 
 
-[转载于](https://blog.51cto.com/qiangsh/1769956)
+[Git错误总结](https://blog.51cto.com/qiangsh/1769956)
