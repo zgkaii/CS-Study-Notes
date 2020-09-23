@@ -400,18 +400,17 @@ public class MyMvcConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-       // super.addViewControllers(registry);
-        //浏览器发送 /atguigu 请求来到 success
-        registry.addViewController("/atguigu").setViewName("success");
+        //浏览器发送 /kai 请求来到 success
+        registry.addViewController("/kai").setViewName("success");
     }
 }
 ```
 
 原理：
 
-​	1）、WebMvcAutoConfiguration是SpringMVC的自动配置类
+​	1）WebMvcAutoConfiguration是SpringMVC的自动配置类
 
-​	2）、在做其他自动配置时会导入；@Import(**EnableWebMvcConfiguration**.class)
+​	2）在做其他自动配置时会导入；@Import(**EnableWebMvcConfiguration**.class)
 
 ```java
     @Configuration
@@ -434,9 +433,9 @@ public class MyMvcConfig extends WebMvcConfigurerAdapter {
 	}
 ```
 
-​	3）、容器中所有的WebMvcConfigurer都会一起起作用；
+​	3）容器中所有的WebMvcConfigurer都会一起起作用；
 
-​	4）、我们的配置类也会被调用；
+​	4）我们的配置类也会被调用；
 
 ​	效果：SpringMVC的自动配置和我们的扩展配置都会起作用；
 
@@ -444,7 +443,7 @@ public class MyMvcConfig extends WebMvcConfigurerAdapter {
 
 SpringBoot对SpringMVC的自动配置不需要了，所有都是我们自己配置；所有的SpringMVC的自动配置都失效了
 
-**我们需要在配置类中添加@EnableWebMvc即可；**
+**在配置类中添加@EnableWebMvc即可；**
 
 ```java
 //使用WebMvcConfigurerAdapter可以来扩展SpringMVC的功能
@@ -472,14 +471,14 @@ public class MyMvcConfig extends WebMvcConfigurerAdapter {
 public @interface EnableWebMvc {
 ```
 
-2）、
+——>
 
 ```java
 @Configuration
 public class DelegatingWebMvcConfiguration extends WebMvcConfigurationSupport {
 ```
 
-3）、
+——>
 
 ```java
 @Configuration
@@ -494,9 +493,9 @@ public class DelegatingWebMvcConfiguration extends WebMvcConfigurationSupport {
 public class WebMvcAutoConfiguration {
 ```
 
-4）、@EnableWebMvc将WebMvcConfigurationSupport组件导入进来；
+2）@EnableWebMvc将WebMvcConfigurationSupport组件导入进来；
 
-5）、导入的WebMvcConfigurationSupport只是SpringMVC最基本的功能；
+3）导入的WebMvcConfigurationSupport只是SpringMVC最基本的功能；
 
 
 
@@ -512,7 +511,7 @@ public class WebMvcAutoConfiguration {
 
 ## 六、RestfulCRUD
 
-### 1）、默认访问首页
+### 1、默认访问首页
 
 ```java
 
@@ -524,8 +523,8 @@ public class MyMvcConfig extends WebMvcConfigurerAdapter {
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
        // super.addViewControllers(registry);
-        //浏览器发送 /atguigu 请求来到 success
-        registry.addViewController("/atguigu").setViewName("success");
+        //浏览器发送 /kai 请求来到 success
+        registry.addViewController("/kai").setViewName("success");
     }
 
     //所有的WebMvcConfigurerAdapter组件都会一起起作用
@@ -544,25 +543,25 @@ public class MyMvcConfig extends WebMvcConfigurerAdapter {
 
 ```
 
-### 2）、国际化
+### 2、国际化
 
-**1）、编写国际化配置文件；**
+  **1. 编写国际化配置文件；**
 
-2）、使用ResourceBundleMessageSource管理国际化资源文件
+2. 使用ResourceBundleMessageSource管理国际化资源文件
 
-3）、在页面使用fmt:message取出国际化内容
+3. 在页面使用fmt:message取出国际化内容
 
 
 
 步骤：
 
-1）、编写国际化配置文件，抽取页面需要显示的国际化消息
+1）编写国际化配置文件，抽取页面需要显示的国际化消息
 
-![](images/搜狗截图20180211130721.png)
+![](https://img-blog.csdnimg.cn/20200923204903441.png)
 
 
 
-2）、SpringBoot自动配置好了管理国际化资源文件的组件；
+2）SpringBoot自动配置好了管理国际化资源文件的组件；
 
 ```java
 @ConfigurationProperties(prefix = "spring.messages")
@@ -597,11 +596,7 @@ public class MessageSourceAutoConfiguration {
 
 
 
-3）、去页面获取国际化的值；
-
-![](images/搜狗截图20180211134506.png)
-
-
+3）去页面获取国际化的值；
 
 ```html
 <!DOCTYPE html>
@@ -666,7 +661,7 @@ public class MessageSourceAutoConfiguration {
 默认的就是根据请求头带来的区域信息获取Locale进行国际化
 ```
 
-4）、点击链接切换国际化
+4）点击链接切换国际化
 
 ```java
 /**
@@ -701,18 +696,18 @@ public class MyLocaleResolver implements LocaleResolver {
 
 ```
 
-### 3）、登陆
+### 3、登陆
 
 开发期间模板引擎页面修改以后，要实时生效
 
-1）、禁用模板引擎的缓存
+1）禁用模板引擎的缓存
 
 ```
 # 禁用缓存
 spring.thymeleaf.cache=false 
 ```
 
-2）、页面修改完成以后ctrl+f9：重新编译；
+2）页面修改完成以后ctrl+f9：重新编译；
 
 
 
@@ -724,7 +719,7 @@ spring.thymeleaf.cache=false
 
 
 
-### 4）、拦截器进行登陆检查
+### 4、拦截器进行登陆检查
 
 拦截器
 
@@ -793,11 +788,11 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
     }
 ```
 
-### 5）、CRUD-员工列表
+### 5、CRUD-员工列表
 
 实验要求：
 
-1）、RestfulCRUD：CRUD满足Rest风格；
+1）RestfulCRUD：CRUD满足Rest风格；
 
 URI：  /资源名称/资源标识       HTTP请求方式区分对资源CRUD操作
 
@@ -808,7 +803,7 @@ URI：  /资源名称/资源标识       HTTP请求方式区分对资源CRUD操�
 | 修改 | updateEmp?id=xxx&xxx=xx   | emp/{id}---PUT    |
 | 删除 | deleteEmp?id=1            | emp/{id}---DELETE |
 
-2）、实验的请求架构;
+2）实验的请求架构;
 
 | 实验功能                             | 请求URI | 请求方式 |
 | ------------------------------------ | ------- | -------- |
@@ -820,7 +815,7 @@ URI：  /资源名称/资源标识       HTTP请求方式区分对资源CRUD操�
 | 修改员工                             | emp     | PUT      |
 | 删除员工                             | emp/1   | DELETE   |
 
-3）、员工列表：
+3）员工列表：
 
 #### thymeleaf公共页面元素抽取
 
@@ -863,7 +858,7 @@ insert的公共片段在div标签中
 <div th:replace="footer :: copy"></div>
 <div th:include="footer :: copy"></div>
 
-效果
+效果分别为
 <div>
     <footer>
     &copy; 2011 The Good Thymes Virtual Grocery
@@ -871,11 +866,11 @@ insert的公共片段在div标签中
 </div>
 
 <footer>
-&copy; 2011 The Good Thymes Virtual Grocery
+	&copy; 2011 The Good Thymes Virtual Grocery
 </footer>
 
 <div>
-&copy; 2011 The Good Thymes Virtual Grocery
+	&copy; 2011 The Good Thymes Virtual Grocery
 </div>
 ```
 
@@ -904,7 +899,7 @@ insert的公共片段在div标签中
 <div th:replace="commons/bar::#sidebar(activeUri='emps')"></div>
 ```
 
-### 6）、CRUD-员工添加
+### 6、CRUD-员工添加
 
 添加页面
 
@@ -957,7 +952,7 @@ insert的公共片段在div标签中
 
 默认日期是按照/的方式；
 
-### 7）、CRUD-员工修改
+### 7、CRUD-员工修改
 
 修改添加二合一表单
 
@@ -1006,7 +1001,7 @@ insert的公共片段在div标签中
 </form>
 ```
 
-### 8）、CRUD-员工删除
+### 8、CRUD-员工删除
 
 ```html
 <tr th:each="emp:${emps}">
@@ -1042,11 +1037,11 @@ insert的公共片段在div标签中
 
 ​		1）、浏览器，返回一个默认的错误页面
 
-![](images/搜狗截图20180226173408.png)
+![](https://img-blog.csdnimg.cn/20200923234108145.png)
 
   浏览器发送请求的请求头：
 
-![](images/搜狗截图20180226180347.png)
+![](https://img-blog.csdnimg.cn/20200923234413877.png)
 
 ​		2）、如果是其他客户端，默认响应一个json数据
 
