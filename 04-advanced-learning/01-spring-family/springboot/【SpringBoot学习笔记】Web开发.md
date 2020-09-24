@@ -439,7 +439,7 @@ public class MyMvcConfig extends WebMvcConfigurerAdapter {
 
 ​	效果：SpringMVC的自动配置和我们的扩展配置都会起作用；
 
-### 3、全面接管SpringMVC；
+### 3、全面接管SpringMVC
 
 SpringBoot对SpringMVC的自动配置不需要了，所有都是我们自己配置；所有的SpringMVC的自动配置都失效了
 
@@ -1031,23 +1031,25 @@ insert的公共片段在div标签中
 
 ## 七、错误处理机制
 
-### 1）、SpringBoot默认的错误处理机制
+### 1、SpringBoot默认的错误处理机制
 
 默认效果：
 
-​		1）、浏览器，返回一个默认的错误页面
+​		1. 浏览器，返回一个默认的错误页面
 
 ![](https://img-blog.csdnimg.cn/20200923234108145.png)
 
   浏览器发送请求的请求头：
 
+![](https://img-blog.csdnimg.cn/20200924074049800.png)
+
+
+
+​	2. 如果是其他客户端，默认响应一个json数据
+
 ![](https://img-blog.csdnimg.cn/20200923234413877.png)
 
-​		2）、如果是其他客户端，默认响应一个json数据
-
-![](images/搜狗截图20180226173527.png)
-
-​		![](images/搜狗截图20180226180504.png)
+​		![](https://img-blog.csdnimg.cn/20200924074049815.png)
 
 原理：
 
@@ -1055,7 +1057,7 @@ insert的公共片段在div标签中
 
   	给容器中添加了以下组件
 
-​	1、DefaultErrorAttributes：
+​	（1）DefaultErrorAttributes：
 
 ```java
 帮我们在页面共享信息；
@@ -1073,7 +1075,7 @@ insert的公共片段在div标签中
 
 
 
-​	2、BasicErrorController：处理默认/error请求
+​	（2）BasicErrorController：处理默认/error请求
 
 ```java
 @Controller
@@ -1105,7 +1107,7 @@ public class BasicErrorController extends AbstractErrorController {
 
 
 
-​	3、ErrorPageCustomizer：
+​	（3）ErrorPageCustomizer：
 
 ```java
 	@Value("${error.path:/error}")
@@ -1114,7 +1116,7 @@ public class BasicErrorController extends AbstractErrorController {
 
 
 
-​	4、DefaultErrorViewResolver：
+​	（4）DefaultErrorViewResolver：
 
 ```java
 @Override
@@ -1149,7 +1151,7 @@ public class BasicErrorController extends AbstractErrorController {
 
 ​		一但系统出现4xx或者5xx之类的错误；ErrorPageCustomizer就会生效（定制错误的响应规则）；就会来到/error请求；就会被**BasicErrorController**处理；
 
-​		1）响应页面；去哪个页面是由**DefaultErrorViewResolver**解析得到的；
+​		1）响应页面，去哪个页面是由**DefaultErrorViewResolver**解析得到的；
 
 ```java
 protected ModelAndView resolveErrorView(HttpServletRequest request,
@@ -1165,9 +1167,9 @@ protected ModelAndView resolveErrorView(HttpServletRequest request,
 }
 ```
 
-### 2）、如果定制错误响应：
+### 2、定制错误响应
 
-#### 	**1）、如何定制错误的页面；**
+#### 	**1）、定制错误的页面**
 
 ​			**1）、有模板引擎的情况下；error/状态码;** 【将错误页面命名为  错误状态码.html 放在模板引擎文件夹里面的 error文件夹下】，发生此状态码的错误就会来到  对应的页面；
 
@@ -1187,13 +1189,17 @@ protected ModelAndView resolveErrorView(HttpServletRequest request,
 
 ​				errors：JSR303数据校验的错误都在这里
 
+
+
 ​			2）、没有模板引擎（模板引擎找不到这个错误页面），静态资源文件夹下找；
+
+
 
 ​			3）、以上都没有错误页面，就是默认来到SpringBoot默认的错误提示页面；
 
 
 
-#### 	2）、如何定制错误的json数据；
+#### 	2）、定制错误的json数据
 
 ​		1）、自定义异常处理&返回定制json数据；
 
@@ -1234,7 +1240,7 @@ public class MyExceptionHandler {
     }
 ```
 
-#### 	3）、将我们的定制数据携带出去；
+#### 	3）、将定制数据携带出去
 
 出现错误以后，会来到/error请求，会被BasicErrorController处理，响应出去可以获取的数据是由getErrorAttributes得到的（是AbstractErrorController（ErrorController）规定的方法）；
 
@@ -1262,7 +1268,7 @@ public class MyErrorAttributes extends DefaultErrorAttributes {
 
 最终的效果：响应是自适应的，可以通过定制ErrorAttributes改变需要返回的内容，
 
-![](images/搜狗截图20180228135513.png)
+![](https://img-blog.csdnimg.cn/20200924074049814.png)
 
 
 
@@ -1270,13 +1276,13 @@ public class MyErrorAttributes extends DefaultErrorAttributes {
 
 SpringBoot默认使用Tomcat作为嵌入式的Servlet容器；
 
-![](images/搜狗截图20180301142915.png)
+![](https://img-blog.csdnimg.cn/20200924082246214.png)
 
 
 
 问题？
 
-### 1）、如何定制和修改Servlet容器的相关配置；
+### 1、如何定制和修改Servlet容器的相关配置；
 
 1、修改和server有关的配置（ServerProperties【也是EmbeddedServletContainerCustomizer】）；
 
@@ -1308,7 +1314,7 @@ public EmbeddedServletContainerCustomizer embeddedServletContainerCustomizer(){
 }
 ```
 
-### 2）、注册Servlet三大组件【Servlet、Filter、Listener】
+### 2、注册Servlet三大组件【Servlet、Filter、Listener】
 
 由于SpringBoot默认是以jar包的方式启动嵌入式的Servlet容器来启动SpringBoot的web应用，没有web.xml文件。
 
@@ -1377,7 +1383,7 @@ public ServletRegistrationBean dispatcherServletRegistration(
 
 2）、SpringBoot能不能支持其他的Servlet容器；
 
-### 3）、替换为其他嵌入式Servlet容器
+### 3、替换为其他嵌入式Servlet容器
 
 ![](images/搜狗截图20180302114401.png)
 
@@ -1437,7 +1443,7 @@ Undertow
 </dependency>
 ```
 
-### 4）、嵌入式Servlet容器自动配置原理；
+### 4、嵌入式Servlet容器自动配置原理；
 
 
 
