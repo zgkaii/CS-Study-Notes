@@ -1,18 +1,16 @@
-# 五、Docker
+# 一、Docker
 
 ## 1、简介
 
-**Docker**是一个开源的应用容器引擎；是一个轻量级容器技术；
+**Docker**是一个开源的应用容器引擎，是一个轻量级容器技术；
 
-Docker支持将软件编译成一个镜像；然后在镜像中各种软件做好配置，将镜像发布出去，其他使用者可以直接使用这个镜像；
+Docker支持将软件编译成一个镜像，然后在镜像中各种软件做好配置，将镜像发布出去，其他使用者可以直接使用这个镜像；
 
 运行中的这个镜像称为容器，容器启动是非常快速的。
 
-![](C:/WorkSpace/IdeaProjects/CS-Notes-Kz/04-advanced-learning/01-spring-family/springboot/images/搜狗截图20180303145450.png)
+![](https://img-blog.csdnimg.cn/2020092409511541.png)
 
 
-
-![](C:/WorkSpace/IdeaProjects/CS-Notes-Kz/04-advanced-learning/01-spring-family/springboot/images/搜狗截图20180303145531.png)
 
 ## 2、核心概念
 
@@ -20,55 +18,55 @@ docker主机(Host)：安装了Docker程序的机器（Docker直接安装在操�
 
 docker客户端(Client)：连接docker主机进行操作；
 
-docker仓库(Registry)：用来保存各种打包好的软件镜像；
+docker仓库(Registry)：用来保存各种打包好的软件镜像。[Hub](https://hub.docker.com) 提供了庞大的镜像集合供使用。
 
 docker镜像(Images)：软件打包好的镜像；放在docker仓库中；
 
 docker容器(Container)：镜像启动后的实例称为一个容器；容器是独立运行的一个或一组应用
 
-![](C:/WorkSpace/IdeaProjects/CS-Notes-Kz/04-advanced-learning/01-spring-family/springboot/images/搜狗截图20180303165113.png)
+![](https://img-blog.csdnimg.cn/20200924095458279.png)
 
 使用Docker的步骤：
 
-1）、安装Docker
+1）安装Docker
 
-2）、去Docker仓库找到这个软件对应的镜像；
+2）去Docker仓库找到这个软件对应的镜像；
 
-3）、使用Docker运行这个镜像，这个镜像就会生成一个Docker容器；
+3）使用Docker运行这个镜像，这个镜像就会生成一个Docker容器；
 
-4）、对容器的启动停止就是对软件的启动停止；
+4）对容器的启动停止就是对软件的启动停止；
 
 ## 3、安装Docker
 
-#### 1）、安装linux虚拟机
+#### 1）安装linux虚拟机
 
-​	1）、VMWare、VirtualBox（安装）；
+​	1）VMWare、VirtualBox（安装）；
 
-​	2）、导入虚拟机文件centos7-atguigu.ova；
+​	2）导入虚拟机文件centos7-atguigu.ova；
 
-​	3）、双击启动linux虚拟机;使用  root/ 123456登陆
+​	3）双击启动linux虚拟机;使用  root/ 123456登陆
 
-​	4）、使用客户端连接linux服务器进行命令操作；
+​	4）使用客户端连接linux服务器进行命令操作；
 
-​	5）、设置虚拟机网络；
+​	5）设置虚拟机网络；
 
 ​		桥接网络===选好网卡====接入网线；
 
-​	6）、设置好网络以后使用命令重启虚拟机的网络
+​	6）设置好网络以后使用命令重启虚拟机的网络
 
 ```shell
 service network restart
 ```
 
-​	7）、查看linux的ip地址
+​	7）查看linux的ip地址
 
 ```shell
 ip addr
 ```
 
-​	8）、使用客户端连接linux；
+​	8）使用客户端连接linux；
 
-#### 2）、在linux虚拟机上安装docker
+#### 2）在linux虚拟机上安装docker
 
 步骤：
 
@@ -91,20 +89,32 @@ systemctl stop docker
 
 ## 4、Docker常用命令&操作
 
-### 1）、镜像操作
+### 1）镜像操作
 
-| 操作 | 命令                                            | 说明                                                     |
-| ---- | ----------------------------------------------- | -------------------------------------------------------- |
-| 检索 | docker  search 关键字  eg：docker  search redis | 我们经常去docker  hub上检索镜像的详细信息，如镜像的TAG。 |
-| 拉取 | docker pull 镜像名:tag                          | :tag是可选的，tag表示标签，多为软件的版本，默认是latest  |
-| 列表 | docker images                                   | 查看所有本地镜像                                         |
-| 删除 | docker rmi image-id                             | 删除指定的本地镜像                                       |
+| 操作 | 命令                                              | 说明                                                         |
+| ---- | ------------------------------------------------- | ------------------------------------------------------------ |
+| 检索 | `docker  search 关键字`  eg：docker  search redis | 我们经常去[dockerhub](https://hub.docker.com/)上检索镜像的详细信息，如镜像的TAG。 |
+| 拉取 | docker pull 镜像名:tag                            | tag是可选的，tag表示标签，多为软件的版本，默认是latest       |
+| 列表 | docker images                                     | 查看所有本地镜像                                             |
+| 删除 | docker rmi image-id                               | 删除指定的本地镜像                                           |
 
-https://hub.docker.com/
 
-### 2）、容器操作
 
-软件镜像（QQ安装程序）----运行镜像----产生一个容器（正在运行的软件，运行的QQ）；
+### 2）容器操作
+
+| 操作     | 命令                                                         | 说明                                                         |
+| :------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| 运行     | docker run --name container-name -d image-name <br>eg:docker run –name myredis –d redis | --name：自定义容器名<br>-d：后台运行 <br>image-name:指定镜像模板 |
+| 列表     | docker ps（查看运行中的容器）                                | 加上-a：可以查看所有容器                                     |
+| 停止     | docker stop container-name/container-id                      | 停止当前运行的容器                                           |
+| 启动     | docker start container-name/container-id                     | 启动容器                                                     |
+| 删除     | docker rm container-id                                       | 删除指定容器                                                 |
+| 端口映射 | -p 6379:6379 <br>eg:docker run -d -p 6379:6379 --name myredis docker.io/redis | -p: 主机端口(映射到)容器内部的端口                           |
+| 容器日志 | docker logs container-name/container-id                      | 查看容器的日志                                               |
+
+
+
+实例操作：软件镜像（.exe安装程序）----运行镜像----产生一个容器（正在运行的软件，运行程序）
 
 步骤：
 
@@ -142,9 +152,7 @@ https://docs.docker.com/engine/reference/commandline/docker/
 
 ````
 
-
-
-### 3）、安装MySQL示例
+### 3）安装MySQL示例
 
 ```shell
 docker pull mysql
@@ -209,7 +217,7 @@ docker run --name some-mysql -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql:tag --
 
 
 
-# 六、SpringBoot与数据访问
+# 二、SpringBoot与数据访问
 
 ## 1、JDBC
 
@@ -231,8 +239,8 @@ docker run --name some-mysql -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql:tag --
 spring:
   datasource:
     username: root
-    password: 123456
-    url: jdbc:mysql://192.168.15.22:3306/jdbc
+    password: root
+    url: jdbc:mysql://192.168.56.10:3306/jdbc
     driver-class-name: com.mysql.jdbc.Driver
 ```
 
@@ -277,9 +285,9 @@ static class Generic {
 
 ​	作用：
 
-​		1）、runSchemaScripts();运行建表语句；
+​		1）runSchemaScripts();运行建表语句；
 
-​		2）、runDataScripts();运行插入数据的sql语句；
+​		2）runDataScripts();运行插入数据的sql语句；
 
 默认只需要将文件命名为：
 
@@ -353,17 +361,17 @@ public class DruidConfig {
 		</dependency>
 ```
 
-![](C:/WorkSpace/IdeaProjects/CS-Notes-Kz/04-advanced-learning/01-spring-family/springboot/images/搜狗截图20180305194443.png)
+![](https://img-blog.csdnimg.cn/20200924153338668.png)
 
 步骤：
 
-​	1）、配置数据源相关属性（见上一节Druid）
+​	1）配置数据源相关属性（见上一节Druid）
 
-​	2）、给数据库建表
+​	2）给数据库建表
 
-​	3）、创建JavaBean
+​	3）创建JavaBean
 
-### 	4）、注解版
+### 	4、注解
 
 ```java
 //指定这是一个操作数据库的mapper
@@ -438,7 +446,7 @@ http://www.mybatis.org/spring-boot-starter/mybatis-spring-boot-autoconfigure/
 
 ### 1）、SpringData简介
 
-![](C:/WorkSpace/IdeaProjects/CS-Notes-Kz/04-advanced-learning/01-spring-family/springboot/images/搜狗截图20180306105412.png)
+![](https://img-blog.csdnimg.cn/20200924153518622.png)
 
 ### 2）、整合SpringData JPA
 
@@ -485,7 +493,7 @@ spring:
 
 
 
-# 七、启动配置原理
+# 三、启动配置原理
 
 几个重要的事件回调机制
 
@@ -528,9 +536,9 @@ private void initialize(Object[] sources) {
 }
 ```
 
-![](C:/WorkSpace/IdeaProjects/CS-Notes-Kz/04-advanced-learning/01-spring-family/springboot/images/搜狗截图20180306145727.png)
+![](https://img-blog.csdnimg.cn/20200924153518611.png#pic_center)
 
-![](C:/WorkSpace/IdeaProjects/CS-Notes-Kz/04-advanced-learning/01-spring-family/springboot/images/搜狗截图20180306145855.png)
+![](https://img-blog.csdnimg.cn/20200924153518613.png)
 
 ## 2、运行run方法
 
@@ -691,7 +699,7 @@ public class HelloCommandLineRunner implements CommandLineRunner {
 
 
 
-# 八、自定义starter
+# 四、自定义starter
 
 starter：
 
@@ -729,7 +737,7 @@ mybatis-spring-boot-starter；自定义启动器名-spring-boot-starter
 
 步骤：
 
-1）、启动器模块
+1）启动器模块
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -756,7 +764,7 @@ mybatis-spring-boot-starter；自定义启动器名-spring-boot-starter
 </project>
 ```
 
-2）、自动配置模块
+2）自动配置模块
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
