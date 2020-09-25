@@ -371,7 +371,7 @@ public class DruidConfig {
 
 ​	3）创建JavaBean
 
-### 	4、注解
+​    **4） 注解**
 
 ```java
 //指定这是一个操作数据库的mapper
@@ -428,7 +428,7 @@ public class SpringBoot06DataMybatisApplication {
 }
 ```
 
-### 5）、配置文件版
+ **5）配置文件版**
 
 ```yaml
 mybatis:
@@ -444,15 +444,15 @@ http://www.mybatis.org/spring-boot-starter/mybatis-spring-boot-autoconfigure/
 
 ## 4、整合SpringData JPA
 
-### 1）、SpringData简介
+### 1）SpringData简介
 
 ![](https://img-blog.csdnimg.cn/20200924153518622.png)
 
-### 2）、整合SpringData JPA
+### 2）整合SpringData JPA
 
 JPA:ORM（Object Relational Mapping）；
 
-1）、编写一个实体类（bean）和数据表进行映射，并且配置好映射关系；
+1）编写一个实体类（bean）和数据表进行映射，并且配置好映射关系；
 
 ```java
 //使用JPA注解配置映射关系
@@ -470,7 +470,7 @@ public class User {
     private String email;
 ```
 
-2）、编写一个Dao接口来操作实体类对应的数据表（Repository）
+2）编写一个Dao接口来操作实体类对应的数据表（Repository）
 
 ```java
 //继承JpaRepository来完成对数据库的操作
@@ -479,7 +479,7 @@ public interface UserRepository extends JpaRepository<User,Integer> {
 
 ```
 
-3）、基本的配置JpaProperties
+3）基本的配置JpaProperties
 
 ```yaml
 spring:  

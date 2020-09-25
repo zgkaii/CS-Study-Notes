@@ -1,33 +1,5 @@
 # Object类、常用API
 
-## 主要内容
-
-* Object类
-* Date类
-* DateFormat类
-* Calendar类
-* System类
-* StringBuilder类
-* 包装类
-
-## 学习目标
-
--[ ] 能够说出Object类的特点
--[ ] 能够重写Object类的toString方法
--[ ] 能够重写Object类的equals方法
--[ ] 能够理解Object类的hashCode方法
--[ ] 能够使用日期类输出当前日期
--[ ] 能够使用将日期格式化为字符串的方法
--[ ] 能够使用将字符串转换成日期的方法
--[ ] 能够使用System类的数组复制方法
--[ ] 能够使用System类获取当前毫秒时刻值
--[ ] 能够说出使用StringBuilder类可以解决的问题
--[ ] 能够使用StringBuilder进行字符串拼接操作
--[ ] 能够说出8种基本类型对应的包装类名称
--[ ] 能够说出自动装箱、自动拆箱的概念
--[ ] 能够将字符串转换为对应的基本类型
--[ ] 能够将基本类型转换为对应的字符串
-
 # 一、Object类
 
 ## 1.1 概述
