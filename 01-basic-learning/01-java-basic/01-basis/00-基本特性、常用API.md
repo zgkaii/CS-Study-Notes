@@ -1,48 +1,6 @@
-## 一、Java程序运行过程
+## 一、基础
 
-### 1.1 Java运行过程
-
-Java 程序的运行必须经过**编写**、**编译**和**运行** 3 个步骤。
-
-1）编写：是指在 Java 开发环境中进行程序代码的输入，最终形成后缀名为` .java `的 Java 源文件。
-
-2）编译：是指使用 Java 编译器（`javac.exe`）对源文件进行错误排査的过程，编译后将生成后缀名为` .class `的字节码文件。
-
-3）运行：是指使用 Java 解释器（`java.exe`）将字节码文件翻译成机器代码，执行并显示结果。
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200805155428223.jpg)
-
-### 1.2 JVM、JRE和JDK区别和联系
-
-1. **JDK**（Java Development Kid，Java 开发开源工具包），是整个 Java 的核心，包括了 Java 运行环境 JRE、Java 工具（javac/java/jdb等）和 Java 基础类库（即Java API 包括rt.jar）。
-   JDK的主要作用的5个文件：bin、include、lib、 jre、db。
-
-   
-
-* bin：一堆exe文件，可执行的开发工具， 例如：**javac**、java、javadoc、native2ascii。
-* include：Java 和 JVM交互用的头文件。
-* lib：包含dt.jar + tools.jar 的常用类库，开发依赖包。
-* jre：java运行环境，包括JVM+Java基础&核心类库
-* db：jdk从1.6之后内置的Derby数据库，是一个纯用Java实现的内存数据库，属于Apache的一个开源项目，体积小，免安装，只需要几个小jar包就可以跨平台运行。
-
-
-
-2. **JRE**（Java Runtime Environment，Java 运行环境）是运行JAVA 程序所必须的环境的集合，包含 JVM 标准实现及 Java 核心类库。
-   jre1.8目录包含：
-
-- bin：有**java.exe（解释器）**但没有javac.exe（编译器），无法编译Java程序，但可以运行Java程序，可以把这个bin目录理解成JVM。
-
-- lib：Java基础&核心类库，如rt.jar，也包含JVM运行时需要的类库。
-
-  
-
-3. **JVM**（Java Virtual Machine，Java 虚拟机）是整个 Java 实现跨平台的最核心的部分，能够运行以 Java 语言写作的软件程序。
-   JVM主要负责运行Java编译器编译后的字节码文件（*.class文件）。JVM在执行字节码时，把字节码解释成具体平台上的机器码执行。JVM自己无法执行，必须要联合JRE中的Java基础&核心类库(特别是rt.jar)才能使用。
-
-总的来看，**<font color="red"  size="4">JDK=JRE+多种Java开发工具；JRE=JVM+各种类库。</font>**
-
-## 二、基础
-
-### 2.1 关键字
+### 1.1 关键字
 
 Java 语言目前定义了 51 个关键字，这些**关键字不能作为变量名、类名和方法名**来使用。
 
@@ -52,13 +10,13 @@ Java 语言目前定义了 51 个关键字，这些**关键字不能作为变量
 - 动作：package、import、throw、throws、extends、implements、this、supper、instanceof、new
 - 保留字：true、false、null、goto、const
 
-### 2.2 标识符
+### 1.2 标识符
 
 - 标识符由**数字**（0-9）和**字母**（A-Z和 a-z）、**美元符号**（$）、**下划线**（_）以及 Unicode 字符集中符号大于 0xC0 的所有符号组合构成（各符号之间没有空格）。
 - 标识符的第一个符号为字母、下划线和美元符号，后面可以是任何字母、数字、美元符号或下划线。
 - 标识符区分大小写。
 
-### 2.3 注释
+### 1.3 注释
 
 ```java
 /**
@@ -109,7 +67,7 @@ Picked up JAVA_TOOL_OPTIONS: -Dfile.encoding=gb2312
 
 ![](https://img-blog.csdnimg.cn/20200924223305625.png)
 
-### 2.4 变量
+### 1.4 变量
 
 1）成员变量：
 
@@ -130,7 +88,7 @@ Picked up JAVA_TOOL_OPTIONS: -Dfile.encoding=gb2312
 - 由**static**修饰的变量，实质上即是一个全局变量。
 - 其生命周期取决于类的生命周期。类被垃圾回收机制彻底回收时才会被销毁。
 
-### 2.5 数据类型
+### 1.5 数据类型
 
 | 类型名称     | 关键字  | 占用内存 | 取值范围                                   |
 | ------------ | ------- | -------- | ------------------------------------------ |
@@ -143,7 +101,7 @@ Picked up JAVA_TOOL_OPTIONS: -Dfile.encoding=gb2312
 | 字符型       | char    | 2 字节   | ISO 单一字符集                             |
 | 单元格       | boolean | 1 字节   | true 或 false                              |
 
-### 2.6 运算符
+### 1.6 运算符
 
 1、自增与自减
 前缀自增自减法(`++i`，`--i`)：先进行自增或者自减运算，再进行表达式运算。
@@ -186,7 +144,7 @@ public class Dog extends Animal{
 
 ... ...
 
-### 2.7 流程控制语句
+### 1.7 流程控制语句
 
 1、`foreach`语句
 语法格式如下：
@@ -203,7 +161,7 @@ for(类型 变量名:集合) {
 
 ... ...
 
-### 2.8 数组
+### 1.8 数组
 
 1、声明数组：
 
@@ -245,7 +203,7 @@ type[] arrayName = new type[]{值 1,值 2,值 3,值 4,• • •,值 n};
 type[] arrayName = {值 1,值 2,值 3,...,值 n};
 ```
 
-## 三、Object类
+## 二、Object类
 
 `java.lang.Object`类是Java语言中的根类，即所有类的父类。它中描述的所有方法子类都可以使用。在对象实例化的时候，最终找的父类就是Object。
 
@@ -263,7 +221,7 @@ public class MyClass /*extends Object*/ {
 * `public boolean equals(Object obj)`：指示其他某个对象是否与此对象“相等”。
 * `public static int hashCode(Object o)`：用于返回字符串的哈希码。
 
-### 3.1 toString()
+### 2.1 toString()
 
 `toString`返回该对象的字符串表示，其实该字符串内容就是对象的类型+@+**内存地址值**。
 
@@ -289,7 +247,7 @@ public class Person {
 
 > Tips：在我们直接使用输出语句输出对象名的时候，其实通过该对象调用了其toString()方法。
 
-### 3.2 equals()
+### 2.2 equals()
 
 Object类中的实例方法，调用成员方法equals()并指定参数为另一个对象，则可以判断这两个对象是否是相同的。这里的“相同”有默认和重写两种方式。
 
@@ -345,9 +303,9 @@ public class Test {
 字符串的哈希码为 :734305825
 ```
 
-## 四、日期时间类
+## 三、日期时间类
 
-### 4.1 Date类
+### 3.1 Date类
 
 ` java.util.Date`类表示特定的瞬间，精确到毫秒。
 
@@ -371,7 +329,7 @@ public class DateTest {
 
 > Tips：在使用println方法时，会自动调用Date类中的toString方法。Date类对Object类中的toString方法进行了覆盖重写，所以结果为指定格式的字符串。
 
-### 4.2 DateFormat类
+### 3.2 DateFormat类
 
 `java.text.DateFormat` 是日期/时间格式化子类的抽象类，可以帮我们完成日期和文本之间的转换，也就是可以在Date对象与String对象之间进行来回转换。
 
@@ -439,7 +397,7 @@ public class SimpleDateFormatTest {
 }
 ```
 
-### 4.3 Calendar类
+### 3.3 Calendar类
 
 `java.util.Calendar`是日历类，将所有可能用到的时间信息封装为静态成员变量，更方便获取各个时间属性的。
 
@@ -542,14 +500,14 @@ public class CalendarTest {
 >
 > ​     日期是有大小关系的，时间靠后，时间越大。
 
-## 五、System类
+## 四、System类
 
 `java.lang.System`类中提供了大量的静态方法，可以获取与系统相关的信息或系统级操作，在System类的API文档中，常用的方法有：
 
 - `public static long currentTimeMillis()`：返回以毫秒为单位的当前时间。
 - `public static void arraycopy(Object src, int srcPos, Object dest, int destPos, int length)`：将数组中指定的数据拷贝到另一个数组中。
 
-### 5.1 currentTimeMillis方法
+### 4.1 currentTimeMillis方法
 
 实际上，currentTimeMillis方法就是 获取当前系统时间与1970年01月01日00:00点之间的毫秒差值
 
@@ -577,7 +535,7 @@ public class Test {
 }
 ~~~
 
-### 5.2 arraycopy方法
+### 4.2 arraycopy方法
 
 数组的拷贝动作是系统级的，性能很高。System.arraycopy方法具有5个参数，含义分别为：
 
@@ -603,9 +561,9 @@ public class ArrayCopyTest {
 }
 ```
 
-## 六、StringBuilder类
+## 五、StringBuilder类
 
-### 6.1 字符串拼接问题
+### 5.1 字符串拼接问题
 
 由于String类的对象内容不可改变，所以每当进行字符串拼接时，总是会在内存中创建一个新的对象。例如：
 
@@ -625,7 +583,7 @@ public class StringDemo {
 
 由此可知，如果对字符串进行拼接操作，每次拼接，都会构建一个新的String对象，既耗时，又浪费空间。为了解决这一问题，可以使用`java.lang.StringBuilder`类。
 
-### 6.2 StringBuilder概述
+### 5.2 StringBuilder概述
 
 查阅`java.lang.StringBuilder`的API，StringBuilder又称为可变字符序列，它是一个类似于 String 的字符串缓冲区，通过某些方法调用可以改变该序列的长度和内容。
 
@@ -633,7 +591,7 @@ public class StringDemo {
 
 它的内部拥有一个数组用来存放字符串内容，进行字符串拼接时，直接在数组中加入新内容。StringBuilder会自动维护数组的扩容。原理如下图所示：(默认16字符空间，超过自动扩充)
 
-### 6.3 构造方法
+### 5.3 构造方法
 
 根据StringBuilder的API文档，常用构造方法有2个：
 
@@ -652,7 +610,7 @@ public class StringBuilderTest {
 }
 ```
 
-### 6.4 常用方法
+### 5.4 常用方法
 
 StringBuilder常用的方法有2个：
 
@@ -704,11 +662,11 @@ public class ToStringTest {
 }
 ```
 
-## 八、字符串处理
+## 六、字符串处理
 
 <font color="red">字符串变量必须经过初始化才能使用。</font>
 
-### 8.1 String字符串和整型int的相互转换
+### 6.1 String字符串和整型int的相互转换
 
 1）String转换为int
 
@@ -739,7 +697,7 @@ static String valueOf(char chars[ ], int startIndex, int numChars)
 - toString()
   toString() 可以把一个引用类型转换为 String 字符串类型。
 
-### 8.2 常用方法
+### 6.2 常用方法
 
 1）字符串大小写转换
 
@@ -777,17 +735,13 @@ str.split(String sign,int limit)
 - 多个分隔符，可以用“|”作为连字符，比如：“acount=? and uu =? or n=?”，把三个都分隔出来，可以用String.split("and|or")。
   ... ...
 
-### 8.3 String、StringBuffer和StringBuilder
+### 6.3 String、StringBuffer和StringBuilder
 
 ![](https://img-blog.csdnimg.cn/20200806103642453.png)
 StringBuilder与StringBuffer是可变字符串类。一般情况下，速度从快到慢为 StringBuilder > StringBuffer > String。
 操作少量的数据使用 String；单线程操作大量数据使用 StringBuilder；多线程操作大量数据使用 StringBuffer。
 
-### 8.4 正则表达式
-
-
-
-## 九、内置包装类
+## 七、内置包装类
 
 | 序号 | 基本数据类 | 包装类        |
 | ---- | ---------- | ------------- |
@@ -800,7 +754,7 @@ StringBuilder与StringBuffer是可变字符串类。一般情况下，速度从�
 | 7    | double     | Double        |
 | 8    | boolean    | Boolean       |
 
-### 9.1 装箱与拆箱
+### 7.1 装箱与拆箱
 
 基本类型与对应的包装类对象之间，来回转换的过程称为”装箱“与”拆箱“：
 
@@ -825,7 +779,7 @@ Integer iii = Integer.valueOf(4);//使用包装类中的valueOf方法
 int num = i.intValue();
 ~~~
 
-### 9.2 自动装箱与自动拆箱
+### 7.2 自动装箱与自动拆箱
 
 从Java 5（JDK 1.5）开始，基本类型与包装类的装箱、拆箱动作可以自动完成。例如：
 
@@ -835,7 +789,7 @@ i = i + 5;    //2.自动拆箱:等号右边将i对象转成基本数值------> i
 		      //3.自动装箱:加法运算完成后，再次装箱，把基本数值转成对象。
 ```
 
-### 9.3 基本类型与字符串之间的转换
+### 7.3 基本类型与字符串之间的转换
 
 **基本类型转换String**总共有三种方式，查看课后资料可以得知，这里只讲最简单的一种方式： 
 
@@ -867,7 +821,7 @@ public class Demo18WrapperParse {
 
 > Tips：如果字符串参数的内容无法正确转换为对应的基本类型，则会抛出`java.lang.NumberFormatException`异常。
 
-### 9.4 疑问解答
+### 7.4 疑问解答
 
 ==1）为什么存在基本类型与包装类型这两种类型呢？==
 在Java语言中，new一个对象存储在堆里，我们通过栈中的引用来使用这些对象；但是对于经常用到的一系列类型如int，如果我们用new将其存储在堆里就不是很有效——特别是简单的小的变量。所以就出现了基本类型，同C++一样，Java采用了相似的做法，对于这些类型不是用new关键字来创建，而是直接将变量的值存储在栈中，因此更加高效。
