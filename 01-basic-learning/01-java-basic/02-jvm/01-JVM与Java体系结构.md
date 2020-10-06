@@ -70,9 +70,9 @@ JVM是运行在操作系统之上的，它与硬件没有直接的交互。
 
 <img src="https://img-blog.csdnimg.cn/20201005164955443.png" style="zoom:67%;" />
 
-Java的体系结构。
+Java的体系结构：
 
-![](https://img-blog.csdnimg.cn/20201005164908977.png)
+<img src="https://img-blog.csdnimg.cn/20201005202622207.png" style="zoom:80%;" />
 
 ### 2.4 JVM整体结构
 
@@ -92,41 +92,44 @@ Java的体系结构。
 
 ### 2.6 JVM的架构模型
 
-Java编译器输入的指令流基本上是一种基于栈的指令集架构，另外一种指令集架构则是基于寄存器的指令集架构。具体来说：这两种架构之间的区别：
+Java编译器输入的指令流基本上是一种**基于栈**的指令集架构，另外一种指令集架构则是**基于寄存器**的指令集架构。
+
+这两种架构之间的区别：
 
 **基于栈式架构的特点**
 
 - 设计和实现更简单，适用于资源受限的系统；
 - 避开了寄存器的分配难题：使用零地址指令方式分配。
-- 指令流中的指令大部分是零地址指令，其执行过程依赖于操作栈。指令集更小，编译器容易实现。
-- 不需要硬件支持，可移植性更好，更好实现跨平台
+- 指令流中的指令大部分是零地址指令，其执行过程依赖于操作栈。**指令集更小**，编译器容易实现。
+- 不需要硬件支持，可移植性更好，更好实现跨平台。
 
 **基于寄存器架构的特点**
 
 - 典型的应用是x86的二进制指令集：比如传统的PC以及Android的Davlik虚拟机。
-- 指令集架构则完全依赖硬件，可移植性差
-- 性能优秀和执行更高效
+- **指令集架构则完全依赖硬件，可移植性差**。
+- **性能优秀和执行更高效**。
 - 花费更少的指令去完成一项操作。
-- 在大部分情况下，基于寄存器架构的指令集往往都以一地址指令、二地址指令和三地址指令为主，而基于栈式架构的指令集却是以零地址指令为主方水洋
+- 在大部分情况下，基于寄存器架构的指令集往往都以一地址指令、二地址指令和三地址指令为主，而基于栈式架构的指令集却是以零地址指令为主。
 
-### 2.7 举例
+**举例1**
 
 同样执行2+3这种逻辑操作，其指令分别如下：
 
 基于栈的计算流程（以Java虚拟机为例）：
 
 ```bash
-iconst_2 //常量2入栈
-istore_1
-iconst_3 // 常量3入栈
-istore_2
-iload_1
-iload_2
-iadd //常量2/3出栈，执行相加
-istore_0 // 结果5入栈
+0: iconst_2 // 常量2入栈
+1: istore_1
+2: iconst_3 // 常量3入栈
+3: istore_2
+4: iload_1
+5: iload_2
+6: iadd // 常量2/3出栈，执行相加
+7: istore_3 // 结果5入栈
+8: return
 ```
 
-而基于寄存器的计算流程
+而基于寄存器的计算流程：
 
 ```bash
 mov eax,2 //将eax寄存器的值设为1
@@ -135,13 +138,9 @@ add eax,3 //使eax寄存器的值加3
 
 **字节码反编译**
 
-我们编写一个简单的代码，然后查看一下字节码的反编译后的结果
+我们编写一个简单的代码，然后查看一下字节码的反编译后的结果：
 
 ```java
-/**
- * @author: 陌溪
- * @create: 2020-07-04-21:17
- */
 public class StackStruTest {
     public static void main(String[] args) {
         int i = 2 + 3;
@@ -149,7 +148,7 @@ public class StackStruTest {
 }
 ```
 
-然后我们找到编译后的 class文件，使用下列命令进行反编译
+然后我们找到编译后的 class文件，使用下列命令进行反编译：
 
 ```bash
 javap -v StackStruTest.class
@@ -157,7 +156,40 @@ javap -v StackStruTest.class
 
 得到的文件为:
 
+```java
+ public static void main(java.lang.String[]);
+    descriptor: ([Ljava/lang/String;)V
+    flags: ACC_PUBLIC, ACC_STATIC
+    Code:
+      stack=1, locals=2, args_size=1
+         0: iconst_5
+         1: istore_1
+         2: return
+      LineNumberTable:
+        line 10: 0
+        line 14: 2
+      LocalVariableTable:
+        Start  Length  Slot  Name   Signature
+            0       3     0  args   [Ljava/lang/String;
+            2       1     1     i   I
+
 ```
+
+倘若代码为：
+
+```java
+public class StackStruTest {
+    public static void main(String[] args) {
+        int i = 2;
+        int j = 3;
+        int k = i + j;
+    }
+}
+```
+
+我们找到编译后的 class文件，使用下列命令进行反编译得到后的文件：
+
+```java
   public static void main(java.lang.String[]);
     descriptor: ([Ljava/lang/String;)V
     flags: ACC_PUBLIC, ACC_STATIC
@@ -173,10 +205,10 @@ javap -v StackStruTest.class
          7: istore_3
          8: return
       LineNumberTable:
-        line 9: 0
-        line 10: 2
-        line 11: 4
-        line 12: 8
+        line 11: 0
+        line 12: 2
+        line 13: 4
+        line 14: 8
       LocalVariableTable:
         Start  Length  Slot  Name   Signature
             0       9     0  args   [Ljava/lang/String;
@@ -187,11 +219,9 @@ javap -v StackStruTest.class
 
 **总结**
 
-由于跨平台性的设计，Java的指令都是根据栈来设计的。不同平台CPU架构不同，所以不能设计为基于寄存器的。优点是跨平台，指令集小，编译器容易实现，缺点是性能下降，实现同样的功能需要更多的指令。
+**由于跨平台性的设计，Java的指令都是根据栈来设计的**。不同平台CPU架构不同，所以不能设计为基于寄存器的。
 
-时至今日，尽管嵌入式平台已经不是Java程序的主流运行平台了（准确来说应该是HotSpotVM的宿主环境已经不局限于嵌入式平台了），那么为什么不将架构更换为基于寄存器的架构呢？
-
-**栈**
+栈的特点：
 
 - 跨平台性
 - 指令集小
@@ -208,7 +238,7 @@ Java虚拟机的启动是通过引导类加载器（bootstrap class loader）创
 
 - 一个运行中的Java虚拟机有着一个清晰的任务：执行Java程序。
 - 程序开始执行时他才运行，程序结束时他就停止。
-- 执行一个所谓的Java程序的时候，真真正正在执行的是一个叫做Java虚拟机的进程。
+- **执行一个所谓的Java程序的时候，真真正正在执行的是一个Java虚拟机的进程**。
 
 ### 3.3 虚拟机的退出
 
@@ -355,4 +385,4 @@ GraalVM在HotSpot VM基础上增强而成的跨语言全栈虚拟机，可以作
 
 **总结**
 
-具体JVM的内存结构，其实取决于其实现，不同厂商的JVM，或者同一厂商发布的不同版本，都有可能存在一定差异。我们学习及开发都主要以**oracle HotSpot VM**为默认虚拟机。
+具体JVM的内存结构，其实取决于其实现。不同厂商的JVM，或者同一厂商发布的不同版本，都有可能存在一定差异。我们学习及开发都主要以**oracle HotSpot VM**为默认虚拟机。
