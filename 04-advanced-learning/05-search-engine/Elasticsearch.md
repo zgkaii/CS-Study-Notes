@@ -1,18 +1,19 @@
+@[TOC](文章目录)
 ## 一、ElasticSearch相关概念
-### 1.1 ElasticSearch和MySQL中的概念比较
+### 1. ElasticSearch和MySQL中的概念比较
 
-|  ElasticSearch   | MySQL  | 
-|  :----:  | :----:  |  
+|  ElasticSearch   | MySQL  |
+|  :----:  | :----:  |
 |  Index   | Database  |
-|  Type   | Table  | 
-|  Document   | Row  | 
+|  Type   | Table  |
+|  Document   | Row  |
 |  Field   | Column |
-|  Mapping   | Schema  |  
-|  Everything is indexed   | Index  |  
-|  GET http://…  | select * from …  |  
-|  POST http://…   | update table set …  |  
+|  Mapping   | Schema  |
+|  Everything is indexed   | Index  |
+|  GET http://…  | select * from …  |
+|  POST http://…   | update table set …  |
 
-### 1.2 倒排索引
+### 2. 倒排索引
 
 Elasticsearch 使用一种称为 倒排索引 的结构，它适用于快速的全文搜索。一个倒排索引由文档中所有不重复词的列表构成，对于其中每个词，有一个包含它的文档列表。
 
@@ -145,10 +146,10 @@ PUT可以新增也可以修改。PUT必须指定id；由于PUT需要指定id，�
 ```
 这些返回的JSON串的含义；这些带有下划线开头的，称为元数据，反映了当前的基本信息。  
 "_index": "customer"  表明该数据在哪个数据库下；  
-"_type": "external"   表明该数据在哪个类型下；  
-"_id": "1"            表明被保存数据的id；  
-"_version": 1,        被保存数据的版本  
-"result": "created"   这里是创建了一条数据，如果重新put一条数据，则该状态会变为updated，并且版本号也会发生变化。  
+"_type": "external"   表明该数据在哪个类型下；  
+"_id": "1"            表明被保存数据的id；  
+"_version": 1,        被保存数据的版本  
+"result": "created"   这里是创建了一条数据，如果重新put一条数据，则该状态会变为updated，并且版本号也会发生变化。  
 下面选用POST方式：  
 添加数据的时候，不指定ID，会自动的生成id，并且类型是新增：    
 ![](https://img-blog.csdnimg.cn/20200908205647844.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0tBSVpfTEVBUk4=,size_16,color_FFFFFF,t_70#pic_center)
@@ -163,7 +164,7 @@ PUT可以新增也可以修改。PUT必须指定id；由于PUT需要指定id，�
 
 ![](https://img-blog.csdnimg.cn/20200908210004128.png#pic_center)
 
-#### 3. 查看文档
+### 3. 查看文档
 GET  /customer/external/2  
 [http://192.168.56.10:9200/customer/external/1](http://192.168.56.10:9200/customer/external/1)
 
@@ -237,7 +238,7 @@ POST更新方式，会对比原来的数据，和原来的相同，则不执行�
 }
 ```
 在更新过程中，重复执行更新操作，数据也能够更新成功，不会和原来的数据进行对比。
-### 5.删除文档或索引
+### 5. 删除文档或索引
 ```
 DELETE customer/external/1
 DELETE customer
@@ -265,7 +266,7 @@ green open .kibana_task_manager_1   wldcIEtbT3uQfH_copflYw 1 0 2 1 26.8kb 26.8kb
 green open .apm-agent-configuration g5iOaK05QrSSmenBQtqupg 1 0 0 0   283b   283b
 green open .kibana_1                2kGHFyKBSCmS8lU1loIqVg 1 0 6 0 22.6kb 22.6kb
 ```
-### 6.elasticsearch的批量操作——bulk
+### 6. elasticsearch的批量操作——bulk
 语法格式：
 ```text
 {action:{metadata}}\n
@@ -375,7 +376,7 @@ POST /_bulk
   ]
 }
 ```
-### 7.样本测试数据
+### 7. 样本测试数据
 准备了一份顾客银行账户信息的虚构的JSON文档样本。每个文档都有下列的schema（模式）。
 ```json
 {
@@ -396,16 +397,16 @@ POST /_bulk
 POST bank/account/_bulk
 
 ## 四、进阶检索
-### 1.search Api
+### 1. search Api
 ES支持两种基本方式检索；
 
 - 通过REST request uri 发送搜索参数 （uri +检索参数）；
 - 通过REST request body 来发送它们（uri+请求体）；
 
 信息检索
-![](https://cdn.nlark.com/yuque/0/2020/png/512093/1591341331567-108ef05c-3af2-4c2e-9f93-79087de8f07b.png#align=left&display=inline&height=462&margin=%5Bobject%20Object%5D&originHeight=462&originWidth=1063&status=done&style=none&width=1063)
-![](https://cdn.nlark.com/yuque/0/2020/png/512093/1591341331692-3966b7bb-72be-47bb-b519-b196bd7583b5.png#align=left&display=inline&height=635&margin=%5Bobject%20Object%5D&originHeight=635&originWidth=950&status=done&style=none&width=950)
-![](https://cdn.nlark.com/yuque/0/2020/png/512093/1591341331800-fda527eb-805e-4645-9047-33f78bddb6a4.png#align=left&display=inline&height=158&margin=%5Bobject%20Object%5D&originHeight=158&originWidth=940&status=done&style=none&width=940)
+![](https://img-blog.csdnimg.cn/img_convert/88d8002eea63e29db53e236583f146af.png#align=left&display=inline&height=462&margin=[object Object]&originHeight=462&originWidth=1063&status=done&style=none&width=1063)
+![](https://img-blog.csdnimg.cn/img_convert/2768e71f9406c5d0690bd7c6620d120f.png#align=left&display=inline&height=635&margin=[object Object]&originHeight=635&originWidth=950&status=done&style=none&width=950)
+![](https://img-blog.csdnimg.cn/img_convert/78a132f50f8d94798a5f9c1a168c9cc9.png#align=left&display=inline&height=158&margin=[object Object]&originHeight=158&originWidth=940&status=done&style=none&width=940)
 uri+请求体进行检索
 ```shell script
 GET /bank/_search
@@ -674,7 +675,7 @@ GET bank/_search?q=*&sort=account_number:asc
 > - `hits.sort` - the document’s sort position (when not sorting by relevance score)
 > - `hits._score` - the document’s relevance score (not applicable when using `match_all`)
 
-### 2.Query DSL
+### 2. Query DSL
 #### （1）基本语法格式
 Elasticsearch提供了一个可以执行查询的Json风格的DSL。这个被称为Query DSL，该查询语言非常全面。
 一个查询语句的典型结构
@@ -954,7 +955,7 @@ GET bank/_search
   }
 }
 ```
-#### （4） match_phrase [短句匹配]
+#### （4）match_phrase [短句匹配]
 将需要匹配的值当成一整个单词（不分词）进行检索
 ```json
 GET bank/_search
@@ -1636,9 +1637,9 @@ GET bank/_search
   }
 }
 ```
-在boolean查询中，`must`, `should` 和`must_not` 元素都被称为查询子句 。 文档是否符合每个“must”或“should”子句中的标准，决定了文档的“相关性得分”。  得分越高，文档越符合您的搜索条件。  默认情况下，Elasticsearch返回根据这些相关性得分排序的文档。
+在boolean查询中，`must`, `should` 和`must_not` 元素都被称为查询子句 。 文档是否符合每个“must”或“should”子句中的标准，决定了文档的“相关性得分”。  得分越高，文档越符合您的搜索条件。  默认情况下，Elasticsearch返回根据这些相关性得分排序的文档。
 
-`“must_not”子句中的条件被视为“过滤器”。` 它影响文档是否包含在结果中，但不影响文档的评分方式。  还可以显式地指定任意过滤器来包含或排除基于结构化数据的文档。
+`“must_not”子句中的条件被视为“过滤器”。` 它影响文档是否包含在结果中，但不影响文档的评分方式。  还可以显式地指定任意过滤器来包含或排除基于结构化数据的文档。
 filter在使用过程中，并不会计算相关性得分：
 ```json
 GET bank/_search
@@ -1918,7 +1919,7 @@ GET bank/_search
 ```
 一条也没有匹配到
 而更换为match匹配时，能够匹配到32个文档
-![](https://cdn.nlark.com/yuque/0/2020/png/512093/1591341331908-ec68d221-4be2-4a42-984e-495f59fc64ca.png#align=left&display=inline&height=337&margin=%5Bobject%20Object%5D&originHeight=337&originWidth=1342&status=done&style=none&width=1342)
+![](https://img-blog.csdnimg.cn/img_convert/96aa9de9112cd2368162acd34a42fbb3.png#align=left&display=inline&height=337&margin=[object Object]&originHeight=337&originWidth=1342&status=done&style=none&width=1342)
 也就是说，**全文检索字段用match，其他非text字段匹配用term**。
 #### （9）Aggregation（执行聚合）
 聚合提供了从数据中分组和提取数据的能力。最简单的聚合方法大致等于SQL Group by和SQL聚合函数。在elasticsearch中，执行搜索返回this（命中结果），并且同时返回聚合结果，把以响应中的所有hits（命中结果）分隔开的能力。这是非常强大且有效的，你可以执行查询和多个聚合，并且在一次使用中得到各自的（任何一个的）返回结果，使用一次简洁和简化的API啦避免网络往返。
@@ -2309,7 +2310,7 @@ GET bank/_search
 
 ### 3.Mapping映射
 #### （1）字段类型
-![](https://cdn.nlark.com/yuque/0/2020/png/512093/1591341331961-b271ecfc-8fa4-4921-a2f3-212607962a32.png#align=left&display=inline&height=400&margin=%5Bobject%20Object%5D&originHeight=400&originWidth=918&status=done&style=none&width=918)
+![](https://img-blog.csdnimg.cn/img_convert/c32b566106dd38bc6db9a053042658c0.png#align=left&display=inline&height=400&margin=[object Object]&originHeight=400&originWidth=918&status=done&style=none&width=918)
 #### （2）映射
 Mapping(映射)
 Mapping是用来定义一个文档（document），以及它所包含的属性（field）是如何存储和索引的。比如：使用maping来定义：
@@ -2415,7 +2416,7 @@ GET bank/_mapping
 
 - 修改mapping信息
 
-![](https://cdn.nlark.com/yuque/0/2020/png/512093/1591341332032-85df5e7b-c983-45f1-9c6a-f5c8187d560d.png#align=left&display=inline&height=476&margin=%5Bobject%20Object%5D&originHeight=476&originWidth=954&status=done&style=none&width=954)
+![](https://img-blog.csdnimg.cn/img_convert/cfff6ca8fcc1b6d601aac639cbb10a36.png#align=left&display=inline&height=476&margin=[object Object]&originHeight=476&originWidth=954&status=done&style=none&width=954)
 #### （3）新版本改变
 ElasticSearch7-去掉type概念
 
@@ -2436,7 +2437,7 @@ ElasticSearch7-去掉type概念
 > - Specifying types in requests is no longer supported.
 > - The `include_type_name` parameter is removed.
 
-#### 创建映射
+#### （4）创建映射
 创建索引并指定映射
 ```json
 PUT /my_index
@@ -2464,7 +2465,7 @@ PUT /my_index
   "index" : "my_index"
 }
 ```
-#### 查看映射
+#### （5）查看映射
 ```json
 GET /my_index
 ```
@@ -2505,7 +2506,7 @@ GET /my_index
   }
 }
 ```
-##### 添加新的字段映射
+#### （6）添加新的字段映射
 ```json
 PUT /my_index/_mapping
 {
@@ -2518,7 +2519,7 @@ PUT /my_index/_mapping
 }
 ```
 这里的 "index": false，表明新增的字段不能被检索，只是一个冗余字段。
-##### 更新映射
+#### （7）更新映射
 对于已经存在的字段映射，我们不能更新。更新必须创建新的索引，进行数据迁移。
 ##### 数据迁移
 先创建new_twitter的正确映射。然后使用如下方式进行数据迁移。
@@ -2590,7 +2591,7 @@ GET /bank/_search
 ```
 GET /bank/_search
 ```
-![](https://cdn.nlark.com/yuque/0/2020/png/512093/1591341332150-0428014d-ac15-4086-975e-cc04782a9050.png#align=left&display=inline&height=450&margin=%5Bobject%20Object%5D&originHeight=450&originWidth=807&status=done&style=none&width=807)
+![](https://img-blog.csdnimg.cn/img_convert/d2af9a1bfc286e5a5f0f16581b97e6cb.png#align=left&display=inline&height=450&margin=[object Object]&originHeight=450&originWidth=807&status=done&style=none&width=807)
 想要将年龄修改为integer
 ```json
 PUT /newbank
@@ -2642,7 +2643,7 @@ PUT /newbank
 ```
 查看“newbank”的映射：
 GET /newbank/_mapping
-![](https://cdn.nlark.com/yuque/0/2020/png/512093/1591341332217-8ab68f08-b193-4388-a8c3-7f8b34613d8b.png#align=left&display=inline&height=337&margin=%5Bobject%20Object%5D&originHeight=337&originWidth=1313&status=done&style=none&width=1313)
+![](https://img-blog.csdnimg.cn/img_convert/817441b5fec8e8af299c27bc5bcd6d6d.png#align=left&display=inline&height=337&margin=[object Object]&originHeight=337&originWidth=1313&status=done&style=none&width=1313)
 能够看到age的映射类型被修改为了integer.
 将bank中的数据迁移到newbank中
 ```json
@@ -2681,9 +2682,9 @@ POST _reindex
 }
 ```
 查看newbank中的数据
-![](https://cdn.nlark.com/yuque/0/2020/png/512093/1591341332253-58aeaec0-4145-47c1-b1bc-9766ee539a5a.png#align=left&display=inline&height=397&margin=%5Bobject%20Object%5D&originHeight=397&originWidth=1246&status=done&style=none&width=1246)
+![](https://img-blog.csdnimg.cn/img_convert/f7259dec8a52bbc32ecbb971853e6592.png#align=left&display=inline&height=397&margin=[object Object]&originHeight=397&originWidth=1246&status=done&style=none&width=1246)
 
-### 4）、分词
+### 4. 分词
 一个tokenizer（分词器）接收一个字符流，将之分割为独立的tokens（词元，通常是独立的单词），然后输出tokens流。
 例如：whitespace tokenizer遇到空白字符时分割文本。它会将文本“Quick brown fox!”分割为[Quick,brown,fox!]。
 该tokenizer（分词器）还负责记录各个terms(词条)的顺序或position位置（用于phrase短语和word proximity词近邻查询），以及term（词条）所代表的原始word（单词）的start（起始）和end（结束）的character offsets（字符串偏移量）（用于高亮显示搜索的内容）。
@@ -2781,13 +2782,13 @@ POST _analyze
 }
 ```
 #### （1）安装ik分词器
-![](https://cdn.nlark.com/yuque/0/2020/png/512093/1591341332297-3c97edb9-eb4c-4901-bcb5-2e087e172c95.png#align=left&display=inline&height=463&margin=%5Bobject%20Object%5D&originHeight=463&originWidth=1414&status=done&style=none&width=1414)
+![](https://img-blog.csdnimg.cn/img_convert/68c6a1a440f8dd3043f6f035f9b754f9.png#align=left&display=inline&height=463&margin=[object Object]&originHeight=463&originWidth=1414&status=done&style=none&width=1414)
 所有的语言分词，默认使用的都是“Standard Analyzer”，但是这些分词器针对于中文的分词，并不友好。为此需要安装中文的分词器。
 注意：不能用默认elasticsearch-plugin install xxx.zip 进行自动安装
 [https://github.com/medcl/elasticsearch-analysis-ik/releases/download](https://github.com/medcl/elasticsearch-analysis-ik/releases/download) 对应es版本安装
 在前面安装的elasticsearch时，我们已经将elasticsearch容器的“/usr/share/elasticsearch/plugins”目录，映射到宿主机的“ /mydata/elasticsearch/plugins”目录下，所以比较方便的做法就是下载“/elasticsearch-analysis-ik-7.6.2.zip”文件，然后解压到该文件夹下即可。安装完毕后，需要重启elasticsearch容器。
 如果不嫌麻烦，还可以采用如下的方式。
-##### （1）查看elasticsearch版本号：
+#### （2）查看elasticsearch版本号
 ```json
 {
 "name": "d30f21ec35fc",
@@ -2807,7 +2808,7 @@ POST _analyze
 "tagline": "You Know, for Search"
 }
 ```
-##### （2）进入es容器内部plugin目录
+#### （3）进入es容器内部plugin目录
 
 - docker exec -it 容器id /bin/bash
 ```shell
@@ -2815,7 +2816,7 @@ POST _analyze
 [root@d30f21ec35fc elasticsearch]#
 ```
 
-- wget  [https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v7.6.2/elasticsearch-analysis-ik-7.6.2.zip](https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v7.6.2/elasticsearch-analysis-ik-7.6.2.zip)
+- wget  [https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v7.6.2/elasticsearch-analysis-ik-7.6.2.zip](https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v7.6.2/elasticsearch-analysis-ik-7.6.2.zip)
 ```shell
 [root@d30f21ec35fc elasticsearch]# pwd
 /usr/share/elasticsearch
@@ -2857,7 +2858,7 @@ Archive:  elasticsearch-analysis-ik-7.6.2.zip
 [root@0adeb7852e00 elasticsearch]# rm -rf elasticsearch-analysis-ik-7.6.2.zip
 ```
 确认是否安装好了分词器
-##### （2）测试分词器
+#### （4）测试分词器
 使用默认
 ```json
 GET my_index/_analyze
@@ -2991,7 +2992,7 @@ GET my_index/_analyze
   ]
 }
 ```
-##### （3）自定义词库
+#### （5）自定义词库
 
 - 重新创建elasticsearch容器
 ```shell script
@@ -3103,12 +3104,12 @@ GET my_index/_analyze
 }
 ```
 ## 五、elasticsearch-Rest-Client
-### 1）9300: TCP
+### 1. 9300: TCP
 
 - spring-data-elasticsearch:transport-api.jar;
    - springboot版本不同，ransport-api.jar不同，不能适配es版本
    - 7.x已经不建议使用，8以后就要废弃
-### 2）9200: HTTP
+### 2. 9200: HTTP
 
 - jestClient: 非官方，更新慢；
 - RestTemplate：模拟HTTP请求，ES很多操作需要自己封装，麻烦；
@@ -3167,4 +3168,68 @@ docker update nginx --restart=always
 echo '<h2>hello nginx!</h2>' >index.html
 ```
 
-- 访问：http://nginx所在主机的IP:80/index.html
+扩展字典 -->
+	<entry key="ext_dict"></entry>
+	 <!--用户可以在这里配置自己的扩展停止词字典-->
+	<entry key="ext_stopwords"></entry>
+	<!--用户可以在这里配置远程扩展字典 -->
+	<entry key="remote_ext_dict">http://192.168.56.10/es/fenci.txt</entry> 
+	<!--用户可以在这里配置远程扩展停止词字典-->
+	<!-- <entry key="remote_ext_stopwords">words_location</entry> -->
+</properties>
+```
+原来的xml
+​```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<comment>IK Analyzer 扩展配置</comment>
+	<!--用户可以在这里配置自己的扩展字典 -->
+	<entry key="ext_dict"></entry>
+	 <!--用户可以在这里配置自己的扩展停止词字典-->
+	<entry key="ext_stopwords"></entry>
+	<!--用户可以在这里配置远程扩展字典 -->
+	<!-- <entry key="remote_ext_dict">words_location</entry> -->
+	<!--用户可以在这里配置远程扩展停止词字典-->
+	<!-- <entry key="remote_ext_stopwords">words_location</entry> -->
+</properties>
+```
+修改完成后，需要重启elasticsearch容器，否则修改不生效。
+更新完成后，es只会对于新增的数据用更新分词。历史数据是不会重新分词的。如果想要历史数据重新分词，需要执行：
+```shell
+POST my_index/_update_by_query?conflicts=proceed
+```
+[http://192.168.56.10/es/fenci.txt](http://192.168.56.10/es/fenci.txt)，这个是nginx上资源的访问路径
+在运行下面实例之前，需要安装nginx（安装方法见安装nginx），然后创建“fenci.txt”文件，内容如下：
+```shell
+刘亦菲
+```
+测试效果：
+```json
+GET my_index/_analyze
+{
+   "analyzer": "ik_max_word", 
+   "text":"刘亦菲爱我"
+}
+```
+输出结果：
+```json
+{
+  "tokens" : [
+    {
+      "token" : "刘亦菲",
+      "start_offset" : 0,
+      "end_offset" : 3,
+      "type" : "CN_WORD",
+      "position" : 0
+    },
+    {
+      "token" : "爱我",
+      "start_offset" : 3,
+      "end_offset" : 5,
+      "type" : "CN_WORD",
+      "position" : 1
+    }
+  ]
+}
+```
