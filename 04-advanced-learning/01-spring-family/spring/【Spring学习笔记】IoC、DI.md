@@ -15,7 +15,7 @@ objects in your application. Beans, and the dependencies among them, are reflect
 * bean由IoC容器管理
 * 实际应用程序中，有很多bean
 
-### 二、IoC(Inversion Of Control)容器又是什么？
+### 二、IoC(Inversion of Control)容器又是什么？
 
 当某个 Java 实例需要另一个 Java 实例时，传统的方法是由调用者创建被调用者的实例（例如，使用 new 关键字获得被调用者实例），而使用 Spring 框架后，被调用者的实例不再由调用者创建，而是由具有依赖注入功能的 IOC 容器创建，这称为控制反转。
 
@@ -43,7 +43,8 @@ Spring 提供了以下两种不同类型的容器：
 	从磁盘路径上加载配置文件，配置文件可以在磁盘的任意位置。（不推荐使用）
 * AnnotationConfigApplicationContext:   
 	当使用注解配置容器对象时，需要使用此类来创建spring容器。（用来读取注解）
-    
+  
+
 下面，写一个简单Demo，初步了解下IoC容器的使用：  
 1）创建UserDao接口：
 ```java
@@ -379,6 +380,7 @@ public class AccountServiceImpl implements IAccountService {
 * name：用于指定给构造函数中指定名称的参数赋值  
 
 =================以上三个用于指定给构造函数中哪个参数赋值================
+
 * value：用于提供基本类型和String类型的数据  
 * ref：用于指定其他的bean类型数据。它指的就是在spring的Ioc核心容器中出现过的bean对象  
 
@@ -397,7 +399,7 @@ public class AccountServiceImpl implements IAccountService {
     <bean id="now" class="java.util.Date"></bean>
 ```
 
-##### 6.复杂类型的注入/集合类型的注入
+##### 3.复杂类型的注入/集合类型的注入
 ```java
 @Data
 public class AccountServiceImpl3 implements IAccountService {
@@ -467,7 +469,7 @@ map  props
 
 ### 七、注解装配Bean
 
-##### 1.常用注解：
+**常用注解**
 
 |基于注解配置 | 描述 |
 | --- | --- |
@@ -481,6 +483,7 @@ map  props
 
 ==下面举一个实例：==
 1）创建DAO层接口
+
 ```java
 public interface UserDao {
     public void save();
@@ -578,7 +581,7 @@ public class UserControllerTests {
 业务层的add()方法执行了
 控制层的add()方法执行了
 ```
-### 八、Spring管理Bean方式比较：
+### 八、Spring管理Bean方式比较
 
 | 管理bean | 基于XML配置| 基于注解配置 |
 | --- | --- | --- |
@@ -635,7 +638,7 @@ public DataSource getDataSource() throws PropertyVetoException {
 }
 ```
 
-#####  十、Spring 整合 Junit  
+###  十、Spring 整合 Junit  
 1、导入spring整合junit的jar(坐标)  
 2、使用Junit提供的一个注解把原有的main方法替换了，替换成spring提供的 @Runwith  
 3、告知spring的运行器，spring和ioc创建是基于xml还是注解的，并且说明位置  

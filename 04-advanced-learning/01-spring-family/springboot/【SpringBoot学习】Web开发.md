@@ -16,10 +16,9 @@
 
 这个场景SpringBoot帮我们配置了什么？能不能修改？能修改哪些配置？能不能扩展？xxx
 
-```
+```java
 xxxxAutoConfiguration：帮我们给容器中自动配置组件；
 xxxxProperties:配置类来封装配置文件的内容；
-
 ```
 
 
@@ -119,8 +118,6 @@ localhost:8080/webjars/jquery/3.3.1/jquery.js
 			<version>3.3.1</version>
 		</dependency>
 ```
-
-
 
 ==2. "/**" 访问当前项目的任何资源，都去（静态资源的文件夹）找映射==
 
@@ -1169,9 +1166,9 @@ protected ModelAndView resolveErrorView(HttpServletRequest request,
 
 ### 2、定制错误响应
 
-#### 	**1）、定制错误的页面**
+#### 	**1）定制错误的页面**
 
-​			**1）、有模板引擎的情况下；error/状态码;** 【将错误页面命名为  错误状态码.html 放在模板引擎文件夹里面的 error文件夹下】，发生此状态码的错误就会来到  对应的页面；
+​			**1）有模板引擎的情况下；error/状态码;** 【将错误页面命名为  错误状态码.html 放在模板引擎文件夹里面的 error文件夹下】，发生此状态码的错误就会来到  对应的页面；
 
 ​			我们可以使用4xx和5xx作为错误页面的文件名来匹配这种类型的所有错误，精确优先（优先寻找精确的状态码.html）；		
 
@@ -1199,9 +1196,9 @@ protected ModelAndView resolveErrorView(HttpServletRequest request,
 
 
 
-#### 	2）、定制错误的json数据
+#### 	2）定制错误的json数据
 
-​		1）、自定义异常处理&返回定制json数据；
+​		1）自定义异常处理&返回定制json数据；
 
 ```java
 @ControllerAdvice
@@ -1221,7 +1218,7 @@ public class MyExceptionHandler {
 
 
 
-​		2）、转发到/error进行自适应响应效果处理
+​		2）转发到/error进行自适应响应效果处理
 
 ```java
  @ExceptionHandler(UserNotExistException.class)
@@ -1240,7 +1237,7 @@ public class MyExceptionHandler {
     }
 ```
 
-#### 	3）、将定制数据携带出去
+#### 	3）将定制数据携带出去
 
 出现错误以后，会来到/error请求，会被BasicErrorController处理，响应出去可以获取的数据是由getErrorAttributes得到的（是AbstractErrorController（ErrorController）规定的方法）；
 

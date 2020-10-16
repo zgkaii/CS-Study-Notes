@@ -55,7 +55,7 @@ C:\WorkSpace\IdeaProjects\spring-learn\001-helloworld\target>dir
  驱动器 D 中的卷是 Data
  卷的序列号是 B8A9-CEA2
 
- C:\WorkSpace\IdeaProjects\spring-learn\001-helloworld\target のディレクトリ
+ C:\WorkSpace\IdeaProjects\spring-learn\001-helloworld\target 目录
 
 2020/09/03  20:35    <DIR>          .
 2020/09/03  20:35    <DIR>          ..
