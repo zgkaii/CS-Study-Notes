@@ -2,9 +2,9 @@
 
 ## 1、简介
 
-**Docker**是一个开源的应用容器引擎，是一个轻量级容器技术；
+**Docker**是一个开源的应用容器引擎，是一个轻量级容器技术。
 
-Docker支持将软件编译成一个镜像，然后在镜像中各种软件做好配置，将镜像发布出去，其他使用者可以直接使用这个镜像；
+Docker支持将软件编译成一个镜像，然后在镜像中各种软件做好配置，将镜像发布出去，其他使用者可以直接使用这个镜像。
 
 运行中的这个镜像称为容器，容器启动是非常快速的。
 
@@ -14,15 +14,15 @@ Docker支持将软件编译成一个镜像，然后在镜像中各种软件做�
 
 ## 2、核心概念
 
-docker主机(Host)：安装了Docker程序的机器（Docker直接安装在操作系统之上）；
+docker主机(Host)：安装了Docker程序的机器（Docker直接安装在操作系统之上）。
 
-docker客户端(Client)：连接docker主机进行操作；
+docker客户端(Client)：连接docker主机进行操作。
 
 docker仓库(Registry)：用来保存各种打包好的软件镜像。[Hub](https://hub.docker.com) 提供了庞大的镜像集合供使用。
 
-docker镜像(Images)：软件打包好的镜像；放在docker仓库中；
+docker镜像(Images)：软件打包好的镜像；放在docker仓库中。
 
-docker容器(Container)：镜像启动后的实例称为一个容器；容器是独立运行的一个或一组应用
+docker容器(Container)：镜像启动后的实例称为一个容器，容器是独立运行的一个或一组应用。
 
 ![](https://img-blog.csdnimg.cn/20200924095458279.png)
 
@@ -30,25 +30,25 @@ docker容器(Container)：镜像启动后的实例称为一个容器；容器是
 
 1）安装Docker
 
-2）去Docker仓库找到这个软件对应的镜像；
+2）去Docker仓库找到这个软件对应的镜像
 
-3）使用Docker运行这个镜像，这个镜像就会生成一个Docker容器；
+3）使用Docker运行这个镜像，这个镜像就会生成一个Docker容器
 
-4）对容器的启动停止就是对软件的启动停止；
+4）对容器的启动停止就是对软件的启动停止
 
 ## 3、安装Docker
 
 #### 1）安装linux虚拟机
 
-​	1）VMWare、VirtualBox（安装）；
+​	1）VMWare、VirtualBox（安装）
 
-​	2）导入虚拟机文件centos7-atguigu.ova；
+​	2）导入虚拟机文件centos7-kai.ova
 
 ​	3）双击启动linux虚拟机;使用  root/ 123456登陆
 
-​	4）使用客户端连接linux服务器进行命令操作；
+​	4）使用客户端连接linux服务器进行命令操作
 
-​	5）设置虚拟机网络；
+​	5）设置虚拟机网络
 
 ​		桥接网络===选好网卡====接入网线；
 
@@ -64,7 +64,7 @@ service network restart
 ip addr
 ```
 
-​	8）使用客户端连接linux；
+​	8）使用客户端连接linux
 
 #### 2）在linux虚拟机上安装docker
 
@@ -93,10 +93,10 @@ systemctl stop docker
 
 | 操作 | 命令                                              | 说明                                                         |
 | ---- | ------------------------------------------------- | ------------------------------------------------------------ |
-| 检索 | `docker  search 关键字`  eg：docker  search redis | 我们经常去[dockerhub](https://hub.docker.com/)上检索镜像的详细信息，如镜像的TAG。 |
-| 拉取 | docker pull 镜像名:tag                            | tag是可选的，tag表示标签，多为软件的版本，默认是latest       |
-| 列表 | docker images                                     | 查看所有本地镜像                                             |
-| 删除 | docker rmi image-id                               | 删除指定的本地镜像                                           |
+| 检索 | `docker  search 关键字`  eg：docker  search redis | 我们经常去[dockerhub](https://hub.docker.com/)上检索镜像的详细信息，如镜像的TAG |
+| 拉取 | `docker pull 镜像名:tag`                          | tag是可选的，tag表示标签，多为软件的版本，默认是latest       |
+| 列表 | `docker images`                                   | 查看所有本地镜像                                             |
+| 删除 | `docker rmi image-id`                             | 删除指定的本地镜像                                           |
 
 
 
@@ -158,8 +158,6 @@ https://docs.docker.com/engine/reference/commandline/docker/
 docker pull mysql
 ```
 
-
-
 错误的启动
 
 ```shell
@@ -202,8 +200,6 @@ CONTAINER ID        IMAGE               COMMAND                  CREATED        
 ad10e4bc5c6a        mysql               "docker-entrypoint.sh"   4 seconds ago       Up 2 seconds        0.0.0.0:3306->3306/tcp   mysql02
 ```
 
-
-
 几个其他的高级操作
 
 ```
@@ -233,8 +229,6 @@ docker run --name some-mysql -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql:tag --
 		</dependency>
 ```
 
-
-
 ```yaml
 spring:
   datasource:
@@ -246,23 +240,21 @@ spring:
 
 效果：
 
-​	默认是用org.apache.tomcat.jdbc.pool.DataSource作为数据源；
-
-​	数据源的相关配置都在DataSourceProperties里面；
+​	默认是用org.apache.tomcat.jdbc.pool.DataSource作为数据源，数据源的相关配置都在DataSourceProperties里面；
 
 自动配置原理：
 
 org.springframework.boot.autoconfigure.jdbc：
 
-1、参考DataSourceConfiguration，根据配置创建数据源，默认使用Tomcat连接池；可以使用spring.datasource.type指定自定义的数据源类型；
+1、参考DataSourceConfiguration，根据配置创建数据源，默认使用Tomcat连接池，可以使用spring.datasource.type指定自定义的数据源类型；
 
-2、SpringBoot默认可以支持；
+2、SpringBoot默认可以支持
 
+```java
+org.apache.tomcat.jdbc.pool.DataSource、HikariDataSource、BasicDataSource...
 ```
-org.apache.tomcat.jdbc.pool.DataSource、HikariDataSource、BasicDataSource、
-```
 
-3、自定义数据源类型
+3、自定义数据源类型java
 
 ```java
 /**
@@ -285,11 +277,11 @@ static class Generic {
 
 ​	作用：
 
-​		1）runSchemaScripts();运行建表语句；
+​		1）runSchemaScripts();运行建表语句
 
-​		2）runDataScripts();运行插入数据的sql语句；
+​		2）runDataScripts();运行插入数据的sql语句
 
-默认只需要将文件命名为：
+默认只需要将文件命名为
 
 ```properties
 schema-*.sql、data-*.sql
@@ -395,7 +387,7 @@ public interface DepartmentMapper {
 
 问题：
 
-自定义MyBatis的配置规则；给容器中添加一个ConfigurationCustomizer；
+自定义MyBatis的配置规则，给容器中添加一个ConfigurationCustomizer：
 
 ```java
 @org.springframework.context.annotation.Configuration
@@ -414,11 +406,9 @@ public class MyBatisConfig {
 }
 ```
 
-
-
 ```java
-使用MapperScan批量扫描所有的Mapper接口；
-@MapperScan(value = "com.atguigu.springboot.mapper")
+// 使用MapperScan批量扫描所有的Mapper接口
+@MapperScan(value = "com.kai.springboot.mapper")
 @SpringBootApplication
 public class SpringBoot06DataMybatisApplication {
 
@@ -450,7 +440,7 @@ http://www.mybatis.org/spring-boot-starter/mybatis-spring-boot-autoconfigure/
 
 ### 2）整合SpringData JPA
 
-JPA:ORM（Object Relational Mapping）；
+JPA:ORM（Object Relational Mapping）
 
 1）编写一个实体类（bean）和数据表进行映射，并且配置好映射关系；
 
@@ -490,8 +480,6 @@ spring:
 #    控制台显示SQL
     show-sql: true
 ```
-
-
 
 # 三、启动配置原理
 
@@ -657,13 +645,11 @@ public class HelloSpringApplicationRunListener implements SpringApplicationRunLi
 
 ```properties
 org.springframework.context.ApplicationContextInitializer=\
-com.atguigu.springboot.listener.HelloApplicationContextInitializer
+com.kai.springboot.listener.HelloApplicationContextInitializer
 
 org.springframework.boot.SpringApplicationRunListener=\
-com.atguigu.springboot.listener.HelloSpringApplicationRunListener
+com.kai.springboot.listener.HelloSpringApplicationRunListener
 ```
-
-
 
 
 
@@ -681,8 +667,6 @@ public class HelloApplicationRunner implements ApplicationRunner {
 }
 ```
 
-
-
 **CommandLineRunner**
 
 ```java
@@ -695,13 +679,11 @@ public class HelloCommandLineRunner implements CommandLineRunner {
 }
 ```
 
-
-
 # 四、自定义starter
 
 starter：
 
-​	1、这个场景需要使用到的依赖是什么？
+​	1、这个场景需要使用到的依赖是什么
 
 ​	2、如何编写自动配置
 
@@ -727,11 +709,9 @@ org.springframework.boot.autoconfigure.aop.AopAutoConfiguration,\
 
 专门来写一个自动配置模块；
 
-启动器依赖自动配置；别人只需要引入启动器（starter）
+启动器依赖自动配置：别人只需要引入启动器（starter）
 
-mybatis-spring-boot-starter；自定义启动器名-spring-boot-starter
-
-
+mybatis-spring-boot-starter：自定义启动器名`-spring-boot-starter`
 
 步骤：
 
@@ -744,8 +724,8 @@ mybatis-spring-boot-starter；自定义启动器名-spring-boot-starter
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.atguigu.starter</groupId>
-    <artifactId>atguigu-spring-boot-starter</artifactId>
+    <groupId>com.kai.starter</groupId>
+    <artifactId>kai-spring-boot-starter</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <!--启动器-->
@@ -753,8 +733,8 @@ mybatis-spring-boot-starter；自定义启动器名-spring-boot-starter
 
         <!--引入自动配置模块-->
         <dependency>
-            <groupId>com.atguigu.starter</groupId>
-            <artifactId>atguigu-spring-boot-starter-autoconfigurer</artifactId>
+            <groupId>com.kai.starter</groupId>
+            <artifactId>kai-spring-boot-starter-autoconfigurer</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
@@ -770,12 +750,12 @@ mybatis-spring-boot-starter；自定义启动器名-spring-boot-starter
    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
    <modelVersion>4.0.0</modelVersion>
 
-   <groupId>com.atguigu.starter</groupId>
-   <artifactId>atguigu-spring-boot-starter-autoconfigurer</artifactId>
+   <groupId>com.kai.starter</groupId>
+   <artifactId>kai-spring-boot-starter-autoconfigurer</artifactId>
    <version>0.0.1-SNAPSHOT</version>
    <packaging>jar</packaging>
 
-   <name>atguigu-spring-boot-starter-autoconfigurer</name>
+   <name>kai-spring-boot-starter-autoconfigurer</name>
    <description>Demo project for Spring Boot</description>
 
    <parent>
@@ -800,21 +780,15 @@ mybatis-spring-boot-starter；自定义启动器名-spring-boot-starter
       </dependency>
 
    </dependencies>
-
-
-
 </project>
-
 ```
 
-
-
 ```java
-package com.atguigu.starter;
+package com.kai.starter;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix = "atguigu.hello")
+@ConfigurationProperties(prefix = "kai.hello")
 public class HelloProperties {
 
     private String prefix;
@@ -836,11 +810,10 @@ public class HelloProperties {
         this.suffix = suffix;
     }
 }
-
 ```
 
 ```java
-package com.atguigu.starter;
+package com.kai.starter;
 
 public class HelloService {
 
@@ -854,15 +827,14 @@ public class HelloService {
         this.helloProperties = helloProperties;
     }
 
-    public String sayHellAtguigu(String name){
+    public String sayHellkai(String name){
         return helloProperties.getPrefix()+"-" +name + helloProperties.getSuffix();
     }
 }
-
 ```
 
 ```java
-package com.atguigu.starter;
+package com.kai.starter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -884,20 +856,13 @@ public class HelloServiceAutoConfiguration {
         return service;
     }
 }
-
 ```
-
-# 更多SpringBoot整合示例
-
-https://github.com/spring-projects/spring-boot/tree/master/spring-boot-samples
 
 # 参考
 
 [视频教程](https://www.bilibili.com/video/BV1gW411W76m?p=28)
 
-
-
-
+[MyBatis-Spring-Boot-Starter](http://mybatis.org/spring-boot-starter/mybatis-spring-boot-autoconfigure/)
 
 
 

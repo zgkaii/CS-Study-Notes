@@ -460,7 +460,7 @@ public class WebMvcAutoConfiguration {
 
 ```java
 //使用WebMvcConfigurerAdapter可以来扩展SpringMVC的功能
-//@EnableWebMvc   不要接管SpringMVC
+//@EnableWebMvc  不要接管SpringMVC
 @Configuration
 public class MyMvcConfig extends WebMvcConfigurerAdapter {
 
@@ -724,9 +724,9 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
 
 （1）RestfulCRUD：CRUD满足Rest风格；
 
-URI：  /资源名称/资源标识       HTTP请求方式区分对资源CRUD操作
+URI：/资源名称/资源标识  HTTP请求方式区分对资源CRUD操作
 
-|      | 普通CRUD（uri来区分操作） | RestfulCRUD       |
+|      | 普通CRUD（URI来区分操作） | RestfulCRUD       |
 | ---- | ------------------------- | ----------------- |
 | 查询 | getEmp                    | emp---GET         |
 | 添加 | addEmp?xxx                | emp---POST        |
@@ -975,7 +975,7 @@ insert的公共片段在div标签中
 
 原理：
 
-​	可以参照ErrorMvcAutoConfiguration；错误处理的自动配置；
+​	可以参照ErrorMvcAutoConfiguration，错误处理的自动配置；
 
   	给容器中添加了以下组件
 
@@ -1063,9 +1063,9 @@ public class BasicErrorController extends AbstractErrorController {
 
 ​	步骤：
 
-​		一但系统出现4xx或者5xx之类的错误；ErrorPageCustomizer就会生效（定制错误的响应规则）；就会来到/error请求；就会被**BasicErrorController**处理；
+​		一但系统出现4xx或者5xx之类的错误，ErrorPageCustomizer就会生效s（定制错误的响应规则），就会来到/error请求，就会被**BasicErrorController**处理。
 
-​		1）响应页面，去哪个页面是由**DefaultErrorViewResolver**解析得到的；
+（1）响应页面，去哪个页面是由**DefaultErrorViewResolver**解析得到的：
 
 ```java
 protected ModelAndView resolveErrorView(HttpServletRequest request,
@@ -1083,9 +1083,9 @@ protected ModelAndView resolveErrorView(HttpServletRequest request,
 
 ### 2、定制错误响应
 
-#### 	**1）定制错误的页面**
+#### 	**2.1 定制错误的页面**
 
-​			**1）有模板引擎的情况下；error/状态码;**【将错误页面命名为  错误状态码.html 放在模板引擎文件夹里面的 error文件夹下】，发生此状态码的错误就会来到  对应的页面。
+​			**（1）有模板引擎的情况下：error/状态码**【将错误页面命名为  错误状态码.html 放在模板引擎文件夹里面的 error文件夹下】，发生此状态码的错误就会来到  对应的页面。
 
 ​			我们可以使用4xx和5xx作为错误页面的文件名来匹配这种类型的所有错误，精确优先（优先寻找精确的状态码.html）。		
 
@@ -1103,13 +1103,13 @@ protected ModelAndView resolveErrorView(HttpServletRequest request,
 
 ​				errors：JSR303数据校验的错误都在这里
 
-​			2）、没有模板引擎（模板引擎找不到这个错误页面），静态资源文件夹下找；
+​			（2）没有模板引擎（模板引擎找不到这个错误页面），静态资源文件夹下找；
 
-​			3）、以上都没有错误页面，就是默认来到SpringBoot默认的错误提示页面；
+​			（3）以上都没有错误页面，就是默认来到SpringBoot默认的错误提示页面；
 
-#### 	2）定制错误的json数据
+#### 	2.2 定制错误的json数据
 
-​		1）自定义异常处理&返回定制json数据；
+​		（1）自定义异常处理&返回定制json数据；
 
 ```java
 @ControllerAdvice
@@ -1127,7 +1127,7 @@ public class MyExceptionHandler {
 //没有自适应效果...
 ```
 
-​		2）转发到/error进行自适应响应效果处理
+​		（2）转发到/error进行自适应响应效果处理
 
 ```java
  @ExceptionHandler(UserNotExistException.class)
@@ -1146,15 +1146,15 @@ public class MyExceptionHandler {
     }
 ```
 
-#### 	3）将定制数据携带出去
+#### 	2.3 将定制数据携带出去
 
 出现错误以后，会来到/error请求，会被BasicErrorController处理，响应出去可以获取的数据是由getErrorAttributes得到的（是AbstractErrorController（ErrorController）规定的方法）；
 
-​	1、完全来编写一个ErrorController的实现类【或者是编写AbstractErrorController的子类】，放在容器中；
+​	1、完全来编写一个ErrorController的实现类【或者是编写AbstractErrorController的子类】，放在容器中。
 
-​	2、页面上能用的数据，或者是json返回能用的数据都是通过errorAttributes.getErrorAttributes得到；
+​	2、页面上能用的数据，或者是json返回能用的数据都是通过errorAttributes.getErrorAttributes得到。
 
-​			容器中DefaultErrorAttributes.getErrorAttributes()；默认进行数据处理的；
+​			容器中DefaultErrorAttributes.getErrorAttributes()：默认进行数据处理的。
 
 自定义ErrorAttributes
 
@@ -1172,9 +1172,7 @@ public class MyErrorAttributes extends DefaultErrorAttributes {
 }
 ```
 
-最终的效果：响应是自适应的，可以通过定制ErrorAttributes改变需要返回的内容，
-
-![](https://img-blog.csdnimg.cn/20200924074049814.png)
+最终的效果：响应是自适应的，可以通过定制ErrorAttributes改变需要返回的内容。
 
 ## 八、配置嵌入式Servlet容器
 
@@ -1200,7 +1198,7 @@ server.xxx
 server.tomcat.xxx
 ```
 
-（2）编写一个**EmbeddedServletContainerCustomizer**：嵌入式的Servlet容器的定制器；来修改Servlet容器的配置
+（2）编写一个**EmbeddedServletContainerCustomizer**：嵌入式的Servlet容器的定制器，来修改Servlet容器的配置
 
 ```java
 @Bean  //一定要将这个定制器加入到容器中
@@ -1253,7 +1251,7 @@ public ServletListenerRegistrationBean myListener(){
 }
 ```
 
-SpringBoot帮我们自动SpringMVC的时候，自动的注册SpringMVC的前端控制器；DIspatcherServlet；
+SpringBoot帮我们自动SpringMVC的时候，自动的注册SpringMVC的前端控制器：DIspatcherServlet。
 
 DispatcherServletAutoConfiguration中：
 
@@ -1264,7 +1262,7 @@ public ServletRegistrationBean dispatcherServletRegistration(
       DispatcherServlet dispatcherServlet) {
    ServletRegistrationBean registration = new ServletRegistrationBean(
          dispatcherServlet, this.serverProperties.getServletMapping());
-    //默认拦截： /  所有请求；包静态资源，但是不拦截jsp请求；   /*会拦截jsp
+    //默认拦截：所有请求；包静态资源，但是不拦截jsp请求；   /*会拦截jsp
     //可以通过server.servletPath来修改SpringMVC前端控制器默认拦截的请求路径
     
    registration.setName(DEFAULT_DISPATCHER_SERVLET_BEAN_NAME);
@@ -1277,8 +1275,6 @@ public ServletRegistrationBean dispatcherServletRegistration(
 }
 
 ```
-
-2）、SpringBoot能不能支持其他的Servlet容器；
 
 ### 3、替换为其他嵌入式Servlet容器
 
@@ -1589,7 +1585,7 @@ public void refresh() throws BeansException, IllegalStateException {
 }
 ```
 
-4）  onRefresh(); web的ioc容器重写了onRefresh方法
+4）onRefresh();：web的ioc容器重写了onRefresh方法
 
 5）webioc容器会创建嵌入式的Servlet容器；**createEmbeddedServletContainer**();
 
@@ -1597,7 +1593,7 @@ public void refresh() throws BeansException, IllegalStateException {
 
 EmbeddedServletContainerFactory containerFactory = getEmbeddedServletContainerFactory();
 
-​	从ioc容器中获取EmbeddedServletContainerFactory 组件；**TomcatEmbeddedServletContainerFactory**创建对象，后置处理器一看是这个对象，就获取所有的定制器来先定制Servlet容器的相关配置；
+从ioc容器中获取EmbeddedServletContainerFactory 组，**TomcatEmbeddedServletContainerFactory**创建对象，后置处理器一看是这个对象，就获取所有的定制器来先定制Servlet容器的相关配置；
 
 7）使用容器工厂获取嵌入式的Servlet容器**：this.embeddedServletContainer = containerFactory      .getEmbeddedServletContainer(getSelfInitializer());
 
@@ -1605,7 +1601,7 @@ EmbeddedServletContainerFactory containerFactory = getEmbeddedServletContainerFa
 
 **先启动嵌入式的Servlet容器，再将ioc容器中剩下没有创建出的对象获取出来**
 
-**==IOC容器启动创建嵌入式的Servlet容器==**
+**==IOC容器启动创建嵌入式的Servlet容器==**。
 
 ## 九、使用外置的Servlet容器
 
@@ -1613,7 +1609,7 @@ EmbeddedServletContainerFactory containerFactory = getEmbeddedServletContainerFa
 
 ​		优点：简单、便携；
 
-​		缺点：默认不支持JSP、优化定制比较复杂（使用定制器【ServerProperties、自定义EmbeddedServletContainerCustomizer】，自己编写嵌入式Servlet容器的创建工厂【EmbeddedServletContainerFactory】）；
+​		缺点：默认不支持JSP、优化定制比较复杂（使用定制器【ServerProperties、自定义EmbeddedServletContainerCustomizer】，自己编写嵌入式Servlet容器的创建工厂【EmbeddedServletContainerFactory】）。
 
 外置的Servlet容器：外面安装Tomcat---应用war包的方式打包
 
@@ -1645,7 +1641,7 @@ public class ServletInitializer extends SpringBootServletInitializer {
 }
 ```
 
-4）启动服务器就可以使用
+4）启动服务器就可以使用。
 
 ### 原理
 
@@ -1661,11 +1657,11 @@ servlet3.0（Spring注解版）：
 
 规则：
 
-​	1）服务器启动（web应用启动）会创建当前web应用里面每一个jar包里面ServletContainerInitializer实例：
+​	1）服务器启动（web应用启动）会创建当前web应用里面每一个jar包里面ServletContainerInitializer实例；
 
-​	2）ServletContainerInitializer的实现放在jar包的META-INF/services文件夹下，有一个名为javax.servlet.ServletContainerInitializer的文件，内容就是ServletContainerInitializer的实现类的全类名
+​	2）ServletContainerInitializer的实现放在jar包的META-INF/services文件夹下，有一个名为javax.servlet.ServletContainerInitializer的文件，内容就是ServletContainerInitializer的实现类的全类名；
 
-​	3）还可以使用@HandlesTypes，在应用启动的时候加载我们感兴趣的类；
+​	3）还可以使用@HandlesTypes，在应用启动的时候加载我们感兴趣的类。
 
 流程：
 
@@ -1766,7 +1762,7 @@ public ConfigurableApplicationContext run(String... args) {
 }
 ```
 
-**==启动Servlet容器，再启动SpringBoot应用==**
+**==启动Servlet容器，再启动SpringBoot应用==**。
 
 ## 参考
 
