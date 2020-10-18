@@ -511,8 +511,6 @@ spring:
 
 **CommandLineRunner**
 
-
-
 启动流程：
 
 ## **1、创建SpringApplication对象**
@@ -893,7 +891,9 @@ public class HelloServiceAutoConfiguration {
 
 https://github.com/spring-projects/spring-boot/tree/master/spring-boot-samples
 
+# 参考
 
+[视频教程](https://www.bilibili.com/video/BV1gW411W76m?p=28)
 
 
 

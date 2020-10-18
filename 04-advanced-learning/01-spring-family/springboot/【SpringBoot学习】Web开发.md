@@ -1,127 +1,37 @@
 -----------------
 
-## 一、简介
+## 一、SpringBoot对静态资源的映射规则
 
-使用SpringBoot：
+静态资源的映射规则都在WebMvcAutoConfiguration中。
 
-**1）创建SpringBoot应用，选中我们需要的模块；**
+ （1）webjars：以jar包的方式引入静态资源
 
-**2）SpringBoot已经默认将这些场景配置好了，只需要在配置文件中指定少量配置就可以运行起来**
-
-**3）自己编写业务代码；**
-
-
-
-**自动配置原理？**
-
-这个场景SpringBoot帮我们配置了什么？能不能修改？能修改哪些配置？能不能扩展？xxx
-
-```java
-xxxxAutoConfiguration：帮我们给容器中自动配置组件；
-xxxxProperties:配置类来封装配置文件的内容；
-```
-
-
-
-## 二、SpringBoot对静态资源的映射规则
-
-```java
-@ConfigurationProperties(prefix = "spring.resources", ignoreUnknownFields = false)
-public class ResourceProperties implements ResourceLoaderAware {
-  //可以设置和静态资源有关的参数，缓存时间等
-```
-
-静态资源的映射规则都在WebMvcAutoConfiguration中
-
-```java
-		@Override
-		public void addResourceHandlers(ResourceHandlerRegistry registry) {
-			if (!this.resourceProperties.isAddMappings()) {
-				logger.debug("Default resource handling disabled");
-				return;
-			}
-			Integer cachePeriod = this.resourceProperties.getCachePeriod();
-			if (!registry.hasMappingForPattern("/webjars/**")) {
-				customizeResourceHandlerRegistration(
-						registry.addResourceHandler("/webjars/**")
-								.addResourceLocations(
-										"classpath:/META-INF/resources/webjars/")
-						.setCachePeriod(cachePeriod));
-			}
-			String staticPathPattern = this.mvcProperties.getStaticPathPattern();
-          	//静态资源文件夹映射
-			if (!registry.hasMappingForPattern(staticPathPattern)) {
-				customizeResourceHandlerRegistration(
-						registry.addResourceHandler(staticPathPattern)
-								.addResourceLocations(
-										this.resourceProperties.getStaticLocations())
-						.setCachePeriod(cachePeriod));
-			}
-		}
-
-        //配置欢迎页映射
-		@Bean
-		public WelcomePageHandlerMapping welcomePageHandlerMapping(
-				ResourceProperties resourceProperties) {
-			return new WelcomePageHandlerMapping(resourceProperties.getWelcomePage(),
-					this.mvcProperties.getStaticPathPattern());
-		}
-
-       //配置喜欢的图标
-		@Configuration
-		@ConditionalOnProperty(value = "spring.mvc.favicon.enabled", matchIfMissing = true)
-		public static class FaviconConfiguration {
-
-			private final ResourceProperties resourceProperties;
-
-			public FaviconConfiguration(ResourceProperties resourceProperties) {
-				this.resourceProperties = resourceProperties;
-			}
-
-			@Bean
-			public SimpleUrlHandlerMapping faviconHandlerMapping() {
-				SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping();
-				mapping.setOrder(Ordered.HIGHEST_PRECEDENCE + 1);
-              	//所有  **/favicon.ico 
-				mapping.setUrlMap(Collections.singletonMap("**/favicon.ico",
-						faviconRequestHandler()));
-				return mapping;
-			}
-
-			@Bean
-			public ResourceHttpRequestHandler faviconRequestHandler() {
-				ResourceHttpRequestHandler requestHandler = new ResourceHttpRequestHandler();
-				requestHandler
-						.setLocations(this.resourceProperties.getFaviconLocations());
-				return requestHandler;
-			}
-
-		}
-
-```
-
-
-
-==1. 所有 /webjars/** ，都去 classpath:/META-INF/resources/webjars/ 找资源==
-
-​	webjars：以jar包的方式引入静态资源  [webjars官网](https://www.webjars.org/)
-
-![](https://img-blog.csdnimg.cn/20200923161019604.png)
-
-localhost:8080/webjars/jquery/3.3.1/jquery.js
+所有` /webjars/**` ，都在 `classpath:/META-INF/resources/webjars/ `查找资源。
 
 ```xml
 <!--引入jquery-webjar-->在访问的时候只需要写webjars下面资源的名称即可
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>jquery</artifactId>
-			<version>3.3.1</version>
-		</dependency>
+<dependency>
+    <groupId>org.webjars</groupId>
+    <artifactId>jquery</artifactId>
+    <version>3.5.0</version>
+</dependency>
 ```
 
-==2. "/**" 访问当前项目的任何资源，都去（静态资源的文件夹）找映射==
+webjars：以jar包的方式引入静态资源
 
-```
+![](https://img-blog.csdnimg.cn/20201017172911901.png)
+
+访问`localhost:8080/webjars/jquery/3.5.0/jquery.js`
+
+![](https://img-blog.csdnimg.cn/20201017173105783.png)
+
+
+
+（2）`/**`访问当前项目的任何资源，都去（静态资源的文件夹）找映射。
+
+静态资源文件，比如一些JS、CSS、jQuery文件，SpringBoot默认是从以下这些路径中读取的：
+
+```java
 -- "classpath:/META-INF/resources/", 
 -- "classpath:/resources/",
 -- "classpath:/static/", 
@@ -129,68 +39,80 @@ localhost:8080/webjars/jquery/3.3.1/jquery.js
 "/"：当前项目的根路径
 ```
 
-localhost:8080/abc ===  去静态资源文件夹里面找abc
+例如：
 
-==3. 欢迎页； 静态资源文件夹下的所有index.html页面，被"/**"映射；==
+![](https://img-blog.csdnimg.cn/20201017175710824.png)
 
-​	localhost:8080/   找index页面
+（3）首页（欢迎页）
 
-==4. 所有的 **/favicon.ico  都是在静态资源文件下找==
+静态资源文件夹下的所有`index.html`页面，都被`/**`映射。
 
+例如`localhost:8080/`会去静态资源文件下找index页面。
 
+![](https://img-blog.csdnimg.cn/20201017180446548.png)
+
+（4）自定义图标图标
+
+把ico格式的图标放在默认静态资源文件路径下，并以favicon.ico命名，应用图标会自动变成指定的图标。所有的 `**/favicon.ico`  都在静态资源文件下查找。
+
+![](https://img-blog.csdnimg.cn/20201017183451913.png)
+
+（5）在application.properties中手动配置静态资源访问路径。
+
+在application.properties配置文件中如下编辑：
+
+```properties
+# 自定义静态资源访问路径，可以指定多个，之间用逗号隔开
+spring.resources.static-locations=classpath:/test1/,classpath:/test2/
+```
+
+特别要注意：**自定义静态资源访问路径后，SpringBoot默认的静态资源路径将不再起作用**。
 
 ## 三、模板引擎
 
-JSP、Velocity、Freemarker、Thymeleaf
+JSP、Velocity、Freemarker、Thymeleaf......
 
 ![](https://img-blog.csdnimg.cn/20200923162202665.png)
 
 
 
-SpringBoot推荐的Thymeleaf：
+SpringBoot推荐的Thymeleaf：语法更简单，功能更强大。
 
-语法更简单，功能更强大。
-
-
-
-### 1、引入thymeleaf
+### 1、引入Thymeleaf
 
 ```xml
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
-          	2.1.6
 		</dependency>
-		切换thymeleaf版本
+		<!--发现默认用的2.3.4版本，需切换thymeleaf版本-->
         <properties>
             <thymeleaf.version>3.0.9.RELEASE</thymeleaf.version>
             <!-- 布局功能的支持程序  thymeleaf3主程序  layout2以上版本 -->
-            <!-- thymeleaf2   layout1-->
             <thymeleaf-layout-dialect.version>2.2.2</thymeleaf-layout-dialect.version>
         </properties>
 ```
 
-
-
 ### 2、Thymeleaf使用
+
+默认规则：
 
 ```java
 @ConfigurationProperties(prefix = "spring.thymeleaf")
 public class ThymeleafProperties {
-
-	private static final Charset DEFAULT_ENCODING = Charset.forName("UTF-8");
-
-	private static final MimeType DEFAULT_CONTENT_TYPE = MimeType.valueOf("text/html");
-
-	public static final String DEFAULT_PREFIX = "classpath:/templates/";
-
-	public static final String DEFAULT_SUFFIX = ".html";
-  	//
+    private static final Charset DEFAULT_ENCODING;
+    public static final String DEFAULT_PREFIX = "classpath:/templates/";
+    public static final String DEFAULT_SUFFIX = ".html";
+    private boolean checkTemplate = true;
+    private boolean checkTemplateLocation = true;
+    private String prefix = "classpath:/templates/";
+    private String suffix = ".html";
+    private String mode = "HTML";
 ```
 
-只要我们把HTML页面放在classpath:/templates/，thymeleaf就能自动渲染。
+只要我们把HTML页面放在`classpath:/templates/`下，thymeleaf就能自动渲染。
 
-[thyeleaf官方文档](https://www.thymeleaf.org/documentation.html) 
+![](https://img-blog.csdnimg.cn/20201018093303866.png)
 
 使用：
 
@@ -200,7 +122,7 @@ public class ThymeleafProperties {
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 ```
 
-2. 使用thymeleaf语法；
+2. 使用thymeleaf语法
 
 ```html
 <!DOCTYPE html>
@@ -211,7 +133,7 @@ public class ThymeleafProperties {
 </head>
 <body>
     <h1>成功！</h1>
-    <!--th:text 将div里面的文本内容设置为指定的值 -->
+    <!-- th:text 将div里面的文本内容设置为指定的值 -->
     <div th:text="${hello}">这是显示欢迎信息</div>
 </body>
 </html>
@@ -219,21 +141,19 @@ public class ThymeleafProperties {
 
 ### 3、语法规则
 
-1. th:text——改变当前元素里面的文本内容；
+**（1）th:text**——改变当前元素里面的文本内容
 
 ​	   th：任意html属性——替换原生属性的值
 
 ![](https://img-blog.csdnimg.cn/20200923164420771.png)
 
-
-
-2. 表达式
+（2）表达式
 
 ```properties
 Simple expressions:（表达式语法）
     Variable Expressions: ${...}：获取变量值；OGNL
     		1）获取对象的属性、调用方法
-    		2）使用内置的基本对象：
+    		2）使用内置的基本对象
     			#ctx : the context object.
     			#vars: the context variables.
                 #locale : the context locale.
@@ -261,21 +181,21 @@ Simple expressions:（表达式语法）
                 #aggregates : methods for creating aggregates on arrays or collections.
                 #ids : methods for dealing with id attributes that might be repeated (for example, as a 					result of an iteration).
 
-    Selection Variable Expressions: *{...}：选择表达式，其实和${}在功能上是一样
-    	补充功能：配合 th:object="${session.user}：
-        <div th:object="${session.user}">
-            <p>Name: <span th:text="*{firstName}">Sebastian</span>.</p>
-            <p>Surname: <span th:text="*{lastName}">Pepper</span>.</p>
-            <p>Nationality: <span th:text="*{nationality}">Saturn</span>.</p>
-        </div>
+Selection Variable Expressions: *{...}：选择表达式，其实和${}在功能上是一样
+    补充功能：配合 th:object="${session.user}：
+    <div th:object="${session.user}">
+    	<p>Name: <span th:text="*{firstName}">Sebastian</span>.</p>
+        <p>Surname: <span th:text="*{lastName}">Pepper</span>.</p>
+        <p>Nationality: <span th:text="*{nationality}">Saturn</span>.</p>
+    </div>
     
-    Message Expressions: #{...}：获取国际化内容
+Message Expressions: #{...}：获取国际化内容
     
-    Link URL Expressions: @{...}：定义URL
-    		@{/order/process(execId=${execId},execType='FAST')}
+Link URL Expressions: @{...}：定义URL
+    	@{/order/process(execId=${execId},execType='FAST')}
     		
-    Fragment Expressions: ~{...}：片段引用表达式
-    		<div th:insert="~{commons :: main}">...</div>
+Fragment Expressions: ~{...}：片段引用表达式
+    	<div th:insert="~{commons :: main}">...</div>
     		
 Literals（字面量）
       Text literals: 'one text' , 'Another one!' ,…
@@ -309,33 +229,68 @@ Special tokens:
     No-Operation: _ 
 ```
 
+例如：
+
+```java
+    @RequestMapping("/success")
+    public String success(Map<String,Object> map){
+        map.put("hello","<h1>你好</h1>");
+        map.put("users", Arrays.asList("zhangsan","lisi","wangwu"));
+        return "success";
+    }
+```
+
+```html
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<h1>成功！</h1>
+<div th:text="${hello}"></div>
+<div th:utext="${hello}"></div>
+
+<!-- th:each每次遍历都会生成当前这个标签： 3个h4 -->
+<h4 th:text="${user}" th:each="user:${users}"></h4>
+</hr>
+<h4>
+    <span th:each="user:${users}">[[${user}]]</span>
+</h4>
+
+</body>
+</html>
+```
+
+输出结果：
+
+<img src="https://img-blog.csdnimg.cn/20201018100130714.png" style="zoom:67%;" />
+
+
+
 ## 四、SpringMVC自动配置
 
-[ Developing Web Applications](https://docs.spring.io/spring-boot/docs/2.4.0-SNAPSHOT/reference/html/spring-boot-features.html#boot-features-webservices)
+### 1、Spring MVC auto-configuration
 
-### 1. Spring MVC auto-configuration
-
-Spring Boot 自动配置好了SpringMVC
-
-以下是SpringBoot对SpringMVC的默认配置:**==（WebMvcAutoConfiguration）==**
+SpringBoot对SpringMVC的默认配置:**（WebMvcAutoConfiguration）**
 
 - Inclusion of `ContentNegotiatingViewResolver` and `BeanNameViewResolver` beans.
-  - 自动配置了ViewResolver（视图解析器：根据方法的返回值得到视图对象（View），视图对象决定如何渲染（转发？重定向？））
-  - ContentNegotiatingViewResolver：组合所有的视图解析器；
-  - ==如何定制：我们可以自己给容器中添加一个视图解析器；自动的将其组合进来；==
+  - 自动配置了ViewResolver（视图解析器：根据方法的返回值得到视图对象（View），视图对象决定如何渲染（转发/重定向））
+  - ContentNegotiatingViewResolver：组合所有的视图解析器。
+  - ==如何定制：我们可以自己给容器中添加一个视图解析器，自动的将其组合进来。==
 
-- Support for serving static resources, including support for WebJars (see below).静态资源文件夹路径,webjars
+- Support for serving static resources, including support for WebJars (see below).静态资源文件夹路径,webjars。
 
 - Static `index.html` support. 静态首页访问
 
 - Custom `Favicon` support (see below).  favicon.ico
 
-  
+- Automatic registration of `Converter`, `GenericConverter`, `Formatter` beans.
 
-- 自动注册了 of `Converter`, `GenericConverter`, `Formatter` beans.
-
-  - Converter：转换器—— public String hello(User user)：类型转换使用Converter
-  - `Formatter`  格式化器；  2017.12.17===Date；
+  - `Converter`转换器—— public String hello(User user)：类型转换使用Converter
+  - `Formatter`  格式化器， 2020.10.10/2020-10-10——>Date
 
 ```java
 		@Bean
@@ -345,36 +300,31 @@ Spring Boot 自动配置好了SpringMVC
 		}
 ```
 
-​	==自己添加的格式化器转换器，我们只需要放在容器中即可==
+​	==添加的格式化器转换器，我们只需要放在容器中即可。==
 
 - Support for `HttpMessageConverters` (see below).
 
-  - HttpMessageConverter：SpringMVC用来转换Http请求和响应的；User---Json；
+  - `HttpMessageConverter`：SpringMVC用来转换Http请求和响应的，User对象---Json数据；
 
-  - `HttpMessageConverters` 是从容器中确定；获取所有的HttpMessageConverter；
+  - `HttpMessageConverters` 是从容器中确定，获取所有的HttpMessageConverter；
 
-    ==自己给容器中添加HttpMessageConverter，只需要将自己的组件注册容器中（@Bean,@Component）==
+    ==给容器中添加HttpMessageConverter，只需要将自己的组件注册容器中（@Bean，@Component）==
 
     
 
-- Automatic registration of `MessageCodesResolver` (see below).定义错误代码生成规则
+- Automatic registration of `MessageCodesResolver` (see below).定义错误代码生成规则。
 
 - Automatic use of a `ConfigurableWebBindingInitializer` bean (see below).
 
-  ==我们可以配置一个ConfigurableWebBindingInitializer来替换默认的；（添加到容器）==
+  ==可以自己配置一个ConfigurableWebBindingInitializer来替换默认的（添加到容器）==，初始化WebDataBinder数据绑定器，将请求数据绑定到JavaBean中
 
-  ```
-  初始化WebDataBinder；
-  请求数据=====JavaBean；
-  ```
+**org.springframework.boot.autoconfigure.web：web的所有自动场景**
 
-**org.springframework.boot.autoconfigure.web：web的所有自动场景；**
+### 2、扩展SpringMVC
 
 If you want to keep Spring Boot MVC features, and you just want to add additional [MVC configuration](https://docs.spring.io/spring/docs/4.3.14.RELEASE/spring-framework-reference/htmlsingle#mvc) (interceptors, formatters, view controllers etc.) you can add your own `@Configuration` class of type `WebMvcConfigurerAdapter`, but **without** `@EnableWebMvc`. If you wish to provide custom instances of `RequestMappingHandlerMapping`, `RequestMappingHandlerAdapter` or `ExceptionHandlerExceptionResolver` you can declare a `WebMvcRegistrationsAdapter` instance providing such components.
 
 If you want to take complete control of Spring MVC, you can add your own `@Configuration` annotated with `@EnableWebMvc`.
-
-### 2、扩展SpringMVC
 
 ```xml
     <mvc:view-controller path="/hello" view-name="success"/>
@@ -386,9 +336,9 @@ If you want to take complete control of Spring MVC, you can add your own `@Confi
     </mvc:interceptors>
 ```
 
-**==编写一个配置类（@Configuration），是WebMvcConfigurerAdapter类型；不能标注@EnableWebMvc==**;
+**==编写一个配置类（@Configuration），是WebMvcConfigurerAdapter类型，不能标注@EnableWebMvc==**。
 
-既保留了所有的自动配置，也能用我们扩展的配置；
+既保留了所有的自动配置，也能用我们扩展的配置。
 
 ```java
 //使用WebMvcConfigurerAdapter可以来扩展SpringMVC的功能
@@ -405,9 +355,9 @@ public class MyMvcConfig extends WebMvcConfigurerAdapter {
 
 原理：
 
-​	1）WebMvcAutoConfiguration是SpringMVC的自动配置类
+​	1）WebMvcAutoConfiguration是SpringMVC的自动配置类。
 
-​	2）在做其他自动配置时会导入；@Import(**EnableWebMvcConfiguration**.class)
+​	2）在做其他自动配置时会导入，@Import(**EnableWebMvcConfiguration**.class)
 
 ```java
     @Configuration
@@ -421,26 +371,26 @@ public class MyMvcConfig extends WebMvcConfigurerAdapter {
               this.configurers.addWebMvcConfigurers(configurers);
             	//一个参考实现；将所有的WebMvcConfigurer相关配置都来一起调用；  
             	@Override
-             // public void addViewControllers(ViewControllerRegistry registry) {
-              //    for (WebMvcConfigurer delegate : this.delegates) {
-               //       delegate.addViewControllers(registry);
-               //   }
+             	// public void addViewControllers(ViewControllerRegistry registry) {
+              	//    for (WebMvcConfigurer delegate : this.delegates) {
+               	//       delegate.addViewControllers(registry);
+               	//   }
               }
           }
 	}
 ```
 
-​	3）容器中所有的WebMvcConfigurer都会一起起作用；
+​	3）容器中所有的WebMvcConfigurer都会一起起作用。
 
-​	4）我们的配置类也会被调用；
+​	4）我们的配置类也会被调用。
 
-​	效果：SpringMVC的自动配置和我们的扩展配置都会起作用；
+​	效果：SpringMVC的自动配置和我们的扩展配置都会起作用。
 
 ### 3、全面接管SpringMVC
 
-SpringBoot对SpringMVC的自动配置不需要了，所有都是我们自己配置；所有的SpringMVC的自动配置都失效了
+SpringBoot对SpringMVC的自动配置不需要了，所有都是我们自己配置，所有的SpringMVC的自动配置都失效了。
 
-**在配置类中添加@EnableWebMvc即可；**
+**在配置类中添加@EnableWebMvc即可**
 
 ```java
 //使用WebMvcConfigurerAdapter可以来扩展SpringMVC的功能
@@ -451,17 +401,17 @@ public class MyMvcConfig extends WebMvcConfigurerAdapter {
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
        // super.addViewControllers(registry);
-        //浏览器发送 /atguigu 请求来到 success
-        registry.addViewController("/atguigu").setViewName("success");
+        //浏览器发送 /kai 请求来到 success
+        registry.addViewController("/kai").setViewName("success");
     }
 }
 ```
 
 原理：
 
-为什么@EnableWebMvc自动配置就失效了；
+为什么@EnableWebMvc自动配置就失效了。
 
-1）@EnableWebMvc的核心
+（1）@EnableWebMvc的核心
 
 ```java
 @Import(DelegatingWebMvcConfiguration.class)
@@ -482,7 +432,7 @@ public class DelegatingWebMvcConfiguration extends WebMvcConfigurationSupport {
 @ConditionalOnWebApplication
 @ConditionalOnClass({ Servlet.class, DispatcherServlet.class,
 		WebMvcConfigurerAdapter.class })
-//容器中没有这个组件的时候，这个自动配置类才生效
+//容器中没有这个组件的时候，自动配置类才生效
 @ConditionalOnMissingBean(WebMvcConfigurationSupport.class)
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE + 10)
 @AutoConfigureAfter({ DispatcherServletAutoConfiguration.class,
@@ -490,28 +440,25 @@ public class DelegatingWebMvcConfiguration extends WebMvcConfigurationSupport {
 public class WebMvcAutoConfiguration {
 ```
 
-2）@EnableWebMvc将WebMvcConfigurationSupport组件导入进来；
-
-3）导入的WebMvcConfigurationSupport只是SpringMVC最基本的功能；
+（2）可见，@EnableWebMvc将WebMvcConfigurationSupport组件导入进来，导入的WebMvcConfigurationSupport只是SpringMVC最基本的功能。
 
 
 
 ## 五、如何修改SpringBoot的默认配置
 
-模式：
+小结：
 
-​	1. SpringBoot在自动配置很多组件的时候，先看容器中有没有用户自己配置的（@Bean、@Component）如果有就用用户配置的，如果没有，才自动配置；如果有些组件可以有多个（ViewResolver）将用户配置的和自己默认的组合起来；
+​	1. SpringBoot在自动配置很多组件的时候，先看容器中有没有用户自己配置的（@Bean、@Component）如果有就用用户配置的，如果没有，才自动配置；如果有些组件可以有多个（ViewResolver）将用户配置的和自己默认的组合起来。
 
-​	2. 在SpringBoot中会有非常多的xxxConfigurer帮助我们进行扩展配置
+​	2. 在SpringBoot中会有非常多的xxxConfigurer帮助我们进行扩展配置。
 
-​	3. 在SpringBoot中会有很多的xxxCustomizer帮助我们进行定制配置
+​	3. 在SpringBoot中会有很多的xxxCustomizer帮助我们进行定制配置。
 
 ## 六、RestfulCRUD
 
 ### 1、默认访问首页
 
 ```java
-
 //使用WebMvcConfigurerAdapter可以来扩展SpringMVC的功能
 //@EnableWebMvc   不要接管SpringMVC
 @Configuration
@@ -537,28 +484,25 @@ public class MyMvcConfig extends WebMvcConfigurerAdapter {
         return adapter;
     }
 }
-
 ```
 
 ### 2、国际化
 
-  **1. 编写国际化配置文件；**
+  **1. 编写国际化配置文件**
 
 2. 使用ResourceBundleMessageSource管理国际化资源文件
 
 3. 在页面使用fmt:message取出国际化内容
 
-
-
 步骤：
 
-1）编写国际化配置文件，抽取页面需要显示的国际化消息
+（1）编写国际化配置文件，抽取页面需要显示的国际化消息
 
 ![](https://img-blog.csdnimg.cn/20200923204903441.png)
 
 
 
-2）SpringBoot自动配置好了管理国际化资源文件的组件；
+（2）SpringBoot自动配置好了管理国际化资源文件的组件；
 
 ```java
 @ConfigurationProperties(prefix = "spring.messages")
@@ -591,9 +535,7 @@ public class MessageSourceAutoConfiguration {
 	}
 ```
 
-
-
-3）去页面获取国际化的值；
+（3）去页面获取国际化的值；
 
 ```html
 <!DOCTYPE html>
@@ -634,13 +576,13 @@ public class MessageSourceAutoConfiguration {
 </html>
 ```
 
-效果：根据浏览器语言设置的信息切换了国际化；
+效果：根据浏览器语言设置的信息切换了国际化。
 
 
 
 原理：
 
-​	国际化Locale（区域信息对象）；LocaleResolver（获取区域信息对象）；
+​	国际化Locale（区域信息对象），LocaleResolver（获取区域信息对象）。
 
 ```java
 		@Bean
@@ -658,7 +600,7 @@ public class MessageSourceAutoConfiguration {
 默认的就是根据请求头带来的区域信息获取Locale进行国际化
 ```
 
-4）点击链接切换国际化
+（4）点击链接切换国际化
 
 ```java
 /**
@@ -689,24 +631,20 @@ public class MyLocaleResolver implements LocaleResolver {
         return new MyLocaleResolver();
     }
 }
-
-
 ```
 
 ### 3、登陆
 
-开发期间模板引擎页面修改以后，要实时生效
+开发期间模板引擎页面修改以后，要实时生效。
 
-1）禁用模板引擎的缓存
+（1）禁用模板引擎的缓存
 
 ```
 # 禁用缓存
 spring.thymeleaf.cache=false 
 ```
 
-2）页面修改完成以后ctrl+f9：重新编译；
-
-
+（2）页面修改完成以后ctrl+f9：重新编译。
 
 登陆错误消息的显示
 
@@ -714,14 +652,11 @@ spring.thymeleaf.cache=false
 <p style="color: red" th:text="${msg}" th:if="${not #strings.isEmpty(msg)}"></p>
 ```
 
-
-
 ### 4、拦截器进行登陆检查
 
 拦截器
 
 ```java
-
 /**
  * 登陆检查，
  */
@@ -755,8 +690,6 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
 
 ```
 
-
-
 注册拦截器
 
 ```java
@@ -789,7 +722,7 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
 
 实验要求：
 
-1）RestfulCRUD：CRUD满足Rest风格；
+（1）RestfulCRUD：CRUD满足Rest风格；
 
 URI：  /资源名称/资源标识       HTTP请求方式区分对资源CRUD操作
 
@@ -800,7 +733,7 @@ URI：  /资源名称/资源标识       HTTP请求方式区分对资源CRUD操�
 | 修改 | updateEmp?id=xxx&xxx=xx   | emp/{id}---PUT    |
 | 删除 | deleteEmp?id=1            | emp/{id}---DELETE |
 
-2）实验的请求架构;
+（2）实验的请求架构
 
 | 实验功能                             | 请求URI | 请求方式 |
 | ------------------------------------ | ------- | -------- |
@@ -812,9 +745,9 @@ URI：  /资源名称/资源标识       HTTP请求方式区分对资源CRUD操�
 | 修改员工                             | emp     | PUT      |
 | 删除员工                             | emp/1   | DELETE   |
 
-3）员工列表：
+（3）员工列表
 
-#### thymeleaf公共页面元素抽取
+**thymeleaf公共页面元素抽取**
 
 ```html
 1、抽取公共片段
@@ -833,8 +766,6 @@ insert的公共片段在div标签中
 行内写法可以加上：[[~{}]];[(~{})]；
 ```
 
-
-
 三种引入公共片段的th属性：
 
 **th:insert**：将公共片段整个插入到声明引入的元素中
@@ -842,8 +773,6 @@ insert的公共片段在div标签中
 **th:replace**：将声明引入的元素替换为公共片段
 
 **th:include**：将被引入的片段的内容包含进这个标签中
-
-
 
 ```html
 <footer th:fragment="copy">
@@ -870,8 +799,6 @@ insert的公共片段在div标签中
 	&copy; 2011 The Good Thymes Virtual Grocery
 </div>
 ```
-
-
 
 引入片段的时候传入参数： 
 
@@ -908,7 +835,7 @@ insert的公共片段在div标签中
     </div>
     <div class="form-group">
         <label>Email</label>
-        <input type="email" class="form-control" placeholder="zhangsan@atguigu.com">
+        <input type="email" class="form-control" placeholder="zhangsan@kai.com">
     </div>
     <div class="form-group">
         <label>Gender</label><br/>
@@ -939,15 +866,15 @@ insert的公共片段在div标签中
 </form>
 ```
 
-提交的数据格式不对：生日：日期；
+提交的数据格式不对：生日：日期。
 
-2017-12-12；2017/12/12；2017.12.12；
+2017-12-12；2017/12/12；2017.12.12。
 
-日期的格式化；SpringMVC将页面提交的值需要转换为指定的类型;
+日期的格式化；SpringMVC将页面提交的值需要转换为指定的类型。
 
-2017-12-12---Date； 类型转换，格式化;
+2017-12-12---Date； 类型转换，格式化。
 
-默认日期是按照/的方式；
+默认日期是按照/的方式。
 
 ### 7、CRUD-员工修改
 
@@ -970,7 +897,7 @@ insert的公共片段在div标签中
     </div>
     <div class="form-group">
         <label>Email</label>
-        <input name="email" type="email" class="form-control" placeholder="zhangsan@atguigu.com" th:value="${emp!=null}?${emp.email}">
+        <input name="email" type="email" class="form-control" placeholder="zhangsan@kai.com" th:value="${emp!=null}?${emp.email}">
     </div>
     <div class="form-group">
         <label>Gender</label><br/>
@@ -1024,15 +951,13 @@ insert的公共片段在div标签中
 </script>
 ```
 
-
-
 ## 七、错误处理机制
 
 ### 1、SpringBoot默认的错误处理机制
 
 默认效果：
 
-​		1. 浏览器，返回一个默认的错误页面
+​		1. 浏览器，返回一个默认的错误页面。
 
 ![](https://img-blog.csdnimg.cn/20200923234108145.png)
 
@@ -1070,8 +995,6 @@ insert的公共片段在div标签中
 	}
 ```
 
-
-
 ​	（2）BasicErrorController：处理默认/error请求
 
 ```java
@@ -1102,16 +1025,12 @@ public class BasicErrorController extends AbstractErrorController {
 	}
 ```
 
-
-
 ​	（3）ErrorPageCustomizer：
 
 ```java
 	@Value("${error.path:/error}")
 	private String path = "/error";  系统出现错误以后来到error请求进行处理；（web.xml注册的错误页面规则）
 ```
-
-
 
 ​	（4）DefaultErrorViewResolver：
 
@@ -1142,8 +1061,6 @@ public class BasicErrorController extends AbstractErrorController {
 	}
 ```
 
-
-
 ​	步骤：
 
 ​		一但系统出现4xx或者5xx之类的错误；ErrorPageCustomizer就会生效（定制错误的响应规则）；就会来到/error请求；就会被**BasicErrorController**处理；
@@ -1168,9 +1085,9 @@ protected ModelAndView resolveErrorView(HttpServletRequest request,
 
 #### 	**1）定制错误的页面**
 
-​			**1）有模板引擎的情况下；error/状态码;** 【将错误页面命名为  错误状态码.html 放在模板引擎文件夹里面的 error文件夹下】，发生此状态码的错误就会来到  对应的页面；
+​			**1）有模板引擎的情况下；error/状态码;**【将错误页面命名为  错误状态码.html 放在模板引擎文件夹里面的 error文件夹下】，发生此状态码的错误就会来到  对应的页面。
 
-​			我们可以使用4xx和5xx作为错误页面的文件名来匹配这种类型的所有错误，精确优先（优先寻找精确的状态码.html）；		
+​			我们可以使用4xx和5xx作为错误页面的文件名来匹配这种类型的所有错误，精确优先（优先寻找精确的状态码.html）。		
 
 ​			页面能获取的信息；
 
@@ -1186,15 +1103,9 @@ protected ModelAndView resolveErrorView(HttpServletRequest request,
 
 ​				errors：JSR303数据校验的错误都在这里
 
-
-
 ​			2）、没有模板引擎（模板引擎找不到这个错误页面），静态资源文件夹下找；
 
-
-
 ​			3）、以上都没有错误页面，就是默认来到SpringBoot默认的错误提示页面；
-
-
 
 #### 	2）定制错误的json数据
 
@@ -1215,8 +1126,6 @@ public class MyExceptionHandler {
 }
 //没有自适应效果...
 ```
-
-
 
 ​		2）转发到/error进行自适应响应效果处理
 
@@ -1257,7 +1166,7 @@ public class MyErrorAttributes extends DefaultErrorAttributes {
     @Override
     public Map<String, Object> getErrorAttributes(RequestAttributes requestAttributes, boolean includeStackTrace) {
         Map<String, Object> map = super.getErrorAttributes(requestAttributes, includeStackTrace);
-        map.put("company","atguigu");
+        map.put("company","kai");
         return map;
     }
 }
@@ -1267,19 +1176,15 @@ public class MyErrorAttributes extends DefaultErrorAttributes {
 
 ![](https://img-blog.csdnimg.cn/20200924074049814.png)
 
-
-
 ## 八、配置嵌入式Servlet容器
 
-SpringBoot默认使用Tomcat作为嵌入式的Servlet容器；
+SpringBoot默认使用Tomcat作为嵌入式的Servlet容器。
 
 ![](https://img-blog.csdnimg.cn/20200924082246214.png)
 
 
 
-问题？
-
-### 1、如何定制和修改Servlet容器的相关配置；
+### 1、定制和修改Servlet容器的相关配置
 
 （1）修改和server有关的配置（ServerProperties【也是EmbeddedServletContainerCustomizer】
 
@@ -1315,9 +1220,7 @@ public EmbeddedServletContainerCustomizer embeddedServletContainerCustomizer(){
 
 由于SpringBoot默认是以jar包的方式启动嵌入式的Servlet容器来启动SpringBoot的web应用，没有web.xml文件。
 
-注册三大组件用以下方式
-
-ServletRegistrationBean
+注册三大组件用以ServletRegistrationBean方式
 
 ```java
 //注册三大组件
@@ -1326,7 +1229,6 @@ public ServletRegistrationBean myServlet(){
     ServletRegistrationBean registrationBean = new ServletRegistrationBean(new MyServlet(),"/myServlet");
     return registrationBean;
 }
-
 ```
 
 FilterRegistrationBean
@@ -1350,8 +1252,6 @@ public ServletListenerRegistrationBean myListener(){
     return registrationBean;
 }
 ```
-
-
 
 SpringBoot帮我们自动SpringMVC的时候，自动的注册SpringMVC的前端控制器；DIspatcherServlet；
 
@@ -1617,11 +1517,11 @@ ServerProperties也是定制器
 
 获取嵌入式的Servlet容器工厂：
 
-1）SpringBoot应用启动运行run方法
+1）SpringBoot应用启动运行run方法。
 
-2）refreshContext(context);SpringBoot刷新IOC容器【创建IOC容器对象，并初始化容器，创建容器中的每一个组件】；如果是web应用创建**AnnotationConfigEmbeddedWebApplicationContext**，否则：**AnnotationConfigApplicationContext**
+2）refreshContext(context)，SpringBoot刷新IOC容器【创建IOC容器对象，并初始化容器，创建容器中的每一个组件】，如果是web应用创建**AnnotationConfigEmbeddedWebApplicationContext**，否则：**AnnotationConfigApplicationContext**
 
-3）refresh(context);**刷新刚才创建好的ioc容器；**
+3）refresh(context);**刷新刚才创建好的ioc容器**
 
 ```java
 public void refresh() throws BeansException, IllegalStateException {
@@ -1701,13 +1601,11 @@ EmbeddedServletContainerFactory containerFactory = getEmbeddedServletContainerFa
 
 7）使用容器工厂获取嵌入式的Servlet容器**：this.embeddedServletContainer = containerFactory      .getEmbeddedServletContainer(getSelfInitializer());
 
-8）嵌入式的Servlet容器创建对象并启动Servlet容器；
+8）嵌入式的Servlet容器创建对象并启动Servlet容器。
 
 **先启动嵌入式的Servlet容器，再将ioc容器中剩下没有创建出的对象获取出来**
 
 **==IOC容器启动创建嵌入式的Servlet容器==**
-
-
 
 ## 九、使用外置的Servlet容器
 
@@ -1716,8 +1614,6 @@ EmbeddedServletContainerFactory containerFactory = getEmbeddedServletContainerFa
 ​		优点：简单、便携；
 
 ​		缺点：默认不支持JSP、优化定制比较复杂（使用定制器【ServerProperties、自定义EmbeddedServletContainerCustomizer】，自己编写嵌入式Servlet容器的创建工厂【EmbeddedServletContainerFactory】）；
-
-
 
 外置的Servlet容器：外面安装Tomcat---应用war包的方式打包
 
@@ -1749,7 +1645,7 @@ public class ServletInitializer extends SpringBootServletInitializer {
 }
 ```
 
-4）启动服务器就可以使用；
+4）启动服务器就可以使用
 
 ### 原理
 
@@ -1770,8 +1666,6 @@ servlet3.0（Spring注解版）：
 ​	2）ServletContainerInitializer的实现放在jar包的META-INF/services文件夹下，有一个名为javax.servlet.ServletContainerInitializer的文件，内容就是ServletContainerInitializer的实现类的全类名
 
 ​	3）还可以使用@HandlesTypes，在应用启动的时候加载我们感兴趣的类；
-
-
 
 流程：
 
@@ -1873,3 +1767,13 @@ public ConfigurableApplicationContext run(String... args) {
 ```
 
 **==启动Servlet容器，再启动SpringBoot应用==**
+
+## 参考
+
+[视频教程](https://www.bilibili.com/video/BV1gW411W76m?p=28)
+
+[webjars官网](https://www.webjars.org/)
+
+[Thymeleaf官方文档](https://www.thymeleaf.org/documentation.html) 
+
+[Spring Web MVC Framework](https://docs.spring.io/spring-boot/docs/2.4.0-SNAPSHOT/reference/html/spring-boot-features.html#boot-features-spring-mvc)
