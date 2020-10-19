@@ -502,7 +502,7 @@ spring:
 
 启动流程：
 
-## **1、创建SpringApplication对象**
+## 1、创建SpringApplication对象
 
 ```java
 initialize(sources);
