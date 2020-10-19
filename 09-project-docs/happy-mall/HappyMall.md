@@ -16,11 +16,11 @@
 
 |  模块   | 说明  | 对应数据库  |
 |  :----:  | :----:  |  :----:  |
-|  mall-coupon   | 优惠卷服务  | happymall_sms |
-|  mall-member   | 会员服务  | happymall_ums |
-|  mall-order   | 订单服务  | happymall_oms |
-|  mall-product   | 商品服务  | happymall_pms |
-|  mall-ware   | 仓储服务  | happymall_wms |
+|  mall-coupon   | 优惠卷服务  | mall_sms |
+|  mall-member   | 会员服务  | mall_ums |
+|  mall-order   | 订单服务  | mall_oms |
+|  mall-product   | 商品服务  | mall_pms |
+|  mall-ware   | 仓储服务  | mall_wms |
 
 ### 后端技术  
 
@@ -37,7 +37,7 @@
 |  Lombok | 简化对象封装工具 | https://github.com/rzwitserloot/lombok  |
 |  Nacos | 分布式组件 | https://nacos.io/zh-cn/docs/quick-start.html  |
 
-### 前端技术 
+### 前端技术
 
 |  技术   | 说明  | 官网&使用教程  |
 |  :----:  | :----:  |  :----:  |

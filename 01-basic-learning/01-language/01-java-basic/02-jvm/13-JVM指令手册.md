@@ -1,13 +1,10 @@
 # JVM指令手册
 
-尚硅谷Java研究院
-
-
-
 ## 一、栈和局部变量操作
 
 ### 将常量压入栈的指令
 
+```java
 aconst_null 将null对象引用压入栈
 iconst_m1 将int类型常量-1压入栈
 iconst_0 将int类型常量0压入栈
@@ -27,9 +24,13 @@ sipush 将16位带符号整数压入栈
 ldc 把常量池中的项压入栈
 ldc_w 把常量池中的项压入栈（使用宽索引）
 ldc2_w 把常量池中long类型或者double类型的项压入栈（使用宽索引）
+```
+
+
 
 ### 从栈中的局部变量中装载值的指令
 
+```java
 iload 从局部变量中装载int类型值
 lload 从局部变量中装载long类型值
 fload 从局部变量中装载float类型值
@@ -63,9 +64,13 @@ aaload 从数组中装载引用类型值
 baload 从数组中装载byte类型或boolean类型值
 caload 从数组中装载char类型值
 saload 从数组中装载short类型值
+```
+
+
 
 ### 将栈中的值存入局部变量的指令
 
+```java
 istore 将int类型值存入局部变量
 lstore 将long类型值存入局部变量
 fstore 将float类型值存入局部变量
@@ -101,9 +106,13 @@ castore 将char类型值存入数组中
 sastore 将short类型值存入数组中
 wide指令
 wide 使用附加字节扩展局部变量索引
+```
+
+
 
 ### 通用(无类型）栈操作
 
+```java
 nop 不做任何操作
 pop 弹出栈顶端一个字长的内容
 pop2 弹出栈顶端两个字长的内容
@@ -114,9 +123,13 @@ dup2 复制栈顶部两个字长内容
 dup2_x1 复制栈顶部两个字长的内容，然后将复制内容及原来弹出的三个字长的内容压入栈
 dup2_x2 复制栈顶部两个字长的内容，然后将复制内容及原来弹出的四个字长的内容压入栈
 swap 交换栈顶部两个字长内容
+```
+
+
 
 ## 二、类型转换
 
+```java
 i2l 把int类型的数据转化为long类型
 i2f 把int类型的数据转化为float类型
 i2d 把int类型的数据转化为double类型
@@ -132,9 +145,13 @@ d2f 把double类型的数据转化为float类型
 i2b 把int类型的数据转化为byte类型
 i2c 把int类型的数据转化为char类型
 i2s 把int类型的数据转化为short类型
+```
+
+
 
 ## 三、整数运算
 
+```java
 iadd 执行int类型的加法
 ladd 执行long类型的加法
 isub 执行int类型的减法
@@ -148,29 +165,41 @@ lrem 计算long类型除法的余数
 ineg 对一个int类型值进行取反操作
 lneg 对一个long类型值进行取反操作
 iinc 把一个常量值加到一个int类型的局部变量上
+```
+
+
 
 ## 四、逻辑运算
 
 ### 移位操作
 
+```java
 ishl 执行int类型的向左移位操作
 lshl 执行long类型的向左移位操作
 ishr 执行int类型的向右移位操作
 lshr 执行long类型的向右移位操作
 iushr 执行int类型的向右逻辑移位操作
 lushr 执行long类型的向右逻辑移位操作
+```
+
+
 
 ### 按位布尔运算
 
+```java
 iand 对int类型值进行“逻辑与”操作
 land 对long类型值进行“逻辑与”操作
 ior 对int类型值进行“逻辑或”操作
 lor 对long类型值进行“逻辑或”操作
 ixor 对int类型值进行“逻辑异或”操作
 lxor 对long类型值进行“逻辑异或”操作
+```
+
+
 
 ### 浮点运算
 
+```java
 fadd 执行float类型的加法
 dadd 执行double类型的加法
 fsub 执行float类型的减法
@@ -183,11 +212,15 @@ frem 计算float类型除法的余数
 drem 计算double类型除法的余数
 fneg 将一个float类型的数值取反
 dneg 将一个double类型的数值取反
+```
+
+
 
 ## 五、对象和数组
 
 ### 对象操作指令
 
+```java
 new 创建一个新对象
 checkcast 确定对象为所给定的类型。后跟目标类，判断栈顶元素是否为目标类 / 接口的实例。如果不是便抛出异常
 getfield 从对象中获取字段
@@ -195,18 +228,26 @@ putfield 设置对象中字段的值
 getstatic 从类中获取静态字段
 putstatic 设置类中静态字段的值
 instanceof 判断对象是否为给定的类型。后跟目标类，判断栈顶元素是否为目标类 / 接口的实例。是则压入 1，否则压入 0
+```
+
+
 
 ### 数组操作指令
 
+```java
 newarray 分配数据成员类型为基本上数据类型的新数组
 anewarray 分配数据成员类型为引用类型的新数组
 arraylength 获取数组长度
 multianewarray 分配新的多维数组
+```
+
+
 
 ## 六、控制流
 
 ### 条件分支指令
 
+```java
 ifeq 如果等于0，则跳转
 ifne 如果不等于0，则跳转
 iflt 如果小于0，则跳转
@@ -223,58 +264,90 @@ ifnull 如果等于null，则跳转
 ifnonnull 如果不等于null，则跳转
 if_acmpeq 如果两个对象引用相等，则跳转
 if_acmpnc 如果两个对象引用不相等，则跳转
+```
+
+
 
 ### 比较指令
 
+```java
 lcmp 比较long类型值
 fcmpl 比较float类型值（当遇到NaN时，返回-1）
 fcmpg 比较float类型值（当遇到NaN时，返回1）
 dcmpl 比较double类型值（当遇到NaN时，返回-1）
 dcmpg 比较double类型值（当遇到NaN时，返回1）
+```
+
+
 
 ### 无条件转移指令
 
+```java
 goto 无条件跳转
 goto_w 无条件跳转（宽索引）
+```
+
+
 
 ### 表跳转指令
 
+```java
 tableswitch 通过索引访问跳转表，并跳转
 lookupswitch 通过键值匹配访问跳转表，并执行跳转操作
+```
+
+
 
 ### 异常
 
+```java
 athrow 抛出异常或错误。将栈顶异常抛出
 finally子句
 jsr 跳转到子例程
 jsr_w 跳转到子例程（宽索引）
 rct 从子例程返回
+```
+
+
 
 ## 七、方法调用与返回
 
 ### 方法调用指令
 
+```java
 invokcvirtual 运行时按照对象的类来调用实例方法
 invokespecial 根据编译时类型来调用实例方法
 invokestatic 调用类（静态）方法
 invokcinterface 调用接口方法
+```
+
+
 
 ### 方法返回指令
 
+```java
 ireturn 从方法中返回int类型的数据
 lreturn 从方法中返回long类型的数据
 freturn 从方法中返回float类型的数据
 dreturn 从方法中返回double类型的数据
 areturn 从方法中返回引用类型的数据
 return 从方法中返回，返回值为void
+```
+
+
 
 ### 线程同步
 
+```java
 montiorenter 进入并获取对象监视器。即：为栈顶对象加锁
 monitorexit 释放并退出对象监视器。即：为栈顶对象解锁
+```
+
+
 
 ## 八、JVM指令助记符
 
+```java
 变量到操作数栈：iload,iload_,lload,lload_,fload,fload_,dload,dload_,aload,aload_
 操作数栈到变量：istore,istore_,lstore,lstore_,fstore,fstore_,dstore,dstor_,astore,astore_
 常数到操作数栈：bipush,sipush,ldc,ldc_w,ldc2_w,aconst_null,iconst_ml,iconst_,lconst_,fconst_,dconst_
@@ -310,4 +383,5 @@ fcmpg,dcmpl,dcmpg
 方法返回：ireturn,lreturn,freturn,dreturn,areturn,return
 异常：athrow
 finally关键字的实现使用：jsr,jsr_w,ret
+```
 

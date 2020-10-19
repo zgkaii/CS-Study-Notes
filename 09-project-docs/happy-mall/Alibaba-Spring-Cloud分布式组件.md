@@ -1,5 +1,6 @@
-### Nacos注册中心（Nacos Discovery）
+## 一、Nacos注册中心（Nacos Discovery）
 1、首先，修改 pom.xml 文件，引入 Nacos Discovery Starter。
+
 ``` yml
 <dependency>
         <groupId>com.alibaba.cloud</groupId>
@@ -7,6 +8,7 @@
     </dependency>
 ```
 2、在应用的 /src/main/resources/application.properties 配置文件中配置 Nacos Server 地址与服务模块名
+
 ```properties
 spring:
   cloud:
@@ -29,8 +31,8 @@ public class MallCouponApplication {
 ```
  访问[http://127.0.0.1:8848/nacos/](http://127.0.0.1:8848/nacos/),
  在服务管理-服务列表可以查看所有运行的实例。
- 
- ### OpenFeign远程调用
+
+ ## 二、OpenFeign远程调用
  以member会员服务远程调用coupon仓储服务为例：  
  1、member服务模块中引入open-feign
  ```yml
@@ -38,7 +40,7 @@ public class MallCouponApplication {
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
-```
+ ```
 2、编写一个接口，告诉SpringCLoud这个接口需要调用远程服务
 修改“com\jd\mall\coupon\controller\CouponController.java”，添加以下controller方法：
 ```yml
@@ -92,9 +94,10 @@ public class MallMemberApplication {
 ![](https://cdn.nlark.com/yuque/0/2020/png/512093/1591341334471-334ddb93-08aa-4d86-ab4e-22619d03f367.png#align=left&display=inline&height=266&margin=%5Bobject%20Object%5D&originHeight=266&originWidth=1098&status=done&style=none&width=1098)
 启动“jdmall-coupon”服务，再次访问，又恢复了正常。
 
-### 配置中心
+## 三、配置中心（Nacos Config）
 [Nacos三种配置加载方方案](https://github.com/alibaba/spring-cloud-alibaba/blob/master/spring-cloud-alibaba-docs/src/main/asciidoc-zh/nacos-config.adoc)
-##### 1、读取本地配置文件
+
+### 1、读取本地配置文件
 （1）首先，修改 pom.xml 文件，引入 Nacos Config Starter。
 ```yaml
  <dependency>
@@ -106,7 +109,7 @@ public class MallMemberApplication {
 ```yaml
  spring.application.name=mall-coupon
  spring.cloud.nacos.config.server-addr=127.0.0.1:8848
-``` 
+```
 （3）创建“application.properties”配置文件，添加如下配置内容：
 ```properties
 coupon.user.name="张三"
@@ -123,12 +126,12 @@ coupon.user.age=20
     public R test(){
         return R.ok().put("name",name).put("age",age);
     }
-```
+ ```
 启动“mall-coupon”服务：
 访问：[http://localhost:7000/coupon/coupon/test](http://localhost:7000/coupon/coupon/test)
 ![](https://cdn.nlark.com/yuque/0/2020/png/512093/1591341334525-d99419de-8f9e-4fc4-ba71-f976e1b6cff7.png#align=left&display=inline&height=107&margin=%5Bobject%20Object%5D&originHeight=107&originWidth=1075&status=done&style=none&width=1075)
 这样做存在的一个问题，如果频繁的修改application.properties，就需要频繁重新打包部署。下面我们将采用Nacos的配置中心来解决这个问题。
-##### 2、读取nacos配置文件
+### 2、读取nacos配置文件
  （1）在nacos配置管理 | 配置列表 创建mall-coupon.properties
  ![](https://img-blog.csdnimg.cn/20200729210220485.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0tBSVpfTEVBUk4=,size_16,color_FFFFFF,t_70)
  （2）添加刷新注解
@@ -150,21 +153,21 @@ coupon.user.age=20
  
  ```
  能够看到读取到了nacos 中的最新的配置信息，并且在指明了相同的配置信息时，配置中心中设置的值优先于本地配置。
- ##### 3、Namespace方案
+ ### 3、Namespace方案
 （1）命名空间：配置隔离
  * 开发dev，测试test，生产prod：利用命名空间来做环境隔离。
-  注意：在bootstrap.properties配置上，需要配置使用命名空间下的ID。
+    注意：在bootstrap.properties配置上，需要配置使用命名空间下的ID。
  * 每一个微服务之间互相隔离配置，每一个微服务都创建自己的命名空间，只加载自己命名空间下的所有配置。
- 
+
 （2）配置集：所有的配置的集合
  例如一个application.yml文件就是一个配置集。
- 
+
 （3）配置集ID：类似文件名，如application.yml，在Nacos中，即是Data ID。  
  ![](https://img-blog.csdnimg.cn/20200729212315870.png)
- 
+
 （4）配置分组：默认所有的配置集都属于：DEFAULT_GROUP。
  项目中的使用：每个微服务创建自己的命名空间，使用配置分组区分环境，dev，test，prod。
- 
+
  5、同时加载多个配置集
  在日常开发中，不会把所有配置写在一个配置集中（如以下application.yml）。
  ```yaml
@@ -242,7 +245,7 @@ coupon.user.age=20
  ```
 ![](https://img-blog.csdnimg.cn/20200729214714288.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0tBSVpfTEVBUk4=,size_16,color_FFFFFF,t_70)
 
-### GatewayAPI网关
+## 四、GatewayAPI网关
 1、使用Spring Intitializr创建模块
 * Project Metadata 
   * Group: com.jd.mall
