@@ -146,11 +146,12 @@ service firewalld stop：关闭防火墙
 11、查看容器的日志
 docker logs container-name/container-id
 
+
+````
+
 更多命令参看
 https://docs.docker.com/engine/reference/commandline/docker/
 可以参考每一个镜像的文档
-
-````
 
 ### 3）安装MySQL示例
 
