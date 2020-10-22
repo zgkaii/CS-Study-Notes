@@ -1,61 +1,5 @@
 ## 一、Java线程
 
-### 1.1 Callable/Future/FutureTask
-
-在[【Java学习笔记】多线程](https://blog.csdn.net/KAIZ_LEARN/article/details/108890366)一文中，已经接触了创建线程的2种方式，一种是直接继承Thread类，另外一种就是实现Runnable接口。
-
-这2种方式都有一个缺陷就是：**在执行完任务之后无法获取执行结果**。如果需要获取执行结果，就必须通过共享变量或者使用线程通信的方式来达到效果。
-
-自从Java 1.5 开始，就提供了Callable、Future接口和FutureTask方法，通过它们可以在任务执行完毕之后得到任务执行结果。
-
-FutureTask 能够接收 Callable 类型的参数，用来处理有返回结果的情况 Test3.java
-
-```java
-    public static void main(String[] args) throws ExecutionException, InterruptedException {
-        // 实现多线程的第三种方法可以返回数据
-        FutureTask futureTask = new FutureTask<>(new Callable<Integer>() {
-            @Override
-            public Integer call() throws Exception {
-                log.debug("多线程任务");
-                Thread.sleep(100);
-                return 100;
-            }
-        });
-        // 主线程阻塞，同步等待 task 执行完毕的结果
-        new Thread(futureTask,"我的名字").start();
-        log.debug("主线程");
-        log.debug("{}",futureTask.get());
-    }
-```
-
-Future就是对于具体的Runnable或者Callable任务的执行结果进行取消、查询是否完成、获取结果。必要时可以通过get方法获取执行结果，该方法会阻塞直到任务返回结果。
-
-```java
-public interface Future<V> {
-    boolean cancel(boolean mayInterruptIfRunning);
-    boolean isCancelled();
-    boolean isDone();
-    V get() throws InterruptedException, ExecutionException;
-    V get(long timeout, TimeUnit unit)
-        throws InterruptedException, ExecutionException, TimeoutException;
-}
-
-```
-
-  Future提供了三种功能：   　　
-
-1. 判断任务是否完成；   　　
-
-2. 能够中断任务；   　　
-
-3. 能够获取任务执行结果。   
-
-[FutureTask是Future和Runable的实现](https://mp.weixin.qq.com/s/RX5rVuGr6Ab0SmKigmZEag)
-
-   
-
-   
-
 ## 3.2 线程运行原理
 
 ### 虚拟机栈与栈帧
@@ -335,6 +279,10 @@ class TwoParseTermination{
 3. `BLOCKED` ， `WAITING` ， `TIMED_WAITING` 都是 Java API 层面对【阻塞状态】的细分，后面会在状态转换一节
    详述
 
-参考资料
+## 参考资料
 
 [JAVA并发编程的艺术](https://weread.qq.com/web/reader/247324e05a66a124750d9e9k8f132430178f14e45fce0f7)
+
+[Runnable、Callable、Future、FutureTask](https://zhuanlan.zhihu.com/p/94810862)
+
+[多线程](https://blog.csdn.net/KAIZ_LEARN/article/details/108890366)
