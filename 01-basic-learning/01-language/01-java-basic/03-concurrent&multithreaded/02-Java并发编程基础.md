@@ -1,121 +1,357 @@
-## 一、Java线程
+## 一、线程基础
 
-## 3.2 线程运行原理
+### 1.1 线程状态
 
-### 虚拟机栈与栈帧
+Java线程在运行的生命周期中可能处于如下6种不同的状态，在给定的一个时刻，线程只能处于其中的一个状态。
 
-拟机栈描述的是Java方法执行的内存模型：每个方法被执行的时候都会同时创建一个栈帧(stack frame)用于存储局部变量表、操作数栈、动态链接、方法出口等信息，是属于线程的私有的。当java中使用多线程时，每个线程都会维护它自己的栈帧！每个线程只能有一个活动栈帧，对应着当前正在执行的那个方法
+| 线程状态      | 说明                                                         |
+| :------------ | ------------------------------------------------------------ |
+| NEW           | 初始状态，线程刚被创建，但是并未启动（还未调用start方法）。  |
+| RUNNABLE      | 运行状态，JAVA线程将操作系统中的就绪（READY）和运行（RUNNING）两种状态笼统地称为“运行中”。 |
+| BLOCKED       | 阻塞状态，表示线程阻塞于锁。                                 |
+| WAITING       | 等待状态，表示该线程无限期等待另一个线程执行一个特别的动作。 |
+| TIMED_WAITING | 超时等待状态，不同于WAITING的是，它可以在指定时间自动返回。  |
+| TERMINATED    | 终止状态，表示当前状态已经执行完毕。                         |
 
-### 线程上下文切换（Thread Context Switch）
+线程在自身的生命周期中，并不是固定地处于某个状态，而是随着代码的执行在不同的状态之间进行切换。
 
-因为以下一些原因导致 cpu 不再执行当前的线程，转而执行另一个线程的代码
+<img src="https://img-blog.csdnimg.cn/20200929220833538.png" style="zoom:80%;" />
 
-- 线程的 cpu 时间片用完(每个线程轮流执行，看前面并行的概念)
-- 垃圾回收
-- 有更高优先级的线程需要运行
-- 线程自己调用了 `sleep`、`yield`、`wait`、`join`、`park`、`synchronized`、`lock` 等方法
+### 1.2 Thread类常用方法
 
-当 Context Switch 发生时，需要由操作系统保存当前线程的状态，并恢复另一个线程的状态，Java 中对应的概念
-就是程序计数器（Program Counter Register），它的作用是记住下一条 jvm 指令的执行地址，是线程私有的
+#### （1）start()与run()
 
-## 3.3 Thread的常见方法
-
-![1583466371181](https://gitee.com/gu_chun_bo/picture/raw/master/image/20200306114615-258720.png)
-
-### 3.3.1 start 与 run
-
-#### 调用start
+void start()启动一个新线程，在新的线程运行run方法中的代码。
 
 ```java
+@Slf4j
+public class ThreadTest {
     public static void main(String[] args) {
-        Thread thread = new Thread(){
-          @Override
-          public void run(){
-              log.debug("我是一个新建的线程正在运行中");
-              FileReader.read(fileName);
-          }
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                log.debug("running...");
+            }
         };
-        thread.setName("新建线程");
+        thread.setName("new thread");
         thread.start();
-        log.debug("主线程");
+        log.debug("main thread");
     }
+}
 ```
 
-输出：程序在 t1 线程运行， `run()`方法里面内容的调用是异步的 Test4.java
-
-```properties
-11:59:40.711 [main] DEBUG com.concurrent.test.Test4 - 主线程
-11:59:40.711 [新建线程] DEBUG com.concurrent.test.Test4 - 我是一个新建的线程正在运行中
-11:59:40.732 [新建线程] DEBUG com.concurrent.test.FileReader - read [test] start ...
-11:59:40.735 [新建线程] DEBUG com.concurrent.test.FileReader - read [test] end ... cost: 3 ms
-```
-
-#### 调用run
-
-将上面代码的`thread.start();`改为 `thread.run();`输出结果如下：程序仍在 main 线程运行， `run()`方法里面内容的调用还是同步的
-
-```properties
-12:03:46.711 [main] DEBUG com.concurrent.test.Test4 - 我是一个新建的线程正在运行中
-12:03:46.727 [main] DEBUG com.concurrent.test.FileReader - read [test] start ...
-12:03:46.729 [main] DEBUG com.concurrent.test.FileReader - read [test] end ... cost: 2 ms
-12:03:46.730 [main] DEBUG com.concurrent.test.Test4 - 主线程
-```
-
-#### 小结
-
-直接调用 `run()` 是在主线程中执行了 `run()`，没有启动新的线程
-使用 `start()` 是启动新的线程，通过新的线程间接执行 `run()`方法 中的代码
-
-### 3.3.2 sleep 与 yield
-
-#### sleep
-
-1. 调用 sleep 会让当前线程从 Running 进入 Timed Waiting 状态（阻塞）
-2. 其它线程可以使用 interrupt 方法打断正在睡眠的线程，那么被打断的线程这时就会抛出 `InterruptedException`异常【注意：这里打断的是正在休眠的线程，而不是其它状态的线程】
-3. 睡眠结束后的线程未必会立刻得到执行(需要分配到cpu时间片)
-4. 建议用 TimeUnit 的 `sleep()` 代替 Thread 的 `sleep()`来获得更好的可读性
-
-
-
-#### yield
-
-1. 调用 yield 会让当前线程从 Running 进入 Runnable 就绪状态，然后调度执行其它线程
-2. 具体的实现依赖于操作系统的任务调度器(就是可能没有其它的线程正在执行，虽然调用了yield方法，但是也没有用)
-
-#### 小结
-
-yield使cpu调用其它线程，但是cpu可能会再分配时间片给该线程；而sleep需要等过了休眠时间之后才有可能被分配cpu时间片
-
-### 3.3.3 线程优先级
-
-线程优先级会提示（hint）调度器优先调度该线程，但它仅仅是一个提示，调度器可以忽略它
-如果 cpu 比较忙，那么优先级高的线程会获得更多的时间片，但 cpu 闲时，优先级几乎没作用
-
-### 3.3.4 join
-
-在主线程中调用t1.join，则主线程会等待t1线程执行完之后再继续执行 Test10.java
+输出结果如下，可见`run()`方法里面内容的调用是异步的。
 
 ```java
-    private static void test1() throws InterruptedException {
-        log.debug("开始");
-        Thread t1 = new Thread(() -> {
-            log.debug("开始");
-            sleep(1);
-            log.debug("结束");
-            r = 10;
-        },"t1");
-        t1.start();
-        t1.join();
-        log.debug("结果为:{}", r);
-        log.debug("结束");
+14:06:43.754 [main] DEBUG com.kai.demo.basic.ThreadTest - main thread
+14:06:43.754 [new thread] DEBUG com.kai.demo.basic.ThreadTest - running...
+```
+
+将上面代码的`thread.start()`改为 `thread.run()`，输出结果如下，可见 `run()`方法里面内容的调用是同步的。
+
+```java
+14:08:17.974 [main] DEBUG com.kai.demo.basic.ThreadTest - running...
+14:08:17.979 [main] DEBUG com.kai.demo.basic.ThreadTest - main thread
+```
+
+#### （2）sleep()与yield()
+
+调用 sleep()会让当前线程从 RUNNING进入TIMED_WAITING状态（超时等待）。
+
+```java
+public class TimeWaitingTest extends Thread {
+    @Override
+    public void run() {
+        for (int i = 0; i < 10; i++) {
+            if ((i) % 5 == 0) {
+                System.out.println("开启线程数为:" + i);
+            }
+            System.out.print(i);
+            try {
+                Thread.sleep(1000);
+                System.out.print(" 线程睡眠1秒！\n");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        new TimeWaitingTest().start();
+    }
+}
+```
+
+运行结果：
+
+```java
+开启线程数为:0
+0 线程睡眠1秒！
+1 线程睡眠1秒！
+2 线程睡眠1秒！
+3 线程睡眠1秒！
+4 线程睡眠1秒！
+开启线程数为:5
+5 线程睡眠1秒！
+6 线程睡眠1秒！
+7 线程睡眠1秒！
+8 线程睡眠1秒！
+9 线程睡眠1秒！
+```
+
+可见，线程睡眠到时间就会自动苏醒，并返回到Runnable（可运行）中的就绪状态。
+
+> 建议用 TimeUnit 的 `sleep()` 代替 Thread 的 `sleep()`来获得更好的可读性。
+
+
+
+调用yield()静态方法，也能暂停当前线程，那其与`sleep()`有何区别呢？
+
+- sleep(long)方法会**使线程转入超时等待状态**，时间到了之后才会转入就绪状态。而yield()方法不会将线程转入等待，而是强制线程进入就绪状态。
+- 使用sleep(long)方法**需要处理异常**`InterruptedException` ，而yield()不用。
+
+> Tips：sleep()中指定的时间是线程暂停运行的最短时间，不能保证该线程睡眠到时后就开始立刻执行。
+
+#### （3）wait()与join()
+
+线程中调用wait()、join()等方法时，当前线程就会进入等待状态，会释放CPU资源和释放同步锁（类锁和对象锁））。直到其他线程调用此对象的`notify()`方法或 `notifyAll()`方法。
+
+* **wait()**
+
+wait是Object类中的方法，方法内部很简单，使用native方法实现：
+
+```java
+	// 进入WAITING状态
+	public final void wait() throws InterruptedException {
+        wait(0);
+    }
+	// 进入TIMED_WAITING状态
+	public final native void wait(long timeout) throws InterruptedException;
+
+    // 进入TIMED_WAITING状态
+    public final void wait(long timeout, int nanos) throws InterruptedException {
+        if (timeout < 0) {
+            throw new IllegalArgumentException("timeout value is negative");
+        }
+        if (nanos < 0 || nanos > 999999) {
+            throw new IllegalArgumentException(
+                                "nanosecond timeout value out of range");
+        }
+        if (nanos > 0) {
+            timeout++;
+        }
+        wait(timeout);
+    }    
+```
+
+wait()方法只能在**同步方法**中调用。如果当前线程不是锁的持有者，该方法抛出一个`IllegalMonitorStateException`异常。
+
+如果当前线程在等待之前或在等待时被任何线程中断，则会抛出 `InterruptedException `异常。
+
+案例：
+
+```java
+public class WaitingTest {
+    public static Object obj = new Object();
+
+    public static void main(String[] args) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    synchronized (obj) {
+                        try {
+                            System.out.println(Thread.currentThread().getName() + "=== 调用wait方法，进入WAITING状态，释放锁对象");
+                            obj.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        System.out.println(Thread.currentThread().getName() + "=== 从WAITING状态醒来，获取到锁对象，继续执行");
+                    }
+                }
+            }
+        }, "线程A").start();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) { //每隔3秒 唤醒一次
+                    try {
+                        System.out.println(Thread.currentThread().getName() + "‐‐‐ 等待3秒钟");
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    synchronized (obj) {
+                        System.out.println(Thread.currentThread().getName() + "‐‐‐ 获取到锁对象, 调用notify方法，释放锁对象");
+                        obj.notify();
+                    }
+                }
+            }
+        }, "线程B").start();
+    }
+}
+```
+
+执行结果：
+
+```java
+线程A=== 调用wait方法，进入WAITING状态，释放锁对象
+线程B‐‐‐ 等待3秒钟
+线程B‐‐‐ 获取到锁对象, 调用notify方法，释放锁对象
+线程B‐‐‐ 等待3秒钟
+线程A=== 从WAITING状态醒来，获取到锁对象，继续执行
+... ... 
+```
+
+通过上述案例我们会发现，线程A在调用了某个对象的 `Object.wait `方法后，需要等待线程B调用此对象的
+`Object.notify()`方法将其唤醒。
+
+* **join()**
+
+join()是Thread类中的方法，若没有指定时间，当前线程中调用另一个线程的join时，当前线程会挂起，等到另一个线程执行完毕之后才能继续向下执行；若指定了时间，到等待指定时间，即便调用join的线程没运行完run方法，当前线程也会继续往下运行。查看源码可知，join方法是通过调用wait方法实现的。
+
+```java
+    public final void join() throws InterruptedException {
+        join(0);
+    }
+	public final synchronized void join(long millis) throws InterruptedException {
+        long base = System.currentTimeMillis();
+        long now = 0;
+
+        if (millis < 0) {
+            throw new IllegalArgumentException("timeout value is negative");
+        }
+
+        if (millis == 0) {
+            while (isAlive()) {// 判断子线程是否存活
+                wait(0);// 调用wait(0)方法，进入WAITING状态
+            }
+        } else {
+            while (isAlive()) {
+                long delay = millis - now;
+                if (delay <= 0) {
+                    break;
+                }
+                wait(delay);// 调用wait(long timeout),进入TIMED_WAITING状态
+                now = System.currentTimeMillis() - base;
+            }
+        }
+    }
+    public final synchronized void join(long millis, int nanos) throws InterruptedException {
+		---Omit---
     }
 ```
 
-![1583483843354](https://gitee.com/gu_chun_bo/picture/raw/master/image/20200306163734-131567.png)
+查看`isAlive()`方法源码：
 
-### 3.3.5 interrupt 方法详解
+```java
+/**
+     * Tests if this thread is alive. A thread is alive if it has
+     * been started and has not yet died.
+     * 测试线程是否存活（线程已经开始，还没有死亡的状态即为存活）。
+     * @return  <code>true</code> if this thread is alive;
+     *          <code>false</code> otherwise.
+     */****
+    public final native boolean isAlive();
+```
 
-#### 打断 sleep，wait，join 的线程
+可见，当A线程调用B线程的join方法时，其实就是在A线程中调B的wait方法，然后使A线程处于等待状态。但是B线程并没有中调notify()，B线程执行完，A线程如何被唤醒呢？
+
+通过debug，发现在线程执行完系统会调用Thread类中的`exit()`方法，查看源码：
+
+```java
+ /**
+     * This method is called by the system to give a Thread
+     * a chance to clean up before it actually exits.
+     * 这个方法由系统调用，当该线程完全退出前给它一个机会去释放空间。
+     */
+private void exit() {
+        if (group != null) {                //线程组在Thread初始化时创建，存有创建的子线程
+            group.threadTerminated(this);   //调用threadTerminated()方法
+            group = null;
+        }
+        /* Aggressively null out all reference fields: see bug 4006245 */
+        target = null;
+        /* Speed the release of some of these resources */
+        threadLocals = null;
+        inheritableThreadLocals = null;
+        inheritedAccessControlContext = null;
+        blocker = null;
+        uncaughtExceptionHandler = null;
+    }
+```
+
+此时线程组中存在当前子线程，因此会调用线程组的threadTerminated()方法。 查看ThreadGroup.threadTerminated()方法源码：
+
+```java
+/** Notifies the group that the thread {@code t} has terminated.
+  * 通知线程组，t线程已经终止。
+  *
+void threadTerminated(Thread t) {
+        synchronized (this) {
+            remove(t);                          //从线程组中删除此线程
+
+            if (nthreads == 0) {                //当线程组中线程数为0时
+                notifyAll();                    //唤醒所有待定中的线程
+            }
+            if (daemon && (nthreads == 0) &&
+                (nUnstartedThreads == 0) && (ngroups == 0))
+            {
+                destroy();
+            }
+        }
+    }
+```
+
+通过此方法，将子线程从线程组中删除，并**唤醒其他等待的线程**。
+
+案例：
+
+```java
+public class JoinTest {
+    public static void main(String[] args) {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("[" + Thread.currentThread().getName() + "] begins");
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                System.out.println("[" + Thread.currentThread().getName() + "] ends");
+            }
+        }, "child thread");
+        thread.start();
+
+        try {
+            thread.join(1000);
+            if (thread.isAlive()) {
+                System.out.println("[" + Thread.currentThread().getName() + "] child thread has not finished");
+            } else {
+                System.out.println("[" + Thread.currentThread().getName() + "] child thread has finished");
+            }
+            System.out.println("Join Success");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+执行结果：
+
+```java
+[child thread] begins
+[main] child thread has not finished
+Join Success
+[child thread] ends
+```
+
+#### （4）interrupt()
+
+打断 sleep，wait，join 的线程
 
 先了解一些interrupt()方法的相关知识：[博客地址](https://www.cnblogs.com/noteless/p/10372826.html#0)
 
@@ -157,7 +393,7 @@ yield使cpu调用其它线程，但是cpu可能会再分配时间片给该线程
 17:06:12.890 [main] DEBUG com.concurrent.test.Test7 - 主线程
 ```
 
-#### 打断正常运行的线程
+打断正常运行的线程
 
 打断正常运行的线程, 线程并不会暂停，只是调用方法`Thread.currentThread().isInterrupted();`的返回值为true，可以判断`Thread.currentThread().isInterrupted();`的值来手动停止线程
 
@@ -179,7 +415,7 @@ yield使cpu调用其它线程，但是cpu可能会再分配时间片给该线程
     }
 ```
 
-#### 终止模式之两阶段终止模式
+终止模式之两阶段终止模式
 
 Two Phase Termination，就是考虑在一个线程T1中如何优雅地终止另一个线程T2？这里的优雅指的是给T2一个料理后事的机会（如释放锁）。
 
@@ -228,7 +464,7 @@ class TwoParseTermination{
 }
 ```
 
-### 3.3.6 sleep，yiled，wait，join 对比
+3.3.6 sleep，yiled，wait，join 对比
 
 关于join的原理和这几个方法的对比：[看这里](https://blog.csdn.net/dataiyangu/article/details/104956755)
 
@@ -242,7 +478,138 @@ class TwoParseTermination{
 > yiled 不释放锁、释放cpu
 > wait 释放锁、释放cpu
 
-## 3.4 守护线程
+### 1.3 线程优先级
+
+现代操作系统基本采用时分的形式调度运行的线程，操作系统会分出一个个时间片，线程会分配到若干时间片，当线程的时间片用完了就会发生线程调度，并等待着下次分配。线程分配到的时间片多少也就决定了线程使用处理器资源的多少，而线程优先级就是决定线程需要多或者少分配一些处理器资源的线程属性。
+
+在Java线程中，通过一个整型成员变量priority来控制优先级，优先级的范围从1～10，默认优先级是5，优先级高的线程分配时间片的数量要多于优先级低的线程。
+
+查看源代码：
+
+```java
+	private int priority;
+	
+	// 设置优先级
+	public final void setPriority(int newPriority) {
+        ThreadGroup g;
+        checkAccess();
+        if (newPriority > MAX_PRIORITY || newPriority < MIN_PRIORITY) {
+            throw new IllegalArgumentException();
+        }
+        if((g = getThreadGroup()) != null) {
+            if (newPriority > g.getMaxPriority()) {
+                newPriority = g.getMaxPriority();
+            }
+            setPriority0(priority = newPriority);
+        }
+    }
+	// 获取优先级
+    public final int getPriority() {
+        return priority;
+    }
+
+    public String toString() {
+        ThreadGroup group = getThreadGroup();
+        if (group != null) {
+            return "Thread[" + getName() + "," + getPriority() + "," +
+                           group.getName() + "]";
+        } else {
+            return "Thread[" + getName() + "," + getPriority() + "," +
+                            "" + "]";
+        }
+    }
+
+	// 优先级常量
+     public final static int MIN_PRIORITY = 1;
+     public final static int NORM_PRIORITY = 5;
+     public final static int MAX_PRIORITY = 10;
+```
+
+查看Thread 初始化 priority 的源代码：
+
+```java
+        Thread parent = currentThread();  
+        // 获取父线程的线程优先级
+        this.priority = parent.getPriority();
+```
+
+可见，**子线程默认优先级和父线程保持一致，Java主线程默认的优先级是 5。**
+
+```java
+public class PriorityTest {
+    public static void main(String[] args) {
+        Thread.currentThread().setPriority(3);// 主线程优先级修改为3
+        Thread thread = new Thread();
+        System.out.println(thread.getPriority());// 子线程优先级跟主线程优先级保持一致，并不是默认的5，而是3。
+    }
+}
+```
+
+下面通过一个例子来测试一下高优先级与低优先级差别：
+
+```java
+public class PriorityTest {
+    private static volatile boolean notStart = true;
+    private static volatile boolean notEnd = true;
+
+    public static void main(String[] args) throws Exception {
+        List<Task> tasks = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            int priority = i < 5 ? Thread.MIN_PRIORITY : Thread.MAX_PRIORITY;
+            Task task = new Task(priority);
+            tasks.add(task);
+            Thread thread = new Thread(task, "Thread:" + i);
+            thread.setPriority(priority);
+            thread.start();
+        }
+        notStart = false;
+        TimeUnit.SECONDS.sleep(10);
+        notEnd = false;
+        for (Task task : tasks) {
+            System.out.println("Task Priority:" + task.priority + " Count:" + task.taskCount);
+        }
+    }
+
+    static class Task implements Runnable {
+        private int priority;
+        private long taskCount;
+
+        public Task(int priority) {
+            this.priority = priority;
+        }
+
+        @Override
+        public void run() {
+            while (notStart) {
+                Thread.yield();
+            }
+            while (notEnd) {
+                Thread.yield();
+                taskCount++;
+            }
+        }
+    }
+}
+```
+
+执行结果：
+
+```java
+Task Priority:1 Count:12774
+Task Priority:1 Count:12775
+Task Priority:1 Count:12762
+Task Priority:1 Count:12747
+Task Priority:1 Count:12758
+Task Priority:10 Count:1984746
+Task Priority:10 Count:1984810
+Task Priority:10 Count:1982704
+Task Priority:10 Count:1985309
+Task Priority:10 Count:1980892
+```
+
+可见，**高优先级的线程大概率比低优先的线程优先获得 CPU 资源**。
+
+### 1.4 守护线程
 
 默认情况下，java进程需要等待所有的线程结束后才会停止，但是有一种特殊的线程，叫做守护线程，在其他线程全部结束的时候即使守护线程还未结束代码未执行完java进程也会停止。普通线程t1可以调用`t1.setDeamon(true);` 方法变成守护线程 
 
@@ -251,38 +618,16 @@ class TwoParseTermination{
 > Tomcat 中的 Acceptor 和 Poller 线程都是守护线程，所以 Tomcat 接收到 shutdown 命令后，不会等
 > 待它们处理完当前请求
 
-## 3.5 线程状态之五种状态
 
-五种状态的划分主要是从操作系统的层面进行划分的
-
-![1583507073055](https://gitee.com/gu_chun_bo/picture/raw/master/image/20200307093417-638644.png)
-
-1. 初始状态，仅仅是在语言层面上创建了线程对象，即`Thead thread = new Thead();`，还未与操作系统线程关联
-2. 可运行状态，也称就绪状态，指该线程已经被创建，与操作系统相关联，等待cpu给它分配时间片就可运行
-3. 运行状态，指线程获取了CPU时间片，正在运行
-   1. 当CPU时间片用完，线程会转换至【可运行状态】，等待 CPU再次分配时间片，会导致我们前面讲到的上下文切换
-4. 阻塞状态
-   1. 如果调用了阻塞API，如BIO读写文件，那么线程实际上不会用到CPU，不会分配CPU时间片，会导致上下文切换，进入【阻塞状态】
-   2. 等待BIO操作完毕，会由操作系统唤醒阻塞的线程，转换至【可运行状态】
-   3. 与【可运行状态】的区别是，只要操作系统一直不唤醒线程，调度器就一直不会考虑调度它们，CPU就一直不会分配时间片
-5. 终止状态，表示线程已经执行完毕，生命周期已经结束，不会再转换为其它状态
-
-## 3.6 线程状态之六种状态
-
-这是从 Java API 层面来描述的，我们主要研究的就是这种。状态转换详情图：[地址](https://www.jianshu.com/p/ec94ed32895f)
-根据 Thread.State 枚举，分为六种状态 Test12.java
-
-![1583507709834](https://gitee.com/gu_chun_bo/picture/raw/master/image/20200307093352-614933.png)
-
-1. NEW 跟五种状态里的初始状态是一个意思
-2. RUNNABLE 是当调用了 `start()` 方法之后的状态，注意，Java API 层面的 `RUNNABLE` 状态涵盖了操作系统层面的【可运行状态】、【运行状态】和【io阻塞状态】（由于 BIO 导致的线程阻塞，在 Java 里无法区分，仍然认为是可运行）
-3. `BLOCKED` ， `WAITING` ， `TIMED_WAITING` 都是 Java API 层面对【阻塞状态】的细分，后面会在状态转换一节
-   详述
 
 ## 参考资料
 
+[多线程基础](https://blog.csdn.net/KAIZ_LEARN/article/details/108890366)
+
+[Java线程优先级](https://juejin.im/post/6844903951339372557)
+
 [JAVA并发编程的艺术](https://weread.qq.com/web/reader/247324e05a66a124750d9e9k8f132430178f14e45fce0f7)
 
-[Runnable、Callable、Future、FutureTask](https://zhuanlan.zhihu.com/p/94810862)
+[Thread-线程的常见方法](https://www.cnblogs.com/xiaokw/p/12678774.html)
 
-[多线程](https://blog.csdn.net/KAIZ_LEARN/article/details/108890366)
+[Java Thread的join() 之刨根问底](https://juejin.im/post/6844903624842149895)
