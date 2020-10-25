@@ -764,13 +764,19 @@ class ThreadSafeSubClass extends ThreadSafe{
 
 ### 4.3.3 常见线程安全类
 
-1. String
-2. Integer
-3. StringBuffer
-4. Random
-5. Vector
-6. Hashtable
-7. java.util.concurrent 包下的类
+* String
+
+* Integer
+
+* StringBuffer
+
+* Random
+
+* Vector
+
+* Hashtable
+
+* `java.util.concurrent` 包下的类
 
 这里说它们是线程安全的是指，<span style ="color:red">多个线程调用它们同一个实例的某个方法时，是线程安全的</span>。也可以理解为它们的每个方法是原子的
 
@@ -828,17 +834,19 @@ public class Immutable{
 @Aspect
 @Component
 public class MyAspect {
- // 是否安全？
- private long start = 0L;
- @Before("execution(* *(..))")
- public void before() {
- start = System.nanoTime();
- }
- @After("execution(* *(..))")
- public void after() {
- long end = System.nanoTime();
- System.out.println("cost time:" + (end-start));
- }
+    // 是否安全？
+    private long start = 0L;
+
+    @Before("execution(* *(..))")
+    public void before() {
+        start = System.nanoTime();
+    }
+
+    @After("execution(* *(..))")
+    public void after() {
+        long end = System.nanoTime();
+        System.out.println("cost time:" + (end - start));
+    }
 }
 ```
 
