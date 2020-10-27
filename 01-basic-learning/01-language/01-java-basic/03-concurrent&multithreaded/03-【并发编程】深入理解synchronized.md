@@ -89,23 +89,29 @@ public class SafeTest {
 
 ![](https://img-blog.csdnimg.cn/20201025112642320.png)
 
-
-
 像上面`count++` 和 `count--` 的代码所在区域又称**临界区**（**一段代码内如果存在对共享资源的多线程读写操作，那么称这段代码为临界区**）。
 
 跟上面案例一样。如果多个线程临界区代码执行竞争同一资源时，对资源的访问顺序敏感，执行时序的不同导致会出现某种不正常的行为，就称存在**竞态条件（Race Condition）**。
 
-为避免竞态条件的出现，保证java共享内存的原子性、可见性、有序性，很有必要保持线程同步。为此，Java中提供了synchronized、volatile关键字与`Lock`类。
+为避免竞态条件的出现，保证java共享内存的原子性、可见性、有序性，很有必要保持线程同步。Java中提供了synchronized、volatile关键字与`Lock`类。
 
 ## 2 初识synchronized
 
-synchronized采用**互斥同步**（Mutual Exclusion & Synchnronization）的方式，让多个线程并发访问共享数据时，保证共享数据在同一时刻只被一个（或一些，使用信号量的时候）线程使用。而互斥是实现同步的一种手段，临界区、互斥量和信号量都是主要的互斥实现方式。因此在互斥同步四个字中，互斥是因，同步是果；互斥是方法，同步是目的。
+synchronized采用**互斥同步**（Mutual Exclusion & Synchnronization）的方式，让多个线程并发访问共享数据时，保证共享数据在同一时刻只被一个（或一些，使用信号量的时候）线程使用。互斥是实现同步的一种手段，临界区、互斥量和信号量都是主要的互斥实现方式。因此在互斥同步四个字中，互斥是因，同步是果；互斥是方法，同步是目的。
+
+### 2.1 使用场景
 
 在Java代码中使用synchronized可使用在代码块和方法中，根据Synchronized用的位置可以有这些使用场景：
 
 ![](https://img-blog.csdnimg.cn/20201025123258136.png)
 
-==这是是否要加入一些实例==
+可见，synchronized的使用场景主要有3种：
+
+* 修饰静态方法，给当前类对象加锁，进入同步方法时需要获得类对象的锁；
+* 修饰实例方法，给当前实例变量加锁，进入同步方法时需要获得当前实例的锁；
+* 修饰同步方法块，指定加锁对象（实例对象/是类变量），进入同步方法块时需要获得加锁对象的锁。
+
+### 2.2 案例分析
 
 下面，将synchronized应用到上面的案例1中：
 
@@ -113,19 +119,19 @@ synchronized采用**互斥同步**（Mutual Exclusion & Synchnronization）的�
 @Slf4j
 public class SafeTest {
     static int count = 0;
-    static final Object obj = new Object();
+    static final Object lock = new Object();
 
     public static void main(String[] args) throws InterruptedException {
         Thread t1 = new Thread(() -> {
             for (int i = 1; i < 5000; i++) {
-                synchronized (obj){
+                synchronized (lock){
                     count++;
                 }
             }
         });
         Thread t2 = new Thread(() -> {
             for (int i = 1; i < 5000; i++) {
-                synchronized (obj){
+                synchronized (lock){
                     count--;
                 }
             }
@@ -139,11 +145,11 @@ public class SafeTest {
 }
 ```
 
-多次测试发现结果都为0了。这是因为synchronized利用对象锁保证了临界区代码的原子性，临界区内的代码在外界看来是不可分割的，不会被线程切换所打断。
+多次测试结果都为0。这是因为synchronized利用对象锁保证了临界区代码的原子性，临界区内的代码在外界看来是不可分割的，不会被线程切换所打断。
 
 ![](https://img-blog.csdnimg.cn/20201025213813109.png)
 
-下面我们就来了解synchronized的实现原理。
+synchronized为什么这么神奇，它到底做了什么呢？下面就进一步探讨一下synchronized的实现原理。
 
 ## 3 Monitor机制
 
@@ -153,22 +159,24 @@ public class SafeTest {
 
 操作系统在面对进程/线程间同步时，所支持的最重要的同步原语即是semaphore **信号量** 和 mutex **互斥量**。在使用基本的 mutex 进行并发控制时，需要程序员非常小心地控制 mutex 的 down 和 up 操作，否则很容易引起死锁等问题。为了更容易地编写出正确的并发程序，在 mutex 和 semaphore 的基础上，提出了更高层次的同步原语 Monitor。
 
-不过需要注意的是，操作系统本身并不支持 Monitor机制，Monitor是属于编程语言的范畴。例如C语言它就不支持 monitor，Java 语言支持 Monitor。而Java对象则是天生的Monitor，每一个Java对象都有成为Monitor的“潜质”。这是为什么呢？
+不过需要注意的是，操作系统本身并不支持 Monitor机制，Monitor是属于编程语言的范畴。例如C语言它就不支持 monitor，Java 语言支持 Monitor。Java对象则是天生的Monitor，每一个Java对象都有成为Monitor的“潜质”。这是为什么呢？
 
-因为在Java的设计中，每一个对象自打娘胎里出来，就带了一把看不见的锁，通常我们叫**“内部锁”，或者“Monitor锁”**，或者“Intrinsic lock”。有了这个锁的帮助，只要把类的对象方法或者代码块用synchronized关键字修饰，就会先获取到与 synchronized 关键字绑定在一起的 Object 的对象锁，这个锁会限定其它线程进入与这个锁相关的synchronized 代码区域。
+因为在Java的设计中，每一个对象自打娘胎里出来，就带了一把看不见的锁，通常我们叫**“内部锁”，或者“Monitor锁”**，或者“Intrinsic lock”。有了这个锁的帮助，**只要把类的对象方法或者代码块用synchronized关键字修饰，就会先获取到与 synchronized 关键字绑定在一起的 Object 的对象锁**，这个锁会限定其它线程进入与这个锁相关的synchronized 代码区域。而这个对象锁，也就是一个货真价实的Monitor。
 
-因此，可以把Monitor模糊地理解为一种同步工具，也可以理解是一种同步机制。其主要特点是：（==这里逻辑不通顺==）
+因此，可以把Monitor模糊地理解为一种同步工具，也可以理解是一种同步机制，它通常被描述为一个对象。其主要特点有：
 
 - 对象的所有方法都被“互斥”的执行。也就是说，同一个时刻，只有一个 进程/线程 能进入 Monitor 中定义的临界区。
 - 通常提供singal机制。即允许正持有“许可”的线程暂时放弃“许可”，等待某个谓词成真（条件变量），而条件成立后，当前进程可以“通知”正在等待这个条件变量的线程，让他可以重新去获得运行许可。
 
+在了解Monitor原理之前，我们先来了解两个重要的概念：对象头与锁记录。
+
 ### 3.2 Java对象头
 
-[对象实例化内存布局与访问定位](https://blog.csdn.net/KAIZ_LEARN/article/details/109281030)描述了，对象内存布局主要分为三块区域：对象头区、实例数据区和填充区。
+[对象实例化内存布局与访问定位](https://blog.csdn.net/KAIZ_LEARN/article/details/109281030)中描述了，JVM中对象内存布局主要分为三块区域：对象头区、实例数据区和填充区。
 
 <img src="https://img-blog.csdnimg.cn/202010111456447.jpg" style="zoom: 67%;" />
 
-**Synchronized用到的锁就是存在Java对象头里的**。对象头区又主要包含了两部分，分别是 运行时元数据（Mark Word）和 类型指针。
+**Synchronized用到的锁就是存在Java对象头里的**。对象头区又主要分为两部分，分别是 运行时元数据（Mark Word）和 类型指针。
 
 如果对象是数组类型，则虚拟机用3个字宽（Word）存储对象头，如果对象是非数组类型，则用2字宽存储对象头。在32位虚拟机中，1字宽等于4字节，即32bit。 Java对象头具体结构描述如下：
 
@@ -186,13 +194,20 @@ public class SafeTest {
 
 ![](https://img-blog.csdnimg.cn/20201026155937989.png#pic_center)
 
-### 3.3 Lock Record
+### 3.3 锁记录
 
-在线程进入同步代码块的时候，**如果此同步对象没有被锁定，即它的锁标志位是01，则虚拟机首先在当前线程的栈中创建我们称之为“锁记录（Lock Record）”的空间，用于存储锁对象的Mark Word的拷贝**，官方把这个拷贝称为Displaced Mark Word。**整个Mark Word及其拷贝至关重要**。
+在线程进入同步代码块的时候，如果此**同步对象没有被锁定，即它的锁标志位是01**，则虚拟机首先在当前线程的栈中创建我们称之为**“锁记录（Lock Record）”**的空间，用于存储锁对象的Mark Word的拷贝，官方把这个拷贝称为Displaced Mark Word。整个Mark Word及其拷贝至关重要。
 
-**Lock Record是线程私有的数据结构**，每一个线程都有一个可用Lock Record列表，同时还有一个全局的可用列表。**每一个被锁住的对象Mark Word都会和一个Lock Record关联（对象头的Mark Word中的Lock Word指向Lock Record的起始地址），同时Lock Record中有一个Owner字段存放拥有该锁的线程的唯一标识（或者`object mark word`），表示该锁被这个线程占用**。
+**Lock Record是线程私有的数据结构**，每一个线程都有一个可用Lock Record列表，同时还有一个全局的可用列表。**每一个被锁住的对象Mark Word都会和一个Lock Record关联**（对象头的Mark Word中的Lock Word指向Lock Record的起始地址），同时**Lock Record中有一个Owner字段存放拥有该锁的线程的唯一标识**（或者`object mark word`），表示该锁被这个线程占用。
 
-==(与下文逻辑不通)==
+| Lock Record | 描述                                                         |
+| ----------- | ------------------------------------------------------------ |
+| Owner       | 初始时为NULL表示当前没有任何线程拥有该monitor record，当线程成功拥有该锁后保存线程唯一标识，当锁被释放时又设置为NULL。 |
+| EntryQ      | 关联一个系统互斥锁（semaphore），阻塞所有试图锁住monitor record失败的线程。 |
+| RcThis      | 表示blocked或waiting在该monitor record上的所有线程的个数。   |
+| Nest        | 用来实现重入锁的计数。                                       |
+| HashCode    | 保存从对象头拷贝过来的HashCode值（可能还包含GC age）。       |
+| Candidate   | 用来避免不必要的阻塞或等待线程唤醒，因为每一次只有一个线程能够成功拥有锁，如果每次前一个释放锁的线程唤醒所有正在阻塞或等待的线程，会引起不必要的上下文切换（从阻塞到就绪然后因为竞争锁失败又被阻塞）从而导致性能严重下降。Candidate只有两种可能的值0表示没有需要唤醒的线程1表示要唤醒一个继任线程来竞争锁 |
 
 ### 3.4 Monitor原理
 
@@ -645,69 +660,6 @@ Java stack information for the threads listed above:
 
 ![1594558499871](D:/workplace/IdeaProjects/CS-Notes-Kz/01-basic-learning/01-language/01-java-basic/03-concurrent&multithreaded/assets/1594558499871.png)
 
-
-
-## 7 ReentrantLock
-
-相对于 synchronized 它具备如下特点
-
-1. 可中断
-2. 可以设置超时时间
-3. 可以设置为公平锁
-4. 支持多个条件变量，即对与不满足条件的线程可以放到不同的集合中等待
-
-与 synchronized 一样，都支持可重入
-
-基本语法
-
-```java
-// 获取锁
-reentrantLock.lock();
-try {
- // 临界区
-} finally {
- // 释放锁
- reentrantLock.unlock();
-}
-
-```
-
-**可重入**
-
-可重入是指同一个线程如果首次获得了这把锁，那么因为它是这把锁的拥有者，因此有权利再次获取这把锁如果是不可重入锁，那么第二次获得锁时，自己也会被锁挡住
-
-**可打断**
-
-直接看例子：Test31.java
-
-**锁超时**
-
-直接看例子：Test32.java
-
-使用锁超时解决哲学家就餐死锁问题：Test33.java
-
-**公平锁**
-
-synchronized锁中，在entrylist等待的锁在竞争时不是按照先到先得来获取锁的，所以说synchronized锁时不公平的；ReentranLock锁默认是不公平的，但是可以通过设置实现公平锁。本意是为了解决之前提到的饥饿问题，但是公平锁一般没有必要，会降低并发度，使用trylock也可以实现。
-
-**条件变量**
-
-synchronized 中也有条件变量，就是我们讲原理时那个 waitSet 休息室，当条件不满足时进入 waitSet 等待
-ReentrantLock 的条件变量比 synchronized 强大之处在于，它是支持多个条件变量的，这就好比
-
-1. synchronized 是那些不满足条件的线程都在一间休息室等消息
-2. 而 ReentrantLock 支持多间休息室，有专门等烟的休息室、专门等早餐的休息室、唤醒时也是按休息室来唤
-   醒
-
-使用要点：  Test34.java
-
-1. await 前需要获得锁
-2. await 执行后，会释放锁，进入 conditionObject 等待
-3. await 的线程被唤醒（或打断、或超时）取重新竞争 lock 锁，执行唤醒的线程爷必须先获得锁
-4. 竞争 lock 锁成功后，从 await 后继续执行
-
-
-
 **本章小结**
 
 本章我们需要重点掌握的是
@@ -733,20 +685,6 @@ ReentrantLock 的条件变量比 synchronized 强大之处在于，它是支持�
    2. 异步模式之生产者消费者
    3. 同步模式之顺序控制
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## 参考资料
 
 [多线程基础](https://blog.csdn.net/KAIZ_LEARN/article/details/108890366)
@@ -769,7 +707,7 @@ ReentrantLock 的条件变量比 synchronized 强大之处在于，它是支持�
 
 [Java CAS 原理剖析](https://juejin.im/post/6844903558937051144)
 
-
+[不可不说的Java“锁”事](https://tech.meituan.com/2018/11/15/java-lock.html)
 
 
 
