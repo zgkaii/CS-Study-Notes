@@ -767,7 +767,7 @@ ReentrantLock 的条件变量比 synchronized 强大之处在于，它是支持�
 
 [深入分析Synchronized原理](https://juejin.im/post/6844903640197513230)
 
-
+[Java CAS 原理剖析](https://juejin.im/post/6844903558937051144)
 
 
 
@@ -789,7 +789,7 @@ ReentrantLock 的条件变量比 synchronized 强大之处在于，它是支持�
 
 ![](https://img-blog.csdnimg.cn/20201026011946370.png#pic_center)
 
-#### 
+
 
 
 
