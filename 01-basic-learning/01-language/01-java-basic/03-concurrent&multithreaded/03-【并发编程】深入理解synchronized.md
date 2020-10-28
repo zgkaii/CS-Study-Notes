@@ -356,15 +356,243 @@ public synchronized void method();
 
 ## 4 synchronized进阶
 
+### 4.1 重量级锁
+
 在JDK 6之前，synchronized通过Monitor来实现线程同步，Monitor可以认为直接对应底层操作系统中的互斥量（mutex）。这种同步方式的成本非常高，包括系统调用引起的内核态与用户态切换、线程阻塞造成的线程切换等。因此，后来称这种锁为“重量级锁”。
 
 JDK 6为了减少获得锁和释放锁带来的性能消耗，引入了“偏向锁”和“轻量级锁”。所以，目前锁一共有4种状态，级别从低到高依次是：**无锁状态、偏向锁状态、轻量级锁状态和重量级锁状态**，这几个状态会随着竞争情况逐渐升级。**锁可以升级但不能降级**，意味着偏向锁升级成轻量级锁后不能降级成偏向锁。这种锁升级却不能降级的策略，目的是为了提高获得锁和释放锁的效率。
 
 ![](https://img-blog.csdnimg.cn/20201027235703700.png)
 
-在了解各种锁状态之前，先来看一个重要的概念，“CAS”。
+### 4.2 自旋
 
-### 4.1 CAS
+#### 4.2.1 自旋锁
+
+**线程的阻塞和唤醒需要CPU从用户态切转为核心态**，而且这种切换不易优化。如果锁的粒度很小，即锁持有的时间很短的时候。由锁竞争造成频繁地阻塞和唤醒线程就显得非常不值得，因此引入了自旋锁。
+
+**自旋锁可以减少线程阻塞造成的线程切换**。其执行步骤如下：
+
+* 当前线程尝试去竞争锁。
+* 竞争失败，准备阻塞自己。
+* 但是并没有阻塞自己，进入自旋状态（空等待，比如一个空的有限for循环）。
+* 自旋状态下，继续竞争锁。
+* 如果自旋期间成功获取锁，那么结束自旋状态，否则进入阻塞状态。
+
+> **如果在自旋期间成功获取锁，那么就减少一次线程的切换。**
+
+可见，如果持有锁的线程很快就释放了锁，那么自旋的效率就非常好，反之，自旋的线程就会白白消耗掉处理的资源。**所以自旋锁适合在持有锁时间短，并且竞争激烈的场景下使用。**
+
+在JDK1.6中自旋锁默认开启。可以使用`-XX:+UseSpinning`开启，`-XX:-UseSpinning`关闭自旋锁优化。
+
+自旋的默认次数为10次，可以使用`-XX:preBlockSpin`参数修改默认的自旋次数。
+
+#### 4.2.2 适应性自旋锁
+
+适应性自旋，是赋予了自旋一种学习能力，它并不固定自旋10次一下。他可以根据它前面线程的自旋情况，从而调整它的自旋。
+
+例如，线程总是自旋成功，那么虚拟机就会允许自旋等待持续的次数更多。反之，如果对于某个锁，很少有自旋能够成功，那么在以后竞争这个锁的时，自旋的次数会减少甚至省略掉自旋过程直接进入阻塞状态，以免浪费处理器资源。
+
+### 4.3  锁消除与锁粗化
+
+#### 4.3.1 锁消除
+
+JVM会对不会存在线程安全的锁进行锁消除。例如使用JDK的内置API，如StringBuffer、Vector、HashTable等会存在隐形的加锁操作。
+
+```java
+public void vectorTest(){
+    Vector<String> vector = new Vector<String>();
+    for(int i = 0 ; i < 10 ; i++){
+        vector.add(i + "");
+    }
+
+    System.out.println(vector);
+}
+```
+
+运行这段代码时，JVM明显检测到变量vector没有逃逸出方法vectorTest()之外，所以JVM会大胆地将vector内部的加锁操作消除。
+
+> 锁消除的依据是逃逸分析的数据支持。
+
+#### 4.3.2 锁粗化
+
+在遇到一连串地对同一锁不断进行请求和释放的操作时，JVM会把所有的锁操作整合成锁的一次请求，从而减少对锁的请求同步次数，这个操作叫做锁的粗化。
+
+例如：
+
+```java
+    for(int i = 0 ; i < 100 ; i++){
+		synchronized(lock){
+            // 同步块 
+    	}
+    }
+```
+
+锁粗化后：
+
+```java
+    synchronized(lock){
+        for(int i = 0 ; i < 100 ; i++){
+           // 同步块 
+        }
+    }
+```
+
+### 4.4 偏向锁
+
+在大多数情况下，锁不仅不存在多线程竞争，而且总是由同一线程多次获得，为了减少此类情况下线程获得锁的性能消耗，JDK6中引进了偏向锁。
+
+#### 4.4.1 偏向状态
+
+当一个线程访问同步代码块并获取锁时，会在Mark Word里存储锁偏向的线程ID。在线程进入和退出同步块时不再通过CAS操作来加锁和解锁，而是检测Mark Word里是否存储着指向当前线程的偏向锁。引入偏向锁是为了在无多线程竞争的情况下尽量减少不必要的轻量级锁执行路径，而偏向锁只需要在置换ThreadID的时候依赖一次CAS原子指令即可。
+
+偏向锁只有遇到其他线程尝试竞争偏向锁时，持有偏向锁的线程才会释放锁，线程不会主动释放偏向锁。偏向锁的撤销，需要等待全局安全点（在这个时间点上没有字节码正在执行），它会首先暂停拥有偏向锁的线程，判断锁对象是否处于被锁定状态。撤销偏向锁后恢复到无锁（标志位为“01”）或轻量级锁（标志位为“00”）的状态。
+
+![1583762169169](https://gitee.com/gu_chun_bo/picture/raw/master/image/20200309215610-51761.png)
+
+偏向锁在JDK 6及以后的JVM里是默认启用的。可以通过JVM参数关闭偏向锁：`-XX:-UseBiasedLocking=false`，关闭之后程序默认会进入轻量级锁状态。
+
+偏向锁默认是延迟的，不会在程序启动的时候立刻生效，可以通过JVM参数来避免延迟：`-XX:BiasedLockingStartupDelay=0`。
+
+一个对象的创建过程
+
+1. 如果开启了偏向锁（默认是开启的），那么对象刚创建之后，Mark Word 最后三位的值101，并且这是它的Thread，epoch，age都是0，在加锁的时候进行设置这些的值.
+
+2. 注意：处于偏向锁的对象解锁后，线程 id 仍存储于对象头中
+
+3. 实验Test18.java，加上虚拟机参数-XX:BiasedLockingStartupDelay=0进行测试
+
+   1. ```java
+      public static void main(String[] args) throws InterruptedException {
+              Test1 t = new Test1();
+              test.parseObjectHeader(getObjectHeader(t))；
+              synchronized (t){
+                  test.parseObjectHeader(getObjectHeader(t));
+              }
+              test.parseObjectHeader(getObjectHeader(t));
+          }
+      ```
+
+   2. 输出结果如下，三次输出的状态码都为101
+
+      ```properties
+      biasedLockFlag (1bit): 1
+      	LockFlag (2bit): 01
+      biasedLockFlag (1bit): 1
+      	LockFlag (2bit): 01
+      biasedLockFlag (1bit): 1
+      	LockFlag (2bit): 01
+      ```
+
+      
+
+测试禁用：如果没有开启偏向锁，那么对象创建后最后三位的值为001，这时候它的hashcode，age都为0，hashcode是第一次用到`hashcode`时才赋值的。在上面测试代码运行时在添加 VM 参数`-XX:-UseBiasedLocking`禁用偏向锁（禁用偏向锁则优先使用轻量级锁），退出`synchronized`状态变回001
+
+1. 测试代码Test18.java 虚拟机参数`-XX:-UseBiasedLocking`
+
+2. 输出结果如下，最开始状态为001，然后加轻量级锁变成00，最后恢复成001
+
+   ```properties
+   biasedLockFlag (1bit): 0
+   	LockFlag (2bit): 01
+   LockFlag (2bit): 00
+   biasedLockFlag (1bit): 0
+   	LockFlag (2bit): 01
+   ```
+
+#### 4.4.2 撤销偏向锁
+
+（1）hashcode方法
+
+测试 `hashCode`：当调用对象的hashcode方法的时候就会撤销这个对象的偏向锁，因为使用偏向锁时没有位置存`hashcode`的值了
+
+1. 测试代码如下，使用虚拟机参数`-XX:BiasedLockingStartupDelay=0`  ，确保我们的程序最开始使用了偏向锁！但是结果显示程序还是使用了轻量级锁。  Test20.java
+
+   ```java
+       public static void main(String[] args) throws InterruptedException {
+           Test1 t = new Test1();
+           t.hashCode();
+           test.parseObjectHeader(getObjectHeader(t));
+   
+           synchronized (t){
+               test.parseObjectHeader(getObjectHeader(t));
+           }
+           test.parseObjectHeader(getObjectHeader(t));
+       }
+   ```
+
+2. 输出结果
+
+   ```properties
+   biasedLockFlag (1bit): 0
+   	LockFlag (2bit): 01
+   LockFlag (2bit): 00
+   biasedLockFlag (1bit): 0
+   	LockFlag (2bit): 01
+   ```
+
+（2）其它线程使用对象
+
+这里我们演示的是偏向锁撤销变成轻量级锁的过程，那么就得满足轻量级锁的使用条件，就是没有线程对同一个对象进行锁竞争，我们使用`wait` 和 `notify` 来辅助实现
+
+1. 代码 Test19.java，虚拟机参数`-XX:BiasedLockingStartupDelay=0`确保我们的程序最开始使用了偏向锁！
+
+2. 输出结果，最开始使用的是偏向锁，但是第二个线程尝试获取对象锁时，发现本来对象偏向的是线程一，那么偏向锁就会失效，加的就是轻量级锁
+
+   ```properties
+   biasedLockFlag (1bit): 1
+   	LockFlag (2bit): 01
+   biasedLockFlag (1bit): 1
+   	LockFlag (2bit): 01
+   biasedLockFlag (1bit): 1
+   	LockFlag (2bit): 01
+   biasedLockFlag (1bit): 1
+   	LockFlag (2bit): 01
+   LockFlag (2bit): 00
+   biasedLockFlag (1bit): 0
+   	LockFlag (2bit): 01
+   ```
+
+（3）wait/notify
+
+会使对象的锁变成重量级锁，因为wait/notify方法之后重量级锁才支持。
+
+#### 4.4.3 批量重偏向
+
+如果对象被多个线程访问，但是没有竞争，这时候偏向了线程一的对象又有机会重新偏向线程二，即可以不用升级为轻量级锁，可这和我们之前做的实验矛盾了呀，其实要实现重新偏向是要有条件的：就是超过20对象对同一个线程如线程一撤销偏向时，那么第20个及以后的对象才可以将撤销对线程一的偏向这个动作变为将第20个及以后的对象偏向线程二。Test21.java
+
+### 4.5 轻量级锁
+
+轻量级锁的使用场景：多个线程使用锁的时间是错开的，相当于没有竞争。轻量级锁对使用者是透明的，即语法仍然是`synchronized`。
+
+例如有两个方法同步块，利用同一个对象加锁：
+
+```java
+static final Object obj = new Object();
+public static void method1() {
+     synchronized( obj ) {
+         // 同步块 A
+         method2();
+     }
+}
+public static void method2() {
+     synchronized( obj ) {
+         // 同步块 B
+     }
+}
+```
+
+### 4.6 锁膨胀/锁升级
+
+![](https://img-blog.csdnimg.cn/20201028011119984.png)
+
+
+
+**写在最后**
+
+Java 提供的 monitor 机制，其实是 Object，synchronized 等元素合作形成的，甚至说外部的条件变量也是个组成部分。JVM 底层的 ObjectMonitor 只是用来辅助实现 monitor 机制的一种常用模式，但大多数文章把 ObjectMonitor 直接当成了 monitor 机制。
+这样理解更合适：Java 对 monitor 的支持，是以机制的粒度提供给开发者使用的，也就是说，开发者要结合使用 synchronized 关键字，以及 Object 的 wait / notify 等元素，才能说自己利用 monitor 的机制去解决了一个生产者消费者的问题。
+
+## 5 CAS
 
 CAS全称 **Compare And Swap（比较与交换）**，是一种无锁算法。在不使用锁（没有线程被阻塞）的情况下实现多线程之间的变量同步。
 
@@ -433,433 +661,6 @@ public final int getAndAddInt(Object o, long offset, int delta) {
 根据OpenJDK 8的源码我们可以看出，getAndAddInt()循环获取给定对象o中的偏移量处的值v，然后判断内存值是否等于v。如果相等则将内存值设置为 v + delta，否则返回false，继续循环进行重试，直到设置成功才能退出循环，并且将旧值返回。整个“比较+更新”操作封装在compareAndSwapInt()中，在JNI里是借助于一个CPU指令完成的，属于原子操作，可以保证多个线程都能够看到同一个变量的修改值。
 
 后续JDK通过CPU的cmpxchg指令，去比较寄存器中的 A 和 内存中的值 V。如果相等，就把要写入的新值 B 存入内存中。如果不相等，就将内存值 V 赋值给寄存器中的值 A。然后通过Java代码中的while循环再次调用cmpxchg指令进行重试，直到设置成功为止。
-
-### 4.2 自旋
-
-#### 4.2.1 自旋锁
-
-**线程的阻塞和唤醒需要CPU从用户态切转为核心态**，而且这种切换不易优化。如果锁的粒度很小，即锁持有的时间很短的时候。由锁竞争造成频繁地阻塞和唤醒线程就显得非常不值得，因此引入了自旋锁。
-
-**自旋锁可以减少线程阻塞造成的线程切换**。其执行步骤如下：
-
-* 当前线程尝试去竞争锁。
-* 竞争失败，准备阻塞自己。
-* 但是并没有阻塞自己，进入自旋状态（空等待，比如一个空的有限for循环）。
-* 自旋状态下，继续竞争锁。
-* 如果自旋期间成功获取锁，那么结束自旋状态，否则进入阻塞状态。
-
-> **如果在自旋期间成功获取锁，那么就减少一次线程的切换。**
-
-可见，如果持有锁的线程很快就释放了锁，那么自旋的效率就非常好，反之，自旋的线程就会白白消耗掉处理的资源。**所以自旋锁适合在持有锁时间短，并且竞争不激烈的场景下使用。**
-
-在JDK1.6中自旋锁默认开启。可以使用`-XX:+UseSpinning`开启，`-XX:-UseSpinning`关闭自旋锁优化。
-
-自旋的默认次数为10次，可以使用`-XX:preBlockSpin`参数修改默认的自旋次数。
-
-#### 4.2.2 适应性自旋锁
-
-适应性自旋，是赋予了自旋一种学习能力，它并不固定自旋10次一下。他可以根据它前面线程的自旋情况，从而调整它的自旋。
-
-例如，线程总是自旋成功，那么虚拟机就会允许自旋等待持续的次数更多。反之，如果对于某个锁，很少有自旋能够成功，那么在以后要或者这个锁的时候自旋的次数会减少甚至省略掉自旋过程，以免浪费处理器资源。
-
-### 4.3  锁消除与锁粗化
-
-#### 4.3.1 锁消除
-
-JVM对不会存在线程安全的锁进行锁消除。例如使用JDK的内置API，如StringBuffer、Vector、HashTable等时，会存在隐形的加锁操作。
-
-```java
-public void vectorTest(){
-    Vector<String> vector = new Vector<String>();
-    for(int i = 0 ; i < 10 ; i++){
-        vector.add(i + "");
-    }
-
-    System.out.println(vector);
-}
-```
-
-运行这段代码时，JVM可以明显检测到变量vector没有逃逸出方法vectorTest()之外，所以JVM可以大胆地将vector内部的加锁操作消除。
-
-> 锁消除的依据是逃逸分析的数据支持。
-
-#### 4.3.2 锁粗化
-
-在遇到一连串地对同一锁不断进行请求和释放的操作时，把所有的锁操作整合成锁的一次请求，从而减少对锁的请求同步次数，这个操作叫做锁的粗化。
-
-例如：
-
-```java
-    for(int i = 0 ; i < 10 ; i++){
-		synchronized(lock){
-            // 同步块 
-    	}
-    }
-```
-
-锁粗化后：
-
-```java
-    synchronized(lock){
-        for(int i = 0 ; i < 10 ; i++){
-           // 同步块 
-        }
-    }
-```
-
-### 4.4 偏向锁
-
-在大多数情况下，锁不仅不存在多线程竞争，而且总是由同一线程多次获得，为了减少此类情况下线程获得锁的性能消耗，JDK6中引进了偏向锁。
-
-当一个线程访问同步代码块并获取锁时，会在Mark Word里存储锁偏向的线程ID。在线程进入和退出同步块时不再通过CAS操作来加锁和解锁，而是检测Mark Word里是否存储着指向当前线程的偏向锁。引入偏向锁是为了在无多线程竞争的情况下尽量减少不必要的轻量级锁执行路径，因为轻量级锁的获取及释放依赖多次CAS原子指令，而偏向锁只需要在置换ThreadID的时候依赖一次CAS原子指令即可。
-
-偏向锁只有遇到其他线程尝试竞争偏向锁时，持有偏向锁的线程才会释放锁，线程不会主动释放偏向锁。偏向锁的撤销，需要等待全局安全点（在这个时间点上没有字节码正在执行），它会首先暂停拥有偏向锁的线程，判断锁对象是否处于被锁定状态。撤销偏向锁后恢复到无锁（标志位为“01”）或轻量级锁（标志位为“00”）的状态。
-
-偏向锁在JDK 6及以后的JVM里是默认启用的。可以通过JVM参数关闭偏向锁：-XX:-UseBiasedLocking=false，关闭之后程序默认会进入轻量级锁状态。
-
-在轻量级的锁中，我们可以发现，如果同一个线程对同一个对象进行重入锁时，也需要执行CAS操作，这是有点耗时滴，那么java6开始引入了偏向锁的东东，只有第一次使用CAS时将对象的Mark Word头设置为入锁线程ID，**之后这个入锁线程再进行重入锁时，发现线程ID是自己的，那么就不用再进行CAS了**
-
-![1583760728806](https://gitee.com/gu_chun_bo/picture/raw/master/image/20200309213209-28609.png)
-
-#### 4.4.1 偏向状态
-
-![1583762169169](https://gitee.com/gu_chun_bo/picture/raw/master/image/20200309215610-51761.png)
-
-一个对象的创建过程
-
-1. 如果开启了偏向锁（默认是开启的），那么对象刚创建之后，Mark Word 最后三位的值101，并且这是它的Thread，epoch，age都是0，在加锁的时候进行设置这些的值.
-
-2. 偏向锁默认是延迟的，不会在程序启动的时候立刻生效，如果想避免延迟，可以添加虚拟机参数来禁用延迟：-`XX:BiasedLockingStartupDelay=0`来禁用延迟
-
-3. 注意：处于偏向锁的对象解锁后，线程 id 仍存储于对象头中
-
-4. 实验Test18.java，加上虚拟机参数-XX:BiasedLockingStartupDelay=0进行测试
-
-   1. ```java
-      public static void main(String[] args) throws InterruptedException {
-              Test1 t = new Test1();
-              test.parseObjectHeader(getObjectHeader(t))；
-              synchronized (t){
-                  test.parseObjectHeader(getObjectHeader(t));
-              }
-              test.parseObjectHeader(getObjectHeader(t));
-          }
-      ```
-
-   2. 输出结果如下，三次输出的状态码都为101
-
-      ```properties
-      biasedLockFlag (1bit): 1
-      	LockFlag (2bit): 01
-      biasedLockFlag (1bit): 1
-      	LockFlag (2bit): 01
-      biasedLockFlag (1bit): 1
-      	LockFlag (2bit): 01
-      ```
-
-      
-
-测试禁用：如果没有开启偏向锁，那么对象创建后最后三位的值为001，这时候它的hashcode，age都为0，hashcode是第一次用到`hashcode`时才赋值的。在上面测试代码运行时在添加 VM 参数`-XX:-UseBiasedLocking`禁用偏向锁（禁用偏向锁则优先使用轻量级锁），退出`synchronized`状态变回001
-
-1. 测试代码Test18.java 虚拟机参数`-XX:-UseBiasedLocking`
-
-2. 输出结果如下，最开始状态为001，然后加轻量级锁变成00，最后恢复成001
-
-   ```properties
-   biasedLockFlag (1bit): 0
-   	LockFlag (2bit): 01
-   LockFlag (2bit): 00
-   biasedLockFlag (1bit): 0
-   	LockFlag (2bit): 01
-   ```
-
-#### 4.4.2 撤销偏向锁-hashcode方法
-
-测试 `hashCode`：当调用对象的hashcode方法的时候就会撤销这个对象的偏向锁，因为使用偏向锁时没有位置存`hashcode`的值了
-
-1. 测试代码如下，使用虚拟机参数`-XX:BiasedLockingStartupDelay=0`  ，确保我们的程序最开始使用了偏向锁！但是结果显示程序还是使用了轻量级锁。  Test20.java
-
-   ```java
-       public static void main(String[] args) throws InterruptedException {
-           Test1 t = new Test1();
-           t.hashCode();
-           test.parseObjectHeader(getObjectHeader(t));
-   
-           synchronized (t){
-               test.parseObjectHeader(getObjectHeader(t));
-           }
-           test.parseObjectHeader(getObjectHeader(t));
-       }
-   ```
-
-2. 输出结果
-
-   ```properties
-   biasedLockFlag (1bit): 0
-   	LockFlag (2bit): 01
-   LockFlag (2bit): 00
-   biasedLockFlag (1bit): 0
-   	LockFlag (2bit): 01
-   ```
-
-
-#### 4.4.3 撤销偏向锁-其它线程使用对象
-
-这里我们演示的是偏向锁撤销变成轻量级锁的过程，那么就得满足轻量级锁的使用条件，就是没有线程对同一个对象进行锁竞争，我们使用`wait` 和 `notify` 来辅助实现
-
-1. 代码 Test19.java，虚拟机参数`-XX:BiasedLockingStartupDelay=0`确保我们的程序最开始使用了偏向锁！
-
-2. 输出结果，最开始使用的是偏向锁，但是第二个线程尝试获取对象锁时，发现本来对象偏向的是线程一，那么偏向锁就会失效，加的就是轻量级锁
-
-   ```properties
-   biasedLockFlag (1bit): 1
-   	LockFlag (2bit): 01
-   biasedLockFlag (1bit): 1
-   	LockFlag (2bit): 01
-   biasedLockFlag (1bit): 1
-   	LockFlag (2bit): 01
-   biasedLockFlag (1bit): 1
-   	LockFlag (2bit): 01
-   LockFlag (2bit): 00
-   biasedLockFlag (1bit): 0
-   	LockFlag (2bit): 01
-   ```
-
-   
-
-#### 4.4.4 撤销 - 调用 wait/notify
-
-会使对象的锁变成重量级锁，因为wait/notify方法之后重量级锁才支持。
-
-#### 4.4.5 批量重偏向
-
-如果对象被多个线程访问，但是没有竞争，这时候偏向了线程一的对象又有机会重新偏向线程二，即可以不用升级为轻量级锁，可这和我们之前做的实验矛盾了呀，其实要实现重新偏向是要有条件的：就是超过20对象对同一个线程如线程一撤销偏向时，那么第20个及以后的对象才可以将撤销对线程一的偏向这个动作变为将第20个及以后的对象偏向线程二。Test21.java
-
-### 4.5 轻量级锁
-
-轻量级锁的使用场景：多个线程使用锁的时间是错开的，相当于没有竞争。轻量级锁对使用者是透明的，即语法仍然是`synchronized`。
-
-例如有两个方法同步块，利用同一个对象加锁：
-
-```java
-static final Object obj = new Object();
-public static void method1() {
-     synchronized( obj ) {
-         // 同步块 A
-         method2();
-     }
-}
-public static void method2() {
-     synchronized( obj ) {
-         // 同步块 B
-     }
-}
-```
-
-1. 每次指向到synchronized代码块时，都会创建锁记录（Lock Record）对象，每个线程都会包括一个锁记录的结构，锁记录内部可以储存对象的Mark Word和对象引用reference。![1583755737580](https://gitee.com/gu_chun_bo/picture/raw/master/image/20200309200902-382362.png)
-2. 让锁记录中的Object reference指向对象，并且尝试用cas(compare and sweep)替换Object对象的Mark Word ，将Mark Word 的值存入锁记录中
-   1. ![1583755888236](https://gitee.com/gu_chun_bo/picture/raw/master/image/20200309201132-961387.png)
-3. 如果cas替换成功，那么对象的对象头储存的就是锁记录的地址和状态01，如下所示
-   1. ![1583755964276](https://gitee.com/gu_chun_bo/picture/raw/master/image/20200309201247-989088.png)
-4. 如果cas失败，有两种情况
-   1. 如果是其它线程已经持有了该Object的轻量级锁，那么表示有竞争，将进入锁膨胀阶段
-   2. 如果是自己的线程已经执行了synchronized进行加锁，那么那么再添加一条 Lock Record 作为重入的计数
-      1. ![1583756190177](https://gitee.com/gu_chun_bo/picture/raw/master/image/20200309201634-451646.png)
-5. 当线程退出synchronized代码块的时候，**如果获取的是取值为 null 的锁记录 **，表示有重入，这时重置锁记录，表示重入计数减一
-   1. ![1583756357835](https://gitee.com/gu_chun_bo/picture/raw/master/image/20200309201919-357425.png)
-6. 当线程退出synchronized代码块的时候，如果获取的锁记录取值不为 null，那么使用cas将Mark Word的值恢复给对象
-   1. 成功则解锁成功
-   2. 失败，则说明轻量级锁进行了锁膨胀或已经升级为重量级锁，进入重量级锁解锁流程
-
-### 4.6 重量级锁
-
-### 4.7 锁膨胀/锁升级
-
-![](https://img-blog.csdnimg.cn/20201028011119984.png)
-
-## 5 wait和notify
-
-建议先看看wait和notify方法的javadoc文档
-
-### 5.1 同步模式之保护性暂停
-
-即 Guarded Suspension，用在一个线程等待另一个线程的执行结果，要点：
-
-1. 有一个结果需要从一个线程传递到另一个线程，让他们关联同一个 GuardedObject
-2. 如果有结果不断从一个线程到另一个线程那么可以使用消息队列（见生产者/消费者）
-3. JDK 中，join 的实现、Future 的实现，采用的就是此模式
-4. 因为要等待另一方的结果，因此归类到同步模式
-
-代码：Test22.java    Test23.java这是带超时时间的
-
-![](https://img-blog.csdnimg.cn/20201026221941471.png)
-
-关于超时的增强，在join(long millis) 的源码中得到了体现：
-
-```java
-    public final synchronized void join(long millis)
-    throws InterruptedException {
-        long base = System.currentTimeMillis();
-        long now = 0;
-
-        if (millis < 0) {
-            throw new IllegalArgumentException("timeout value is negative");
-        }
-		
-        if (millis == 0) {
-            while (isAlive()) {
-                wait(0);
-            }
-        } else {
-        // join一个指定的时间
-            while (isAlive()) {
-                long delay = millis - now;
-                if (delay <= 0) {
-                    break;
-                }
-                wait(delay);
-                now = System.currentTimeMillis() - base;
-            }
-        }
-    }
-```
-
-
-
-多任务版 GuardedObject图中 Futures 就好比居民楼一层的信箱（每个信箱有房间编号），左侧的 t0，t2，t4 就好比等待邮件的居民，右侧的 t1，t3，t5 就好比邮递员如果需要在多个类之间使用 GuardedObject 对象，作为参数传递不是很方便，因此设计一个用来解耦的中间类，这样不仅能够解耦【结果等待者】和【结果生产者】，还能够同时支持多个任务的管理。和生产者消费者模式的区别就是：这个生产者和消费者之间是一一对应的关系，但是生产者消费者模式并不是。rpc框架的调用中就使用到了这种模式。  Test24.java
-
-![1594518049426](D:/workplace/IdeaProjects/CS-Notes-Kz/01-basic-learning/01-language/01-java-basic/03-concurrent&multithreaded/assets/1594518049426.png)
-
-### 5.2 异步模式之生产者/消费者
-
-要点
-
-1. 与前面的保护性暂停中的 GuardObject 不同，不需要产生结果和消费结果的线程一一对应
-2. 消费队列可以用来平衡生产和消费的线程资源
-3. 生产者仅负责产生结果数据，不关心数据该如何处理，而消费者专心处理结果数据
-4. 消息队列是有容量限制的，满时不会再加入数据，空时不会再消耗数据
-5. JDK 中各种[阻塞队列](https://blog.csdn.net/yanpenglei/article/details/79556591)，采用的就是这种模式
-
-“异步”的意思就是生产者产生消息之后消息没有被立刻消费，而“同步模式”中，消息在产生之后被立刻消费了。
-
-![1594524622020](D:/workplace/IdeaProjects/CS-Notes-Kz/01-basic-learning/01-language/01-java-basic/03-concurrent&multithreaded/assets/1594524622020.png)
-
-我们写一个线程间通信的消息队列，要注意区别，像rabbit mq等消息框架是进程间通信的。
-
-### 5.3 同步模式之顺序控制
-
-1. 固定运行顺序，比如，必须先 2 后 1 打印
-   1.  wait notify 版  Test35.java
-   2.  Park Unpark 版  Test36.java
-2. 交替输出，线程 1 输出 a 5 次，线程 2 输出 b 5 次，线程 3 输出 c 5 次。现在要求输出 abcabcabcabcabc 怎么实现
-   1. wait notify 版   Test37.java
-   2. Lock 条件变量版 Test38.java
-   3. Park Unpark 版 Test39.java
-
-## 6 活跃性
-
-活跃性相关的一系列问题都可以用ReentrantLock进行解决。
-
-### 6.1 死锁
-
-有这样的情况：一个线程需要同时获取多把锁，这时就容易发生死锁t1 线程获得A对象锁，接下来想获取B对象的锁；t2 线程获得B对象锁，接下来想获取A对象的锁例。Test28.java
-
-### 6.2 检测死锁
-
-检测死锁可以使用 jconsole工具；或者使用 jps 定位进程 id，再用 jstack 定位死锁：Test28.java
-
-下面使用jstack工具进行演示
-
-```java
-D:\我的项目\JavaLearing\java并发编程\jdk8>jps
-1156 RemoteMavenServer36
-20452 Test25
-9156 Launcher
-23544 Jps
-23848
-22748 Test28
-
-D:\我的项目\JavaLearing\java并发编程\jdk8>jstack 22748
-2020-07-12 18:54:44
-Full thread dump Java HotSpot(TM) 64-Bit Server VM (25.211-b12 mixed mode):
-
-"DestroyJavaVM" #14 prio=5 os_prio=0 tid=0x0000000002a03800 nid=0x5944 waiting on condition [0x0000000000000000]
-   java.lang.Thread.State: RUNNABLE
-
-//................省略了大部分内容.............//
-Found one Java-level deadlock:
-=============================
-"线程二":
-  waiting to lock monitor 0x0000000002afc0e8 (object 0x00000000db9f76d0, a java.lang.Object),
-  which is held by "线程1"
-"线程1":
-  waiting to lock monitor 0x0000000002afe1e8 (object 0x00000000db9f76e0, a java.lang.Object),
-  which is held by "线程二"
-
-Java stack information for the threads listed above:
-===================================================
-"线程二":
-        at com.concurrent.test.Test28.lambda$main$1(Test28.java:39)
-        - waiting to lock <0x00000000db9f76d0> (a java.lang.Object)
-        - locked <0x00000000db9f76e0> (a java.lang.Object)
-        at com.concurrent.test.Test28$$Lambda$2/326549596.run(Unknown Source)
-        at java.lang.Thread.run(Thread.java:748)
-"线程1":
-        at com.concurrent.test.Test28.lambda$main$0(Test28.java:23)
-        - waiting to lock <0x00000000db9f76e0> (a java.lang.Object)
-        - locked <0x00000000db9f76d0> (a java.lang.Object)
-        at com.concurrent.test.Test28$$Lambda$1/1343441044.run(Unknown Source)
-        at java.lang.Thread.run(Thread.java:748)
-```
-
-
-
-### 6.3 哲学家就餐问题
-
-![1594553609905](D:/workplace/IdeaProjects/CS-Notes-Kz/01-basic-learning/01-language/01-java-basic/03-concurrent&multithreaded/assets/1594553609905.png)
-
-有五位哲学家，围坐在圆桌旁。
-他们只做两件事，思考和吃饭，思考一会吃口饭，吃完饭后接着思考。
-吃饭时要用两根筷子吃，桌上共有 5 根筷子，每位哲学家左右手边各有一根筷子。
-如果筷子被身边的人拿着，自己就得等待  Test29.java
-
-当每个哲学家即线程持有一根筷子时，他们都在等待另一个线程释放锁，因此造成了死锁。这种线程没有按预期结束，执行不下去的情况，归类为【活跃性】问题，除了死锁以外，还有活锁和饥饿者两种情
-况
-
-### 6.4 饥饿
-
-很多教程中把饥饿定义为，一个线程由于优先级太低，始终得不到 CPU 调度执行，也不能够结束，饥饿的情况不易演示，讲读写锁时会涉及饥饿问题下面我讲一下一个线程饥饿的例子，先来看看使用顺序加锁的方式解决之前的死锁问题，就是两个线程对两个不同的对象加锁的时候都使用相同的顺序进行加锁。 但是会产生饥饿问题Test29
-
-![1594558469826](https://gitee.com/gu_chun_bo/picture/raw/master/image/20200712205431-675389.png)
-
-顺序加锁的解决方案
-
-![1594558499871](D:/workplace/IdeaProjects/CS-Notes-Kz/01-basic-learning/01-language/01-java-basic/03-concurrent&multithreaded/assets/1594558499871.png)
-
-**本章小结**
-
-本章我们需要重点掌握的是
-
-1. 分析多线程访问共享资源时，哪些代码片段属于临界区
-2. 使用 synchronized 互斥解决临界区的线程安全问题
-   1. 掌握 synchronized 锁对象语法
-   2. 掌握 synchronzied 加载成员方法和静态方法语法
-   3. 掌握 wait/notify 同步方法
-3. 使用 lock 互斥解决临界区的线程安全问题
-   掌握 lock 的使用细节：可打断、锁超时、公平锁、条件变量
-4. 学会分析变量的线程安全性、掌握常见线程安全类的使用
-5. 了解线程活跃性问题：死锁、活锁、饥饿
-6. 应用方面
-   1. **互斥：使用 synchronized 或 Lock 达到共享资源互斥效果，实现原子性效果，保证线程安全。**
-   2. **同步：使用 wait/notify 或 Lock 的条件变量来达到线程间通信效果。**
-7. 原理方面
-   1. monitor、synchronized 、wait/notify 原理
-   2. synchronized 进阶原理
-   3. park & unpark 原理
-8. 模式方面
-   1. 同步模式之保护性暂停
-   2. 异步模式之生产者消费者
-   3. 同步模式之顺序控制
 
 ## 参考资料
 
