@@ -32,7 +32,7 @@ NEXT 10m;                 --自动增长的大小
 
 ### 三、用户
 oracle的表和其它的数据库对象都是存储在用户下的。  
-##### 1.创建用户：
+##### 1.创建用户
 ```oracle
 CREATE USER root
 IDENTIFIED BY root         --用户的密码
@@ -317,12 +317,12 @@ CREATE OR REPLACE VIEW empvd20 AS SELECT * FROM emp t WHERE t.deptno = 20;
 
 ### 十二、索引
 索引是用于加速数据存取的数据对象。合理的使用索引可以大大降低I/O 次数,从而提高数据访问性能。  
-##### 1．单列索引
+##### 1.单列索引
 单列索引是基于单个列所建立的索引，比如:
 ```oracle
 CREATE index 索引名on 表名(列名)
 ```
-##### 2. 复合索引
+##### 2.复合索引
 复合索引是基于两个列或多个列的索引。在同一张表上可以有多个索引，但是要求列的组合必须不同,比如：  
 Create index emp_idx1 on emp(ename,job);  
 Create index emp_idx1 on emp(job,ename);  
@@ -405,7 +405,7 @@ END;
 SMITH  800
 ```
 ### 十四、分支
-##### if分支
+##### 1.if分支
 * 语法一
 ```oracle
 IF 条件 THEN 
@@ -511,7 +511,8 @@ CURSOR c1 IS SELECT ename FROM emp;
 * 取一行游标的值： fetch c1 into pjob; (取一行到变量中)
 * 关闭游标： close c1;(关闭游标释放资源)
 * 游标的结束方式 exit when c1%notfound
-    
+  
+
 **注意**： 上面的 pjob 必须与 emp 表中的 job 列类型一致：  
 定义： pjob emp.empjob%type;
 
