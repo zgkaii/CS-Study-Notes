@@ -1,51 +1,6 @@
 
-<!-- TOC -->
 
-- [一 使用线程池的好处](#一-使用线程池的好处)
-- [二 Executor 框架](#二-executor-框架)
-    - [2.1 简介](#21-简介)
-    - [2.2 Executor 框架结构(主要由三大部分组成)](#22-executor-框架结构主要由三大部分组成)
-        - [1) 任务(`Runnable` /`Callable`)](#1-任务runnable-callable)
-        - [2) 任务的执行(`Executor`)](#2-任务的执行executor)
-        - [3) 异步计算的结果(`Future`)](#3-异步计算的结果future)
-    - [2.3 Executor 框架的使用示意图](#23-executor-框架的使用示意图)
-- [三 (重要)ThreadPoolExecutor 类简单介绍](#三-重要threadpoolexecutor-类简单介绍)
-    - [3.1 ThreadPoolExecutor 类分析](#31-threadpoolexecutor-类分析)
-    - [3.2 推荐使用 `ThreadPoolExecutor` 构造函数创建线程池](#32-推荐使用-threadpoolexecutor-构造函数创建线程池)
-- [四 (重要)ThreadPoolExecutor 使用示例](#四-重要threadpoolexecutor-使用示例)
-    - [4.1 示例代码:`Runnable`+`ThreadPoolExecutor`](#41-示例代码runnablethreadpoolexecutor)
-    - [4.2 线程池原理分析](#42-线程池原理分析)
-    - [4.3 几个常见的对比](#43-几个常见的对比)
-        - [4.3.1 `Runnable` vs `Callable`](#431-runnable-vs-callable)
-        - [4.3.2 `execute()` vs `submit()`](#432-execute-vs-submit)
-        - [4.3.3 `shutdown()`VS`shutdownNow()`](#433-shutdownvsshutdownnow)
-        - [4.3.2 `isTerminated()` VS `isShutdown()`](#432-isterminated-vs-isshutdown)
-    - [4.4 加餐:`Callable`+`ThreadPoolExecutor`示例代码](#44-加餐callablethreadpoolexecutor示例代码)
-- [五 几种常见的线程池详解](#五-几种常见的线程池详解)
-    - [5.1 FixedThreadPool](#51-fixedthreadpool)
-        - [5.1.1 介绍](#511-介绍)
-        - [5.1.2 执行任务过程介绍](#512-执行任务过程介绍)
-        - [5.1.3 为什么不推荐使用`FixedThreadPool`？](#513-为什么不推荐使用fixedthreadpool)
-    - [5.2 SingleThreadExecutor 详解](#52-singlethreadexecutor-详解)
-        - [5.2.1 介绍](#521-介绍)
-        - [5.2.2 执行任务过程介绍](#522-执行任务过程介绍)
-        - [5.2.3 为什么不推荐使用`SingleThreadExecutor`？](#523-为什么不推荐使用singlethreadexecutor)
-    - [5.3 CachedThreadPool 详解](#53-cachedthreadpool-详解)
-        - [5.3.1 介绍](#531-介绍)
-        - [5.3.2 执行任务过程介绍](#532-执行任务过程介绍)
-        - [5.3.3 为什么不推荐使用`CachedThreadPool`？](#533-为什么不推荐使用cachedthreadpool)
-- [六 ScheduledThreadPoolExecutor 详解](#六-scheduledthreadpoolexecutor-详解)
-    - [6.1 简介](#61-简介)
-    - [6.2 运行机制](#62-运行机制)
-    - [6.3 ScheduledThreadPoolExecutor 执行周期任务的步骤](#63-scheduledthreadpoolexecutor-执行周期任务的步骤)
-- [七 线程池大小确定](#七-线程池大小确定)
-- [八 参考](#八-参考)
-- [九 其他推荐阅读](#九-其他推荐阅读)
-
-<!-- /TOC -->
-
-
-## 一 使用线程池的好处
+##  1 使用线程池的好处
 
 > **池化技术相比大家已经屡见不鲜了，线程池、数据库连接池、Http 连接池等等都是对这个思想的应用。池化技术的思想主要是为了减少每次获取资源的消耗，提高对资源的利用率。**
 
