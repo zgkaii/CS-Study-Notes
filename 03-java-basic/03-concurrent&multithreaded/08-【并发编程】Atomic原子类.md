@@ -203,8 +203,8 @@ class User {
 
 * AtomicReference：引用类型原子类
 
-- AtomicStampedReference：原子更新带有版本号的引用类型。该类将整数值与引用关联起来，可用于解决原子的更新数据和数据的版本号，可以解决使用 CAS 进行原子更新时可能出现的 ABA 问题。
-- AtomicMarkableReference ：原子更新带有标记的引用类型。该类将 boolean 标记与引用关联起来，~~也可以解决使用 CAS 进行原子更新时可能出现的 ABA 问题。~~
+- AtomicStampedReference：原子更新带有版本号的引用类型。该类将整数值与引用关联起来，可用于解决原子的更新数据和数据的版本号，**可以解决使用 CAS 进行原子更新时可能出现的 ABA 问题**。
+- AtomicMarkableReference ：原子更新带有标记的引用类型。该类将 boolean 标记与引用关联起来。
 
 （1）`AtomicReference类`使用示例：
 
@@ -259,105 +259,39 @@ LiSi
 30
 ```
 
-（2） `AtomicStampedReference`类使用示例
+（2）` AtomicMarkableReference`类使用示例
 
-```java
-public class AtomicStampedReferenceDemo {
-    public static void main(String[] args) {
-        // 实例化、取当前值和 stamp 值
-        final Integer initialRef = 0, initialStamp = 0;
-        final AtomicStampedReference<Integer> asr = new AtomicStampedReference<>(initialRef, initialStamp);
-        System.out.println("currentValue=" + asr.getReference() + ", currentStamp=" + asr.getStamp());
-
-        // compare and set
-        final Integer newReference = 666, newStamp = 999;
-        final boolean casResult = asr.compareAndSet(initialRef, newReference, initialStamp, newStamp);
-        System.out.println("currentValue=" + asr.getReference()
-                + ", currentStamp=" + asr.getStamp()
-                + ", casResult=" + casResult);
-
-        // 获取当前的值和当前的 stamp 值
-        int[] arr = new int[1];
-        final Integer currentValue = asr.get(arr);
-        final int currentStamp = arr[0];
-        System.out.println("currentValue=" + currentValue + ", currentStamp=" + currentStamp);
-
-        // 单独设置 stamp 值
-        final boolean attemptStampResult = asr.attemptStamp(newReference, 88);
-        System.out.println("currentValue=" + asr.getReference()
-                + ", currentStamp=" + asr.getStamp()
-                + ", attemptStampResult=" + attemptStampResult);
-
-        // 重新设置当前值和 stamp 值
-        asr.set(initialRef, initialStamp);
-        System.out.println("currentValue=" + asr.getReference() + ", currentStamp=" + asr.getStamp());
-
-        // [不推荐使用，除非搞清楚注释的意思了] weak compare and set
-        // 困惑！weakCompareAndSet 这个方法最终还是调用 compareAndSet 方法。[版本: jdk-8u191]
-        // 但是注释上写着 "May fail spuriously and does not provide ordering guarantees,
-        // so is only rarely an appropriate alternative to compareAndSet."
-        // todo 感觉有可能是 jvm 通过方法名在 native 方法里面做了转发
-        final boolean wCasResult = asr.weakCompareAndSet(initialRef, newReference, initialStamp, newStamp);
-        System.out.println("currentValue=" + asr.getReference()
-                + ", currentStamp=" + asr.getStamp()
-                + ", wCasResult=" + wCasResult);
-    }
-}
-```
-
-输出结果：
-
-```java
-currentValue=0, currentStamp=0
-currentValue=666, currentStamp=999, casResult=true
-currentValue=666, currentStamp=999
-currentValue=666, currentStamp=88, attemptStampResult=true
-currentValue=0, currentStamp=0
-currentValue=666, currentStamp=999, wCasResult=true
-```
-
-（3）` AtomicMarkableReference`类使用示例
+AtomicMarkableReference是将一个boolean值作是否有更改的标记，本质就是它的版本号只有两个，true和false，修改的时候在这两个版本号之间来回切换，这样做并不能解决ABA的问题，只是会降低ABA问题发生的几率。
 
 ``` java
-public class AtomicMarkableReferenceDemo {
+public class SolveABAByAtomicMarkableReference {
+    private static AtomicMarkableReference atomicMarkableReference = new AtomicMarkableReference(100, false);
+
     public static void main(String[] args) {
-        // 实例化、取当前值和 mark 值
-        final Boolean initialRef = null, initialMark = false;
-        final AtomicMarkableReference<Boolean> amr = new AtomicMarkableReference<>(initialRef, initialMark);
-        System.out.println("currentValue=" + amr.getReference() + ", currentMark=" + amr.isMarked());
 
-        // compare and set
-        final Boolean newReference1 = true, newMark1 = true;
-        final boolean casResult = amr.compareAndSet(initialRef, newReference1, initialMark, newMark1);
-        System.out.println("currentValue=" + amr.getReference()
-                + ", currentMark=" + amr.isMarked()
-                + ", casResult=" + casResult);
+        Thread refT1 = new Thread(() -> {
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            atomicMarkableReference.compareAndSet(100, 101, atomicMarkableReference.isMarked(), !atomicMarkableReference.isMarked());
+            atomicMarkableReference.compareAndSet(101, 100, atomicMarkableReference.isMarked(), !atomicMarkableReference.isMarked());
+        });
 
-        // 获取当前的值和当前的 mark 值
-        boolean[] arr = new boolean[1];
-        final Boolean currentValue = amr.get(arr);
-        final boolean currentMark = arr[0];
-        System.out.println("currentValue=" + currentValue + ", currentMark=" + currentMark);
+        Thread refT2 = new Thread(() -> {
+            boolean marked = atomicMarkableReference.isMarked();
+            try {
+                TimeUnit.SECONDS.sleep(2);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            boolean c3 = atomicMarkableReference.compareAndSet(100, 101, marked, !marked);
+            System.out.println(c3); // 返回true,实际应该返回false
+        });
 
-        // 单独设置 mark 值
-        final boolean attemptMarkResult = amr.attemptMark(newReference1, false);
-        System.out.println("currentValue=" + amr.getReference()
-                + ", currentMark=" + amr.isMarked()
-                + ", attemptMarkResult=" + attemptMarkResult);
-
-        // 重新设置当前值和 mark 值
-        amr.set(initialRef, initialMark);
-        System.out.println("currentValue=" + amr.getReference() + ", currentMark=" + amr.isMarked());
-
-        // [不推荐使用，除非搞清楚注释的意思了] weak compare and set
-        // 困惑！weakCompareAndSet 这个方法最终还是调用 compareAndSet 方法。[版本: jdk-8u191]
-        // 但是注释上写着 "May fail spuriously and does not provide ordering guarantees,
-        // so is only rarely an appropriate alternative to compareAndSet."
-        // todo 感觉有可能是 jvm 通过方法名在 native 方法里面做了转发
-        final boolean wCasResult = amr.weakCompareAndSet(initialRef, newReference1, initialMark, newMark1);
-        System.out.println("currentValue=" + amr.getReference()
-                + ", currentMark=" + amr.isMarked()
-                + ", wCasResult=" + wCasResult);
+        refT1.start();
+        refT2.start();
     }
 }
 ```
@@ -365,12 +299,7 @@ public class AtomicMarkableReferenceDemo {
 输出结果：
 
 ```java
-currentValue=null, currentMark=false
-currentValue=true, currentMark=true, casResult=true
-currentValue=true, currentMark=true
-currentValue=true, currentMark=false, attemptMarkResult=true
-currentValue=null, currentMark=false
-currentValue=true, currentMark=true, wCasResult=true
+true
 ```
 
 ### 1.5 原子累加器
@@ -381,11 +310,15 @@ currentValue=true, currentMark=true, wCasResult=true
 
 原子类型累加器的用法及原理可以参考[Java多线程进阶（十七）—— J.U.C之atomic框架：LongAdder](https://segmentfault.com/a/1190000015865714)一文。
 
-## 2 原子类实现原理
+## 2 原子操作实现原理
 
-### 1 简析CAS
+在Java中可以通过**锁**和**循环CAS**的方式来实现原子操作。
+
+### 2.1 简析CAS
 
 CAS全称 **Compare And Swap（比较与交换）**，是一种无锁算法。在不使用锁（没有线程被阻塞）的情况下实现多线程之间的**变量同步**。
+
+CAS是**原子性**的操作(读和写两者同时具有原子性)，其实现方式是通过借助`C/C++`调用CPU指令完成的，效率很高。
 
 CAS算法涉及到三个操作数：
 
@@ -395,7 +328,9 @@ CAS算法涉及到三个操作数：
 
 当且仅当V的值等于A时（旧值和内存中实际的值相同），表明旧值A已经是目前最新版本的值，自然而然可以将新值 N 赋值给 V。反之则表明V和A变量不同步，直接返回V即可。当多个线程使用CAS操作一个变量时，只有一个线程会更新成功，其余失败的线程会重新尝试。也就是说，“更新”是一个不断重试的操作。
 
-进入原子类AtomicInteger的源码，看一下AtomicInteger的定义：
+下面以基本原子类AtomicInteger为例，来理解原子操作的实现原理。
+
+查看AtomicInteger源码：
 
 ```java
 public class AtomicInteger extends Number implements java.io.Serializable {
@@ -417,14 +352,14 @@ public class AtomicInteger extends Number implements java.io.Serializable {
     private volatile int value;
 ```
 
-接下来，我们查看AtomicInteger的自增函数incrementAndGet()的源码时，发现自增函数底层调用的是unsafe.getAndAddInt()。
+接下来，查看AtomicInteger的自增函数incrementAndGet()的源码时，发现自增函数底层调用的是unsafe.getAndAddInt()。
 
 ```java
     // AtomicInteger 自增方法
     public final int incrementAndGet() {
       return unsafe.getAndAddInt(this, valueOffset, 1) + 1;
     }    
-
+------------------------------------------------------------------------
 	// Unsafe.class
 	public final int getAndAddInt(Object var1, long var2, int var4) {
         int var5;
@@ -436,7 +371,19 @@ public class AtomicInteger extends Number implements java.io.Serializable {
     }
 ```
 
-`compareAndSwapInt`这个函数，它也是`CAS`缩写的由来。通过OpenJDK 8 来查看Unsafe.cpp的源码：
+`Unsafe`还有很多个`CAS`操作的相关方法，比如：
+
+```java
+public final native boolean compareAndSwapObject(Object var1, long var2, Object var4, Object var5);
+
+public final native boolean compareAndSwapLong(Object var1, long var2, long var4, long var6);
+
+--- omit ---
+```
+
+这些函数是是`CAS`缩写的由来。
+
+还是以`compareAndSwapInt`为例，查看OpenJDK 8 中Unsafe.cpp的源码：
 
 ```java
 // Unsafe.java
@@ -451,200 +398,147 @@ public final int getAndAddInt(Object o, long offset, int delta) {
 
 根据OpenJDK 8的源码我们可以看出，getAndAddInt()循环获取给定对象o中的偏移量处的值v，然后判断内存值是否等于v。如果相等则将内存值设置为 v + delta，否则返回false，继续循环进行重试，直到设置成功才能退出循环，并且将旧值返回。整个“比较+更新”操作封装在compareAndSwapInt()中，在JNI里是借助于一个CPU指令完成的，属于原子操作，可以保证多个线程都能够看到同一个变量的修改值。
 
-后续JDK通过CPU的**cmpxchg指令**，去比较寄存器中的 A 和 内存中的值 V。如果相等，就把要写入的新值 B 存入内存中。如果不相等，就将内存值 V 赋值给寄存器中的值 A。然后通过Java代码中的while循环再次调用cmpxchg指令进行重试，直到设置成功为止。
+后续JDK通过CPU的**cmpxchg指令**，去比较寄存器中的 A 和 内存中的值 V。如果相等，就把要写入的新值 B 存入内存中。如果不相等，就将内存值 V 赋值给寄存器中的值 A。然后通过Java代码中的**while循环调用cmpxchg指令进行重试，直到设置成功为止**。
 
-CAS虽然很高效，但是它也存在三大问题：
+### 2.2 CAS实现原子操作的三大问题
 
-（1）ABA问题
+CAS虽然很高效地解决了原子操作，但是CAS仍然存在三大问题。ABA问题，循环时间长开销大，以及只能保证一个共享变量的原子操作。
 
-CAS需要在操作值的时候检查内存值是否发生变化，没有发生变化才会更新内存值。但是如果内存值原来是A，后来变成了B，然后又变成了A，那么CAS进行检查时会发现值没有发生变化，但是实际上是有变化的。ABA问题的解决思路就是在变量前面添加版本号，每次变量更新的时候都把版本号加一，这样变化过程就从“A－B－A”变成了“1A－2B－3A”。
+#### 2.2.1 ABA问题
 
-JDK从1.5开始提供了AtomicStampedReference类来解决ABA问题，具体操作封装在compareAndSet()中。compareAndSet()首先检查当前引用和当前标志与预期引用和预期标志是否相等，如果都相等，则以原子方式将引用值和标志的值设置为给定的更新值。
+CAS需要在操作值的时候去检查内存中的值是否发生变化，没有发生变化才会更新内存值。但是如果一个值原来是A，变成了B，又变成了A，那么使用CAS进行检查时会发现它的值没有发生变化，但是实际上却变化了。这就是一个典型的ABA问题。
 
-（2）**循环时间长开销大**。CAS操作如果长时间不成功，会导致其一直自旋，给CPU带来非常大的开销。
+代码示例：
 
-（3）只能保证一个共享变量的原子操作
+```java
+@Slf4j(topic = "AtomicReferenceTest")
+public class AtomicReferenceTest {
+    public static void main(String[] args) {
+        Person person1 = new Person("ZhangSan");
+        Person person2 = new Person("LiSi");
+        Person person3 = new Person("WangWu");
+        AtomicReference<Person> atomicReference = new AtomicReference<>(person1);
+        log.info("success? " + atomicReference.compareAndSet(person1, person2));
+        log.info("success? " + atomicReference.compareAndSet(person2, person1));
+        log.info("success? " + atomicReference.compareAndSet(person1, person3));
+    }
+}
+
+class Person {
+    private String name;
+
+    public Person(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                "name='" + name + '\'' +
+                '}';
+    }
+}
+```
+
+输出结果：
+
+```java
+// 三个CAS的结果都是true。说明CAS只是比较的两者的值是否相等，对其他内容的变化并不关心。
+11:17:13.359 [main] INFO AtomicReferenceTest - success? true
+11:17:13.366 [main] INFO AtomicReferenceTest - success? true
+11:17:13.366 [main] INFO AtomicReferenceTest - success? true
+```
+
+ABA问题的解决思路就是在变量前面**添加版本号**，每次变量更新的时候都把版本号加1，这样变化过程就从“A－B－A”变成了“1A－2B－3A”。
+
+JDK从1.5开始提供了**带版本号的引用类型AtomicStampedReference类**来解决ABA问题，具体操作封装在compareAndSet()中。compareAndSet()首先检查当前引用和当前标志与预期引用和预期标志是否相等，如果都相等，则以原子方式将引用值和标志的值设置为给定的更新值。
+
+```java
+    public boolean compareAndSet(V   expectedReference,		// 预期引用
+                                 V   newReference,			// 更新后引用
+                                 int expectedStamp,			// 预期标志
+                                 int newStamp) {			// 更新后标志
+		--- omit ---
+    }
+```
+
+上面代码修改为：
+
+```java
+        AtomicStampedReference<Person> atomicStampedReference = new AtomicStampedReference(person1, 0);
+        log.info("success? " + atomicStampedReference.compareAndSet(person1, person2, 0, 1));
+        log.info("success? " + atomicStampedReference.compareAndSet(person2, person1, 1, 2));
+        log.info("success? " + atomicStampedReference.compareAndSet(person1, person3, 0, 1));
+        log.info("success? " + atomicStampedReference.compareAndSet(person1, person3, 2, 3));
+```
+
+运行结果：
+
+```java
+11:19:37.839 [main] INFO AtomicReferenceTest - success? true
+11:19:37.846 [main] INFO AtomicReferenceTest - success? true
+11:19:37.846 [main] INFO AtomicReferenceTest - success? false	// 不是预期版本，CAS失败
+11:19:37.846 [main] INFO AtomicReferenceTest - success? true
+```
+
+#### 2.2.2 循环时间长开销大
+
+CAS操作如果长时间不成功，会导致其一直自旋，给CPU带来非常大的开销。
+
+如果JVM能支持处理器提供的**pause指令**，那么效率会有一定的提升。pause指令有两个作用：第一，它可以延迟流水线执行指令（de-pipeline），使CPU不会消耗过多的执行资源，延迟的时间取决于具体实现的版本，在一些处理器上延迟时间是零；第二，它可以避免在退出循环的时候因内存顺序冲突（MemoryOrder Violation）而引起CPU流水线被清空（CPU Pipeline Flush），从而提高CPU的执行效率。
+
+#### 2.2.3 只能保证一个共享变量的原子操作
 
 对一个共享变量执行操作时，CAS能够保证原子操作，但是对多个共享变量操作时，CAS是无法保证操作的原子性的。
 
-Java从1.5开始JDK提供了AtomicReference类来保证引用对象之间的原子性，可以把多个变量放在一个对象里来进行CAS操作。
+多个共享变量操作时，一般都用锁解决。
 
+但Java从1.5开始JDK提供了**引用类型AtomicReference类**来保证引用对象之间的原子性，可以把多个变量放在一个对象里来进行CAS操作。
 
+### 2.3 CAS应用
 
+**（1）悲观锁**
 
+**悲观锁**总是假设最坏的情况，每次去操作数据时候都认为会被的线程修改数据，**所以在每次操作数据的时候都会给数据加锁**，让别的线程无法操作这个数据，别的线程会一直阻塞直到获取到这个数据的锁。传统的关系型数据库里边就用到了很多这种锁机制，比如行锁，表锁等，读锁，写锁等，都是在做操作之前先上锁。Java中`synchronized`和`ReentrantLock`等独占锁就是悲观锁思想的实现。这样的话就会影响效率，比如当有个线程发生一个很耗时的操作的时候，别的线程只是想获取这个数据的值而已都要等待很久。
 
+**（2）乐观锁**
 
+**乐观锁**总是假设最好的情况，每次去操作数据都认为不会被别的线程修改数据，**所以在每次操作数据的时候都不会给数据加锁**，即在线程对数据进行操作的时候，**别的线程不会阻塞**仍然可以对数据进行操作，只有在需要更新数据的时候才会去判断数据是否被别的线程修改过，如果数据被修改过则会拒绝操作并且返回错误信息给用户。**乐观锁适用于多读的应用类型，这样可以提高吞吐量**，像数据库提供的类似于**write_condition机制**，其实都是提供的乐观锁。在Java中`java.util.concurrent.atomic`包下面的原子变量类就是使用了乐观锁的一种实现方式**CAS**实现的。
 
-在多线程环境不使用原子类保证线程安全（基本数据类型）
-
-```java
-class Test1 {
-    private volatile int count = 0;
-
-    // 若要线程安全执行count++，需要加锁
-    public synchronized void increment() {
-        count++;
-    }
-
-    public int getCount() {
-        return count;
-    }
-}
-```
-
-多线程环境使用**原子类**保证线程安全（基本数据类型）
+光说概念有些抽象，看下乐观锁和悲观锁的调用方式简单示例：
 
 ```java
-class Test2 {
-    private AtomicInteger count = new AtomicInteger();
-
-    public void increment() {
-        count.incrementAndGet();
-    }
-
-    // 使用AtomicInteger之后，不需要加锁，也可以实现线程安全。
-    public int getCount() {
-        return count.get();
-    }
+// ------------------------- 悲观锁的调用方式 -------------------------
+// synchronized
+public synchronized void testMethod() {
+	// 操作同步资源
 }
+// ReentrantLock
+private ReentrantLock lock = new ReentrantLock(); // 需要保证多个线程使用的是同一个锁
+public void modifyPublicResources() {
+	lock.lock();
+	// 操作同步资源
+	lock.unlock();
+}
+
+// ------------------------- 乐观锁的调用方式 -------------------------
+private AtomicInteger atomicInteger = new AtomicInteger();  // 需要保证多个线程使用的是同一个AtomicInteger
+atomicInteger.incrementAndGet(); //执行自增1
 ```
-
-
-
-
-
-
 
 ## 参考
 
 - 《Java并发编程的艺术》
 - [Java中的无锁编程](https://my.oschina.net/cqqcqqok/blog/1925073)
-- [Java高并发：CAS无锁原理及广泛应用](https://developer.aliyun.com/article/694255)
+- [Atomic原子类总结](https://github.com/Snailclimb/JavaGuide/blob/master/docs/java/multi-thread/Atomic%E5%8E%9F%E5%AD%90%E7%B1%BB%E6%80%BB%E7%BB%93.md)
+- [ABA问题的本质及其解决办法](https://segmentfault.com/a/1190000022798961)
 
 * [Java多线程进阶（十七）—— J.U.C之atomic框架：LongAdder](https://segmentfault.com/a/1190000015865714)
-
-
-
-> 修正: **AtomicMarkableReference 不能解决ABA问题**   **[issue#626](https://github.com/Snailclimb/JavaGuide/issues/626)**
-
-```java
-    /**
-
-AtomicMarkableReference是将一个boolean值作是否有更改的标记，本质就是它的版本号只有两个，true和false，
-
-修改的时候在这两个版本号之间来回切换，这样做并不能解决ABA的问题，只是会降低ABA问题发生的几率而已
-
-@author : mazh
-
-@Date : 2020/1/17 14:41
-*/
-
-public class SolveABAByAtomicMarkableReference {
-       
-       private static AtomicMarkableReference atomicMarkableReference = new AtomicMarkableReference(100, false);
-
-        public static void main(String[] args) {
-
-            Thread refT1 = new Thread(() -> {
-                try {
-                    TimeUnit.SECONDS.sleep(1);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                atomicMarkableReference.compareAndSet(100, 101, atomicMarkableReference.isMarked(), !atomicMarkableReference.isMarked());
-                atomicMarkableReference.compareAndSet(101, 100, atomicMarkableReference.isMarked(), !atomicMarkableReference.isMarked());
-            });
-
-            Thread refT2 = new Thread(() -> {
-                boolean marked = atomicMarkableReference.isMarked();
-                try {
-                    TimeUnit.SECONDS.sleep(2);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                boolean c3 = atomicMarkableReference.compareAndSet(100, 101, marked, !marked);
-                System.out.println(c3); // 返回true,实际应该返回false
-            });
-
-            refT1.start();
-            refT2.start();
-        }
-    }
-```
-
-**CAS ABA 问题**
-
-- 描述: 第一个线程取到了变量 x 的值 A，然后巴拉巴拉干别的事，总之就是只拿到了变量 x 的值 A。这段时间内第二个线程也取到了变量 x 的值 A，然后把变量 x 的值改为 B，然后巴拉巴拉干别的事，最后又把变量 x 的值变为 A （相当于还原了）。在这之后第一个线程终于进行了变量 x 的操作，但是此时变量 x 的值还是 A，所以 compareAndSet 操作是成功。
-- 例子描述(可能不太合适，但好理解): 年初，现金为零，然后通过正常劳动赚了三百万，之后正常消费了（比如买房子）三百万。年末，虽然现金零收入（可能变成其他形式了），但是赚了钱是事实，还是得交税的！
-- 代码例子（以``` AtomicInteger ```为例）
-
-```java
-import java.util.concurrent.atomic.AtomicInteger;
-
-public class AtomicIntegerDefectDemo {
-    public static void main(String[] args) {
-        defectOfABA();
-    }
-
-    static void defectOfABA() {
-        final AtomicInteger atomicInteger = new AtomicInteger(1);
-
-        Thread coreThread = new Thread(
-                () -> {
-                    final int currentValue = atomicInteger.get();
-                    System.out.println(Thread.currentThread().getName() + " ------ currentValue=" + currentValue);
-
-                    // 这段目的：模拟处理其他业务花费的时间
-                    try {
-                        Thread.sleep(300);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
-                    boolean casResult = atomicInteger.compareAndSet(1, 2);
-                    System.out.println(Thread.currentThread().getName()
-                            + " ------ currentValue=" + currentValue
-                            + ", finalValue=" + atomicInteger.get()
-                            + ", compareAndSet Result=" + casResult);
-                }
-        );
-        coreThread.start();
-
-        // 这段目的：为了让 coreThread 线程先跑起来
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        Thread amateurThread = new Thread(
-                () -> {
-                    int currentValue = atomicInteger.get();
-                    boolean casResult = atomicInteger.compareAndSet(1, 2);
-                    System.out.println(Thread.currentThread().getName()
-                            + " ------ currentValue=" + currentValue
-                            + ", finalValue=" + atomicInteger.get()
-                            + ", compareAndSet Result=" + casResult);
-
-                    currentValue = atomicInteger.get();
-                    casResult = atomicInteger.compareAndSet(2, 1);
-                    System.out.println(Thread.currentThread().getName()
-                            + " ------ currentValue=" + currentValue
-                            + ", finalValue=" + atomicInteger.get()
-                            + ", compareAndSet Result=" + casResult);
-                }
-        );
-        amateurThread.start();
-    }
-}
-```
-
-输出内容如下：
-
-```
-Thread-0 ------ currentValue=1
-Thread-1 ------ currentValue=1, finalValue=2, compareAndSet Result=true
-Thread-1 ------ currentValue=2, finalValue=1, compareAndSet Result=true
-Thread-0 ------ currentValue=1, finalValue=2, compareAndSet Result=true
-```
-
