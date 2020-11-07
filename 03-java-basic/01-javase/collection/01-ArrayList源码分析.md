@@ -1,421 +1,152 @@
-## 1. ArrayList 简介
+## 1. AzrrayList 简介
 
-`ArrayList` 的底层是数组队列，相当于动态数组。与 Java 中的数组相比，它的容量能动态增长。在添加大量元素前，应用程序可以使用`ensureCapacity`操作来增加 `ArrayList` 实例的容量。这可以减少递增式再分配的数量。
+`java.util.ArrayList` 是一个**数组队列**，相当于 **动态数组**。与Java中的数组相比，它具有**容量能动态增长、元素增删慢、查找快**的特点。
 
-`ArrayList`继承于 **`AbstractList`**，实现了 **`List`**, **`RandomAccess`**, **`Cloneable`**, **`java.io.Serializable`** 这些接口。
+![](https://img-blog.csdnimg.cn/20201107204840817.png)
+
+`ArrayList`继承于 **`AbstractList`**，实现了 **`List`**、 **`RandomAccess`**、 **`Cloneable`**、**`java.io.Serializable`** 这些接口。
 
 ```java
 public class ArrayList<E> extends AbstractList<E>
         implements List<E>, RandomAccess, Cloneable, java.io.Serializable{
-
+		--- omit ---
   }
 ```
 
+- `ArrayList` 继承了`AbstractList`抽象方法，实现了List接口，提供了相关的**添加、删除、修改、遍历**等功能。
 - `RandomAccess` 是一个标志接口，表明实现这个这个接口的 List 集合是支持**快速随机访问**的。在 `ArrayList` 中，我们即可以通过元素的序号快速获取元素对象，这就是快速随机访问。
-- `ArrayList` 实现了 **`Cloneable` 接口** ，即覆盖了函数`clone()`，能被克隆。
-- `ArrayList` 实现了 java.io.Serializable `接口，这意味着`ArrayList`支持序列化，能通过序列化去传输。
+- `ArrayList` 实现了 `Cloneable` 接口，即覆盖了函数`clone()`，能被克隆。
+- `ArrayList` 实现了` java.io.Serializable `接口，这意味着`ArrayList`支持序列化，能通过序列化去传输。
 
-### 1.1. Arraylist 和 Vector 的区别?
+> Tips：**`ArrayList`中的操作不是线程安全的**！建议在单线程中才使用`ArrayList`，多线程中选择使用Vector或者`CopyOnWriteArrayList`。
 
-1. `ArrayList` 是 `List` 的主要实现类，底层使用 `Object[ ]`存储，适用于频繁的查找工作，线程不安全 ；
-2. `Vector` 是 `List` 的古老实现类，底层使用 `Object[ ]`存储，线程安全的。
+## 2. ArrayList源码简析（JDK 1.8）
 
-### 1.2. Arraylist 与 LinkedList 区别?
-
-1. **是否保证线程安全：** `ArrayList` 和 `LinkedList` 都是不同步的，也就是不保证线程安全；
-2. **底层数据结构：** `Arraylist` 底层使用的是 **`Object` 数组**；`LinkedList` 底层使用的是 **双向链表** 数据结构（JDK1.6 之前为循环链表，JDK1.7 取消了循环。注意双向链表和双向循环链表的区别，下面有介绍到！）
-3. **插入和删除是否受元素位置的影响：** ① **`ArrayList` 采用数组存储，所以插入和删除元素的时间复杂度受元素位置的影响。** 比如：执行`add(E e)`方法的时候， `ArrayList` 会默认在将指定的元素追加到此列表的末尾，这种情况时间复杂度就是 O(1)。但是如果要在指定位置 i 插入和删除元素的话（`add(int index, E element)`）时间复杂度就为 O(n-i)。因为在进行上述操作的时候集合中第 i 和第 i 个元素之后的(n-i)个元素都要执行向后位/向前移一位的操作。 ② **`LinkedList` 采用链表存储，所以对于`add(E e)`方法的插入，删除元素时间复杂度不受元素位置的影响，近似 O(1)，如果是要在指定位置`i`插入和删除元素的话（`(add(int index, E element)`） 时间复杂度近似为`o(n))`因为需要先移动到指定位置再插入。**
-4. **是否支持快速随机访问：** `LinkedList` 不支持高效的随机元素访问，而 `ArrayList` 支持。快速随机访问就是通过元素的序号快速获取元素对象(对应于`get(int index)`方法)。
-5. **内存空间占用：** `ArrayList` 的空 间浪费主要体现在在 list 列表的结尾会预留一定的容量空间，而 `LinkedList` 的空间花费则体现在它的每一个元素都需要消耗比 `ArrayList` 更多的空间（因为要存放直接后继和直接前驱以及数据）。
-
-## 2. ArrayList 核心源码解读
+### 2.1 成员属性
 
 ```java
-package java.util;
+// 默认容量大小
+private static final int DEFAULT_CAPACITY = 10;
 
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
+// ArrayList空实例共享的一个空数组
+private static final Object[] EMPTY_ELEMENTDATA = {};
 
+// ArrayList空实例共享的一个空数组，用于默认大小的空实例。
+// 与EMPTY_ELEMENTDATA分开，这样就可以了解当添加第一个元素时需要创建多大的空间。
+private static final Object[] DEFAULTCAPACITY_EMPTY_ELEMENTDATA = {};
 
-public class ArrayList<E> extends AbstractList<E>
-        implements List<E>, RandomAccess, Cloneable, java.io.Serializable
-{
-    private static final long serialVersionUID = 8683452581122892189L;
+// 真正存储ArrayList中的元素的数组
+transient Object[] elementData;
 
+// ArrayList 所包含的元素个数，注意并不是elementData的长度
+private int size;
+
+// 数组的最大长度
+private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
+```
+
+`AbstractList`抽象类中唯一属性：
+
+```java
+// 表示elementData被修改的次数，每次add或者remove它的值都会加1
+protected transient int modCount = 0;
+```
+
+**为什么size不是用来标记elementData数组的长度呢？**
+
+在Java中，一般来说：
+
+-  `length`属性是针对数组而言的，比如下面源码中`elementData.length`表示`elementData`数组的长度。
+-  `length()` 方法是针对字符串而言的，可以调用 `length()` 获取字符串长度。
+-  `size()` 方法是针对泛型集合而言的，可以调用`size()`来获取集合中个数。
+
+这样，就很好理解为什么size不是ArrayList的长度了，不易记混。
+
+### 2.2 构造方法
+
+ArrayList有三种初始化方式：
+
+```java
     /**
-     * 默认初始容量大小
-     */
-    private static final int DEFAULT_CAPACITY = 10;
-
-    /**
-     * 空数组（用于空实例）。
-     */
-    private static final Object[] EMPTY_ELEMENTDATA = {};
-
-     //用于默认大小空实例的共享空数组实例。
-      //我们把它从EMPTY_ELEMENTDATA数组中区分出来，以知道在添加第一个元素时容量需要增加多少。
-    private static final Object[] DEFAULTCAPACITY_EMPTY_ELEMENTDATA = {};
-
-    /**
-     * 保存ArrayList数据的数组
-     */
-    transient Object[] elementData; // non-private to simplify nested class access
-
-    /**
-     * ArrayList 所包含的元素个数
-     */
-    private int size;
-
-    /**
-     * 带初始容量参数的构造函数（用户可以在创建ArrayList对象时自己指定集合的初始大小）
-     */
-    public ArrayList(int initialCapacity) {
+     * 有参的构造函数
+     */    
+	public ArrayList(int initialCapacity) {
         if (initialCapacity > 0) {
-            //如果传入的参数大于0，创建initialCapacity大小的数组
+            // 初始化容量大于0，创建initialCapacity大小的数组
             this.elementData = new Object[initialCapacity];
         } else if (initialCapacity == 0) {
-            //如果传入的参数等于0，创建空数组
+            // 初始化容量等于0，创建空数组
             this.elementData = EMPTY_ELEMENTDATA;
         } else {
-            //其他情况，抛出异常
             throw new IllegalArgumentException("Illegal Capacity: "+
                                                initialCapacity);
         }
     }
 
     /**
-     *默认无参构造函数
-     *DEFAULTCAPACITY_EMPTY_ELEMENTDATA 为0.初始化为10，也就是说初始其实是空数组 当添加第一个元素的时候数组容量才变成10
+     * 默认无参构造函数（未指定初始化容量大小），使用初始容量10构造一个空列表。
      */
     public ArrayList() {
         this.elementData = DEFAULTCAPACITY_EMPTY_ELEMENTDATA;
     }
 
     /**
-     * 构造一个包含指定集合的元素的列表，按照它们由集合的迭代器返回的顺序。
+     * 使用Collection集合来初始化ArrayList
      */
     public ArrayList(Collection<? extends E> c) {
-        //将指定集合转换为数组
+        // 将集合转换为数组
         elementData = c.toArray();
-        //如果elementData数组的长度不为0
+        // 如果数组的长度size不等于0
         if ((size = elementData.length) != 0) {
-            // 如果elementData不是Object类型数据（c.toArray可能返回的不是Object类型的数组所以加上下面的语句用于判断）
+            // 如果返回的不是Object类型数据
             if (elementData.getClass() != Object[].class)
-                //将原来不是Object类型的elementData数组的内容，赋值给新的Object类型的elementData数组
+                // 重新创建一个size大小的数组。
+                // 并将原来不是Object[]数组的内容，Copy给新的是Object[]的数组
                 elementData = Arrays.copyOf(elementData, size, Object[].class);
         } else {
-            // 其他情况，用空数组代替
+            // 用空数组代替
             this.elementData = EMPTY_ELEMENTDATA;
         }
     }
+```
 
+从上面的分析中看出**EMPTY_ELEMENTDATA与DEFAULTCAPACITY_EMPTY_ELEMENTDATA的区别**。
+
+EMPTY_ELEMENTDATA表示在我们实例化对象时指定了容量就是0，当添加1个元素后，那么elementData.length=1。
+
+DEFAULTCAPACITY_EMPTY_ELEMENTDATA表示实例化时是无参构造，未指定容量，在调用add方法添加第1个元素后会默认扩容容量为10，即elementData.length=10。
+
+### 2.3 添加元素
+
+```java
     /**
-     * 修改这个ArrayList实例的容量是列表的当前大小。 应用程序可以使用此操作来最小化ArrayList实例的存储。
-     */
-    public void trimToSize() {
-        modCount++;
-        if (size < elementData.length) {
-            elementData = (size == 0)
-              ? EMPTY_ELEMENTDATA
-              : Arrays.copyOf(elementData, size);
-        }
-    }
-//下面是ArrayList的扩容机制
-//ArrayList的扩容机制提高了性能，如果每次只扩充一个，
-//那么频繁的插入会导致频繁的拷贝，降低性能，而ArrayList的扩容机制避免了这种情况。
-    /**
-     * 如有必要，增加此ArrayList实例的容量，以确保它至少能容纳元素的数量
-     * @param   minCapacity   所需的最小容量
-     */
-    public void ensureCapacity(int minCapacity) {
-        //如果是true，minExpand的值为0，如果是false,minExpand的值为10
-        int minExpand = (elementData != DEFAULTCAPACITY_EMPTY_ELEMENTDATA)
-            // any size if not default element table
-            ? 0
-            // larger than default for default empty table. It's already
-            // supposed to be at default size.
-            : DEFAULT_CAPACITY;
-        //如果最小容量大于已有的最大容量
-        if (minCapacity > minExpand) {
-            ensureExplicitCapacity(minCapacity);
-        }
-    }
-   //得到最小扩容量
-    private void ensureCapacityInternal(int minCapacity) {
-        if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {
-              // 获取“默认的容量”和“传入参数”两者之间的最大值
-            minCapacity = Math.max(DEFAULT_CAPACITY, minCapacity);
-        }
-
-        ensureExplicitCapacity(minCapacity);
-    }
-  //判断是否需要扩容
-    private void ensureExplicitCapacity(int minCapacity) {
-        modCount++;
-
-        // overflow-conscious code
-        if (minCapacity - elementData.length > 0)
-            //调用grow方法进行扩容，调用此方法代表已经开始扩容了
-            grow(minCapacity);
-    }
-
-    /**
-     * 要分配的最大数组大小
-     */
-    private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
-
-    /**
-     * ArrayList扩容的核心方法。
-     */
-    private void grow(int minCapacity) {
-        // oldCapacity为旧容量，newCapacity为新容量
-        int oldCapacity = elementData.length;
-        //将oldCapacity 右移一位，其效果相当于oldCapacity /2，
-        //我们知道位运算的速度远远快于整除运算，整句运算式的结果就是将新容量更新为旧容量的1.5倍，
-        int newCapacity = oldCapacity + (oldCapacity >> 1);
-        //然后检查新容量是否大于最小需要容量，若还是小于最小需要容量，那么就把最小需要容量当作数组的新容量，
-        if (newCapacity - minCapacity < 0)
-            newCapacity = minCapacity;
-        //再检查新容量是否超出了ArrayList所定义的最大容量，
-        //若超出了，则调用hugeCapacity()来比较minCapacity和 MAX_ARRAY_SIZE，
-        //如果minCapacity大于MAX_ARRAY_SIZE，则新容量则为Interger.MAX_VALUE，否则，新容量大小则为 MAX_ARRAY_SIZE。
-        if (newCapacity - MAX_ARRAY_SIZE > 0)
-            newCapacity = hugeCapacity(minCapacity);
-        // minCapacity is usually close to size, so this is a win:
-        elementData = Arrays.copyOf(elementData, newCapacity);
-    }
-    //比较minCapacity和 MAX_ARRAY_SIZE
-    private static int hugeCapacity(int minCapacity) {
-        if (minCapacity < 0) // overflow
-            throw new OutOfMemoryError();
-        return (minCapacity > MAX_ARRAY_SIZE) ?
-            Integer.MAX_VALUE :
-            MAX_ARRAY_SIZE;
-    }
-
-    /**
-     *返回此列表中的元素数。
-     */
-    public int size() {
-        return size;
-    }
-
-    /**
-     * 如果此列表不包含元素，则返回 true 。
-     */
-    public boolean isEmpty() {
-        //注意=和==的区别
-        return size == 0;
-    }
-
-    /**
-     * 如果此列表包含指定的元素，则返回true 。
-     */
-    public boolean contains(Object o) {
-        //indexOf()方法：返回此列表中指定元素的首次出现的索引，如果此列表不包含此元素，则为-1
-        return indexOf(o) >= 0;
-    }
-
-    /**
-     *返回此列表中指定元素的首次出现的索引，如果此列表不包含此元素，则为-1
-     */
-    public int indexOf(Object o) {
-        if (o == null) {
-            for (int i = 0; i < size; i++)
-                if (elementData[i]==null)
-                    return i;
-        } else {
-            for (int i = 0; i < size; i++)
-                //equals()方法比较
-                if (o.equals(elementData[i]))
-                    return i;
-        }
-        return -1;
-    }
-
-    /**
-     * 返回此列表中指定元素的最后一次出现的索引，如果此列表不包含元素，则返回-1。.
-     */
-    public int lastIndexOf(Object o) {
-        if (o == null) {
-            for (int i = size-1; i >= 0; i--)
-                if (elementData[i]==null)
-                    return i;
-        } else {
-            for (int i = size-1; i >= 0; i--)
-                if (o.equals(elementData[i]))
-                    return i;
-        }
-        return -1;
-    }
-
-    /**
-     * 返回此ArrayList实例的浅拷贝。 （元素本身不被复制。）
-     */
-    public Object clone() {
-        try {
-            ArrayList<?> v = (ArrayList<?>) super.clone();
-            //Arrays.copyOf功能是实现数组的复制，返回复制后的数组。参数是被复制的数组和复制的长度
-            v.elementData = Arrays.copyOf(elementData, size);
-            v.modCount = 0;
-            return v;
-        } catch (CloneNotSupportedException e) {
-            // 这不应该发生，因为我们是可以克隆的
-            throw new InternalError(e);
-        }
-    }
-
-    /**
-     *以正确的顺序（从第一个到最后一个元素）返回一个包含此列表中所有元素的数组。
-     *返回的数组将是“安全的”，因为该列表不保留对它的引用。 （换句话说，这个方法必须分配一个新的数组）。
-     *因此，调用者可以自由地修改返回的数组。 此方法充当基于阵列和基于集合的API之间的桥梁。
-     */
-    public Object[] toArray() {
-        return Arrays.copyOf(elementData, size);
-    }
-
-    /**
-     * 以正确的顺序返回一个包含此列表中所有元素的数组（从第一个到最后一个元素）;
-     *返回的数组的运行时类型是指定数组的运行时类型。 如果列表适合指定的数组，则返回其中。
-     *否则，将为指定数组的运行时类型和此列表的大小分配一个新数组。
-     *如果列表适用于指定的数组，其余空间（即数组的列表数量多于此元素），则紧跟在集合结束后的数组中的元素设置为null 。
-     *（这仅在调用者知道列表不包含任何空元素的情况下才能确定列表的长度。）
-     */
-    @SuppressWarnings("unchecked")
-    public <T> T[] toArray(T[] a) {
-        if (a.length < size)
-            // 新建一个运行时类型的数组，但是ArrayList数组的内容
-            return (T[]) Arrays.copyOf(elementData, size, a.getClass());
-            //调用System提供的arraycopy()方法实现数组之间的复制
-        System.arraycopy(elementData, 0, a, 0, size);
-        if (a.length > size)
-            a[size] = null;
-        return a;
-    }
-
-    // Positional Access Operations
-
-    @SuppressWarnings("unchecked")
-    E elementData(int index) {
-        return (E) elementData[index];
-    }
-
-    /**
-     * 返回此列表中指定位置的元素。
-     */
-    public E get(int index) {
-        rangeCheck(index);
-
-        return elementData(index);
-    }
-
-    /**
-     * 用指定的元素替换此列表中指定位置的元素。
-     */
-    public E set(int index, E element) {
-        //对index进行界限检查
-        rangeCheck(index);
-
-        E oldValue = elementData(index);
-        elementData[index] = element;
-        //返回原来在这个位置的元素
-        return oldValue;
-    }
-
-    /**
-     * 将指定的元素追加到此列表的末尾。
+     * 直接将元素添加到数组末尾。
      */
     public boolean add(E e) {
         ensureCapacityInternal(size + 1);  // Increments modCount!!
-        //这里看到ArrayList添加元素的实质就相当于为数组赋值
         elementData[size++] = e;
         return true;
     }
 
     /**
-     * 在此列表中的指定位置插入指定的元素。
-     *先调用 rangeCheckForAdd 对index进行界限检查；然后调用 ensureCapacityInternal 方法保证capacity足够大；
-     *再将从index开始之后的所有成员后移一个位置；将element插入index位置；最后size加1。
+     * 将元素添加到指定index位置。
      */
     public void add(int index, E element) {
+        // 对index进行界限检查
         rangeCheckForAdd(index);
 
         ensureCapacityInternal(size + 1);  // Increments modCount!!
-        //arraycopy()这个实现数组之间复制的方法一定要看一下，下面就用到了arraycopy()方法实现数组自己复制自己
+        // native静态方法，原elementData数组的index（包含）之后的数据，复制到目标elementData数组的index + 1之后位置
         System.arraycopy(elementData, index, elementData, index + 1,
                          size - index);
+        // 将从index开始之后的所有成员后移一个位，将element插入到index位置。
         elementData[index] = element;
+        // 最后size+1
         size++;
     }
 
     /**
-     * 删除该列表中指定位置的元素。 将任何后续元素移动到左侧（从其索引中减去一个元素）。
-     */
-    public E remove(int index) {
-        rangeCheck(index);
-
-        modCount++;
-        E oldValue = elementData(index);
-
-        int numMoved = size - index - 1;
-        if (numMoved > 0)
-            System.arraycopy(elementData, index+1, elementData, index,
-                             numMoved);
-        elementData[--size] = null; // clear to let GC do its work
-      //从列表中删除的元素
-        return oldValue;
-    }
-
-    /**
-     * 从列表中删除指定元素的第一个出现（如果存在）。 如果列表不包含该元素，则它不会更改。
-     *返回true，如果此列表包含指定的元素
-     */
-    public boolean remove(Object o) {
-        if (o == null) {
-            for (int index = 0; index < size; index++)
-                if (elementData[index] == null) {
-                    fastRemove(index);
-                    return true;
-                }
-        } else {
-            for (int index = 0; index < size; index++)
-                if (o.equals(elementData[index])) {
-                    fastRemove(index);
-                    return true;
-                }
-        }
-        return false;
-    }
-
-    /*
-     * Private remove method that skips bounds checking and does not
-     * return the value removed.
-     */
-    private void fastRemove(int index) {
-        modCount++;
-        int numMoved = size - index - 1;
-        if (numMoved > 0)
-            System.arraycopy(elementData, index+1, elementData, index,
-                             numMoved);
-        elementData[--size] = null; // clear to let GC do its work
-    }
-
-    /**
-     * 从列表中删除所有元素。
-     */
-    public void clear() {
-        modCount++;
-
-        // 把数组中所有的元素的值设为null
-        for (int i = 0; i < size; i++)
-            elementData[i] = null;
-
-        size = 0;
-    }
-
-    /**
-     * 按指定集合的Iterator返回的顺序将指定集合中的所有元素追加到此列表的末尾。
+     * 将指定集合中的所有元素追加到此列表的末尾。
      */
     public boolean addAll(Collection<? extends E> c) {
         Object[] a = c.toArray();
@@ -427,7 +158,7 @@ public class ArrayList<E> extends AbstractList<E>
     }
 
     /**
-     * 将指定集合中的所有元素插入到此列表中，从指定的位置开始。
+     * 从指定的位置开始，将指定集合中的所有元素插入到此列表中。
      */
     public boolean addAll(int index, Collection<? extends E> c) {
         rangeCheckForAdd(index);
@@ -445,10 +176,78 @@ public class ArrayList<E> extends AbstractList<E>
         size += numNew;
         return numNew != 0;
     }
+```
+
+源码中大量调用了`arraycopy()`方法，其具体使用可以参考[由 System.arraycopy 引发的巩固：对象引用 与 对象 的区别](https://juejin.im/post/6844903502901149703)一文。
+
+### 2.4 删除元素
+
+```java
+    /**
+     * 删除列表中指定位置的元素。将任何后续元素移动到左侧（从其索引中减1）。
+     */
+    public E remove(int index) {
+        rangeCheck(index);
+
+        modCount++;
+        E oldValue = elementData(index);
+
+        int numMoved = size - index - 1;
+        if (numMoved > 0)
+            System.arraycopy(elementData, index+1, elementData, index,
+                             numMoved);
+        elementData[--size] = null;
+      	// 从列表中删除的元素
+        return oldValue;
+    }
 
     /**
-     * 从此列表中删除所有索引为fromIndex （含）和toIndex之间的元素。
-     *将任何后续元素移动到左侧（减少其索引）。
+     * 从列表中删除指定元素。
+     */
+    public boolean remove(Object o) {
+        // 如果列表不包含该元素，则它不会更改。
+        if (o == null) {
+            for (int index = 0; index < size; index++)
+                if (elementData[index] == null) {
+                    fastRemove(index);
+                    return true;
+                }
+        } else {
+            for (int index = 0; index < size; index++)
+                // 返回true，此列表包含指定的元素
+                if (o.equals(elementData[index])) {
+                    fastRemove(index);
+                    return true;
+                }
+        }
+        return false;
+    }
+
+	// 它跳过边界检查而不返回移除的值。
+    private void fastRemove(int index) {
+        modCount++;
+        int numMoved = size - index - 1;
+        if (numMoved > 0)
+            System.arraycopy(elementData, index+1, elementData, index,
+                             numMoved);
+        elementData[--size] = null;
+    }
+
+    /**
+     * 从列表中删除所有元素。
+     */
+    public void clear() {
+        modCount++;
+
+        // 把数组中所有的元素的值设为null
+        for (int i = 0; i < size; i++)
+            elementData[i] = null;
+
+        size = 0;
+    }
+
+    /**
+     * 从此列表中删除所有索引为fromIndex （包含）和toIndex之间的元素。
      */
     protected void removeRange(int fromIndex, int toIndex) {
         modCount++;
@@ -456,7 +255,6 @@ public class ArrayList<E> extends AbstractList<E>
         System.arraycopy(elementData, toIndex, elementData, fromIndex,
                          numMoved);
 
-        // clear to let GC do its work
         int newSize = size - (toIndex-fromIndex);
         for (int i = newSize; i < size; i++) {
             elementData[i] = null;
@@ -465,370 +263,126 @@ public class ArrayList<E> extends AbstractList<E>
     }
 
     /**
-     * 检查给定的索引是否在范围内。
-     */
-    private void rangeCheck(int index) {
-        if (index >= size)
-            throw new IndexOutOfBoundsException(outOfBoundsMsg(index));
-    }
-
-    /**
-     * add和addAll使用的rangeCheck的一个版本
-     */
-    private void rangeCheckForAdd(int index) {
-        if (index > size || index < 0)
-            throw new IndexOutOfBoundsException(outOfBoundsMsg(index));
-    }
-
-    /**
-     * 返回IndexOutOfBoundsException细节信息
-     */
-    private String outOfBoundsMsg(int index) {
-        return "Index: "+index+", Size: "+size;
-    }
-
-    /**
      * 从此列表中删除指定集合中包含的所有元素。
      */
     public boolean removeAll(Collection<?> c) {
         Objects.requireNonNull(c);
-        //如果此列表被修改则返回true
+        // 如果此列表被修改则返回true
         return batchRemove(c, false);
     }
-
-    /**
-     * 仅保留此列表中包含在指定集合中的元素。
-     *换句话说，从此列表中删除其中不包含在指定集合中的所有元素。
-     */
-    public boolean retainAll(Collection<?> c) {
-        Objects.requireNonNull(c);
-        return batchRemove(c, true);
-    }
-
-
-    /**
-     * 从列表中的指定位置开始，返回列表中的元素（按正确顺序）的列表迭代器。
-     *指定的索引表示初始调用将返回的第一个元素为next 。 初始调用previous将返回指定索引减1的元素。
-     *返回的列表迭代器是fail-fast 。
-     */
-    public ListIterator<E> listIterator(int index) {
-        if (index < 0 || index > size)
-            throw new IndexOutOfBoundsException("Index: "+index);
-        return new ListItr(index);
-    }
-
-    /**
-     *返回列表中的列表迭代器（按适当的顺序）。
-     *返回的列表迭代器是fail-fast 。
-     */
-    public ListIterator<E> listIterator() {
-        return new ListItr(0);
-    }
-
-    /**
-     *以正确的顺序返回该列表中的元素的迭代器。
-     *返回的迭代器是fail-fast 。
-     */
-    public Iterator<E> iterator() {
-        return new Itr();
-    }
-
-
 ```
 
-## 3. ArrayList 扩容机制分析
+### 2.5 ArrayList扩容机制
 
-### 3.1. 先从 ArrayList 的构造函数说起
+可以发现，ArrayList添加元素时，都会调用ensureCapacityInternal方法。
 
-**ArrayList 有三种方式来初始化，构造方法源码如下：**
-
-```java
-   /**
-     * 默认初始容量大小
-     */
-    private static final int DEFAULT_CAPACITY = 10;
-
-
-    private static final Object[] DEFAULTCAPACITY_EMPTY_ELEMENTDATA = {};
-
-    /**
-     *默认构造函数，使用初始容量10构造一个空列表(无参数构造)
-     */
-    public ArrayList() {
-        this.elementData = DEFAULTCAPACITY_EMPTY_ELEMENTDATA;
-    }
-
-    /**
-     * 带初始容量参数的构造函数。（用户自己指定容量）
-     */
-    public ArrayList(int initialCapacity) {
-        if (initialCapacity > 0) {//初始容量大于0
-            //创建initialCapacity大小的数组
-            this.elementData = new Object[initialCapacity];
-        } else if (initialCapacity == 0) {//初始容量等于0
-            //创建空数组
-            this.elementData = EMPTY_ELEMENTDATA;
-        } else {//初始容量小于0，抛出异常
-            throw new IllegalArgumentException("Illegal Capacity: "+
-                                               initialCapacity);
-        }
-    }
-
-
-   /**
-    *构造包含指定collection元素的列表，这些元素利用该集合的迭代器按顺序返回
-    *如果指定的集合为null，throws NullPointerException。
-    */
-     public ArrayList(Collection<? extends E> c) {
-        elementData = c.toArray();
-        if ((size = elementData.length) != 0) {
-            // c.toArray might (incorrectly) not return Object[] (see 6260652)
-            if (elementData.getClass() != Object[].class)
-                elementData = Arrays.copyOf(elementData, size, Object[].class);
-        } else {
-            // replace with empty array.
-            this.elementData = EMPTY_ELEMENTDATA;
-        }
-    }
-
-```
-
-细心的同学一定会发现 ：**以无参数构造方法创建 ArrayList 时，实际上初始化赋值的是一个空数组。当真正对数组进行添加元素操作时，才真正分配容量。即向数组中添加第一个元素时，数组容量扩为 10。** 下面在我们分析 ArrayList 扩容时会讲到这一点内容！
-
-### 3.2. 一步一步分析 ArrayList 扩容机制
-
-这里以无参构造函数创建的 ArrayList 为例分析
-
-#### 3.2.1. 先来看 `add` 方法
+以add(E e)方法为例：
 
 ```java
     /**
-     * 将指定的元素追加到此列表的末尾。
+     * 直接将元素添加到数组末尾。
      */
     public boolean add(E e) {
-   //添加元素之前，先调用ensureCapacityInternal方法
+        // 检查是否需要扩容
         ensureCapacityInternal(size + 1);  // Increments modCount!!
-        //这里看到ArrayList添加元素的实质就相当于为数组赋值
         elementData[size++] = e;
         return true;
     }
 ```
 
-> **注意** ：JDK11 移除了 `ensureCapacityInternal()` 和 `ensureExplicitCapacity()` 方法
+#### 2.5.1 `ensureCapacityInternal()` 和 `ensureExplicitCapacity()` 
 
-#### 3.2.2. 再来看看 `ensureCapacityInternal()` 方法
-
-可以看到 `add` 方法 首先调用了`ensureCapacityInternal(size + 1)`
+查看ensureCapacityInternal()方法：
 
 ```java
-   //得到最小扩容量
-    private void ensureCapacityInternal(int minCapacity) {
-        if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {
-              // 获取默认的容量和传入参数的较大值
-            minCapacity = Math.max(DEFAULT_CAPACITY, minCapacity);
-        }
-
-        ensureExplicitCapacity(minCapacity);
+    // 获取到满足需求的最小容量
+	private void ensureCapacityInternal(int minCapacity) {
+        ensureExplicitCapacity(calculateCapacity(elementData, minCapacity));
     }
-```
+	
+	private static int calculateCapacity(Object[] elementData, int minCapacity) {
+        // elementData是空列表
+        if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {
+             // 扩容数组到DEFAULT_CAPACITY(10)
+            return Math.max(DEFAULT_CAPACITY, minCapacity);
+        }
+        // return size+1
+        return minCapacity;
+    }
 
-**当 要 add 进第 1 个元素时，minCapacity 为 1，在 Math.max()方法比较后，minCapacity 为 10。**
-
-#### 3.2.3. `ensureExplicitCapacity()` 方法
-
-如果调用 `ensureCapacityInternal()` 方法就一定会进入（执行）这个方法，下面我们来研究一下这个方法的源码！
-
-```java
-  //判断是否需要扩容
+	// 判断是否需要扩容
     private void ensureExplicitCapacity(int minCapacity) {
         modCount++;
 
-        // overflow-conscious code
         if (minCapacity - elementData.length > 0)
-            //调用grow方法进行扩容，调用此方法代表已经开始扩容了
+            //调用grow方法进行真正地扩容
             grow(minCapacity);
     }
-
 ```
 
-我们来仔细分析一下：
+1. 当添加第1个元素到 ArrayList 中时，minCapacity 为size+1=0，elementData还是空的list，elementData.length=0 ，所有会执行`return Math.max(DEFAULT_CAPACITY, minCapacity);`，minCapacity变为10。此时，`minCapacity - elementData.length > 0`成立，所以会进入 `grow(minCapacity)` 方法真正扩容。
 
-- 当我们要 add 进第 1 个元素到 ArrayList 时，elementData.length 为 0 （因为还是一个空的 list），因为执行了 `ensureCapacityInternal()` 方法 ，所以 minCapacity 此时为 10。此时，`minCapacity - elementData.length > 0`成立，所以会进入 `grow(minCapacity)` 方法。
-- 当 add 第 2 个元素时，minCapacity 为 2，此时 e lementData.length(容量)在添加第一个元素后扩容成 10 了。此时，`minCapacity - elementData.length > 0` 不成立，所以不会进入 （执行）`grow(minCapacity)` 方法。
-- 添加第 3、4···到第 10 个元素时，依然不会执行 grow 方法，数组容量都为 10。
+2. 当添加第2个元素时，minCapacity 为 size+1 =2，由于elementData.length在添加第一个元素后已经扩容成10了。此时，`minCapacity - elementData.length > 0` 不成立，不会执行`grow(minCapacity)` 方法，即不会扩容。
 
-直到添加第 11 个元素，minCapacity(为 11)比 elementData.length（为 10）要大。进入 grow 方法进行扩容。
+3. 添加第 3、4、5......到第10个元素时，依然不会扩容，数组容量还是为10。
 
-#### 3.2.4. `grow()` 方法
+直到添加第11个元素，`minCapacity - elementData.length > 0` 成立，执行grow 方法进行扩容。
+
+#### 2.5.2 `grow()` 
+
+grow方法是整个ArrayList扩容的核心：
 
 ```java
-    /**
-     * 要分配的最大数组大小
-     */
-    private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
-
-    /**
-     * ArrayList扩容的核心方法。
-     */
-    private void grow(int minCapacity) {
-        // oldCapacity为旧容量，newCapacity为新容量
-        int oldCapacity = elementData.length;
-        //将oldCapacity 右移一位，其效果相当于oldCapacity /2，
-        //我们知道位运算的速度远远快于整除运算，整句运算式的结果就是将新容量更新为旧容量的1.5倍，
+    private void grow(int minCapacity) {//11
+        // oldCapacity为旧容量
+        int oldCapacity = elementData.length;//10
+        // 位移运算符比普通运算符的运算快很多。>>表示将oldCapacity右移一位，(oldCapacity >> 1)相当于oldCapacity /2
+        // 将新容量更新为旧容量的1.5倍
         int newCapacity = oldCapacity + (oldCapacity >> 1);
-        //然后检查新容量是否大于最小需要容量，若还是小于最小需要容量，那么就把最小需要容量当作数组的新容量，
+        // 若新容量还是小于最小需求容量
         if (newCapacity - minCapacity < 0)
+            // 直接最小需求容量当作数组的新容量
             newCapacity = minCapacity;
-       // 如果新容量大于 MAX_ARRAY_SIZE,进入(执行) `hugeCapacity()` 方法来比较 minCapacity 和 MAX_ARRAY_SIZE，
        //如果minCapacity大于最大容量，则新容量则为`Integer.MAX_VALUE`，否则，新容量大小则为 MAX_ARRAY_SIZE 即为 `Integer.MAX_VALUE - 8`。
+        // 新容量大于MAX_ARRAY_SIZE,
         if (newCapacity - MAX_ARRAY_SIZE > 0)
+            // 执行hugeCapacity()方法
             newCapacity = hugeCapacity(minCapacity);
-        // minCapacity is usually close to size, so this is a win:
+
         elementData = Arrays.copyOf(elementData, newCapacity);
     }
-```
 
-**int newCapacity = oldCapacity + (oldCapacity >> 1),所以 ArrayList 每次扩容之后容量都会变为原来的 1.5 倍左右（oldCapacity 为偶数就是 1.5 倍，否则是 1.5 倍左右）！** 奇偶不同，比如 ：10+10/2 = 15, 33+33/2=49。如果是奇数的话会丢掉小数.
-
-> ">>"（移位运算符）：>>1 右移一位相当于除 2，右移 n 位相当于除以 2 的 n 次方。这里 oldCapacity 明显右移了 1 位所以相当于 oldCapacity /2。对于大数据的 2 进制运算,位移运算符比那些普通运算符的运算要快很多,因为程序仅仅移动一下而已,不去计算,这样提高了效率,节省了资源
-
-**我们再来通过例子探究一下`grow()` 方法 ：**
-
-- 当 add 第 1 个元素时，oldCapacity 为 0，经比较后第一个 if 判断成立，newCapacity = minCapacity(为 10)。但是第二个 if 判断不会成立，即 newCapacity 不比 MAX_ARRAY_SIZE 大，则不会进入 `hugeCapacity` 方法。数组容量为 10，add 方法中 return true,size 增为 1。
-- 当 add 第 11 个元素进入 grow 方法时，newCapacity 为 15，比 minCapacity（为 11）大，第一个 if 判断不成立。新容量没有大于数组最大 size，不会进入 hugeCapacity 方法。数组容量扩为 15，add 方法中 return true,size 增为 11。
-- 以此类推······
-
-**这里补充一点比较重要，但是容易被忽视掉的知识点：**
-
-- java 中的 `length`属性是针对数组说的,比如说你声明了一个数组,想知道这个数组的长度则用到了 length 这个属性.
-- java 中的 `length()` 方法是针对字符串说的,如果想看这个字符串的长度则用到 `length()` 这个方法.
-- java 中的 `size()` 方法是针对泛型集合说的,如果想看这个泛型有多少个元素,就调用此方法来查看!
-
-#### 3.2.5. `hugeCapacity()` 方法。
-
-从上面 `grow()` 方法源码我们知道： 如果新容量大于 MAX_ARRAY_SIZE,进入(执行) `hugeCapacity()` 方法来比较 minCapacity 和 MAX_ARRAY_SIZE，如果 minCapacity 大于最大容量，则新容量则为`Integer.MAX_VALUE`，否则，新容量大小则为 MAX_ARRAY_SIZE 即为 `Integer.MAX_VALUE - 8`。
-
-```java
+	// 比较minCapacity和MAX_ARRAY_SIZE
     private static int hugeCapacity(int minCapacity) {
-        if (minCapacity < 0) // overflow
+        if (minCapacity < 0)
             throw new OutOfMemoryError();
-        //对minCapacity和MAX_ARRAY_SIZE进行比较
-        //若minCapacity大，将Integer.MAX_VALUE作为新数组的大小
-        //若MAX_ARRAY_SIZE大，将MAX_ARRAY_SIZE作为新数组的大小
-        //MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
+
+        // minCapacity > MAX_ARRAY_SIZE，新数组的大小为Integer.MAX_VALUE
+        // 否则，新数组的大小为MAX_ARRAY_SIZE
+        // MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
         return (minCapacity > MAX_ARRAY_SIZE) ?
             Integer.MAX_VALUE :
             MAX_ARRAY_SIZE;
     }
 ```
 
-### 3.3. `System.arraycopy()` 和 `Arrays.copyOf()`方法
+由此可知，ArrayList默认扩容大小是原大小的**1.5倍左右**（oldCapacity为偶数肯定是 1.5 倍，为奇数肯定就是等于1.5倍左右）。
 
-阅读源码的话，我们就会发现 ArrayList 中大量调用了这两个方法。比如：我们上面讲的扩容操作以及`add(int index, E element)`、`toArray()` 等方法中都用到了该方法！
+* 如果扩容后的newCapacity仍小于minCapacity，那么就将数组大小调整为minCapacity大小。
 
-#### 3.3.1. `System.arraycopy()` 方法
+* 如果minCapacity的值在MAX_ARRAY_SIZE和Integer.MAX_VALUE之间，那么新数组分配Integer.MAX_VALUE大小，否则分配MAX_ARRAY_SIZE。
 
-```java
-    /**
-     * 在此列表中的指定位置插入指定的元素。
-     *先调用 rangeCheckForAdd 对index进行界限检查；然后调用 ensureCapacityInternal 方法保证capacity足够大；
-     *再将从index开始之后的所有成员后移一个位置；将element插入index位置；最后size加1。
-     */
-    public void add(int index, E element) {
-        rangeCheckForAdd(index);
+> ">>"（右移运算符）：”>>1“表示右移1位；右移n位相当于除以2的n次方。
 
-        ensureCapacityInternal(size + 1);  // Increments modCount!!
-        //arraycopy()方法实现数组自己复制自己
-        //elementData:源数组;index:源数组中的起始位置;elementData：目标数组；index + 1：目标数组中的起始位置； size - index：要复制的数组元素的数量；
-        System.arraycopy(elementData, index, elementData, index + 1, size - index);
-        elementData[index] = element;
-        size++;
-    }
-```
+### 2.6 `ensureCapacity`
 
-我们写一个简单的方法测试以下：
+从上面源码分析，在使用Arraylist初始化容量时，就会通过一系列逻辑判断后再进行扩容。如果数据量很大，运行效率岂不是很低。
+
+而`ensureCapacity()`方法，就是让我们预先设置Arraylist的大小，这样就可以大大提高初始化速度了。 
 
 ```java
-public class ArraycopyTest {
-
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		int[] a = new int[10];
-		a[0] = 0;
-		a[1] = 1;
-		a[2] = 2;
-		a[3] = 3;
-		System.arraycopy(a, 2, a, 3, 3);
-		a[2]=99;
-		for (int i = 0; i < a.length; i++) {
-			System.out.print(a[i] + " ");
-		}
-	}
-
-}
-```
-
-结果：
-
-```
-0 1 99 2 3 0 0 0 0 0
-```
-
-#### 3.3.2. `Arrays.copyOf()`方法
-
-```java
-   /**
-     以正确的顺序返回一个包含此列表中所有元素的数组（从第一个到最后一个元素）; 返回的数组的运行时类型是指定数组的运行时类型。
-     */
-    public Object[] toArray() {
-    //elementData：要复制的数组；size：要复制的长度
-        return Arrays.copyOf(elementData, size);
-    }
-```
-
-个人觉得使用 `Arrays.copyOf()`方法主要是为了给原有数组扩容，测试代码如下：
-
-```java
-public class ArrayscopyOfTest {
-
-	public static void main(String[] args) {
-		int[] a = new int[3];
-		a[0] = 0;
-		a[1] = 1;
-		a[2] = 2;
-		int[] b = Arrays.copyOf(a, 10);
-		System.out.println("b.length"+b.length);
-	}
-}
-```
-
-结果：
-
-```
-10
-```
-
-#### 3.3.3. 两者联系和区别
-
-**联系：**
-
-看两者源代码可以发现 `copyOf()`内部实际调用了 `System.arraycopy()` 方法
-
-**区别：**
-
-`arraycopy()` 需要目标数组，将原数组拷贝到你自己定义的数组里或者原数组，而且可以选择拷贝的起点和长度以及放入新数组中的位置 `copyOf()` 是系统自动在内部新建一个数组，并返回该数组。
-
-### 3.4. `ensureCapacity`方法
-
-ArrayList 源码中有一个 `ensureCapacity` 方法不知道大家注意到没有，这个方法 ArrayList 内部没有被调用过，所以很显然是提供给用户调用的，那么这个方法有什么作用呢？
-
-```java
-    /**
-    如有必要，增加此 ArrayList 实例的容量，以确保它至少可以容纳由minimum capacity参数指定的元素数。
-     *
-     * @param   minCapacity   所需的最小容量
-     */
     public void ensureCapacity(int minCapacity) {
+        // 以此来判断我们实例化时是否调用无参构造函数。如果不是，minExpand=0；如果是，minExpand=10。
         int minExpand = (elementData != DEFAULTCAPACITY_EMPTY_ELEMENTDATA)
             // any size if not default element table
             ? 0
@@ -836,60 +390,169 @@ ArrayList 源码中有一个 `ensureCapacity` 方法不知道大家注意到没�
             // supposed to be at default size.
             : DEFAULT_CAPACITY;
 
+        // 我们设置的minCapacity大于minExpand才进行扩容
         if (minCapacity > minExpand) {
             ensureExplicitCapacity(minCapacity);
         }
     }
-
 ```
 
-**最好在 add 大量元素之前用 `ensureCapacity` 方法，以减少增量重新分配的次数**
+**最好在 add 大量元素之前用 `ensureCapacity` 方法，以减少增量重新分配的次数**。
 
-我们通过下面的代码实际测试以下这个方法的效果：
-
-```java
-public class EnsureCapacityTest {
-	public static void main(String[] args) {
-		ArrayList<Object> list = new ArrayList<Object>();
-		final int N = 10000000;
-		long startTime = System.currentTimeMillis();
-		for (int i = 0; i < N; i++) {
-			list.add(i);
-		}
-		long endTime = System.currentTimeMillis();
-		System.out.println("使用ensureCapacity方法前："+(endTime - startTime));
-
-	}
-}
-```
-
-运行结果：
-
-```
-使用ensureCapacity方法前：2158
-```
+下面就来测试一下使用`ensureCapacity`前后的区别：
 
 ```java
 public class EnsureCapacityTest {
     public static void main(String[] args) {
         ArrayList<Object> list = new ArrayList<Object>();
-        final int N = 10000000;
+        final int minCapacity = 10000000;
+        long startTime = System.currentTimeMillis();
+        for (int i = 0; i < minCapacity; i++) {
+            list.add(i);
+        }
+        long endTime = System.currentTimeMillis();
+        System.out.println("不使用ensureCapacity耗时：" + (endTime - startTime));
+
         list = new ArrayList<Object>();
         long startTime1 = System.currentTimeMillis();
-        list.ensureCapacity(N);
-        for (int i = 0; i < N; i++) {
+        list.ensureCapacity(minCapacity);
+        for (int i = 0; i < minCapacity; i++) {
             list.add(i);
         }
         long endTime1 = System.currentTimeMillis();
-        System.out.println("使用ensureCapacity方法后："+(endTime1 - startTime1));
+        System.out.println("使用ensureCapacity耗时：" + (endTime1 - startTime1));
     }
 }
 ```
 
 运行结果：
 
-```
-使用ensureCapacity方法前：1773
+```java
+不使用ensureCapacity耗时：2471
+使用ensureCapacity耗时：289
 ```
 
-通过运行结果，我们可以看出向 ArrayList 添加大量元素之前最好先使用`ensureCapacity` 方法，以减少增量重新分配的次数。
+## 3 遍历
+
+ArrayList主要支持三种遍历方式：
+
+- foreach循环遍历
+
+```java
+Integer value = null;
+for (Integer integ:list) {
+    value = integ;
+}
+```
+
+- 迭代器遍历
+
+```java
+Integer value = null;
+Iterator iter = list.iterator();
+while (iter.hasNext()) {
+    value = (Integer)iter.next();
+}
+```
+
+- 随机访问，通过索引值去遍历
+
+由于ArrayList实现了RandomAccess接口，它支持通过索引值去随机访问元素。
+
+```java
+Integer value = null;
+int size = list.size();
+for (int i=0; i<size; i++) {
+    value = (Integer)list.get(i);        
+}
+```
+
+## 4 fail-fast机制
+
+**快速失败(fail-fast)** 是 Java 集合中的一种错误检测机制。它的特性就是在遍历Java集合时，不允许进行值的修改，否则会抛出`ConcurrentModificationException`异常。
+
+例如在**多线程**开发中，线程A正在通过iterator遍历某集合，线程B恰巧对该集合的内容进行了修改，那么线程A继续遍历集合就会抛出`ConcurrentModificationException`异常，产生fail-fast事件。
+
+查看AbstractList源码：
+
+```java
+public abstract class AbstractList<E> extends AbstractCollection<E> implements List<E> {
+    ... ...
+
+    // 用来记录List修改的次数：每修改一次(添加/删除等操作)，将modCount+1
+    protected transient int modCount = 0;
+
+    // 返回List对应迭代器。实际上，是返回Itr对象。
+    public Iterator<E> iterator() {
+        return new Itr();
+    }
+
+    // Itr是Iterator(迭代器)的实现类
+    private class Itr implements Iterator<E> {
+        int cursor = 0;
+
+        int lastRet = -1;
+
+        // 修改数的记录值。
+        // 每次新建Itr()对象时，都会保存新建该对象时对应的modCount。
+        int expectedModCount = modCount;
+
+        public boolean hasNext() {
+            return cursor != size();
+        }
+
+        public E next() {
+            checkForComodification();
+			--- omit ---
+        }
+
+        public void remove() {
+            if (lastRet == -1)
+                throw new IllegalStateException();
+            checkForComodification();
+			--- omit ---
+        }
+
+        final void checkForComodification() {
+            // 每次遍历List中的元素的时候，都会比较expectedModCount和modCount是否相等。
+        	// 若不相等，则抛出ConcurrentModificationException异常，产生fail-fast事件。
+            if (modCount != expectedModCount)
+                throw new ConcurrentModificationException();
+        }
+    }
+ 	... ...   
+}
+```
+
+可见，ArrayList在添加或者删除元素时，无论是调用add()、remove()还是clear()等其他方法，只要涉及到修改集合中的元素个数时，都会改变modCount的值。
+
+而每当迭代器遍历下一个元素之前，都会检测 `modCount` 变量是否为 `expectedModCount` 值。如果在集合被遍历期间修改 `modCount` 的值，那么 `modCount != expectedModCount` ，进而抛出 `ConcurrentModificationException` 异常。
+
+因此，在多线程开发中，建议使用`java.util.concurrent`包下的线程安全类去取代`java.util`包下的线程不安全类。比如`ArrayList`对应的线程安全类为`CopyOnWriteArrayList`。
+
+特别注意的是，并不是只有在多线程中才会出现fail-fast事件。**在单线程下，如果遍历过程中对集合对象的内容进行了修改的话也会触发 fail-fast 机制**。
+
+> foreach循环也是借助迭代器进行遍历的。
+
+应该避免写出类似这样的代码：
+
+```java
+        List<String> list = new ArrayList<>();
+        list.add("a");
+        list.add("b");
+        for (String str : list) {
+            if("b".equals(str)){
+                list.remove(str);
+            }
+        }
+```
+
+## 参考
+
+* [ArrayList源码解析](https://juejin.im/post/6844903758334279693)
+
+* [由 System.arraycopy 引发的巩固：对象引用 与 对象 的区别](https://juejin.im/post/6844903502901149703)
+
+* [Java 集合系列03之 ArrayList详细介绍(源码解析)和使用示例](https://www.cnblogs.com/skywang12345/p/3308556.html)
+
+* [Java 集合系列04之 fail-fast总结(通过ArrayList来说明fail-fast的原理、解决办法)](https://www.cnblogs.com/skywang12345/p/3308762.html)
