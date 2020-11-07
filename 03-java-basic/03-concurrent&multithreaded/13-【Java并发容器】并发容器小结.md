@@ -1,34 +1,18 @@
-点击关注[公众号](#公众号 "公众号")及时获取笔主最新更新文章，并可免费领取本文档配套的《Java 面试突击》以及 Java 工程师必备学习资源。
+- [ ] HashMap与HashTable
+- [ ] ConcurrentHashMap详解
+- [ ] ConcurrentLinkedQueue
+- [ ] 阻塞队列
+- [ ] CopyOnWriteArrayList
+- [ ] ConcurrentSkipListMap
 
-<!-- MarkdownTOC -->
+## 一 JDK 提供的并发容器简介
 
-- [一 JDK 提供的并发容器总结](#一-jdk-提供的并发容器总结 "一 JDK 提供的并发容器总结")
-- [二 ConcurrentHashMap](#二-concurrenthashmap "二 ConcurrentHashMap")
-- [三 CopyOnWriteArrayList](#三-copyonwritearraylist "三 CopyOnWriteArrayList")
-  - [3.1 CopyOnWriteArrayList 简介](#31-copyonwritearraylist-简介 "3.1 CopyOnWriteArrayList 简介")
-  - [3.2 CopyOnWriteArrayList 是如何做到的？](#32-copyonwritearraylist-是如何做到的？ "3.2 CopyOnWriteArrayList 是如何做到的？")
-  - [3.3 CopyOnWriteArrayList 读取和写入源码简单分析](#33-copyonwritearraylist-读取和写入源码简单分析 "3.3 CopyOnWriteArrayList 读取和写入源码简单分析")
-    - [3.3.1 CopyOnWriteArrayList 读取操作的实现](#331-copyonwritearraylist-读取操作的实现 "3.3.1 CopyOnWriteArrayList 读取操作的实现")
-    - [3.3.2 CopyOnWriteArrayList 写入操作的实现](#332-copyonwritearraylist-写入操作的实现 "3.3.2 CopyOnWriteArrayList 写入操作的实现")
-- [四 ConcurrentLinkedQueue](#四-concurrentlinkedqueue "四 ConcurrentLinkedQueue")
-- [五 BlockingQueue](#五-blockingqueue "五 BlockingQueue")
-  - [5.1 BlockingQueue 简单介绍](#51-blockingqueue-简单介绍 "5.1 BlockingQueue 简单介绍")
-  - [5.2 ArrayBlockingQueue](#52-arrayblockingqueue "5.2 ArrayBlockingQueue")
-  - [5.3 LinkedBlockingQueue](#53-linkedblockingqueue "5.3 LinkedBlockingQueue")
-  - [5.4 PriorityBlockingQueue](#54-priorityblockingqueue "5.4 PriorityBlockingQueue")
-- [六 ConcurrentSkipListMap](#六-concurrentskiplistmap "六 ConcurrentSkipListMap")
-- [七 参考](#七-参考 "七 参考")
+并发编程大师Doug Lea开发了非常多的并发容器和框架，这些容器大部分在 `java.util.concurrent` 包中。
 
-<!-- /MarkdownTOC -->
-
-## 一 JDK 提供的并发容器总结
-
-JDK 提供的这些容器大部分在 `java.util.concurrent` 包中。
-
-- **ConcurrentHashMap:** 线程安全的 HashMap
+- **ConcurrentHashMap:** ConcurrentHashMap是线程安全且高效的HashMap。
+- **ConcurrentLinkedQueue:** 一个基于链接节点的无界线程安全队列，可以看做一个线程安全的 LinkedList，是一个非阻塞队列。
+- **BlockingQueue:** 一个阻塞队列，适合用于作为数据共享的通道。它是一个接口，JDK 内部通过链表、数组等方式实现了这个接口。
 - **CopyOnWriteArrayList:** 线程安全的 List，在读多写少的场合性能非常好，远远好于 Vector.
-- **ConcurrentLinkedQueue:** 高效的并发队列，使用链表实现。可以看做一个线程安全的 LinkedList，这是一个非阻塞队列。
-- **BlockingQueue:** 这是一个接口，JDK 内部通过链表、数组等方式实现了这个接口。表示阻塞队列，非常适合用于作为数据共享的通道。
 - **ConcurrentSkipListMap:** 跳表的实现。这是一个 Map，使用跳表的数据结构进行快速查找。
 
 ## 二 ConcurrentHashMap
@@ -133,6 +117,12 @@ BlockingQueue 是一个接口，继承自 Queue，所以其实现类也可以作
 
 **下面主要介绍一下:ArrayBlockingQueue、LinkedBlockingQueue、PriorityBlockingQueue，这三个 BlockingQueue 的实现类。**
 
+
+
+JDK 7提供了7个阻塞队列，如下。❑ ArrayBlockingQueue：一个由数组结构组成的有界阻塞队列。❑ LinkedBlockingQueue：一个由链表结构组成的有界阻塞队列。❑ PriorityBlockingQueue：一个支持优先级排序的无界阻塞队列。❑ DelayQueue：一个使用优先级队列实现的无界阻塞队列。❑ SynchronousQueue：一个不存储元素的阻塞队列。❑ LinkedTransferQueue：一个由链表结构组成的无界阻塞队列。❑ LinkedBlockingDeque：一个由链表结构组成的双向阻塞队列。
+
+
+
 ### 5.2 ArrayBlockingQueue
 
 **ArrayBlockingQueue** 是 BlockingQueue 接口的有界队列实现类，底层采用**数组**来实现。ArrayBlockingQueue 一旦创建，容量不能改变。其并发控制采用可重入锁来控制，不管是插入操作还是读取操作，都需要获取到锁才能进行操作。当队列容量满时，尝试将元素放入队列将导致操作阻塞;尝试从一个空队列中取一个元素也会同样阻塞。
@@ -217,3 +207,5 @@ PriorityBlockingQueue 并发控制采用的是 **ReentrantLock**，队列为无�
 - 《实战 Java 高并发程序设计》
 - https://javadoop.com/post/java-concurrent-queue
 - https://juejin.im/post/5aeebd02518825672f19c546
+
+* [ConcurrentHashMap 线程安全的具体实现方式/底层具体实现](https://github.com/Snailclimb/JavaGuide/blob/master/docs/java/collection/Java%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6%E5%B8%B8%E8%A7%81%E9%9D%A2%E8%AF%95%E9%A2%98.md#concurrenthashmap%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E7%9A%84%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F%E5%BA%95%E5%B1%82%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0 )
