@@ -1,37 +1,40 @@
+## 1 LinkedList简介
 
-<!-- MarkdownTOC -->
+`LinkedList`是一个实现了<font color="red">List接口</font>和<font color="red">Deque接口</font>的<font color="red">双端链表</font>。
 
-- [简介](#简介)
-- [内部结构分析](#内部结构分析)
-- [LinkedList源码分析](#linkedlist源码分析)
-    - [构造方法](#构造方法)
-    - [添加（add）方法](#add方法)
-    - [根据位置取数据的方法](#根据位置取数据的方法)
-    - [根据对象得到索引的方法](#根据对象得到索引的方法)
-    - [检查链表是否包含某对象的方法：](#检查链表是否包含某对象的方法：)
-    - [删除（remove/pop）方法](#删除方法)
-- [LinkedList类常用方法测试：](#linkedlist类常用方法测试)
+<img src="https://img-blog.csdnimg.cn/20201108105348736.png"  />
 
-<!-- /MarkdownTOC -->
+`LinkedList`继承于 **`AbstractSequentialList`**，实现了 **`List`**、 **`Deque`**、 **`Cloneable`**、**`java.io.Serializable`** 接口。
 
-## <font face="楷体" id="1">简介</font>
-<font color="red">LinkedList</font>是一个实现了<font color="red">List接口</font>和<font color="red">Deque接口</font>的<font color="red">双端链表</font>。 
-LinkedList底层的链表结构使它<font color="red">支持高效的插入和删除操作</font>，另外它实现了Deque接口，使得LinkedList类也具有队列的特性;
-LinkedList<font color="red">不是线程安全的</font>，如果想使LinkedList变成线程安全的，可以调用静态类<font color="red">Collections类</font>中的<font color="red">synchronizedList</font>方法： 
+`LinkedList `实现了` List `接口，表明其能进行链表的高效插入和删除操作。
+`LinkedList `实现了` Deque` 接口，即能将`LinkedList`当作双端队列使用。
+`LinkedList `实现了了`Cloneable`接口，即覆盖了函数clone()，能够克隆。
+`LinkedList `实现了`java.io.Serializable`接口，这意味着`LinkedList `支持序列化，能通过序列化传输数据。
+
+> LinkedList不是线程安全的，如果想使LinkedList变成线程安全的，可以调用静态类Collections类中的synchronizedList方法
+>
+> `List list=Collections.synchronizedList(new LinkedList(...));`
+
+## 2 成员属性
+
 ```java
-List list=Collections.synchronizedList(new LinkedList(...));
+// 总节点数
+transient int size = 0;
+// 头节点
+transient Node<E> first;
+// 尾节点
+transient Node<E> last;
 ```
-## <font face="楷体" id="2">内部结构分析</font>
-**如下图所示：**
 
-![LinkedList内部结构](images/linkedlist/LinkedList内部结构.png)
-看完了图之后，我们再看LinkedList类中的一个<font color="red">**内部私有类Node**</font>就很好理解了：
+可以发现LinkedList是基于双向链表实现的，使用 Node 存储链表节点信息。
+
+![](https://img-blog.csdnimg.cn/20201108111123539.png)
 
 ```java
-private static class Node<E> {
+    private static class Node<E> {
         E item;//节点值
-        Node<E> next;//后继节点
-        Node<E> prev;//前驱节点
+        Node<E> next;// 后继节点
+        Node<E> prev;// 前驱节点
 
         Node(Node<E> prev, E element, Node<E> next) {
             this.item = element;
@@ -40,43 +43,52 @@ private static class Node<E> {
         }
     }
 ```
-这个类就代表双端链表的节点Node。这个类有三个属性，分别是前驱节点，本节点的值，后继结点。
 
-## <font face="楷体" id="3">LinkedList源码分析</font>
-### <font face="楷体" id="3.1">构造方法</font>
-**空构造方法：**
-```java
-    public LinkedList() {
-    }
-```
-**用已有的集合创建链表的构造方法：**
-```java
-    public LinkedList(Collection<? extends E> c) {
-        this();
-        addAll(c);
-    }
-```
-### <font face="楷体" id="3.2">add方法</font>
-**add(E e)** 方法：将元素添加到链表尾部
-```java
-public boolean add(E e) {
-        linkLast(e);//这里就只调用了这一个方法
-        return true;
-    }
-```
+LinkedList的结构图：
+
+![](https://img-blog.csdnimg.cn/20201108111340847.png)
+
+## 3 构造方法
 
 ```java
-   /**
+// 空参的构造方法，只生成了对象
+public LinkedList() {
+}
+
+public LinkedList(Collection<? extends E> c) {
+    // 先构造一个空链表
+    this();
+    // 添加Collection中的元素
+    addAll(c);
+}
+```
+
+## 4 常用方法
+
+### 4.1 添加元素
+
+**add(E e)** ：将元素添加到链表尾部
+
+```java
+    public boolean add(E e) {
+            linkLast(e);
+            return true;
+        }   
+
+	/**
      * 链接使e作为最后一个元素。
      */
     void linkLast(E e) {
+        // 取出尾节点
         final Node<E> l = last;
+        // 根据传入的元素构建新节点，这个节点前置节点是上一个尾节点
         final Node<E> newNode = new Node<>(l, e, null);
-        last = newNode;//新建节点
+        // 新创建的节点作为当前链表的尾节点
+        last = newNode;
         if (l == null)
-            first = newNode;
+            first = newNode;// 如果尾节点为空，那么说明链表是空的，然后把新构建的节点作为头节点
         else
-            l.next = newNode;//指向后继元素也就是指向下一个元素
+            l.next = newNode;// 如果不为空，那么把添加前的尾节点的后置节点设置为我们新的尾节点
         size++;
         modCount++;
     }
@@ -84,54 +96,78 @@ public boolean add(E e) {
 **add(int index,E e)**：在指定位置添加元素
 ```java
 public void add(int index, E element) {
-        checkPositionIndex(index); //检查索引是否处于[0-size]之间
+        checkPositionIndex(index);// 检查索引index是否处于[0-size]之间
 
-        if (index == size)//添加在链表尾部
-            linkLast(element);
-        else//添加在链表中间
-            linkBefore(element, node(index));
+        if (index == size)
+            linkLast(element);// 添加在链表尾部
+        else 
+            linkBefore(element, node(index));// 插入到index所在位置的节点的前面
+    }
+	
+	/**
+	 * 将新节点插入到指定节点前面
+	 */
+    void linkBefore(E e, Node<E> succ) {
+        // 取出查找到指定位置的节点
+        final Node<E> pred = succ.prev;
+        // 构建新节点，前置节点找到节点的原前置节点，e 是元素值，后置节点是根据位置找到的 succ
+        final Node<E> newNode = new Node<>(pred, e, succ);
+        // // 原位置的前置节点设置为要插入的节点。
+        succ.prev = newNode;
+        // 如果原位置的前置节点为空，即原位置 succ 是头节点，即 add(0 ,E )然后把新建节点赋值为头节点
+        if (pred == null)
+            first = newNode;
+        else
+            pred.next = newNode; // 不为空，原位置的前置节点的后置节点设置为新节点。
+        size++;
+        modCount++;
+    }
+
+    private void checkPositionIndex(int index) {
+        if (!isPositionIndex(index))
+            throw new IndexOutOfBoundsException(outOfBoundsMsg(index));
+    }
+
+    private boolean isPositionIndex(int index) {
+        return index >= 0 && index <= size;// 检查索引index是否处于[0-size]之间
     }
 ```
-<font color="red">linkBefore方法</font>需要给定两个参数，一个<font color="red">插入节点的值</font>，一个<font color="red">指定的node</font>，所以我们又调用了<font color="red">Node(index)去找到index对应的node</font>
-
 **addAll(Collection  c )：将集合插入到链表尾部**
 
 ```java
 public boolean addAll(Collection<? extends E> c) {
         return addAll(size, c);
     }
-```
-**addAll(int index, Collection c)：** 将集合从指定位置开始插入
-```java
+
 public boolean addAll(int index, Collection<? extends E> c) {
-        //1:检查index范围是否在size之内
+        // 1、检查index范围是否在size之内
         checkPositionIndex(index);
 
-        //2:toArray()方法把集合的数据存到对象数组中
+        // 2、toArray()方法把集合的数据存到对象数组中
         Object[] a = c.toArray();
         int numNew = a.length;
         if (numNew == 0)
             return false;
 
-        //3：得到插入位置的前驱节点和后继节点
+        // 3、得到插入位置的前驱节点和后继节点
         Node<E> pred, succ;
-        //如果插入位置为尾部，前驱节点为last，后继节点为null
+        // 如果插入位置为尾部，前驱节点为last，后继节点为null
         if (index == size) {
             succ = null;
             pred = last;
         }
-        //否则，调用node()方法得到后继节点，再得到前驱节点
+        // 否则，调用node()方法得到后继节点，再得到前驱节点
         else {
             succ = node(index);
             pred = succ.prev;
         }
 
-        // 4：遍历数据将数据插入
+        // 4、遍历数据将数据插入
         for (Object o : a) {
             @SuppressWarnings("unchecked") E e = (E) o;
-            //创建新节点
+            // 创建新节点
             Node<E> newNode = new Node<>(pred, e, null);
-            //如果插入位置在链表头部
+            // 如果插入位置在链表头部
             if (pred == null)
                 first = newNode;
             else
@@ -139,11 +175,11 @@ public boolean addAll(int index, Collection<? extends E> c) {
             pred = newNode;
         }
 
-        //如果插入位置在尾部，重置last节点
+        // 如果插入位置在尾部，重置last节点
         if (succ == null) {
             last = pred;
         }
-        //否则，将插入的链表与先前链表连接起来
+        // 否则，将插入的链表与先前链表连接起来
         else {
             pred.next = succ;
             succ.prev = pred;
@@ -154,19 +190,13 @@ public boolean addAll(int index, Collection<? extends E> c) {
         return true;
     }    
 ```
-上面可以看出addAll方法通常包括下面四个步骤：
-1. 检查index范围是否在size之内
-2. toArray()方法把集合的数据存到对象数组中
-3. 得到插入位置的前驱和后继节点
-4. 遍历数据，将数据插入到指定位置
-
 **addFirst(E e)：** 将元素添加到链表头部
+
 ```java
  public void addFirst(E e) {
         linkFirst(e);
     }
-```
-```java
+
 private void linkFirst(E e) {
         final Node<E> f = first;
         final Node<E> newNode = new Node<>(null, e, f);//新建节点，以头节点为后继节点
@@ -187,17 +217,18 @@ public void addLast(E e) {
         linkLast(e);
     }
 ```
-### <font face="楷体" id="3.3">根据位置取数据的方法</font>
+### 4.2 查找元素
 **get(int index)：** 根据指定索引返回数据
 ```java
 public E get(int index) {
-        //检查index范围是否在size之内
+        // 检查index 是否在合法位置
         checkElementIndex(index);
-        //调用Node(index)去找到index对应的node然后返回它的值
+        // 调用Node(index)去找到index对应的node然后返回它的值item
         return node(index).item;
     }
 ```
 **获取头节点（index=0）数据方法:**
+
 ```java
 public E getFirst() {
         final Node<E> f = first;
@@ -238,7 +269,9 @@ element()方法的内部就是使用getFirst()实现的。它们会在链表为�
 ```
 **两者区别：**
 **getLast()** 方法在链表为空时，会抛出**NoSuchElementException**，而**peekLast()** 则不会，只是会返回 **null**。
-### <font face="楷体" id="3.4">根据对象得到索引的方法</font>
+
+**根据对象得到索引的方法**
+
 **int indexOf(Object o)：** 从头遍历找
 ```java
 public int indexOf(Object o) {
@@ -283,14 +316,7 @@ public int lastIndexOf(Object o) {
         return -1;
     }
 ```
-### <font face="楷体" id="3.5">检查链表是否包含某对象的方法：</font>
-**contains(Object o)：** 检查对象o是否存在于链表中
-```java
- public boolean contains(Object o) {
-        return indexOf(o) != -1;
-    }
-```
-### <font face="楷体" id="3.6">删除方法</font>
+### 4.3 删除元素
 **remove()** ,**removeFirst(),pop():** 删除头节点
 ```
 public E pop() {
@@ -390,128 +416,52 @@ public E remove(int index) {
         return unlink(node(index));
     }
 ```
-## <font face="楷体" id="4">LinkedList类常用方法测试</font>
+## 5 Arraylist与LinkedList异同
+
+1. **是否保证线程安全：** `ArrayList` 和 `LinkedList` 都是不同步的，都不保证线程安全；
+2. **底层数据结构：** `Arraylist` 底层使用的是 **`Object` 数组**；`LinkedList` 底层使用的是 **双向链表** 数据结构（JDK1.6 之前为循环链表，JDK1.7 取消了循环。）
+3. **插入和删除是否受元素位置的影响：** ① **`ArrayList` 采用数组存储，所以插入和删除元素的时间复杂度受元素位置的影响。** 比如：执行`add(E e)`方法的时候， `ArrayList` 会默认在将指定的元素追加到此列表的末尾，这种情况时间复杂度就是 O(1)。但是如果要在指定位置 i 插入和删除元素的话（`add(int index, E element)`）时间复杂度就为 O(n-i)。因为在进行上述操作的时候集合中第 i 和第 i 个元素之后的(n-i)个元素都要执行向后位/向前移一位的操作。 ② **`LinkedList` 采用链表存储，所以对于`add(E e)`方法的插入，删除元素时间复杂度不受元素位置的影响，近似 O(1)，如果是要在指定位置`i`插入和删除元素的话（`(add(int index, E element)`） 时间复杂度近似为`o(n))`因为需要先移动到指定位置再插入。**
+4. **是否支持快速随机访问：** `LinkedList` 不支持高效的随机元素访问，而 `ArrayList` 支持。快速随机访问就是通过元素的序号快速获取元素对象(对应于`get(int index)`方法)。
+5. **内存空间占用：** ArrayList 的空 间浪费主要体现在在 list 列表的结尾会预留一定的容量空间，而 LinkedList 的空间花费则体现在它的每一个元素都需要消耗比 ArrayList 更多的空间（因为要存放直接后继和直接前驱以及数据）。
+
+### 5.1 双向链表与双向循环链表
+
+**双向链表：** 包含两个指针，一个 prev 指向前一个节点，一个 next 指向后一个节点。
+
+![](https://img-blog.csdnimg.cn/20201107160432215.png)
+
+**双向循环链表：** 最后一个节点的 next 指向 head，而 head 的 prev 指向最后一个节点，构成一个环。
+
+![](https://img-blog.csdnimg.cn/20201107160457158.png)
+
+### 5.2 RandomAccess 接口
 
 ```java
-package list;
-
-import java.util.Iterator;
-import java.util.LinkedList;
-
-public class LinkedListDemo {
-    public static void main(String[] srgs) {
-        //创建存放int类型的linkedList
-        LinkedList<Integer> linkedList = new LinkedList<>();
-        /************************** linkedList的基本操作 ************************/
-        linkedList.addFirst(0); // 添加元素到列表开头
-        linkedList.add(1); // 在列表结尾添加元素
-        linkedList.add(2, 2); // 在指定位置添加元素
-        linkedList.addLast(3); // 添加元素到列表结尾
-        
-        System.out.println("LinkedList（直接输出的）: " + linkedList);
-
-        System.out.println("getFirst()获得第一个元素: " + linkedList.getFirst()); // 返回此列表的第一个元素
-        System.out.println("getLast()获得第最后一个元素: " + linkedList.getLast()); // 返回此列表的最后一个元素
-        System.out.println("removeFirst()删除第一个元素并返回: " + linkedList.removeFirst()); // 移除并返回此列表的第一个元素
-        System.out.println("removeLast()删除最后一个元素并返回: " + linkedList.removeLast()); // 移除并返回此列表的最后一个元素
-        System.out.println("After remove:" + linkedList);
-        System.out.println("contains()方法判断列表是否包含1这个元素:" + linkedList.contains(1)); // 判断此列表包含指定元素，如果是，则返回true
-        System.out.println("该linkedList的大小 : " + linkedList.size()); // 返回此列表的元素个数
-
-        /************************** 位置访问操作 ************************/
-        System.out.println("-----------------------------------------");
-        linkedList.set(1, 3); // 将此列表中指定位置的元素替换为指定的元素
-        System.out.println("After set(1, 3):" + linkedList);
-        System.out.println("get(1)获得指定位置（这里为1）的元素: " + linkedList.get(1)); // 返回此列表中指定位置处的元素
-
-        /************************** Search操作 ************************/
-        System.out.println("-----------------------------------------");
-        linkedList.add(3);
-        System.out.println("indexOf(3): " + linkedList.indexOf(3)); // 返回此列表中首次出现的指定元素的索引
-        System.out.println("lastIndexOf(3): " + linkedList.lastIndexOf(3));// 返回此列表中最后出现的指定元素的索引
-
-        /************************** Queue操作 ************************/
-        System.out.println("-----------------------------------------");
-        System.out.println("peek(): " + linkedList.peek()); // 获取但不移除此列表的头
-        System.out.println("element(): " + linkedList.element()); // 获取但不移除此列表的头
-        linkedList.poll(); // 获取并移除此列表的头
-        System.out.println("After poll():" + linkedList);
-        linkedList.remove();
-        System.out.println("After remove():" + linkedList); // 获取并移除此列表的头
-        linkedList.offer(4);
-        System.out.println("After offer(4):" + linkedList); // 将指定元素添加到此列表的末尾
-
-        /************************** Deque操作 ************************/
-        System.out.println("-----------------------------------------");
-        linkedList.offerFirst(2); // 在此列表的开头插入指定的元素
-        System.out.println("After offerFirst(2):" + linkedList);
-        linkedList.offerLast(5); // 在此列表末尾插入指定的元素
-        System.out.println("After offerLast(5):" + linkedList);
-        System.out.println("peekFirst(): " + linkedList.peekFirst()); // 获取但不移除此列表的第一个元素
-        System.out.println("peekLast(): " + linkedList.peekLast()); // 获取但不移除此列表的第一个元素
-        linkedList.pollFirst(); // 获取并移除此列表的第一个元素
-        System.out.println("After pollFirst():" + linkedList);
-        linkedList.pollLast(); // 获取并移除此列表的最后一个元素
-        System.out.println("After pollLast():" + linkedList);
-        linkedList.push(2); // 将元素推入此列表所表示的堆栈（插入到列表的头）
-        System.out.println("After push(2):" + linkedList);
-        linkedList.pop(); // 从此列表所表示的堆栈处弹出一个元素（获取并移除列表第一个元素）
-        System.out.println("After pop():" + linkedList);
-        linkedList.add(3);
-        linkedList.removeFirstOccurrence(3); // 从此列表中移除第一次出现的指定元素（从头部到尾部遍历列表）
-        System.out.println("After removeFirstOccurrence(3):" + linkedList);
-        linkedList.removeLastOccurrence(3); // 从此列表中移除最后一次出现的指定元素（从尾部到头部遍历列表）
-        System.out.println("After removeFirstOccurrence(3):" + linkedList);
-
-        /************************** 遍历操作 ************************/
-        System.out.println("-----------------------------------------");
-        linkedList.clear();
-        for (int i = 0; i < 100000; i++) {
-            linkedList.add(i);
-        }
-        // 迭代器遍历
-        long start = System.currentTimeMillis();
-        Iterator<Integer> iterator = linkedList.iterator();
-        while (iterator.hasNext()) {
-            iterator.next();
-        }
-        long end = System.currentTimeMillis();
-        System.out.println("Iterator：" + (end - start) + " ms");
-
-        // 顺序遍历(随机遍历)
-        start = System.currentTimeMillis();
-        for (int i = 0; i < linkedList.size(); i++) {
-            linkedList.get(i);
-        }
-        end = System.currentTimeMillis();
-        System.out.println("for：" + (end - start) + " ms");
-
-        // 另一种for循环遍历
-        start = System.currentTimeMillis();
-        for (Integer i : linkedList)
-            ;
-        end = System.currentTimeMillis();
-        System.out.println("for2：" + (end - start) + " ms");
-
-        // 通过pollFirst()或pollLast()来遍历LinkedList
-        LinkedList<Integer> temp1 = new LinkedList<>();
-        temp1.addAll(linkedList);
-        start = System.currentTimeMillis();
-        while (temp1.size() != 0) {
-            temp1.pollFirst();
-        }
-        end = System.currentTimeMillis();
-        System.out.println("pollFirst()或pollLast()：" + (end - start) + " ms");
-
-        // 通过removeFirst()或removeLast()来遍历LinkedList
-        LinkedList<Integer> temp2 = new LinkedList<>();
-        temp2.addAll(linkedList);
-        start = System.currentTimeMillis();
-        while (temp2.size() != 0) {
-            temp2.removeFirst();
-        }
-        end = System.currentTimeMillis();
-        System.out.println("removeFirst()或removeLast()：" + (end - start) + " ms");
-    }
+public interface RandomAccess {
 }
 ```
+
+查看源码我们发现实际上 `RandomAccess` 接口中没有任何方法与定义。可以把`RandomAccess` 接口理解为一个标识。
+
+标识什么？ **标识实现这个接口的类具有随机访问功能**。
+
+在 `binarySearch（)` 方法中，它要判断传入的 list 是否 `RamdomAccess` 的实例，如果是，调用`indexedBinarySearch()`方法，如果不是，那么调用`iteratorBinarySearch()`方法
+
+```java
+    public static <T>
+    int binarySearch(List<? extends Comparable<? super T>> list, T key) {
+        if (list instanceof RandomAccess || list.size()<BINARYSEARCH_THRESHOLD)
+            return Collections.indexedBinarySearch(list, key);
+        else
+            return Collections.iteratorBinarySearch(list, key);
+    }
+```
+
+`ArrayList` 实现了 `RandomAccess` 接口， 而 `LinkedList` 没有实现。为什么呢？我觉得还是和底层数据结构有关！`ArrayList` 底层是数组，而 `LinkedList` 底层是链表。数组天然支持随机访问，时间复杂度为 O(1)，所以称为快速随机访问。链表需要遍历到特定位置才能访问特定位置的元素，时间复杂度为 O(n)，所以不支持快速随机访问。，`ArrayList` 实现了 `RandomAccess` 接口，就表明了他具有快速随机访问功能。 `RandomAccess` 接口只是标识，并不是说 `ArrayList` 实现 `RandomAccess` 接口才具有快速随机访问功能的！
+
+## 参考
+
+[LinkedList源码分析（一）](https://juejin.im/post/6844903615811813384)
+
+[LinkedList源码分析（二）](https://juejin.im/post/6844903617904771085)
+

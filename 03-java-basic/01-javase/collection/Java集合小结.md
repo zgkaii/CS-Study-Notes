@@ -142,8 +142,6 @@ public interface RandomAccess {
 
 ## 2.3 ArrayList的扩容机制
 
-详见笔主的这篇文章：[通过源码一步一步分析 ArrayList 扩容机制](https://github.com/Snailclimb/JavaGuide/blob/master/docs/java/collection/ArrayList-Grow.md)
-
 # 3 Collection子接口之Set
 
 ### 3.1 比较 HashSet、LinkedHashSet 和 TreeSet 三者的异同

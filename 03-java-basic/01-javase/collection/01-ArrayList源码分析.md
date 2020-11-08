@@ -1,4 +1,4 @@
-## 1. AzrrayList 简介
+## 1. AzrrayList简介
 
 `java.util.ArrayList` 是一个**数组队列**，相当于 **动态数组**。与Java中的数组相比，它具有**容量能动态增长、元素增删慢、查找快**的特点。
 
