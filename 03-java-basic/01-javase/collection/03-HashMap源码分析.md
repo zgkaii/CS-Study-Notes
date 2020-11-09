@@ -1,70 +1,43 @@
 ## 1 HashMap简介
-HashMap 主要用来存放键值对，继承于AbstractMap，实现了Map、Cloneable、`java.io.Serializable`接口。
+HashMap 是一个散列表，它存储的内容是键值对(key-value)映射。它继承于AbstractMap，实现了Map、Cloneable、`java.io.Serializable`接口。
 
 <img src="https://img-blog.csdnimg.cn/20201108151702116.png" style="zoom: 80%;" />
 
 HashMap的实现是不同步的，这意味着**线程不安全**，在并发的环境中建议使用`ConcurrentHashMap`。
 
-HashMap的key、value都可以为null（除了不同步和允许使用 null 之外，HashMap 类与 Hashtable 大致相同）。此外，HashMap中的映射是**无序**的。
+HashMap的key、value都可以为null（除了不同步和允许使用 null 之外，HashMap与 Hashtable大致相同）。此外，HashMap中的映射是**无序**的。
 
-HashMap 的实例有两个参数影响其性能：“**初始容量**” 和 “**负载因子**”。容量是哈希表中桶的数量，初始容量只是哈希表在创建时的容量。
+HashMap 的实例有两个参数影响其性能：“**初始容量**” 和 “**加载因子**”。容量是哈希表中桶的数量，初始容量只是哈希表在创建时的容量。
 
-负载因子是哈希表在其容量自动增加之前可以达到多满的一种尺度。当哈希表中的条目数超出了负载因子与当前容量的乘积时，则要对
+加载因子是哈希表在其容量自动增加之前可以达到多满的一种尺度。当哈希表中的条目数超出了加载因子与当前容量的乘积时，则要对
 
 该哈希表进行 rehash 操作（即重建内部数据结构），从而哈希表将具有大约两倍的桶数。
 
-通常，**默认负载因子是0.75**，这是在时间和空间成本上寻求一种折衷。负载因子过高虽然减少了空间开销，但同时也增加了查询成本
+通常，**默认加载因子是0.75**，这是在时间和空间成本上寻求一种折衷。加载因子过高虽然减少了空间开销，但同时也增加了查询成本
 
 （大多数 HashMap 类的操作中，包括 get 和 put 操作，都反映了这一点）。在设置初始容量时应该考虑到映射中所需的条目数及其
 
-负载因子，以便最大限度地减少 rehash 操作次数。如果初始容量大于最大条目数除以负载因子，则不会发生 rehash 操作。
+加载因子，以便最大限度地减少 rehash 操作次数。如果初始容量大于最大条目数除以加载因子，则不会发生 rehash 操作。
 
 ## 2 底层数据结构
 
-### 2.1 JDK1.8之前
+### 2.1 JDK1.7
 
-JDK1.8 之前 HashMap 底层是 **数组+链表** 结合在一起使用的**链表散列**。**HashMap 通过 key 的 hashCode 经过扰动函数处理过后得到 hash  值，然后通过 `(n - 1) & hash` 判断当前元素存放的位置（这里的 n 指的是数组的长度），如果当前位置存在元素的话，就判断该元素与要存入的元素的 hash 值以及 key 是否相同，如果相同的话，直接覆盖，不相同就通过拉链法解决冲突。**
+JDK1.7中HashMap是**数组+链表**结合在一起使用的**链表散列**。HashMap 定义了扰动函数`hash()`来减少碰撞，当两个不同元素经过计算发现在数组中的位置一样时，就通过拉链法解决冲突。
 
-**所谓扰动函数指的就是 HashMap 的 hash 方法。使用 hash 方法也就是扰动函数是为了防止一些实现比较差的 hashCode() 方法 换句话说使用扰动函数之后可以减少碰撞。**
+所谓 **“拉链法”** 就是，将链表和数组相结合。也就是说创建一个链表数组，数组中每一格就是一个链表。若遇到哈希冲突，则将冲突的值加到链表中即可。
 
-JDK 1.8 HashMap 的 hash 方法源码：
+![](https://img-blog.csdnimg.cn/20201109212426593.png)
 
-  ```java
-      static final int hash(Object key) {
-        int h;
-        // key.hashCode()：返回散列值也就是hashcode
-        // ^ ：按位异或
-        // >>>:无符号右移，忽略符号位，空位都以0补齐
-        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
-    
-  ```
+HashMap 在JDK1.7中详细实现可参考[深入理解HashMap（jdk7）](https://juejin.im/post/6844903903595593741)一文。
 
-对比一下 JDK1.7的 HashMap 的 hash 方法源码：
+### 2.2 JDK1.8
 
-```java
-static int hash(int h) {
-    // This function ensures that hashCodes that differ only by
-    // constant multiples at each bit position have a bounded
-    // number of collisions (approximately 8 at default load factor).
+如果位于链表中的结点过多，那么很显然通过key值依次查找效率就太低了。因此JDK1.8在解决哈希冲突时有了较大的变化，**当链表长度大于阈值（默认为8）时，将链表转化为红黑树**，以减少搜索时间。
 
-    h ^= (h >>> 20) ^ (h >>> 12);
-    return h ^ (h >>> 7) ^ (h >>> 4);
-}
-```
+也就是说，JDK1.8之后，HashMap底层数据结构是**数组+链表+红黑树**。
 
-JDK 1.8 的 hash方法 相比于 JDK 1.7 hash 方法更加简化，但是原理不变。相比于 JDK1.8 的 hash 方法 ，JDK 1.7 的 hash 方法的性能会稍差一点点，因为毕竟扰动了 4 次。
-
-所谓 **“拉链法”** 就是：将链表和数组相结合。也就是说创建一个链表数组，数组中每一格就是一个链表。若遇到哈希冲突，则将冲突的值加到链表中即可。
-
-![](https://img-blog.csdnimg.cn/20201108215735285.png)
-
-### 2.2 JDK1.8之后
-
-JDK1.8在解决哈希冲突时有了较大的变化，**当链表长度大于阈值（默认为8）时，将链表转化为红黑树**，以减少搜索时间。也就是说，JDK1.8之后，HashMap底层数据结构是**数组+链表+红黑树**。
-
-![](https://img-blog.csdnimg.cn/20201108215815798.png)
-
-查看源码，HashMap内部包含了一个 Node 类型的数组 table，Node存储着键值对。
+![](https://img-blog.csdnimg.cn/20201109213850718.png)
 
 **Node节点类源码:**
 
@@ -72,10 +45,10 @@ JDK1.8在解决哈希冲突时有了较大的变化，**当链表长度大于阈
 // 继承自 Map.Entry<K,V>
 static class Node<K,V> implements Map.Entry<K,V> {
        final int hash;// 哈希值，存放元素到hashmap中时用来与其他元素hash值比较
-       final K key;//键
-       V value;//值
+       final K key;// 键
+       V value;// 值
        // 指向下一个节点
-       Node<K,V> next;
+       Node<K,V> next;// 链表的next指针
        Node(int hash, K key, V value, Node<K,V> next) {
             this.hash = hash;
             this.key = key;
@@ -109,35 +82,31 @@ static class Node<K,V> implements Map.Entry<K,V> {
         }
 }
 ```
-**树节点类源码:**
+**TreeNode节点类源码:**
 
 ```java
-     static final class TreeNode<K,V> extends LinkedHashMap.Entry<K,V> {
-        TreeNode<K,V> parent;  // 父
-        TreeNode<K,V> left;    // 左
-        TreeNode<K,V> right;   // 右
+    // 转变为红黑树后的结点类
+	static final class TreeNode<K,V> extends LinkedHashMap.Entry<K,V> {
+        TreeNode<K,V> parent;  // 父节点
+        TreeNode<K,V> left;    // 左子树
+        TreeNode<K,V> right;   // 右子树
         TreeNode<K,V> prev;    // needed to unlink next upon deletion
-        boolean red;           // 判断颜色
+        boolean red;		   // 判断颜色
         TreeNode(int hash, K key, V val, Node<K,V> next) {
             super(hash, key, val, next);
         }
-
-        /**
-         * Returns root of tree containing this node.
-         */
+		// 返回当前节点的根节点
         final TreeNode<K,V> root() {
             for (TreeNode<K,V> r = this, p;;) {
                 if ((p = r.parent) == null)
                     return r;
                 r = p;
             }
-        }      
+        }    
+        --- omit ---
+    }
 ```
-因此，HashMap存储结构如下：
-
-![](https://img-blog.csdnimg.cn/20201108220337563.png)
-
-## 3 HashMap源码分析
+## 3 HashMap源码分析（JDK 1.8）
 
 ### 3.1 静态属性
 
@@ -148,11 +117,11 @@ static class Node<K,V> implements Map.Entry<K,V> {
     static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;   
     // 最大容量
     static final int MAXIMUM_CAPACITY = 1 << 30; 
-    // 默认的负载因子
+    // 默认的加载因子
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    // 树化阈值。当桶(bucket)上的结点数大于这个值时会转成红黑树
+    // 树化阈值。当上某个桶(bucket)的结点数大于这个值时会转成红黑树
     static final int TREEIFY_THRESHOLD = 8; 
-    //  链表还原阈值。当桶(bucket)上的结点数小于这个值时树转链表
+    // 链表还原阈值。当某个桶(bucket)上的结点数小于这个值时树转链表
     static final int UNTREEIFY_THRESHOLD = 6;
     // 桶中结构转化为红黑树对应的table的最小大小
     static final int MIN_TREEIFY_CAPACITY = 64;
@@ -161,33 +130,33 @@ static class Node<K,V> implements Map.Entry<K,V> {
 ### 3.2 成员属性
 
 ```java
-    // 存储元素的数组，总是2的幂次倍
+    // 哈希桶数组
     transient Node<k,v>[] table; 
-    // 存放具体元素的集
+    // 保存缓存的entrySet
     transient Set<map.entry<k,v>> entrySet;
-    // 存放元素的个数，注意这个不等于数组的长度。
+    // 桶的实际元素个数 != table.length。
     transient int size;
-    // 每次扩容和更改map结构的计数器
+    // 每次扩容和更改map结构的计数器都会+1
     transient int modCount;   
-    // 临界值 当实际大小(容量*负载因子)超过临界值时，会进行扩容
+    // 临界值，当实际大小(容量*加载因子)超过临界值时，会进行扩容
     int threshold;
-    // 负载因子
+    // 加载因子
     final float loadFactor;
 ```
 
-- **loadFactor负载因子**
+- **loadFactor加载因子**
 
-  loadFactor负载因子是控制数组存放数据的疏密程度，loadFactor越趋近于1，那么   数组中存放的数据(entry)也就越多，也就越密，也就是会让链表的长度增加，loadFactor越小，也就是趋近于0，数组中存放的数据(entry)也就越少，也就越稀疏。
+  loadFactor加载因子是控制数组存放数据的疏密程度，loadFactor越趋近于1，那么   数组中存放的数据(entry)也就越多，也就越密，也就是会让链表的长度增加，loadFactor越小，也就是趋近于0，数组中存放的数据(entry)也就越少，也就越稀疏。
 
   **loadFactor太大导致查找元素效率低，太小导致数组的利用率低，存放的数据会很分散。loadFactor的默认值为0.75f是官方给出的一个比较好的临界值**。 
 
-  给定的默认容量为 16，负载因子为 0.75。Map 在使用过程中不断的往里面存放数据，当数量达到了 16 * 0.75 = 12 就需要将当前 16 的容量进行扩容，而扩容这个过程涉及到 rehash、复制数据等操作，所以非常消耗性能。
+  给定的默认容量为 16，加载因子为 0.75。Map 在使用过程中不断的往里面存放数据，当数量达到了 16 * 0.75 = 12 就需要将当前 16 的容量进行扩容，而扩容这个过程涉及到 rehash、复制数据等操作，所以非常消耗性能。
 
 - **threshold**
 
   **threshold = capacity * loadFactor**，**当Size>=threshold**的时候，那么就要考虑对数组的扩增了，也就是说，这个的意思就是**衡量数组是否需要扩增的一个标准**。
 
-### 3.1 构造方法
+### 3.3 构造方法
 
 HashMap 中有四个构造方法，它们分别如下：
 
@@ -197,7 +166,7 @@ HashMap 中有四个构造方法，它们分别如下：
         this.loadFactor = DEFAULT_LOAD_FACTOR;
      }
      
-     // 包含另一个“Map”的构造函数
+     // 调用putMapEntries将Map中的值加入新的Map集合中
      public HashMap(Map<? extends K, ? extends V> m) {
          this.loadFactor = DEFAULT_LOAD_FACTOR;
          putMapEntries(m, false);// 在构造函数使用的时候是false其他时候是true
@@ -208,7 +177,7 @@ HashMap 中有四个构造方法，它们分别如下：
          this(initialCapacity, DEFAULT_LOAD_FACTOR);
      }
      
-     // 指定“容量大小”和“负载因子”的构造函数
+     // 指定“容量大小”和“加载因子”的构造函数
      public HashMap(int initialCapacity, float loadFactor) {
          if (initialCapacity < 0)
              throw new IllegalArgumentException("Illegal initial capacity: " + initialCapacity);
@@ -217,42 +186,32 @@ HashMap 中有四个构造方法，它们分别如下：
          if (loadFactor <= 0 || Float.isNaN(loadFactor))
              throw new IllegalArgumentException("Illegal load factor: " + loadFactor);
          this.loadFactor = loadFactor;
-         this.threshold = tableSizeFor(initialCapacity);
+         this.threshold = tableSizeFor(initialCapacity);// 临界值为大于initialCapacity的最小二次幂。
      }
 ```
 
-可以发现， loadFactor 一定会在构造方法中被初始化。
+可以发现，不论是哪个构造构造方法，loadFactor一定会被初始化的。
 
-带参构造方法主要做的就是对 initialCapacity 和 loadFactor 的校验工作，并且会通过 tableSizeFor 方法计算其合理的初始容量，由于此时 table 数组尚未实例化，所以该合理的初始容量被暂存在 threshold 属性中，由其代为保管。
+第二个构造方法是将传入的Map集合元素添加到Map实例中，源码如下：
 
 ```java
-// 返回2的整数次幂作为容量
-static final int tableSizeFor(int cap) {
-    int n = cap - 1;
-    n |= n >>> 1;
-    n |= n >>> 2;
-    n |= n >>> 4;
-    n |= n >>> 8;
-    n |= n >>> 16;
-    return (n < 0) ? 1 : (n >= MAXIMUM_CAPACITY) ? MAXIMUM_CAPACITY : n + 1;
-}
-
+// 传递的Map集合中的所有元素加入本Map实例中
 final void putMapEntries(Map<? extends K, ? extends V> m, boolean evict) {
-    // 获取传入的Map的长度
+    // 传入Map实际元素个数
     int s = m.size();
     if (s > 0) {
         // 判断table是否已经初始化
-        if (table == null) { // pre-size
-            // 计算传进来的map的长度是否要达到阈值，因为会计算出小数因此+1.0F向上取整
-            // 未初始化，s为m的实际元素个数
+        if (table == null) {
+            // 计算传进来的map的实际元素个数ft = m.size() / 0.75 + 1，因为会计算出小数因此+1.0F向上取整
             float ft = ((float)s / loadFactor) + 1.0F;
+            // 判断ft是否小于最大容量
             int t = ((ft < (float)MAXIMUM_CAPACITY) ?
                     (int)ft : MAXIMUM_CAPACITY);
-            // 计算得到的t大于阈值，则初始化阈值
+            // 计算得到的t大于临界值，则重新计算阈值
             if (t > threshold)
                 threshold = tableSizeFor(t);
         }
-        // 已初始化，并且m元素个数大于阈值，进行扩容处理
+        // 已初始化，并且m中元素个数大于阈值，进行扩容处理
         else if (s > threshold)
             resize();
         // 遍历，将m中的所有元素添加至HashMap中
@@ -264,13 +223,94 @@ final void putMapEntries(Map<? extends K, ? extends V> m, boolean evict) {
     }
 }
 ```
-### 3.2 put方法
+**tableSizeFor(int cap)方法**：
 
-HashMap只提供了put用于添加元素，putVal方法只是给put方法调用的一个方法，并没有提供给用户使用。
+tableSizeFor(int cap) 静态方法的作用是计算其合理的初始容量，也就是满足 2 的幂，且大于等于参数 cap，最接近的那一个数即可。
+
+```java
+// 返回大于cap的最小的二次幂数值
+static final int tableSizeFor(int cap) {
+    int n = cap - 1;
+    n |= n >>> 1;
+    n |= n >>> 2;
+    n |= n >>> 4;
+    n |= n >>> 8;
+    n |= n >>> 16;
+    // n<0返回1
+    // n>最大容量，返回最大容量MAXIMUM_CAPACITY
+    // 否则返回n+1
+    return (n < 0) ? 1 : (n >= MAXIMUM_CAPACITY) ? MAXIMUM_CAPACITY : n + 1;
+}
+```
+
+**这里为什么` cap - 1`呢？**
+
+==待解决==
+
+
+
+### 3.4 确定数组索引位置
+
+不管增加、删除、查找键值对，定位到哈希桶数组的位置都是很关键的第一步。
+
+HashMap先是通过扰动函数`hash(Object key)`处理key的hashCode而得到其hash 值，然后通过 `(n - 1) & hash` 判断当前元素存放的位置（这里的 n 指的是数组的长度）。
+
+#### 3.4.1 hash(Object key) 
+
+该方法是 HashMap 的核心静态方法，用于计算 key 的 hash 值。我们在使用HashMap存放数据时，当然希望元素位置分布均匀一点。而使用hash算法计算位置的时，可以直接确定位置，不用遍历链表，大大优化了查询的效率。
+
+JDK 1.8 HashMap 的 hash 方法源码：
+
+  ```java
+    // 通过位运算减少 Hash 冲突  
+	static final int hash(Object key) {
+        int h;
+        // key.hashCode()  返回散列值
+        // h ^ (h >>> 16)  高位参与运算
+        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+  ```
+
+key.hashCode()函数调用的是key键值类型自带的哈希函数`public native int hashCode();`，返回的hashcode是int类型。如果直接拿散列值做数组下标，那么索引范围就是‑2147483648到2147483648，前后加起来大概40亿的映射空间，很难出现碰撞。问题是默认的初始容量最大才16，这就说明散列值是不能直接用来访问。
+
+实际上，散列值使用前需要对数组长度取模运算，到的余数才能用来访问数组下标。源码中模运算是在这个indexFor( )函数里完成。
+
+
+
+
+
+
+
+
+
+对比一下 JDK1.7的 HashMap 的 hash 方法源码：
+
+```java
+static int hash(int h) {
+
+    h ^= (h >>> 20) ^ (h >>> 12);
+    return h ^ (h >>> 7) ^ (h >>> 4);
+}
+```
+
+JDK 1.8 的 hash方法 相比于 JDK 1.7 hash 方法更加简化，但是原理不变。JDK 1.7 的 hash 方法的性能会稍差一点点，毕竟扰动了 4 次。
+
+至于hash方法原理，强烈推荐[全网把Map中的hash()分析的最透彻的文章，别无二家](https://www.hollischuang.com/archives/2091)一文。
+
+#### 3.4.2 桶下标计算公式
+
+计算桶下标时，需要先通过 HashMap 内部的 hash() 方法计算其 hash 值，然后将 hash 值对桶个数取模，即：
+
+`hash % capacity` 如果能保证 capacity 为 2 的幂，那么就可以将这个操作转换为高效的位运算，也就是 HashMap 源码中的桶下标计算公式：
+
+`(capacity - 1) & hash` 以上便是 HashMap 内部数组的容量为 2 的幂的其中一个原因，另一个原因是在 resize() 扩容方法中可以更高效的重新计算桶下标。
+
+### 3.5 put方法
+
+put方法中调用了putVal方法，传递的参数是调用了hash()方法计算key的hash值，主要逻辑在putVal中。
 
 **对putVal方法添加元素的分析如下：**
 
-- 如果定位到的数组位置没有元素 就直接插入。
+- 如果定位到的数组位置没有元素就直接插入。
 - 如果定位到的数组位置有元素就和要插入的key比较，如果key相同就直接覆盖，如果key不相同，就判断p是否是一个树节点，如果是就调用`e = ((TreeNode<K,V>)p).putTreeVal(this, tab, hash, key, value)`将元素添加进入。如果不是就遍历链表插入(插入的是链表尾部)。
 
 ```java
@@ -347,7 +387,7 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
 } 
 ```
 
-### 3.3 get方法
+### 3.6 get方法
 ```java
 public V get(Object key) {
     Node<K,V> e;
@@ -378,7 +418,7 @@ final Node<K,V> getNode(int hash, Object key) {
     return null;
 }
 ```
-### 3.4 resize方法
+### 3.7 resize方法
 进行扩容，会伴随着一次重新hash分配，并且会遍历hash表中所有的元素，是非常耗时的。在编写程序中，要尽量避免resize。
 ```java
 final Node<K,V>[] resize() {
@@ -620,3 +660,11 @@ public class HashMapDemo {
 [Java 集合系列10之 HashMap详细介绍(源码解析)和使用示例](https://www.cnblogs.com/skywang12345/p/3310835.html)
 
 [HashMap(JDK1.8)源码+底层数据结构分析](https://github.com/Snailclimb/JavaGuide/blob/master/docs/java/collection/HashMap(JDK1.8)%E6%BA%90%E7%A0%81%2B%E5%BA%95%E5%B1%82%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90.md)
+
+[深入理解HashMap（jdk7）](https://juejin.im/post/6844903903595593741)
+
+[全网把Map中的hash()分析的最透彻的文章，别无二家](https://www.hollischuang.com/archives/2091)
+
+[JDK1.8中HashMap的hash算法和寻址算法](https://www.cnblogs.com/eycuii/p/12015283.html)
+
+[HashMap 的 7 种遍历方式与性能分析！](https://juejin.im/post/6844904144331866119)
