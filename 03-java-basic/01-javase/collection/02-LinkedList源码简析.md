@@ -44,7 +44,7 @@ transient Node<E> last;
     }
 ```
 
-LinkedList的结构图：
+因此LinkedList的结构如下：
 
 ![](https://img-blog.csdnimg.cn/20201108111340847.png)
 
@@ -79,9 +79,9 @@ public LinkedList(Collection<? extends E> c) {
      * 链接使e作为最后一个元素。
      */
     void linkLast(E e) {
-        // 取出尾节点
+        // 找到当前尾节点
         final Node<E> l = last;
-        // 根据传入的元素构建新节点，这个节点前置节点是上一个尾节点
+        // 构建新节点，这个节点的前驱节点是上一个尾节点
         final Node<E> newNode = new Node<>(l, e, null);
         // 新创建的节点作为当前链表的尾节点
         last = newNode;
@@ -101,24 +101,24 @@ public void add(int index, E element) {
         if (index == size)
             linkLast(element);// 添加在链表尾部
         else 
-            linkBefore(element, node(index));// 插入到index所在位置的节点的前面
+            linkBefore(element, node(index));// 插入到index所指位置的节点前面
     }
 	
 	/**
 	 * 将新节点插入到指定节点前面
 	 */
     void linkBefore(E e, Node<E> succ) {
-        // 取出查找到指定位置的节点
+        // 取出指定位置的前一个节点
         final Node<E> pred = succ.prev;
-        // 构建新节点，前置节点找到节点的原前置节点，e 是元素值，后置节点是根据位置找到的 succ
+        // 构建新节点，pred指定位置的前驱节点，succ指定位置，e是添加的元素
         final Node<E> newNode = new Node<>(pred, e, succ);
-        // // 原位置的前置节点设置为要插入的节点。
+        // 指定节点的前驱节点指向要插入的节点。
         succ.prev = newNode;
-        // 如果原位置的前置节点为空，即原位置 succ 是头节点，即 add(0 ,E )然后把新建节点赋值为头节点
+        // 如果指定位置的前驱节点为空，即指定位置succ是头节点，即newNode设为头节点
         if (pred == null)
             first = newNode;
         else
-            pred.next = newNode; // 不为空，原位置的前置节点的后置节点设置为新节点。
+            pred.next = newNode; // 不为空，原位置的前驱节点的后置节点设置为新节点。
         size++;
         modCount++;
     }
@@ -132,7 +132,7 @@ public void add(int index, E element) {
         return index >= 0 && index <= size;// 检查索引index是否处于[0-size]之间
     }
 ```
-**addAll(Collection  c )：将集合插入到链表尾部**
+**addAll(Collection  c )**：将集合元素插入到链表中
 
 ```java
 public boolean addAll(Collection<? extends E> c) {
@@ -143,7 +143,7 @@ public boolean addAll(int index, Collection<? extends E> c) {
         // 1、检查index范围是否在size之内
         checkPositionIndex(index);
 
-        // 2、toArray()方法把集合的数据存到对象数组中
+        // 2、把集合的数据存到对象数组中
         Object[] a = c.toArray();
         int numNew = a.length;
         if (numNew == 0)
@@ -169,9 +169,11 @@ public boolean addAll(int index, Collection<? extends E> c) {
             Node<E> newNode = new Node<>(pred, e, null);
             // 如果插入位置在链表头部
             if (pred == null)
+                // 把前一个节点向后指向newNode
                 first = newNode;
             else
                 pred.next = newNode;
+            // 在if-else之外，如果没有这语句，pred节点就固定是那一个节点，所以需要在每一次循环内更换节点
             pred = newNode;
         }
 
@@ -179,7 +181,7 @@ public boolean addAll(int index, Collection<? extends E> c) {
         if (succ == null) {
             last = pred;
         }
-        // 否则，将插入的链表与先前链表连接起来
+        // 插入的链表与先前链表连接起来
         else {
             pred.next = succ;
             succ.prev = pred;
@@ -198,13 +200,15 @@ public boolean addAll(int index, Collection<? extends E> c) {
     }
 
 private void linkFirst(E e) {
+    	// 找到当前头节点
         final Node<E> f = first;
-        final Node<E> newNode = new Node<>(null, e, f);//新建节点，以头节点为后继节点
-        first = newNode;
-        //如果链表为空，last节点也指向该节点
+        final Node<E> newNode = new Node<>(null, e, f);// 新建节点，以之前头节点为后继节点
+        // 新节点为头节点
+    	first = newNode;
+        // 如果链表为空，last节点也指向新节点
         if (f == null)
             last = newNode;
-        //否则，将头节点的前驱指针指向新节点，也就是指向前一个元素
+        // 否则，将之前头节点的前驱指针指向新节点，也就是指向前一个元素
         else
             f.prev = newNode;
         size++;
@@ -212,6 +216,7 @@ private void linkFirst(E e) {
     }
 ```
 **addLast(E e)：** 将元素添加到链表尾部，与 **add(E e)** 方法一样
+
 ```java
 public void addLast(E e) {
         linkLast(e);
@@ -221,7 +226,7 @@ public void addLast(E e) {
 **get(int index)：** 根据指定索引返回数据
 ```java
 public E get(int index) {
-        // 检查index 是否在合法位置
+        // 检查index是否在合法位置
         checkElementIndex(index);
         // 调用Node(index)去找到index对应的node然后返回它的值item
         return node(index).item;
@@ -250,11 +255,12 @@ public E peekFirst() {
      }
 ```
 **区别：**
-getFirst(),element(),peek(),peekFirst()
-这四个获取头结点方法的区别在于对链表为空时的处理，是抛出异常还是返回null，其中**getFirst()** 和**element()** 方法将会在链表为空时，抛出异常
+**getFirst()** 和**element()** 方法将会在链表为空时，抛出异常；
 
-element()方法的内部就是使用getFirst()实现的。它们会在链表为空时，抛出NoSuchElementException  
+**element()**方法的内部就是使用**getFirst()**实现的。它们会在链表为空时，抛出NoSuchElementException 。
+
 **获取尾节点（index=-1）数据方法:**
+
 ```java
  public E getLast() {
         final Node<E> l = last;
@@ -268,57 +274,12 @@ element()方法的内部就是使用getFirst()实现的。它们会在链表为�
     }
 ```
 **两者区别：**
-**getLast()** 方法在链表为空时，会抛出**NoSuchElementException**，而**peekLast()** 则不会，只是会返回 **null**。
+**getLast()** 方法在链表为空时，会抛出**NoSuchElementException**；而**peekLast()** 只是会返回 **null**。
 
-**根据对象得到索引的方法**
-
-**int indexOf(Object o)：** 从头遍历找
-```java
-public int indexOf(Object o) {
-        int index = 0;
-        if (o == null) {
-            //从头遍历
-            for (Node<E> x = first; x != null; x = x.next) {
-                if (x.item == null)
-                    return index;
-                index++;
-            }
-        } else {
-            //从头遍历
-            for (Node<E> x = first; x != null; x = x.next) {
-                if (o.equals(x.item))
-                    return index;
-                index++;
-            }
-        }
-        return -1;
-    }
-```
-**int lastIndexOf(Object o)：** 从尾遍历找
-```java
-public int lastIndexOf(Object o) {
-        int index = size;
-        if (o == null) {
-            //从尾遍历
-            for (Node<E> x = last; x != null; x = x.prev) {
-                index--;
-                if (x.item == null)
-                    return index;
-            }
-        } else {
-            //从尾遍历
-            for (Node<E> x = last; x != null; x = x.prev) {
-                index--;
-                if (o.equals(x.item))
-                    return index;
-            }
-        }
-        return -1;
-    }
-```
 ### 4.3 删除元素
-**remove()** ,**removeFirst(),pop():** 删除头节点
-```
+**remove()** 、**removeFirst()、pop():** 删除头节点
+
+```java
 public E pop() {
         return removeFirst();
     }
@@ -332,7 +293,8 @@ public E removeFirst() {
         return unlinkFirst(f);
     }
 ```
-**removeLast(),pollLast():** 删除尾节点
+**removeLast()、pollLast():** 删除尾节点
+
 ```java
 public E removeLast() {
         final Node<E> l = last;
@@ -345,28 +307,29 @@ public E pollLast() {
         return (l == null) ? null : unlinkLast(l);
     }
 ```
-**区别：** removeLast()在链表为空时将抛出NoSuchElementException，而pollLast()方法返回null。
+**区别：** removeLast()在链表为空时将抛出NoSuchElementException；pollLast()方法返回null。
 
 **remove(Object o):** 删除指定元素
+
 ```java
 public boolean remove(Object o) {
-        //如果删除对象为null
+        // 如果要删除对象为null
         if (o == null) {
-            //从头开始遍历
+            // 从头开始遍历
             for (Node<E> x = first; x != null; x = x.next) {
-                //找到元素
+                // 找到元素
                 if (x.item == null) {
-                   //从链表中移除找到的元素
+                   // 从链表中移除找到的元素
                     unlink(x);
                     return true;
                 }
             }
         } else {
-            //从头开始遍历
+            // 从头开始遍历
             for (Node<E> x = first; x != null; x = x.next) {
-                //找到元素
+                // 找到元素
                 if (o.equals(x.item)) {
-                    //从链表中移除找到的元素
+                    // 从链表中移除找到的元素
                     unlink(x);
                     return true;
                 }
@@ -377,30 +340,36 @@ public boolean remove(Object o) {
 ```
 当删除指定对象时，只需调用remove(Object o)即可，不过该方法一次只会删除一个匹配的对象，如果删除了匹配对象，返回true，否则false。
 
-unlink(Node<E> x) 方法：
+**unlink(Node<E> x)** 方法：删除指定节点
+
 ```java
 E unlink(Node<E> x) {
-        // assert x != null;
         final E element = x.item;
-        final Node<E> next = x.next;//得到后继节点
-        final Node<E> prev = x.prev;//得到前驱节点
+    	// 得到x的后继节点
+        final Node<E> next = x.next;
+    	// 得到x的前驱节点
+        final Node<E> prev = x.prev;
 
-        //删除前驱指针
+    	// x是头节点
         if (prev == null) {
-            first = next;//如果删除的节点是头节点,令头节点指向该节点的后继节点
+            // 如果删除的节点是头节点,令头节点指向该节点的后继节点
+            first = next;
         } else {
-            prev.next = next;//将前驱节点的后继节点指向后继节点
+            // 将前驱节点的后继节点指向x的后继节点
+            prev.next = next;
+            // 删除x的前指向
             x.prev = null;
         }
 
-        //删除后继指针
+        // x是尾节点
         if (next == null) {
-            last = prev;//如果删除的节点是尾节点,令尾节点指向该节点的前驱节点
+            last = prev;// 如果删除的节点是尾节点,令尾节点指向该节点的前驱节点
         } else {
             next.prev = prev;
             x.next = null;
         }
-
+		
+    	// 删除指定节点内容
         x.item = null;
         size--;
         modCount++;
@@ -410,54 +379,40 @@ E unlink(Node<E> x) {
 **remove(int index)**：删除指定位置的元素
 ```java
 public E remove(int index) {
-        //检查index范围
+        // 检查index范围
         checkElementIndex(index);
-        //将节点删除
+        // 将节点删除
         return unlink(node(index));
     }
 ```
-## 5 Arraylist与LinkedList异同
+### 4.4 修改元素
 
-1. **是否保证线程安全：** `ArrayList` 和 `LinkedList` 都是不同步的，都不保证线程安全；
-2. **底层数据结构：** `Arraylist` 底层使用的是 **`Object` 数组**；`LinkedList` 底层使用的是 **双向链表** 数据结构（JDK1.6 之前为循环链表，JDK1.7 取消了循环。）
-3. **插入和删除是否受元素位置的影响：** ① **`ArrayList` 采用数组存储，所以插入和删除元素的时间复杂度受元素位置的影响。** 比如：执行`add(E e)`方法的时候， `ArrayList` 会默认在将指定的元素追加到此列表的末尾，这种情况时间复杂度就是 O(1)。但是如果要在指定位置 i 插入和删除元素的话（`add(int index, E element)`）时间复杂度就为 O(n-i)。因为在进行上述操作的时候集合中第 i 和第 i 个元素之后的(n-i)个元素都要执行向后位/向前移一位的操作。 ② **`LinkedList` 采用链表存储，所以对于`add(E e)`方法的插入，删除元素时间复杂度不受元素位置的影响，近似 O(1)，如果是要在指定位置`i`插入和删除元素的话（`(add(int index, E element)`） 时间复杂度近似为`o(n))`因为需要先移动到指定位置再插入。**
-4. **是否支持快速随机访问：** `LinkedList` 不支持高效的随机元素访问，而 `ArrayList` 支持。快速随机访问就是通过元素的序号快速获取元素对象(对应于`get(int index)`方法)。
-5. **内存空间占用：** ArrayList 的空 间浪费主要体现在在 list 列表的结尾会预留一定的容量空间，而 LinkedList 的空间花费则体现在它的每一个元素都需要消耗比 ArrayList 更多的空间（因为要存放直接后继和直接前驱以及数据）。
-
-### 5.1 双向链表与双向循环链表
-
-**双向链表：** 包含两个指针，一个 prev 指向前一个节点，一个 next 指向后一个节点。
-
-![](https://img-blog.csdnimg.cn/20201107160432215.png)
-
-**双向循环链表：** 最后一个节点的 next 指向 head，而 head 的 prev 指向最后一个节点，构成一个环。
-
-![](https://img-blog.csdnimg.cn/20201107160457158.png)
-
-### 5.2 RandomAccess 接口
+set(int index, E element)方法：修改指定节点元素
 
 ```java
-public interface RandomAccess {
-}
-```
-
-查看源码我们发现实际上 `RandomAccess` 接口中没有任何方法与定义。可以把`RandomAccess` 接口理解为一个标识。
-
-标识什么？ **标识实现这个接口的类具有随机访问功能**。
-
-在 `binarySearch（)` 方法中，它要判断传入的 list 是否 `RamdomAccess` 的实例，如果是，调用`indexedBinarySearch()`方法，如果不是，那么调用`iteratorBinarySearch()`方法
-
-```java
-    public static <T>
-    int binarySearch(List<? extends Comparable<? super T>> list, T key) {
-        if (list instanceof RandomAccess || list.size()<BINARYSEARCH_THRESHOLD)
-            return Collections.indexedBinarySearch(list, key);
-        else
-            return Collections.iteratorBinarySearch(list, key);
+    public E set(int index, E element) {
+        // 检查是否越界
+        checkElementIndex(index);
+        // 根据索引查找节点
+        Node<E> x = node(index);
+        // oldVal存放需要改变的内容
+        E oldVal = x.item;
+        x.item = element;
+        // 返回改变前的值
+        return oldVal;
     }
 ```
 
-`ArrayList` 实现了 `RandomAccess` 接口， 而 `LinkedList` 没有实现。为什么呢？我觉得还是和底层数据结构有关！`ArrayList` 底层是数组，而 `LinkedList` 底层是链表。数组天然支持随机访问，时间复杂度为 O(1)，所以称为快速随机访问。链表需要遍历到特定位置才能访问特定位置的元素，时间复杂度为 O(n)，所以不支持快速随机访问。，`ArrayList` 实现了 `RandomAccess` 接口，就表明了他具有快速随机访问功能。 `RandomAccess` 接口只是标识，并不是说 `ArrayList` 实现 `RandomAccess` 接口才具有快速随机访问功能的！
+## 5 ArrayList与LinkedList异同
+
+| 异同                           | ArrayList                                       | LinkedList                                           |
+| ------------------------------ | ----------------------------------------------- | ---------------------------------------------------- |
+| 是否保证线程安全               | 否                                              | 否                                                   |
+| 插入和删除是否受元素位置的影响 | 是                                              | 否                                                   |
+| 是否支持快速随机访问           | 是                                              | 否                                                   |
+| 是否实现了RandomAccess接口     | 是                                              | 否                                                   |
+| 底层数据结构                   | Object数组                                      | 双向链表（JDK1.6 之前为循环链表，JDK1.7 取消了循环） |
+| 内存空间占用                   | 扩容机制导致list 列表的结尾会预留一定的容量空间 | 每一个元素都需额外消耗存放后继/前驱的空间            |
 
 ## 参考
 
