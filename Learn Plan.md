@@ -1,10 +1,10 @@
-## 写在最前 
+写在最前 
 
 [John Washam](https://startupnextdoor.com/author/john/) 记录了从Web开发者（自学、非计算机科学学位）蜕变至 Google软件工程师所制定的学习历程[coding-interview-university](https://github.com/jwasham/coding-interview-university)。
 
 ![白板上编程 ———— 来自 HBO 频道的剧集，“硅谷”](https://d3j2pkmjtin6ou.cloudfront.net/coding-at-the-whiteboard-silicon-valley.png)
 
-受其启发，我根据自身情况及诉求，也制定了学习计划。希望通过接下来一段时间的学习，打通任督二脉，对计算机科学有体系的理解，能够获取BAT独角兽公司的Offer，然后逐渐蜕变为一位优秀的软件工程师。
+受其启发，我根据自身情况及诉求，也制定了学习计划。希望通过接下来一段时间的学习，打通任督二脉，对计算机科学有体系的理解，然后逐渐蜕变为一位优秀的软件工程师。
 
 ## 正式开始之前
 
@@ -130,12 +130,12 @@ John Washam的抽认卡网站：
 
 视频推荐：
 
-- [ ] [王道考研 计算机网络](https://www.bilibili.com/video/BV19E411D78Q)
+* [计算机网络](https://www.bilibili.com/video/BV19E411D78Q)
 
-- [ ] [王道考研 计算机组成原理](https://www.bilibili.com/video/BV1BE411D7ii)
+* [计算机组成原理](https://www.bilibili.com/video/BV1BE411D7ii)
 
-- [ ] [王道考研 操作系统](https://www.bilibili.com/video/BV1YE411D7nH)
-- [ ] [信息安全——复旦大学（MOOC 优质课程）](https://www.bilibili.com/video/BV1jJ411X7nN)
+* [操作系统](https://www.bilibili.com/video/BV1YE411D7nH)
+* [信息安全——复旦大学（MOOC 优质课程）](https://www.bilibili.com/video/BV1jJ411X7nN)
 
 相关书籍推荐：
 
@@ -143,3 +143,5 @@ John Washam的抽认卡网站：
 * [编码的奥秘（Charles Petzold）](https://book.douban.com/subject/1024570/)
 * [深入理解计算机系统（Randal E.Bryant ）](https://book.douban.com/subject/5333562/)
 * [信息安全原理与实践](https://book.douban.com/subject/24733262/)
+
+## 数据结构
