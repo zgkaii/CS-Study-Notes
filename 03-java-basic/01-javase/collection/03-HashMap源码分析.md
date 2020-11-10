@@ -35,6 +35,8 @@ HashMap 在JDK1.7中详细实现可参考[深入理解HashMap（jdk7）](https:/
 
 如果位于链表中的结点过多，那么很显然通过key值依次查找效率就太低了。因此JDK1.8在解决哈希冲突时有了较大的变化，**当链表长度大于阈值（默认为8）时，将链表转化为红黑树**，以减少搜索时间。
 
+数组的查询效率为O(1)，链表的查询效率是O(k)，红黑树的查询效率是O(log k)，k为桶中的元素个数，所以当元素数量非常多的时候，转化为红黑树能极大地提高效率。
+
 也就是说，JDK1.8之后，HashMap底层数据结构是**数组+链表+红黑树**。
 
 ![](https://img-blog.csdnimg.cn/20201109213850718.png)
@@ -197,12 +199,12 @@ HashMap 中有四个构造方法，它们分别如下：
 ```java
 // 传递的Map集合中的所有元素加入本Map实例中
 final void putMapEntries(Map<? extends K, ? extends V> m, boolean evict) {
-    // 传入Map实际元素个数
+    // 传入Map元素个数
     int s = m.size();
     if (s > 0) {
         // 判断table是否已经初始化
         if (table == null) {
-            // 计算传进来的map的实际元素个数ft = m.size() / 0.75 + 1，因为会计算出小数因此+1.0F向上取整
+            // ft = m.size() / 0.75 + 1，因为会计算出小数因此+1.0F向上取整
             float ft = ((float)s / loadFactor) + 1.0F;
             // 判断ft是否小于最大容量
             int t = ((ft < (float)MAXIMUM_CAPACITY) ?
@@ -211,7 +213,7 @@ final void putMapEntries(Map<? extends K, ? extends V> m, boolean evict) {
             if (t > threshold)
                 threshold = tableSizeFor(t);
         }
-        // 已初始化，并且m中元素个数大于阈值，进行扩容处理
+        // 已初始化，并且m中元素个数大于临界值，进行扩容处理
         else if (s > threshold)
             resize();
         // 遍历，将m中的所有元素添加至HashMap中
@@ -223,14 +225,15 @@ final void putMapEntries(Map<? extends K, ? extends V> m, boolean evict) {
     }
 }
 ```
-**tableSizeFor(int cap)方法**：
+### 3.4 tableSizeFor(int cap)方法
 
-tableSizeFor(int cap) 静态方法的作用是计算其合理的初始容量，也就是满足 2 的幂，且大于等于参数 cap，最接近的那一个数即可。
+tableSizeFor(int cap) 静态方法是用来**计算合理的初始容量，返回大于等于参数 cap的最小 2 次幂**。
 
 ```java
 // 返回大于cap的最小的二次幂数值
 static final int tableSizeFor(int cap) {
     int n = cap - 1;
+    //  >>>，无符号右移，忽略符号位，空位都以0补齐。对于正数移位来说等同于：>>。
     n |= n >>> 1;
     n |= n >>> 2;
     n |= n >>> 4;
@@ -243,46 +246,35 @@ static final int tableSizeFor(int cap) {
 }
 ```
 
-**这里为什么` cap - 1`呢？**
+**这里为什么` cap - 1`呢？**先来分析有关n位操作部分
 
-==待解决==
+先来假设n的二进制为01xxx...xxx。
 
+对n右移1位：001xx...xxx，再位或：011xx...xxx（1 与 `0 或1 `位或结果都为 1）
 
+对n右移2为：00011...xxx，再位或：01111...xxx
+
+... ...
+
+同理，如果有8个1，右移8位肯定会让后八位也为1。综上可得，该算法让最高位的1后面的位全变为1。
+
+最后再让结果n+1，即得到了2的整数次幂的值了。
+
+回过头再来看`int n = cap - 1;`，就明白用`cap-1`赋值给n是**为了找出大于或等于原值的目标值**。
+
+例如，二进制数0100，即4。如果不进行减1操作，通过运算会等到1000，即8，直接翻倍了，不符合结果。进行减1操作后，二进制数为0011，再进行运算会得到0100，即4。
 
 ### 3.4 确定数组索引位置
 
-不管增加、删除、查找键值对，定位到哈希桶数组的位置都是很关键的第一步。
+不管增加、删除、查找键值对，定位到哈希桶数组的位置都是关键的第一步。
 
-HashMap先是通过扰动函数`hash(Object key)`处理key的hashCode而得到其hash 值，然后通过 `(n - 1) & hash` 判断当前元素存放的位置（这里的 n 指的是数组的长度）。
+HashMap先是通过**扰动函数**`hash(Object key)`处理key的hashCode而得到其hash 值，然后通过 `(n - 1) & hash` 判断当前元素存放的位置（这里的 n 指的是数组的长度）。
 
 #### 3.4.1 hash(Object key) 
 
-该方法是 HashMap 的核心静态方法，用于计算 key 的 hash 值。我们在使用HashMap存放数据时，当然希望元素位置分布均匀一点。而使用hash算法计算位置的时，可以直接确定位置，不用遍历链表，大大优化了查询的效率。
+该方法是 HashMap 的核心静态方法，用于**计算 key 的 hash 值**。我们在使用HashMap存放数据时，当然希望元素位置分布均匀一点。而使用hash算法计算位置的时，可以直接确定位置，不用遍历链表，大大优化了查询的效率。
 
-JDK 1.8 HashMap 的 hash 方法源码：
-
-  ```java
-    // 通过位运算减少 Hash 冲突  
-	static final int hash(Object key) {
-        int h;
-        // key.hashCode()  返回散列值
-        // h ^ (h >>> 16)  高位参与运算
-        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
-  ```
-
-key.hashCode()函数调用的是key键值类型自带的哈希函数`public native int hashCode();`，返回的hashcode是int类型。如果直接拿散列值做数组下标，那么索引范围就是‑2147483648到2147483648，前后加起来大概40亿的映射空间，很难出现碰撞。问题是默认的初始容量最大才16，这就说明散列值是不能直接用来访问。
-
-实际上，散列值使用前需要对数组长度取模运算，到的余数才能用来访问数组下标。源码中模运算是在这个indexFor( )函数里完成。
-
-
-
-
-
-
-
-
-
-对比一下 JDK1.7的 HashMap 的 hash 方法源码：
+**JDK1.7**的 HashMap 的 hash 方法源码：
 
 ```java
 static int hash(int h) {
@@ -292,26 +284,72 @@ static int hash(int h) {
 }
 ```
 
-JDK 1.8 的 hash方法 相比于 JDK 1.7 hash 方法更加简化，但是原理不变。JDK 1.7 的 hash 方法的性能会稍差一点点，毕竟扰动了 4 次。
+JDK 1.8 的 hash方法 相比于 JDK 1.7 hash 方法更加简化，但是**原理不变**。JDK 1.7 的 hash 方法的性能会稍差一点点，毕竟扰动了 4 次。
 
-至于hash方法原理，强烈推荐[全网把Map中的hash()分析的最透彻的文章，别无二家](https://www.hollischuang.com/archives/2091)一文。
+**JDK1.8**中 HashMap 的 hash 方法源码：
+
+  ```java
+    // 通过位运算减少 Hash 冲突  
+	static final int hash(Object key) {
+        int h;
+        // key.hashCode()  传入key的散列值
+		// 按位异或^，如果相对应位值相同，则结果为0，否则为1        	
+        // h ^ (h >>> 16)  高位参与运算
+        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+  ```
+
+key.hashCode()函数调用的是key键值类型自带的哈希函数`public native int hashCode();`，返回的hashcode是int类型。如果直接拿散列值做数组下标，那么索引范围就是‑2147483648到2147483648，前后加起来大概40亿的映射空间，很难出现碰撞。问题是默认的初始容量最大才16，这就说明散列值是不能直接用来访问。
+
+在**JDK1.7**中，散列值使用前需要**对数组长度取模运算**，到的余数才能用来访问数组下标。源码中模运算是在这个indexFor( )函数里完成。
+
+```java
+bucketIndex = indexFor(hash, table.length);
+
+static int indexFor(int h, int length) {
+    // 散列值和数组长度做一个“与”操作
+    return h & (length-1);
+}
+```
+
+位与运算符`&`运算规则是只有**二进制位同时为 1，那么计算结果才为 1，否则为 0**。所有说，“与”操作的结果就是将散列值的高位全部归0，只保留低位值用来做数组下标访问。
+
+以初始长度8为例，8-1=7。2进制表示为00000000 00000000 00000111。与某散列值做“与”操作，结果就是截取了最低4位。
+
+```java
+		10100101 11000100 00100101
+&		00000000 00000000 00000111
+----------------------------------	
+		00000000 00000000 00000101
+```
+
+在**JDK1.8**中，**putVal()** 中寻址部分如下，原理跟上面一样。
+
+```java
+tab[i = (n - 1) & hash]
+```
+
+问题来了，就算散列值再松散，总是截取最后几位，碰撞还是会很严重。比如初始长度为16，16-1=15。与某散列值做“与”操作结果跟之前是一样的。
+
+```java
+		11110101 10000101 00110100
+&		00000000 00000000 00001111
+----------------------------------	
+		00000000 00000000 00000101
+```
+
+这时候，”扰动函数“的价值就体现出来了。
+
+![](https://img-blog.csdnimg.cn/img_convert/e65b38bc4f21af766926790f1b34387b.png)
+
+右位移16位，正好是32bit的一半，自己的高半区与低半区做异或，就是**为了混合原始哈希码的高位与低位，以此来加大低位随机性**。而混合后的低位参杂了高位部分特征，高位信息也参入了寻址计算（进行扰动）。
 
 #### 3.4.2 桶下标计算公式
 
-计算桶下标时，需要先通过 HashMap 内部的 hash() 方法计算其 hash 值，然后将 hash 值对桶个数取模，即：
-
-`hash % capacity` 如果能保证 capacity 为 2 的幂，那么就可以将这个操作转换为高效的位运算，也就是 HashMap 源码中的桶下标计算公式：
-
-`(capacity - 1) & hash` 以上便是 HashMap 内部数组的容量为 2 的幂的其中一个原因，另一个原因是在 resize() 扩容方法中可以更高效的重新计算桶下标。
+由之前的分析可知，桶下标计算公式即是`(capacity - 1) & hash` 。之所以不使用`hash % capacity`方式取模，是因为HashMap中规定了哈希表长度为2 的幂，在这种情况下，位与运算更快， resize() 扩容时可以更高效的重新计算桶下标。
 
 ### 3.5 put方法
 
-put方法中调用了putVal方法，传递的参数是调用了hash()方法计算key的hash值，主要逻辑在putVal中。
-
-**对putVal方法添加元素的分析如下：**
-
-- 如果定位到的数组位置没有元素就直接插入。
-- 如果定位到的数组位置有元素就和要插入的key比较，如果key相同就直接覆盖，如果key不相同，就判断p是否是一个树节点，如果是就调用`e = ((TreeNode<K,V>)p).putTreeVal(this, tab, hash, key, value)`将元素添加进入。如果不是就遍历链表插入(插入的是链表尾部)。
+put方法中调用了putVal方法，传递的参数是调用了hash()方法计算key的hash值，主要逻辑写在putVal中。
 
 ```java
 public V put(K key, V value) {
@@ -321,54 +359,51 @@ public V put(K key, V value) {
 final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
                    boolean evict) {
     Node<K,V>[] tab; Node<K,V> p; int n, i;
-    // table未初始化或者长度为0，进行扩容
+    // 步骤1：桶数组未初始化或者长度为0，进行扩容
     if ((tab = table) == null || (n = tab.length) == 0)
         n = (tab = resize()).length;
-    // (n - 1) & hash 确定元素存放在哪个桶中，桶为空，新生成结点放入桶中(此时，这个结点是放在数组中)
+    // 步骤2：指定桶为空，新生成结点直接放入
+    // (n - 1) & hash 计算元素在哪个桶中
     if ((p = tab[i = (n - 1) & hash]) == null)
         tab[i] = newNode(hash, key, value, null);
-    // 桶中已经存在元素
+    // 指定位置已经存在元素
     else {
         Node<K,V> e; K k;
-        // 比较桶中第一个元素(数组中的结点)的hash值相等，key相等
+        // 步骤3： 如果桶中第一个元素的key与待插入元素的key相同，保存到e中用于后续修改value值
         if (p.hash == hash &&
             ((k = p.key) == key || (key != null && key.equals(k))))
                 // 将第一个元素赋值给e，用e来记录
                 e = p;
-        // hash值不相等，即key不相等；为红黑树结点
+        // 步骤4：如果第一个元素是树节点，则调用树节点的putTreeVal插入元素
         else if (p instanceof TreeNode)
-            // 放入树中
             e = ((TreeNode<K,V>)p).putTreeVal(this, tab, hash, key, value);
-        // 为链表结点
+        // 步骤5：为链表结点，遍历链表进行操作
         else {
-            // 在链表最末插入结点
+            // inCount用于存储链表中元素的个数
             for (int binCount = 0; ; ++binCount) {
-                // 到达链表的尾部
+                // 到达链表的尾部还没有找到相同key的元素，则在尾部插入新结点
                 if ((e = p.next) == null) {
-                    // 在尾部插入新结点
                     p.next = newNode(hash, key, value, null);
-                    // 结点数量达到阈值，转化为红黑树
-                    if (binCount >= TREEIFY_THRESHOLD - 1) // -1 for 1st
+                    // 结点数量达到临界值，转化为红黑树
+                    if (binCount >= TREEIFY_THRESHOLD - 1) 
                         treeifyBin(tab, hash);
-                    // 跳出循环
                     break;
                 }
-                // 判断链表中结点的key值与插入的元素的key值是否相等
+                // 判断链表中结点的key值与插入的元素的key值相等，则退出循环
                 if (e.hash == hash &&
                     ((k = e.key) == key || (key != null && key.equals(k))))
-                    // 相等，跳出循环
                     break;
                 // 用于遍历桶中的链表，与前面的e = p.next组合，可以遍历链表
                 p = e;
             }
         }
-        // 表示在桶中找到key值、hash值与插入元素相等的结点
+        // 步骤6：表示在桶中找到key值、hash值与插入元素相等的结点
         if (e != null) { 
-            // 记录e的value
+            // 记录e的旧value
             V oldValue = e.value;
-            // onlyIfAbsent为false或者旧值为null
+            // 判断是否要置换旧值
             if (!onlyIfAbsent || oldValue == null)
-                //用新值替换旧值
+                // 直接覆盖，并返回旧值
                 e.value = value;
             // 访问后回调
             afterNodeAccess(e);
@@ -376,9 +411,9 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
             return oldValue;
         }
     }
-    // 结构性修改
+
     ++modCount;
-    // 实际大小大于阈值则扩容
+    // 步骤7：元素加1后，判断是否扩容
     if (++size > threshold)
         resize();
     // 插入后回调
@@ -387,47 +422,29 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
 } 
 ```
 
-### 3.6 get方法
-```java
-public V get(Object key) {
-    Node<K,V> e;
-    return (e = getNode(hash(key), key)) == null ? null : e.value;
-}
+**对putVal方法添加元素的分析如下：**
 
-final Node<K,V> getNode(int hash, Object key) {
-    Node<K,V>[] tab; Node<K,V> first, e; int n; K k;
-    if ((tab = table) != null && (n = tab.length) > 0 &&
-        (first = tab[(n - 1) & hash]) != null) {
-        // 数组元素相等
-        if (first.hash == hash && // always check first node
-            ((k = first.key) == key || (key != null && key.equals(k))))
-            return first;
-        // 桶中不止一个节点
-        if ((e = first.next) != null) {
-            // 在树中get
-            if (first instanceof TreeNode)
-                return ((TreeNode<K,V>)first).getTreeNode(hash, key);
-            // 在链表中get
-            do {
-                if (e.hash == hash &&
-                    ((k = e.key) == key || (key != null && key.equals(k))))
-                    return e;
-            } while ((e = e.next) != null);
-        }
-    }
-    return null;
-}
-```
-### 3.7 resize方法
+* 如果桶容量为0，则初始化桶。
+
+- 如果定位到的桶位置没有元素就直接插入元素。
+- 如果定位到的桶位置有元素就和要插入的元素key比较，如果key相同就直接覆盖。
+- 如果定位到的桶位置有元素且与插入的key不相同，就判断是否是一个树节点，如果是就调用`e = ((TreeNode<K,V>)p).putTreeVal(this, tab, hash, key, value)`将元素添加进入。如果不是就遍历链表插入(插入的是链表尾部)。
+- 插入了元素，则桶的容量加1，并判断是否需要扩容
+
+### 3.6 resize方法
+
 进行扩容，会伴随着一次重新hash分配，并且会遍历hash表中所有的元素，是非常耗时的。在编写程序中，要尽量避免resize。
 ```java
 final Node<K,V>[] resize() {
+    // 旧数组
     Node<K,V>[] oldTab = table;
+    // 旧容量
     int oldCap = (oldTab == null) ? 0 : oldTab.length;
+    // 旧临界值
     int oldThr = threshold;
     int newCap, newThr = 0;
     if (oldCap > 0) {
-        // 超过最大值就不再扩充了，就只好随你碰撞去吧
+        // 如果旧容量达到了最大容量，则不再进行扩容
         if (oldCap >= MAXIMUM_CAPACITY) {
             threshold = Integer.MAX_VALUE;
             return oldTab;
@@ -437,13 +454,16 @@ final Node<K,V>[] resize() {
             newThr = oldThr << 1; // double threshold
     }
     else if (oldThr > 0) // initial capacity was placed in threshold
+        // 使用非默认构造方法创建的map，第一次插入元素会走到这里
+        // 如果旧容量为0且旧扩容门槛大于0，则把新容量赋值为旧门槛
         newCap = oldThr;
     else { 
-        // signifies using defaults
+        // 调用默认构造方法创建的map，第一次插入元素会走到这里
+        // 如果旧容量旧扩容门槛都是0，说明还未初始化过，则初始化容量为默认容量，扩容门槛为默认容量*默认加载因子
         newCap = DEFAULT_INITIAL_CAPACITY;
         newThr = (int)(DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);
     }
-    // 计算新的resize上限
+    // 如果新扩容门槛为0，则计算为容量*装载因子，但不能超过最大容量
     if (newThr == 0) {
         float ft = (float)newCap * loadFactor;
         newThr = (newCap < MAXIMUM_CAPACITY && ft < (float)MAXIMUM_CAPACITY ? (int)ft : Integer.MAX_VALUE);
@@ -502,6 +522,51 @@ final Node<K,V>[] resize() {
     return newTab;
 }
 ```
+### 3.7 get方法
+
+```java
+public V get(Object key) {
+    Node<K,V> e;
+    return (e = getNode(hash(key), key)) == null ? null : e.value;
+}
+
+final Node<K,V> getNode(int hash, Object key) {
+    Node<K,V>[] tab; Node<K,V> first, e; int n; K k;
+    if ((tab = table) != null && (n = tab.length) > 0 &&
+        (first = tab[(n - 1) & hash]) != null) {
+        // 数组元素相等
+        if (first.hash == hash && // always check first node
+            ((k = first.key) == key || (key != null && key.equals(k))))
+            return first;
+        // 桶中不止一个节点
+        if ((e = first.next) != null) {
+            // 在树中get
+            if (first instanceof TreeNode)
+                return ((TreeNode<K,V>)first).getTreeNode(hash, key);
+            // 在链表中get
+            do {
+                if (e.hash == hash &&
+                    ((k = e.key) == key || (key != null && key.equals(k))))
+                    return e;
+            } while ((e = e.next) != null);
+        }
+    }
+    return null;
+}
+```
+
+### 3.8 treeifyBin()
+
+### 3.9 remove(Object key)
+
+### 3.10 TreeNode.putTreeVal(...)
+
+### 3.11 TreeNode.treeify()
+
+### 3.12 TreeNode.getTreeNode(int h, Object k)
+
+### 3.13 TreeNode.removeTreeNode(...)
+
 ## 4 遍历方式
 
 遍历分为5种方式：
@@ -561,97 +626,7 @@ final Node<K,V>[] resize() {
 
 **推荐使用第一种方式。**
 
-## 5 其它常用方法
 
-HashMap中常用的方法有：
-
-* **void clear()**：从指定的Map中删除所有键和值对。
-* **Object clone()**：它返回一个映射的所有映射的副本，并用于将它们克隆到另一个映射中。
-* **boolean containsKey(Object key)**：这是一个布尔函数，根据在Map中是否找到指定的键来返回true或false。
-* **boolean containsValue(Object Value)**：类似于containsKey（）方法，但是它将查找指定的值而不是键。
-* **Value get(Object key)**：它返回指定键的值。
-* **boolean isEmpty()**：检查映射是否为空。如果映射中不存在键值映射，则此函数返回true，否则返回false。
-* **Set keySet()**：它返回从Map获取的键的Set。
-* **value put(Key k，Value v)**：将键值映射插入到映射中。
-* **int size()**：返回映射的大小–键值映射的数量。
-* **Collection values()**：它返回Map的值的集合。
-* **Value remove(Object key)**：删除指定键的键值对。
-* **void putAll(Map m)**：将Map的所有元素复制到另一个指定的Map。
-
-**HashMap常用方法测试**
-
-```java
-package map;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Set;
-
-public class HashMapDemo {
-
-    public static void main(String[] args) {
-        HashMap<String, String> map = new HashMap<String, String>();
-        // 键不能重复，值可以重复
-        map.put("san", "张三");
-        map.put("si", "李四");
-        map.put("wu", "王五");
-        map.put("wang", "老王");
-        map.put("wang", "老王2");// 老王被覆盖
-        map.put("lao", "老王");
-        System.out.println("-------直接输出hashmap:-------");
-        System.out.println(map);
-        /**
-         * 遍历HashMap
-         */
-        // 1.获取Map中的所有键
-        System.out.println("-------foreach获取Map中所有的键:------");
-        Set<String> keys = map.keySet();
-        for (String key : keys) {
-            System.out.print(key+"  ");
-        }
-        System.out.println();//换行
-        // 2.获取Map中所有值
-        System.out.println("-------foreach获取Map中所有的值:------");
-        Collection<String> values = map.values();
-        for (String value : values) {
-            System.out.print(value+"  ");
-        }
-        System.out.println();//换行
-        // 3.得到key的值的同时得到key所对应的值
-        System.out.println("-------得到key的值的同时得到key所对应的值:-------");
-        Set<String> keys2 = map.keySet();
-        for (String key : keys2) {
-            System.out.print(key + "：" + map.get(key)+"   ");
-
-        }
-        /**
-         * 如果既要遍历key又要value，那么建议这种方式，因为如果先获取keySet然后再执行map.get(key)，map内部会执行两次遍历。
-         * 一次是在获取keySet的时候，一次是在遍历所有key的时候。
-         */
-        // 当我调用put(key,value)方法的时候，首先会把key和value封装到
-        // Entry这个静态内部类对象中，把Entry对象再添加到数组中，所以我们想获取
-        // map中的所有键值对，我们只要获取数组中的所有Entry对象，接下来
-        // 调用Entry对象中的getKey()和getValue()方法就能获取键值对了
-        Set<java.util.Map.Entry<String, String>> entrys = map.entrySet();
-        for (java.util.Map.Entry<String, String> entry : entrys) {
-            System.out.println(entry.getKey() + "--" + entry.getValue());
-        }
-        
-        /**
-         * HashMap其他常用方法
-         */
-        System.out.println("after map.size()："+map.size());
-        System.out.println("after map.isEmpty()："+map.isEmpty());
-        System.out.println(map.remove("san"));
-        System.out.println("after map.remove()："+map);
-        System.out.println("after map.get(si)："+map.get("si"));
-        System.out.println("after map.containsKey(si)："+map.containsKey("si"));
-        System.out.println("after containsValue(李四)："+map.containsValue("李四"));
-        System.out.println(map.replace("si", "李四2"));
-        System.out.println("after map.replace(si, 李四2):"+map);
-    }
-}
-```
 
 ## 参考
 
@@ -668,3 +643,9 @@ public class HashMapDemo {
 [JDK1.8中HashMap的hash算法和寻址算法](https://www.cnblogs.com/eycuii/p/12015283.html)
 
 [HashMap 的 7 种遍历方式与性能分析！](https://juejin.im/post/6844904144331866119)
+
+[Java中的移位运算符](https://zhuanlan.zhihu.com/p/30108890)
+
+[JDK 源码中 HashMap 的 hash 方法原理是什么？](https://www.zhihu.com/question/20733617)
+
+[死磕 java集合之HashMap源码分析](https://juejin.im/post/6844903817855631373)
