@@ -1,23 +1,19 @@
 ## 1 HashMap简介
-HashMap 是一个散列表，它存储的内容是键值对(key-value)映射。它继承于AbstractMap，实现了Map、Cloneable、`java.io.Serializable`接口。
+HashMap 是一个散列表，它存储的内容是键值对(key-value)映射。它继承了AbstractMap，实现了Map、Cloneable、`java.io.Serializable`接口。
 
 <img src="https://img-blog.csdnimg.cn/20201108151702116.png" style="zoom: 80%;" />
 
-HashMap的实现是不同步的，这意味着**线程不安全**，在并发的环境中建议使用`ConcurrentHashMap`。
+HashMap的实现是不同步的，这意味着**线程不安全**。并发的环境下建议使用`ConcurrentHashMap`。
 
 HashMap的key、value都可以为null（除了不同步和允许使用 null 之外，HashMap与 Hashtable大致相同）。此外，HashMap中的映射是**无序**的。
 
-HashMap 的实例有两个参数影响其性能：“**初始容量**” 和 “**加载因子**”。容量是哈希表中桶的数量，初始容量只是哈希表在创建时的容量。
+HashMap 的实例有两个参数影响其性能：“**初始容量**” 和 “**加载因子**”。容量是哈希表中桶的数量，初始容量是哈希表在创建时的容量。
 
-加载因子是哈希表在其容量自动增加之前可以达到多满的一种尺度。当哈希表中的条目数超出了加载因子与当前容量的乘积时，则要对
+loadFactor加载因子是控制数组存放数据的疏密程度，loadFactor越趋近于1，那么   数组中存放的数据(entry)也就越多，也就越密，会导致查找元素效率低；loadFactor越小，也就是趋近于0，数组中存放的数据(entry)也就越少，也就越稀疏，但会导致数组的利用率低。
 
-该哈希表进行 rehash 操作（即重建内部数据结构），从而哈希表将具有大约两倍的桶数。
+通常，**默认加载因子是0.75**，这是在时间和空间成本上寻求一种折衷。在设置初始容量时应该考虑到映射中所需的条目数及其
 
-通常，**默认加载因子是0.75**，这是在时间和空间成本上寻求一种折衷。加载因子过高虽然减少了空间开销，但同时也增加了查询成本
-
-（大多数 HashMap 类的操作中，包括 get 和 put 操作，都反映了这一点）。在设置初始容量时应该考虑到映射中所需的条目数及其
-
-加载因子，以便最大限度地减少 rehash 操作次数。如果初始容量大于最大条目数除以加载因子，则不会发生 rehash 操作。
+加载因子，以便最大限度地减少 rehash 操作次数。如果初始容量大于（最大容量数/加载因子），则不会发生 rehash 操作。
 
 ## 2 底层数据结构
 
@@ -33,9 +29,9 @@ HashMap 在JDK1.7中详细实现可参考[深入理解HashMap（jdk7）](https:/
 
 ### 2.2 JDK1.8
 
-如果位于链表中的结点过多，那么很显然通过key值依次查找效率就太低了。因此JDK1.8在解决哈希冲突时有了较大的变化，**当链表长度大于阈值（默认为8）时，将链表转化为红黑树**，以减少搜索时间。
+众所周知，数组的查询效率为O(1)，链表的查询效率是O(n)，红黑树的查询效率是O(log n)，n为桶中的元素个数。
 
-数组的查询效率为O(1)，链表的查询效率是O(k)，红黑树的查询效率是O(log k)，k为桶中的元素个数，所以当元素数量非常多的时候，转化为红黑树能极大地提高效率。
+所有当位于链表中的结点过多，显然通过key值依次查找效率就太低了。因此JDK1.8在解决哈希冲突时有了较大的变化，**当链表长度大于阈值（默认为8）时，将链表转化为红黑树**，以提高查询效率。
 
 也就是说，JDK1.8之后，HashMap底层数据结构是**数组+链表+红黑树**。
 
@@ -115,7 +111,7 @@ static class Node<K,V> implements Map.Entry<K,V> {
 ```java
     // 序列号
     private static final long serialVersionUID = 362498820763181265L;    
-    // 默认的初始容量是2的4次方，即16
+    // 桶默认的初始容量，2的4次方，即16
     static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;   
     // 最大容量
     static final int MAXIMUM_CAPACITY = 1 << 30; 
@@ -125,7 +121,7 @@ static class Node<K,V> implements Map.Entry<K,V> {
     static final int TREEIFY_THRESHOLD = 8; 
     // 链表还原阈值。当某个桶(bucket)上的结点数小于这个值时树转链表
     static final int UNTREEIFY_THRESHOLD = 6;
-    // 桶中结构转化为红黑树对应的table的最小大小
+    // 桶中链表结构转化为红黑树对应的table的最小容量
     static final int MIN_TREEIFY_CAPACITY = 64;
 ```
 
@@ -138,25 +134,13 @@ static class Node<K,V> implements Map.Entry<K,V> {
     transient Set<map.entry<k,v>> entrySet;
     // 桶的实际元素个数 != table.length。
     transient int size;
-    // 每次扩容和更改map结构的计数器都会+1
+    // 每次扩容和更改map结构计数器都会+1
     transient int modCount;   
-    // 临界值，当实际大小(容量*加载因子)超过临界值时，会进行扩容
+    // 临界值，当实际大小(容量*加载因子)超过临界值时，会进行扩容。是衡量数组是否需扩容的一个标准。
     int threshold;
     // 加载因子
     final float loadFactor;
 ```
-
-- **loadFactor加载因子**
-
-  loadFactor加载因子是控制数组存放数据的疏密程度，loadFactor越趋近于1，那么   数组中存放的数据(entry)也就越多，也就越密，也就是会让链表的长度增加，loadFactor越小，也就是趋近于0，数组中存放的数据(entry)也就越少，也就越稀疏。
-
-  **loadFactor太大导致查找元素效率低，太小导致数组的利用率低，存放的数据会很分散。loadFactor的默认值为0.75f是官方给出的一个比较好的临界值**。 
-
-  给定的默认容量为 16，加载因子为 0.75。Map 在使用过程中不断的往里面存放数据，当数量达到了 16 * 0.75 = 12 就需要将当前 16 的容量进行扩容，而扩容这个过程涉及到 rehash、复制数据等操作，所以非常消耗性能。
-
-- **threshold**
-
-  **threshold = capacity * loadFactor**，**当Size>=threshold**的时候，那么就要考虑对数组的扩增了，也就是说，这个的意思就是**衡量数组是否需要扩增的一个标准**。
 
 ### 3.3 构造方法
 
@@ -284,7 +268,7 @@ static int hash(int h) {
 }
 ```
 
-JDK 1.8 的 hash方法 相比于 JDK 1.7 hash 方法更加简化，但是**原理不变**。JDK 1.7 的 hash 方法的性能会稍差一点点，毕竟扰动了 4 次。
+JDK 1.8 的 hash方法 相比于 JDK 1.7 hash 方法更加简化，但是**原理不变**。（JDK 1.7 的 hash 方法的性能会稍差一点点，毕竟扰动了 4 次。）
 
 **JDK1.8**中 HashMap 的 hash 方法源码：
 
@@ -345,7 +329,7 @@ tab[i = (n - 1) & hash]
 
 #### 3.4.2 桶下标计算公式
 
-由之前的分析可知，桶下标计算公式即是`(capacity - 1) & hash` 。之所以不使用`hash % capacity`方式取模，是因为HashMap中规定了哈希表长度为2 的幂，在这种情况下，位与运算更快， resize() 扩容时可以更高效的重新计算桶下标。
+由之前的分析可知，桶下标计算公式即是`(capacity - 1) & hash` 。之所以不使用`hash % capacity`方式取模，是因为HashMap中规定了哈希表长度为2 的幂，在这种情况下，位与运算更快， resize() 扩容时也可以更高效地重新计算桶下标。
 
 ### 3.5 put方法
 
@@ -449,40 +433,49 @@ final Node<K,V>[] resize() {
             threshold = Integer.MAX_VALUE;
             return oldTab;
         }
-        // 没超过最大值，就扩充为原来的2倍
+        // 就容量小于最大容量大于默认初始容量，就扩容为原来的2倍
         else if ((newCap = oldCap << 1) < MAXIMUM_CAPACITY && oldCap >= DEFAULT_INITIAL_CAPACITY)
-            newThr = oldThr << 1; // double threshold
+            newThr = oldThr << 1; // 新临界值等于旧临界值两倍
     }
-    else if (oldThr > 0) // initial capacity was placed in threshold
-        // 使用非默认构造方法创建的map，第一次插入元素会走到这里
-        // 如果旧容量为0且旧扩容门槛大于0，则把新容量赋值为旧门槛
+    else if (oldThr > 0) 
+        // 使用 非默认构造方法 创建的map，第一次插入元素会走到这里
+        // 如果旧容量为0且旧扩容门槛大于0，则把新容量等于旧临界值
         newCap = oldThr;
     else { 
-        // 调用默认构造方法创建的map，第一次插入元素会走到这里
-        // 如果旧容量旧扩容门槛都是0，说明还未初始化过，则初始化容量为默认容量，扩容门槛为默认容量*默认加载因子
+        // 调用 默认构造方法 创建的map，第一次插入元素会走到这里
+        // 如果旧容量旧临界值都是0，说明还未初始化过，则初始化容量为默认容量，临界值=默认容量*默认加载因子
         newCap = DEFAULT_INITIAL_CAPACITY;
         newThr = (int)(DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);
     }
-    // 如果新扩容门槛为0，则计算为容量*装载因子，但不能超过最大容量
+    // 如果新临界值为0，则计算为容量*装载因子，但不能超过最大容量
     if (newThr == 0) {
         float ft = (float)newCap * loadFactor;
         newThr = (newCap < MAXIMUM_CAPACITY && ft < (float)MAXIMUM_CAPACITY ? (int)ft : Integer.MAX_VALUE);
     }
+    // 将旧临界值设为扩容门槛
     threshold = newThr;
+    // 新建一个新容量的数组
     @SuppressWarnings({"rawtypes","unchecked"})
         Node<K,V>[] newTab = (Node<K,V>[])new Node[newCap];
+    // 把桶赋值为新数组
     table = newTab;
     if (oldTab != null) {
         // 把每个bucket都移动到新的buckets中
         for (int j = 0; j < oldCap; ++j) {
             Node<K,V> e;
             if ((e = oldTab[j]) != null) {
+                // 清空旧桶，便于GC回收
                 oldTab[j] = null;
                 if (e.next == null)
                     newTab[e.hash & (newCap - 1)] = e;
                 else if (e instanceof TreeNode)
                     ((TreeNode<K,V>)e).split(this, newTab, j, oldCap);
                 else { 
+                    // 如果这个链表不止一个元素且不是一颗树
+                    // 则分化成两个链表插入到新的桶中去
+                    // 比如，假如原来容量为4，3、7、11、15这四个元素都在三号桶中
+                    // 现在扩容到8，则3和11还是在三号桶，7和15要搬移到七号桶中去
+                    // 也就是分化成了两个链表                  
                     Node<K,V> loHead = null, loTail = null;
                     Node<K,V> hiHead = null, hiTail = null;
                     Node<K,V> next;
@@ -555,21 +548,397 @@ final Node<K,V> getNode(int hash, Object key) {
 }
 ```
 
-### 3.8 treeifyBin()
+### 3.8 treeifyBin方法
+
+```java
+final void treeifyBin(Node<K, V>[] tab, int hash) {
+    int n, index;
+    Node<K, V> e;
+    if (tab == null || (n = tab.length) < MIN_TREEIFY_CAPACITY)
+        // 如果桶数量小于64，直接扩容而不用树化
+        // 因为扩容之后，链表会分化成两个链表，达到减少元素的作用
+        // 当然也不一定，比如容量为4，里面存的全是除以4余数等于3的元素
+        // 这样即使扩容也无法减少链表的长度
+        resize();
+    else if ((e = tab[index = (n - 1) & hash]) != null) {
+        TreeNode<K, V> hd = null, tl = null;
+        // 把所有节点换成树节点
+        do {
+            TreeNode<K, V> p = replacementTreeNode(e, null);
+            if (tl == null)
+                hd = p;
+            else {
+                p.prev = tl;
+                tl.next = p;
+            }
+            tl = p;
+        } while ((e = e.next) != null);
+        // 如果进入过上面的循环，则从头节点开始树化
+        if ((tab[index] = hd) != null)
+            hd.treeify(tab);
+    }
+}
+```
 
 ### 3.9 remove(Object key)
 
+```java
+public V remove(Object key) {
+    Node<K, V> e;
+    return (e = removeNode(hash(key), key, null, false, true)) == null ?
+            null : e.value;
+}
+
+final Node<K, V> removeNode(int hash, Object key, Object value,
+                            boolean matchValue, boolean movable) {
+    Node<K, V>[] tab;
+    Node<K, V> p;
+    int n, index;
+    // 如果桶的数量大于0且待删除的元素所在的桶的第一个元素不为空
+    if ((tab = table) != null && (n = tab.length) > 0 &&
+            (p = tab[index = (n - 1) & hash]) != null) {
+        Node<K, V> node = null, e;
+        K k;
+        V v;
+        if (p.hash == hash &&
+                ((k = p.key) == key || (key != null && key.equals(k))))
+            // 如果第一个元素正好就是要找的元素，赋值给node变量后续删除使用
+            node = p;
+        else if ((e = p.next) != null) {
+            if (p instanceof TreeNode)
+                // 如果第一个元素是树节点，则以树的方式查找节点
+                node = ((TreeNode<K, V>) p).getTreeNode(hash, key);
+            else {
+                // 否则遍历整个链表查找元素
+                do {
+                    if (e.hash == hash &&
+                            ((k = e.key) == key ||
+                                    (key != null && key.equals(k)))) {
+                        node = e;
+                        break;
+                    }
+                    p = e;
+                } while ((e = e.next) != null);
+            }
+        }
+        // 如果找到了元素，则看参数是否需要匹配value值，如果不需要匹配直接删除，如果需要匹配则看value值是否与传入的value相等
+        if (node != null && (!matchValue || (v = node.value) == value ||
+                (value != null && value.equals(v)))) {
+            if (node instanceof TreeNode)
+                // 如果是树节点，调用树的删除方法（以node调用的，是删除自己）
+                ((TreeNode<K, V>) node).removeTreeNode(this, tab, movable);
+            else if (node == p)
+                // 如果待删除的元素是第一个元素，则把第二个元素移到第一的位置
+                tab[index] = node.next;
+            else
+                // 否则删除node节点
+                p.next = node.next;
+            ++modCount;
+            --size;
+            // 删除节点后置处理
+            afterNodeRemoval(node);
+            return node;
+        }
+    }
+    return null;
+}
+
+```
+
 ### 3.10 TreeNode.putTreeVal(...)
+
+```java
+final TreeNode<K, V> putTreeVal(HashMap<K, V> map, Node<K, V>[] tab,
+                                int h, K k, V v) {
+    Class<?> kc = null;
+    // 标记是否找到这个key的节点
+    boolean searched = false;
+    // 找到树的根节点
+    TreeNode<K, V> root = (parent != null) ? root() : this;
+    // 从树的根节点开始遍历
+    for (TreeNode<K, V> p = root; ; ) {
+        // dir=direction，标记是在左边还是右边
+        // ph=p.hash，当前节点的hash值
+        int dir, ph;
+        // pk=p.key，当前节点的key值
+        K pk;
+        if ((ph = p.hash) > h) {
+            // 当前hash比目标hash大，说明在左边
+            dir = -1;
+        }
+        else if (ph < h)
+            // 当前hash比目标hash小，说明在右边
+            dir = 1;
+        else if ((pk = p.key) == k || (k != null && k.equals(pk)))
+            // 两者hash相同且key相等，说明找到了节点，直接返回该节点
+            // 回到putVal()中判断是否需要修改其value值
+            return p;
+        else if ((kc == null &&
+                // 如果k是Comparable的子类则返回其真实的类，否则返回null
+                (kc = comparableClassFor(k)) == null) ||
+                // 如果k和pk不是同样的类型则返回0，否则返回两者比较的结果
+                (dir = compareComparables(kc, k, pk)) == 0) {
+            // 这个条件表示两者hash相同但是其中一个不是Comparable类型或者两者类型不同
+            // 比如key是Object类型，这时可以传String也可以传Integer，两者hash值可能相同
+            // 在红黑树中把同样hash值的元素存储在同一颗子树，这里相当于找到了这颗子树的顶点
+            // 从这个顶点分别遍历其左右子树去寻找有没有跟待插入的key相同的元素
+            if (!searched) {
+                TreeNode<K, V> q, ch;
+                searched = true;
+                // 遍历左右子树找到了直接返回
+                if (((ch = p.left) != null &&
+                        (q = ch.find(h, k, kc)) != null) ||
+                        ((ch = p.right) != null &&
+                                (q = ch.find(h, k, kc)) != null))
+                    return q;
+            }
+            // 如果两者类型相同，再根据它们的内存地址计算hash值进行比较
+            dir = tieBreakOrder(k, pk);
+        }
+
+        TreeNode<K, V> xp = p;
+        if ((p = (dir <= 0) ? p.left : p.right) == null) {
+            // 如果最后确实没找到对应key的元素，则新建一个节点
+            Node<K, V> xpn = xp.next;
+            TreeNode<K, V> x = map.newTreeNode(h, k, v, xpn);
+            if (dir <= 0)
+                xp.left = x;
+            else
+                xp.right = x;
+            xp.next = x;
+            x.parent = x.prev = xp;
+            if (xpn != null)
+                ((TreeNode<K, V>) xpn).prev = x;
+            // 插入树节点后平衡
+            // 把root节点移动到链表的第一个节点
+            moveRootToFront(tab, balanceInsertion(root, x));
+            return null;
+        }
+    }
+}
+```
 
 ### 3.11 TreeNode.treeify()
 
+```java
+final void treeify(Node<K, V>[] tab) {
+    TreeNode<K, V> root = null;
+    for (TreeNode<K, V> x = this, next; x != null; x = next) {
+        next = (TreeNode<K, V>) x.next;
+        x.left = x.right = null;
+        // 第一个元素作为根节点且为黑节点，其它元素依次插入到树中再做平衡
+        if (root == null) {
+            x.parent = null;
+            x.red = false;
+            root = x;
+        } else {
+            K k = x.key;
+            int h = x.hash;
+            Class<?> kc = null;
+            // 从根节点查找元素插入的位置
+            for (TreeNode<K, V> p = root; ; ) {
+                int dir, ph;
+                K pk = p.key;
+                if ((ph = p.hash) > h)
+                    dir = -1;
+                else if (ph < h)
+                    dir = 1;
+                else if ((kc == null &&
+                        (kc = comparableClassFor(k)) == null) ||
+                        (dir = compareComparables(kc, k, pk)) == 0)
+                    dir = tieBreakOrder(k, pk);
+
+                // 如果最后没找到元素，则插入
+                TreeNode<K, V> xp = p;
+                if ((p = (dir <= 0) ? p.left : p.right) == null) {
+                    x.parent = xp;
+                    if (dir <= 0)
+                        xp.left = x;
+                    else
+                        xp.right = x;
+                    // 插入后平衡，默认插入的是红节点，在balanceInsertion()方法里
+                    root = balanceInsertion(root, x);
+                    break;
+                }
+            }
+        }
+    }
+    // 把根节点移动到链表的头节点，因为经过平衡之后原来的第一个元素不一定是根节点了
+    moveRootToFront(tab, root);
+}
+```
+
 ### 3.12 TreeNode.getTreeNode(int h, Object k)
+
+```java
+final TreeNode<K, V> getTreeNode(int h, Object k) {
+    // 从树的根节点开始查找
+    return ((parent != null) ? root() : this).find(h, k, null);
+}
+
+final TreeNode<K, V> find(int h, Object k, Class<?> kc) {
+    TreeNode<K, V> p = this;
+    do {
+        int ph, dir;
+        K pk;
+        TreeNode<K, V> pl = p.left, pr = p.right, q;
+        if ((ph = p.hash) > h)
+            // 左子树
+            p = pl;
+        else if (ph < h)
+            // 右子树
+            p = pr;
+        else if ((pk = p.key) == k || (k != null && k.equals(pk)))
+            // 找到了直接返回
+            return p;
+        else if (pl == null)
+            // hash相同但key不同，左子树为空查右子树
+            p = pr;
+        else if (pr == null)
+            // 右子树为空查左子树
+            p = pl;
+        else if ((kc != null ||
+                (kc = comparableClassFor(k)) != null) &&
+                (dir = compareComparables(kc, k, pk)) != 0)
+            // 通过compare方法比较key值的大小决定使用左子树还是右子树
+            p = (dir < 0) ? pl : pr;
+        else if ((q = pr.find(h, k, kc)) != null)
+            // 如果以上条件都不通过，则尝试在右子树查找
+            return q;
+        else
+            // 都没找到就在左子树查找
+            p = pl;
+    } while (p != null);
+    return null;
+}
+```
 
 ### 3.13 TreeNode.removeTreeNode(...)
 
+```java
+final void removeTreeNode(HashMap<K, V> map, Node<K, V>[] tab,
+                          boolean movable) {
+    int n;
+    // 如果桶的数量为0直接返回
+    if (tab == null || (n = tab.length) == 0)
+        return;
+    // 节点在桶中的索引
+    int index = (n - 1) & hash;
+    // 第一个节点，根节点，根左子节点
+    TreeNode<K, V> first = (TreeNode<K, V>) tab[index], root = first, rl;
+    // 后继节点，前置节点
+    TreeNode<K, V> succ = (TreeNode<K, V>) next, pred = prev;
+
+    if (pred == null)
+        // 如果前置节点为空，说明当前节点是根节点，则把后继节点赋值到第一个节点的位置，相当于删除了当前节点
+        tab[index] = first = succ;
+    else
+        // 否则把前置节点的下个节点设置为当前节点的后继节点，相当于删除了当前节点
+        pred.next = succ;
+
+    // 如果后继节点不为空，则让后继节点的前置节点指向当前节点的前置节点，相当于删除了当前节点
+    if (succ != null)
+        succ.prev = pred;
+
+    // 如果第一个节点为空，说明没有后继节点了，直接返回
+    if (first == null)
+        return;
+
+    // 如果根节点的父节点不为空，则重新查找父节点
+    if (root.parent != null)
+        root = root.root();
+
+    // 如果根节点为空，则需要反树化（将树转化为链表）
+    // 如果需要移动节点且树的高度比较小，则需要反树化
+    if (root == null
+            || (movable
+            && (root.right == null
+            || (rl = root.left) == null
+            || rl.left == null))) {
+        tab[index] = first.untreeify(map);  // too small
+        return;
+    }
+
+    // 分割线，以上都是删除链表中的节点，下面才是直接删除红黑树的节点（因为TreeNode本身即是链表节点又是树节点）
+
+    // 删除红黑树节点的大致过程是寻找右子树中最小的节点放到删除节点的位置，然后做平衡，此处不过多注释
+    TreeNode<K, V> p = this, pl = left, pr = right, replacement;
+    if (pl != null && pr != null) {
+        TreeNode<K, V> s = pr, sl;
+        while ((sl = s.left) != null) // find successor
+            s = sl;
+        boolean c = s.red;
+        s.red = p.red;
+        p.red = c; // swap colors
+        TreeNode<K, V> sr = s.right;
+        TreeNode<K, V> pp = p.parent;
+        if (s == pr) { // p was s's direct parent
+            p.parent = s;
+            s.right = p;
+        } else {
+            TreeNode<K, V> sp = s.parent;
+            if ((p.parent = sp) != null) {
+                if (s == sp.left)
+                    sp.left = p;
+                else
+                    sp.right = p;
+            }
+            if ((s.right = pr) != null)
+                pr.parent = s;
+        }
+        p.left = null;
+        if ((p.right = sr) != null)
+            sr.parent = p;
+        if ((s.left = pl) != null)
+            pl.parent = s;
+        if ((s.parent = pp) == null)
+            root = s;
+        else if (p == pp.left)
+            pp.left = s;
+        else
+            pp.right = s;
+        if (sr != null)
+            replacement = sr;
+        else
+            replacement = p;
+    } else if (pl != null)
+        replacement = pl;
+    else if (pr != null)
+        replacement = pr;
+    else
+        replacement = p;
+    if (replacement != p) {
+        TreeNode<K, V> pp = replacement.parent = p.parent;
+        if (pp == null)
+            root = replacement;
+        else if (p == pp.left)
+            pp.left = replacement;
+        else
+            pp.right = replacement;
+        p.left = p.right = p.parent = null;
+    }
+
+    TreeNode<K, V> r = p.red ? root : balanceDeletion(root, replacement);
+
+    if (replacement == p) {  // detach
+        TreeNode<K, V> pp = p.parent;
+        p.parent = null;
+        if (pp != null) {
+            if (p == pp.left)
+                pp.left = null;
+            else if (p == pp.right)
+                pp.right = null;
+        }
+    }
+    if (movable)
+        moveRootToFront(tab, r);
+}
+
+```
+
 ## 4 遍历方式
 
-遍历分为5种方式：
+遍历分为7种方式：
 
 （1）**调用`map.entrySet()`的集合迭代器**
 
@@ -625,8 +994,6 @@ final Node<K,V> getNode(int hash, Object key) {
 ```
 
 **推荐使用第一种方式。**
-
-
 
 ## 参考
 
