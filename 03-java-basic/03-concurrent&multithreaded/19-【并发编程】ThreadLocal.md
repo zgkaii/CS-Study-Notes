@@ -1,32 +1,3 @@
->  本文来自一枝花算不算浪漫投稿， 原文地址：[https://juejin.im/post/5eacc1c75188256d976df748](https://juejin.im/post/5eacc1c75188256d976df748)。
-
-### 前言
-
-![](./images/thread-local/1.png)
-
-**全文共10000+字，31张图，这篇文章同样耗费了不少的时间和精力才创作完成，原创不易，请大家点点关注+在看，感谢。**
-
-对于`ThreadLocal`，大家的第一反应可能是很简单呀，线程的变量副本，每个线程隔离。那这里有几个问题大家可以思考一下：
-
-- `ThreadLocal`的key是**弱引用**，那么在 `ThreadLocal`.get()的时候,发生**GC**之后，key是否为**null**？
-- `ThreadLocal`中`ThreadLocalMap`的**数据结构**？
-- `ThreadLocalMap`的**Hash算法**？
-- `ThreadLocalMap`中**Hash冲突**如何解决？
-- `ThreadLocalMap`的**扩容机制**？
-- `ThreadLocalMap`中**过期key的清理机制**？**探测式清理**和**启发式清理**流程？
-- `ThreadLocalMap.set()`方法实现原理？
-- `ThreadLocalMap.get()`方法实现原理？
-- 项目中`ThreadLocal`使用情况？遇到的坑？
-- ......
-
-上述的一些问题你是否都已经掌握的很清楚了呢？本文将围绕这些问题使用图文方式来剖析`ThreadLocal`的**点点滴滴**。
-
-### 目录
-
-
-
-**注明：** 本文源码基于`JDK 1.8`
-
 ### `ThreadLocal`代码演示
 
 我们先看下`ThreadLocal`使用示例：
@@ -35,7 +6,7 @@
 public class ThreadLocalTest {
     private List<String> messages = Lists.newArrayList();
 
-    public static final `ThreadLocal`<ThreadLocalTest> holder = `ThreadLocal`.withInitial(ThreadLocalTest::new);
+    public static final `ThreadLocal`<ThreadLocalTest> holder = 	ThreadLocal.withInitial(ThreadLocalTest::new);
 
     public static void add(String message) {
         holder.get().messages.add(message);
@@ -910,5 +881,7 @@ public class MyThreadPoolTaskExecutor extends ThreadPoolTaskExecutor {
 
 
 
+## 参考
 
+[【深入AQS原理】我画了35张图就是为了让你深入 AQS](https://juejin.im/post/6844904146127044622)
 

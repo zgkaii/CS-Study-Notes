@@ -87,7 +87,7 @@ public interface Future<V> {
 
 可以把Future理解为Callable任务返回给调用方这么一个句柄，通过这个句柄我们可以跟这个异步任务联系起来，对任务进行查询、取消、执行结果的获取的操作。也就是说，Future是调用方与异步执行方之间沟通的桥梁。
 
-案例：
+使用案例：
 
 ```java
 @Slf4j
@@ -102,7 +102,7 @@ public class CallableTest {
             long startTime = System.currentTimeMillis();
             log.info("主线程等待获取 Future 结果");
             while (!future.isDone()) {
-                System.out.println("子线程还未完成");
+                log.info("子线程还未完成");
                 Thread.sleep(2000);
             }
             if (!future.isCancelled()) {
@@ -130,9 +130,9 @@ public class CallableTest {
 }
 ```
 
+### 4. FutureTask 
 
-
-再来查看ExecutorService中对应的submit方法：
+了解FutureTask 之前，我们先来了解上面提到ExecutorService中对应有三种submit方法：
 
 ```java
 	Future<?> submit(Runnable task);
@@ -186,8 +186,6 @@ public interface RunnableFuture<V> extends Runnable, Future<V> {
 
 也就是说，RunnableFuture接口同时继承了 `Runnable` 和 `Future` 接口，也就同时拥有了这两个接口的特性，而这些特性的具体实现是由FutureTask完成的。
 
-### 4. FutureTask 
-
 #### 4.1 概述
 
 `FutureTask` 类实现了 `RunnableFuture` 接口，而  `RunnableFuture` 接口又继承了 `Runnable` 和 `Future` 接口。可以推断出 `FutureTask` 同时具有这两种接口的特性：
@@ -215,7 +213,7 @@ public interface RunnableFuture<V> extends Runnable, Future<V> {
 
 可见，即便在 FutureTask 构造方法中传入的是 Runnable 形式的线程，该构造方法也会通过 `Executors.callable` 工厂方法将其转换为 Callable 类型。
 
- FutureTask 实现的是 Runnable 接口，也就是只能重写 run() 方法。
+FutureTask 实现的是 Runnable 接口，也就是只能重写 run() 方法。
 
 ```java
 public void run() {
