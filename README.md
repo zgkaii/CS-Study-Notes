@@ -129,14 +129,19 @@ John Washam的抽认卡网站：
 
 ## 计算机基础
 
-视频推荐：
+视频学习：
 
-* [ ] [计算机网络](https://www.bilibili.com/video/BV19E411D78Q)
+* [计算机网络](https://www.bilibili.com/video/BV19E411D78Q)
+  - [x] 物理层
+  - [ ] 数据链路层
+  - [ ] 网络层
+  - [ ] 传输层
+  - [ ] 应用层
+  - [ ] TCP/IP协议
 
-* [ ] [计算机组成原理](https://www.bilibili.com/video/BV1BE411D7ii)
-
-* [ ] [操作系统](https://www.bilibili.com/video/BV1YE411D7nH)
-* [ ] [信息安全——复旦大学（MOOC 优质课程）](https://www.bilibili.com/video/BV1jJ411X7nN)
+* [计算机组成原理](https://www.bilibili.com/video/BV1BE411D7ii)
+* [操作系统](https://www.bilibili.com/video/BV1YE411D7nH)
+* [信息安全——复旦大学（MOOC 优质课程）](https://www.bilibili.com/video/BV1jJ411X7nN)
 
 相关书籍推荐：
 
