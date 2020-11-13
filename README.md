@@ -61,18 +61,18 @@ John Washam的抽认卡网站：
 |    ├── Java新特性
 |    └── 源码学习
 ├── JavaWeb
-|	 ├── 前端
-|    |    ├── 前端基础
-|    |    |    ├── HTML
-|    |    |    ├── CSS
-|    |    |    └── JAVAScript
-|    |    ├── 模板引擎
-|    |    |    ├── Thymeleaf
-|    |    |    └── FreeMarker
-|    |    └── 组合框架
-|    |    	   ├── Vue
-|    |    	   └── React
 |	 └── JDBC
+├── 前端
+|    ├── 前端基础
+|    |    ├── HTML
+|    |    ├── CSS
+|    |    └── JAVAScript
+|    ├── 模板引擎
+|    |    ├── Thymeleaf
+|    |    └── FreeMarker
+|    └── 组合框架
+|    	   ├── Vue
+|    	   └── React
 ├── 进阶学习
 |    ├── Spring全家桶
 |    |    ├── Spring
@@ -133,7 +133,7 @@ John Washam的抽认卡网站：
 
 * [计算机网络](https://www.bilibili.com/video/BV19E411D78Q)
   - [x] 物理层
-  - [ ] 数据链路层
+  - [x] 数据链路层
   - [ ] 网络层
   - [ ] 传输层
   - [ ] 应用层
