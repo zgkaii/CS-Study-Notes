@@ -266,8 +266,8 @@ John Washam的抽认卡网站：
 ## Spring全家桶
 
 * Spring
-  - [x] AOP
   - [x] IoC、DI
+  - [x] AOP
   - [x] 事务管理
 * SpringBoot
   - [x] 日志框架
@@ -282,9 +282,17 @@ John Washam的抽认卡网站：
 
 
 
+持续更新... ...
+
 ---
 
+11/13-11/15 任务清单
 
+- [ ] React 入门学习
+- [ ] Response/Request...更新 
+- [ ] Spring/SpringBoot... 总结更新
+- [ ] 计算机网络——传输层/传输层/应用层
+- [ ]  [http://docs.swagger.io/swagger-core/current/apidocs/index.html?io/swagger/annotations](http://docs.swagger.io/swagger-core/current/apidocs/index.html?io/swagger/annotations) 
 
 
 
