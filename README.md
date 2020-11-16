@@ -135,8 +135,8 @@ John Washam的抽认卡网站：
   - [x] 物理层
   - [x] 数据链路层
   - [x] 网络层
-  - [ ] 传输层
-  - [ ] 应用层
+  - [x] 传输层
+  - [x] 应用层
   
 * [计算机组成原理](https://www.bilibili.com/video/BV1BE411D7ii)
 * [操作系统](https://www.bilibili.com/video/BV1YE411D7nH)
@@ -290,7 +290,6 @@ John Washam的抽认卡网站：
 - [ ] React学习
 - [ ] Response/Request...更新 
 - [ ] Spring/SpringBoot... 总结更新
-- [ ] 计算机网络——传输层/应用层
 - [ ] [Swagger UI]([http://docs.swagger.io/swagger-core/current/apidocs/index.html?io/swagger/annotations](http://docs.swagger.io/swagger-core/current/apidocs/index.html?io/swagger/annotations) )
 - [ ] PostgreSQL 
 - [ ] [REST](https://zhuanlan.zhihu.com/p/90367875)
