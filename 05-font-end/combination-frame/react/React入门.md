@@ -40,3 +40,5 @@ React_DeveloperTools 浏览器插件。
 http://www.woc12138.com/article/55
 
 [BootCDN](https://www.bootcdn.cn/)
+
+[React 入门实例教程](https://www.ruanyifeng.com/blog/2015/03/react.html)
