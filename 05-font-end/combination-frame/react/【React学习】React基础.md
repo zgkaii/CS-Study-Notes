@@ -1,21 +1,26 @@
 
-# 第一章 React入门
+# 1 React入门
 ## 1.1 React基础认识
 
 用于构建用户界面的 JavaScript 库（只关注于 View），由 Facebook 开源。
 
 **特点**
 
-1. Declarative（声明式编码）
-2. Component-Based（组件化编码）
-3. Learn Once，Write Anywhere（支持客户端与服务器渲染，React-Native）
-4. 高效
-5. 单向数据流
+* Declarative（声明式编码）
+
+* Component-Based（组件化编码）
+
+* Learn Once，Write Anywhere（支持客户端与服务器渲染，React-Native）
+
+* 高效
+
+* 单向数据流
 
 **高效的原因**
 
-1. 虚拟（virtual）DOM，不总是操作 DOM
-2. DOM Diff 算法，最小化页面重绘
+* 虚拟（virtual）DOM，不总是操作真实DOM。
+
+* DOM Diff 算法，最小化页面重绘。
 
 ## 1.2 React基本使用
 
@@ -64,7 +69,7 @@
 
 * 创建虚拟DOM（特别的 js 对象）的两种方式：
 
-1. React 提供的 API 来创建（纯 JS，一般不用）
+（1）React 提供的 API 来创建（纯 JS，一般不用）
 
 ```js
   <script type="text/javascript">
@@ -78,7 +83,7 @@
   </script>
 ```
 
-2. JSX 语法（需要 babel 转换为 js）
+（2）JSX 语法（需要 babel 转换为 js）
 
 ```js
   <script type="text/babel">
@@ -130,32 +135,33 @@ babel.js 的作用
 
 ### 1.3.3 渲染虚拟 DOM(元素)
 
-1.语法：`ReactDOM.render(virtualDOM, containerDOM)`
+* 语法：`ReactDOM.render(virtualDOM, containerDOM)`
 
-2.作用：将虚拟 DOM 元素渲染到页面中的真实容器 DOM 中显示
+* 作用：将虚拟 DOM 元素渲染到页面中的真实容器 DOM 中显示
 
-3.参数说明
+* 参数说明
 
-* 参数一：纯 js 或 jsx 创建的虚拟 dom 对象
-* 参数二：用来包含虚拟 DOM 元素的真实 dom 元素对象(一般是一个 div)
+  * 参数一：纯 js 或 jsx 创建的虚拟 dom 对象
+
+  * 参数二：用来包含虚拟 DOM 元素的真实 dom 元素对象(一般是一个 div)
 
 ## 1.4 模块与组件、模块化与组件化的理解
 
 **模块**
 
-1.理解：向外提供特定功能的 js 程序，一般就是一个 js 文件
+* 理解：向外提供特定功能的 js 程序，一般就是一个 js 文件
 
-2.为什么：js 代码很多很复杂
+* 为什么：js 代码很多很复杂
 
-3.作用：复用 js，简化 js 的编写，提高 js 运行效率
+* 作用：复用 js，简化 js 的编写，提高 js 运行效率
 
 **组件**
 
-1.理解：用来实现特定（局部）功能效果的代码集合（包含 html/css/js/图片 等）
+* 理解：用来实现特定（局部）功能效果的代码集合（包含 html/css/js/图片 等）
 
-2.为什么：一个界面的功能很复杂
+* 为什么：一个界面的功能很复杂
 
-3.作用：复用编码，简化项目编码，提高运行效率
+* 作用：复用编码，简化项目编码，提高运行效率
 
 **模块化**
 
@@ -165,47 +171,46 @@ babel.js 的作用
 
 当应用是以多组件的方式实现，这个应用就是一个组件化的应用
 
-## 二、React 面向组件编程
+# 2 React 面向组件编程
 
-### 2.1 自定义组件
+## 2.1 自定义组件
 
-1.定义组件的两种方式
+* **定义组件**的两种方式
 
-```
-// 方式1：工厂函数组件（是简单组件，没有state状态）
-function MyComponent() {
-  return <h2>工厂函数组件（简单组件）</h2>
-}
-// 方式2：ES6类组件（是复杂组件，可以有state）
-class MyComponent2 extends React.Component {
-  render() {
-    console.log(this) // MyComponent2的实例对象
-    return <h2>ES6类组件（复杂组件）</h2>
-  }
-}
-```
-
-2.渲染组件标签
-
-```
-ReactDOM.render(<MyComponent />, document.getElementById('example1'))
+```js
+    /*方式1: 工厂函数组件(简单组件)*/
+    function MyComponent () {
+      return <h2>工厂函数组件(简单组件)</h2>
+    }
+    /*方式2: ES6类组件(复杂组件)*/
+    class MyComponent2 extends React.Component {
+      render () {
+        console.log(this) // MyComponent2的实例对象
+        return <h2>ES6类组件(复杂组件)</h2>
+      }
+    }
 ```
 
-3.注意：
+* **渲染组件**标签
 
-- 组件名必须首字母大写
-- 虚拟 DOM 元素只能有一个根元素
-- 虚拟 DOM 元素必须有结束标签
+```js
+    ReactDOM.render(<MyComponent />, document.getElementById('example1'))
+    ReactDOM.render(<MyComponent2 />, document.getElementById('example2'))
+```
 
-4.render() 渲染组件标签的基本流程：
+* 注意：
+  * 组件名必须首字母大写
+  * 虚拟 DOM 元素只能有一个根元素
+  * 虚拟 DOM 元素必须有结束标签
 
-1. React 内部会创建组件实例对象
-2. 得到包含的虚拟 DOM 并解析为真实 DOM
-3. 插入到指定的页面元素内部
+* render() 渲染组件标签的基本流程：
+  * React 内部会创建组件实例对象
+  * 得到包含的虚拟 DOM 并解析为真实 DOM
+  * 插入到指定的页面元素内部
 
-### 2.2 组件三大属性
+## 2.2 组件三大属性
 
-#### 2.2.1 state
+### 2.2.1 state
 
 **理解**
 
@@ -235,7 +240,7 @@ this.setState({
 })
 ```
 
-#### 2.2.2 props
+### 2.2.2 props
 
 **理解**
 
@@ -280,7 +285,7 @@ constructor(props) {
 
 2.props：从组件外部向组件内部传递数据，组件内部只读不修改
 
-#### 2.2.3 refs
+### 2.2.3 refs
 
 1.组件内的标签都可以定义 ref 属性来标识自己
 
@@ -292,7 +297,7 @@ constructor(props) {
 
 3.作用：通过 ref 获取组件内容特定标签对象，进行读取其相关数据
 
-#### 2.2.4 事件处理
+### 2.2.4 事件处理
 
 1.通过 onXxx 属性指定组件的事件处理函数（如：onClick、onBlur，注意需要大写）
 
@@ -320,9 +325,9 @@ handleFocus(event) {
 
  b. 箭头函数（ES6模块化编码时才能使用）
 
-### 2.3 组件的组合
+## 2.3 组件的组合
 
-#### 2.3.1 功能界面的组件化编码流程（无比重要）
+### 2.3.1 功能界面的组件化编码流程（无比重要）
 
 1.拆分组件：拆分界面，抽取组件（有几个组件）
 
@@ -334,7 +339,7 @@ handleFocus(event) {
 
  b. 交互功能（从绑定事件监听开始）
 
-### 2.4 收集表单数据
+## 2.4 收集表单数据
 
 **理解**
 
@@ -358,9 +363,9 @@ b. **非受控组件**：需要时才手动读取表单输入框中的数据（r
 用户名：<input type="text" ref={input => this.nameInput = input} />
 ```
 
-### 2.5 组件生命周期
+## 2.5 组件生命周期
 
-#### 2.5.1 理解
+### 2.5.1 理解
 
 1.组件对象从创建到死亡它会经历特定的生命周期阶段
 
@@ -368,11 +373,11 @@ b. **非受控组件**：需要时才手动读取表单输入框中的数据（r
 
 3.我们在定义组件时，可以重写特定的生命周期回调函数，做特定的工作
 
-#### 2.5.2 生命周期流程图
+### 2.5.2 生命周期流程图
 
 ![image-20200823105645557](https://img-blog.csdnimg.cn/20200830142058207.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwNTA4ODMy,size_16,color_FFFFFF,t_70#pic_center)
 
-#### 2.5.3 生命周期详述
+### 2.5.3 生命周期详述
 
 1.组件的三个生命周期状态：
 
@@ -438,14 +443,14 @@ b. **非受控组件**：需要时才手动读取表单输入框中的数据（r
 
   - 一般在 `componentDidMount` 里面注册的事件需要在这里删除
 
-#### 2.5.4 重要的勾子
+### 2.5.4 重要的勾子
 
 1. render()：初始化渲染时或更新渲染时调用
 2. componentDidMount()：开启监听，可以初始化一些异步操作：启动定时器/发送 ajax 请求
 3. componentWillUnmount()：做一些收尾工作，如：清理定时器
 4. componentWillReceiveProps()：当组件接收到（父元素传递的）新的 props 属性前调用
 
-#### 2.5.5 **新的生命周期**
+### 2.5.5 **新的生命周期**
 
 **注意**
 
@@ -491,9 +496,9 @@ static getDerivedStateFromProps(props, state) {
 
 > 与 `componentDidUpdate` 一起，这个新的生命周期涵盖过时的 `componentWillUpdate` 的所有用例。
 
-### 2.6 虚拟 DOM 与 DOM Diff 算法
+## 2.6 虚拟 DOM 与 DOM Diff 算法
 
-#### 2.6.1 基本原理图
+### 2.6.1 基本原理图
 
 ![image-20200823152235286](https://img-blog.csdnimg.cn/20200830142058100.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwNTA4ODMy,size_16,color_FFFFFF,t_70#pic_center)
 
@@ -507,8 +512,4 @@ DOM Diff 能比较新旧虚拟 DOM 树，计算哪里改变，然后就只需要
 
 http://www.woc12138.com/article/55
 
-[BootCDN](https://www.bootcdn.cn/)
-
 [React 入门实例教程](https://www.ruanyifeng.com/blog/2015/03/react.html)
-
-https://www.html.cn/qa/react/15081.html
