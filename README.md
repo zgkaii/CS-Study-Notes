@@ -136,7 +136,7 @@ John Washam的抽认卡网站：
   - [x] 数据链路层
   - [x] 网络层
   - [x] 传输层
-  - [ ] 应用层
+  - [x] 应用层
   
 * [TCP/IP详解 卷1：协议](http://www.52im.net/topic-tcpipvol1.html)
 * [计算机组成原理](https://www.bilibili.com/video/BV1BE411D7ii)
