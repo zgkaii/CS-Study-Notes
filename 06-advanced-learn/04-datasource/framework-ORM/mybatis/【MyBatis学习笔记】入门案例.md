@@ -176,7 +176,7 @@ public interface UserDao {
     List<User> findAll();
 }
 ```
-##### 1. 修改MyBatis主配置文件SqlMapConfig.xml 
+##### 3. 修改MyBatis主配置文件SqlMapConfig.xml 
 ```xml
     <!--用注解来配置的话，此处应该使用class属性指定被注解的dao全限定类名-->
     <mappers>
@@ -193,7 +193,7 @@ public interface UserDao {
 
 
 ### 附录
-##### 1、Config约束与Mapper约束
+##### 1.Config约束与Mapper约束
 * Config:
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>

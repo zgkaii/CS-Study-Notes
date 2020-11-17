@@ -1,13 +1,12 @@
-### 一、Spring Bean到底是什么？
+### 一、SpringBean到底是什么？
 Bean是Spring中一个重要的概念。Spring官方文档对bean的解释是：  
 ```
 In Spring, the objects that form the backbone of your application and that are managed by the Spring IoC container are called beans. 
-A bean is an object that is instantiated, assembled, and managed by a Spring IoC container.Otherwise, a bean is simply one of many 
-objects in your application. Beans, and the dependencies among them, are reflected in the configuration metadata used by a container.
+A bean is an object that is instantiated, assembled, and managed by a Spring IoC container.Otherwise, a bean is simply one of many objects in your application. Beans, and the dependencies among them, are reflected in the configuration metadata used by a container.
 ```
 也就是说：
 ```
-在Spring中，构成应用程序主干并由Spring IoC容器管理的对象统称为beans。 bean是一个由Spring IoC容器实例化、组装和管理的对象。
+在Spring中，构成应用程序的主体并由Spring IoC容器管理的对象统称为beans。 bean是一个由Spring IoC容器实例化、组装和管理的对象。
 此外，bean只是应用程序中许多对象中的一个。Beans以及他们之间的依赖关系是通过容器配置元数据反映出来。
 ```
 可以看出：
@@ -15,9 +14,11 @@ objects in your application. Beans, and the dependencies among them, are reflect
 * bean由IoC容器管理
 * 实际应用程序中，有很多bean
 
+总而言之，bean 即是由 IoC 容器初始化、装配及管理的对象，除此之外，bean 就与应用程序中的其他对象没有什么区别了。而 bean 的定义以及 bean 相互间的依赖关系将通过配置元数据来描述。
+
 ### 二、IoC(Inversion of Control)容器又是什么？
 
-当某个 Java 实例需要另一个 Java 实例时，传统的方法是由调用者创建被调用者的实例（例如，使用 new 关键字获得被调用者实例），而使用 Spring 框架后，被调用者的实例不再由调用者创建，而是由具有依赖注入功能的 IOC 容器创建，这称为控制反转。
+当某个 Java 实例需要另一个 Java 实例时，传统的方法是由调用者创建被调用者的实例（例如，使用 new 关键字获得被调用者实例）；而使用 Spring 框架后，被调用者的实例不再由调用者创建，而是由具有依赖注入功能的 IoC 容器创建，这就是所谓的**控制反转**。
 
 这样带来的好处就有：
 * 资源集中管理，实现资源的可配置和易管理。
@@ -27,26 +28,26 @@ objects in your application. Beans, and the dependencies among them, are reflect
 Spring 提供了以下两种不同类型的容器：
 
 ##### 1.Spring BeanFactory
-* 提供了能够管理任何类型对象的高级配置机制。由org.springframework.beans.factory.BeanFactory接口来定义。
+* 提供了能够管理任何类型对象的高级配置机制。由`org.springframework.beans.factory.BeanFactory`接口来定义。
 
 ##### 2.Spring ApplicationContext
 * ApplicationContext是BeanFactory的子接口，提供了BeanFactory的所有功能，更容易集成Spring的AOP功能、资源访问、事件传播和特定的上下文应用层。
 
->通常不建议使用BeanFactory。
+>建议使用ApplicationContext。
 
 ![](https://img-blog.csdnimg.cn/20200910173222719.png)  
 
 ##### 3.ApplicationContext接口常用实现类：
-* ClassPathXmlApplicationContext:  
+* ClassPathXmlApplicationContext: 
 	从类的根路径下加载配置文件。（推荐使用）
-* FileSystemXmlApplicationContext:   
+* FileSystemXmlApplicationContext: 
 	从磁盘路径上加载配置文件，配置文件可以在磁盘的任意位置。（不推荐使用）
-* AnnotationConfigApplicationContext:   
+* AnnotationConfigApplicationContext: 
 	当使用注解配置容器对象时，需要使用此类来创建spring容器。（用来读取注解）
-  
 
-下面，写一个简单Demo，初步了解下IoC容器的使用：  
+下面，写一个简单Demo，初步了解下IoC容器的使用： 
 1）创建UserDao接口：
+
 ```java
 public interface UserDao {
     public void save();
@@ -92,7 +93,8 @@ class SpringDemoApplicationTest {
 }
 ```
 5）测试结果
-```
+
+```java
 save()执行了
 ```
 
@@ -100,7 +102,7 @@ save()执行了
 
 ![Bean与容器的关系](https://img-blog.csdnimg.cn/20200915131957564.png) 
 
-可见，Spring容器在启动时，先读取应用程序提供的Bean配置信息，并在Spring容器内部建立Bean定义注册表；然后根据注册表加载、实例化Bean,并装配好Bean之间的依赖关系；最后将这些准备就绪的Bean放到Bean缓存池中，以供外层的应用程序进行调用。
+可见，Spring容器在启动时，先读取应用程序提供的Bean配置信息，并在Spring容器内部建立Bean定义注册表；然后根据注册表加载、实例化Bean，并装配好Bean之间的依赖关系；最后将这些准备就绪的Bean放到Bean缓存池中，以供外层的应用程序进行调用。
 
 当然，要使应用程序中的Spring容器成功启动，需要以下三方面条件：  
 * Spring框架所需的包都放在类路径下。
@@ -111,15 +113,16 @@ save()执行了
 
 Bean的配置信息即是Bean的元数据信息，它主要分为基于XML配置与基于注解配置。但无论以何种方式配置，它都主要包含：
 * Bean 的实现类。
-* Bean 的属性信息,如数据源的连接数、用户名、密码等。
-* Bean 的依赖关系,Spring根据依赖关系配置完成Bean之间的装配。
-* Bean 的行为配置,如生命周期范围及生命周期各过程的回调函数等。
+* Bean 的属性信息，如数据源的连接数、用户名、密码等。
+* Bean 的依赖关系，Spring根据依赖关系配置完成Bean之间的装配。
+* Bean 的行为配置，如生命周期范围及生命周期各过程的回调函数等。
 
 ##### 1.基于XML配置
 通常情况下，Spring都会以XML文件格式作为Spring的配置文件，这种配置方式通过XML文件注册并管理 Bean之间的依赖关系。
 
-XML格式配置文件的根元素是`<beans>`，该元素包含了多个`<bean>`子元素，每一个`<bean>`子元素定义了一个Bean，并描述了该Bean如何被装配到Spring容器中。  
-例如上诉代码：  
+XML格式配置文件的根元素是`<beans>`，该元素包含了多个`<bean>`子元素，每一个`<bean>`子元素定义了一个Bean，并描述了该Bean如何被装配到Spring容器中。 
+例如上述代码：  
+
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
@@ -131,8 +134,8 @@ XML格式配置文件的根元素是`<beans>`，该元素包含了多个`<bean>`
     <bean id="UserDao" class="com.kai.demo.dao.impl.UserDaoImpl" />
 </beans>
 ```
-其中：  
-**id：给对象在容器中提供一个唯一标识。用于获取对象。**  
+其中： 
+**id：给对象在容器中提供一个唯一标识。用于获取对象。** 
 **class：指定类的全限定类名。用于反射创建对象。默认情况下调用无参构造函数。**
 
 <bean>元素中其他常用属性:
@@ -210,11 +213,12 @@ public class AccountServiceImpl implements IAccountService {
     }
 }
 ```
-1）单例模式：  
-出生：当容器创建时对象出生  
-活着：只要容器还在，对象一直活着    
-死亡：容器销毁，对象消亡    
+1）单例模式： 
+出生：当容器创建时对象出生 
+活着：只要容器还在，对象一直活着 
+死亡：容器销毁，对象消亡 
 总结：单例对象的生命周期和容器相同  
+
 ```xml
 <bean id="accountService" class="com.ioc.service.impl.AccountServiceImpl"
           scope="singleton" init-method="init" destroy-method="destroy"></bean>
@@ -226,10 +230,11 @@ public class AccountServiceImpl implements IAccountService {
 saveAccount()执行
 对象销毁了
 ```
-2）原型模式：   
-出生：当我们使用对象时spring框架为我们创建    
-活着：对象只要是在使用过程中就一直活着    
+2）原型模式： 
+出生：当我们使用对象时spring框架为我们创建 
+活着：对象只要是在使用过程中就一直活着 
 死亡：当对象长时间不用，且没有别的对象引用时，由Java的垃圾回收器回收  
+
 ```xml
 <bean id="accountService" class="com.ioc.service.impl.AccountServiceImpl"
           scope="prototype" init-method="init" destroy-method="destroy"></bean>
@@ -299,7 +304,7 @@ public class InstanceFactory {
 
 ### 六、什么是依赖注入？
 
-之前我们已经知道，将被调用者的实例交由 Spring容器创建，即是控制反转；而Spring容器在创建被调用者的实例时，会自动将调用者需要的对象实例注入给调用者，这样，调用者通过 Spring容器获得被调用者实例，这称为依赖注入。
+之前我们已经知道，将被调用者的实例交由 Spring容器创建，即是控制反转；而Spring容器在创建被调用者的实例时，会自动将调用者需要的对象实例注入给调用者，这样，调用者通过 Spring容器获得被调用者实例，这称为**依赖注入**。
 
 依赖注入主要有两种实现方式，分别是属性 set方法注入 和 构造方法注入。
 
@@ -329,16 +334,17 @@ public class AccountServiceImpl implements IAccountService {
     }
 }
 ```
-涉及的标签：property  
-出现的位置：bean标签的内部  
+涉及的标签：property 
+出现的位置：bean标签的内部 
 标签的属性： 
+
 * name：用于指定注入时所调用的set方法名称
 * value：用于提供基本类型和String类型的数据
 * ref：用于指定其他的bean类型数据。它指的就是在spring的Ioc核心容器中出现过的bean对象
 
-优势：  
-创建对象时没有明确的限制，可以直接使用默认构造函数  
-弊端：  
+优势： 
+创建对象时没有明确的限制，可以直接使用默认构造函数 
+弊端： 
 如果有某个成员必须有值，则获取对象是有可能set方法没有执行。
 
 XML配置文件：
@@ -372,9 +378,10 @@ public class AccountServiceImpl implements IAccountService {
     }
 }
 ```
-使用的标签：constructor-arg  
-标签出现的位置：bean标签的内部  
+使用的标签：constructor-arg 
+标签出现的位置：bean标签的内部 
 标签中的属性：  
+
 * type：用于指定要注入的数据的数据类型，该数据类型也是构造函数中某个或某些参数的类型
 * index：用于指定要注入的数据给构造函数中指定索引位置的参数赋值。索引的位置是从0开始
 * name：用于指定给构造函数中指定名称的参数赋值  
@@ -384,9 +391,9 @@ public class AccountServiceImpl implements IAccountService {
 * value：用于提供基本类型和String类型的数据  
 * ref：用于指定其他的bean类型数据。它指的就是在spring的Ioc核心容器中出现过的bean对象  
 
-优势：  
-在获取bean对象时，注入数据是必须的操作，否则对象无法创建成功。  
-弊端：  
+优势： 
+在获取bean对象时，注入数据是必须的操作，否则对象无法创建成功。 
+弊端： 
 改变了bean对象的实例化方式，使我们在创建对象时，如果用不到这些数据，也必须提供。
 
 ```xml
@@ -419,10 +426,11 @@ public class AccountServiceImpl3 implements IAccountService {
     }
 }
 ```
-用于给List结构集合注入的标签：  
-list array set  
-用于个Map结构集合注入的标签:  
+用于给List结构集合注入的标签： 
+list array set 
+用于个Map结构集合注入的标签: 
 map  props
+
 ```xml
     <bean id="accountService" class="com.kai.service.impl.AccountServiceImpl">
         <property name="myStrs">
@@ -481,7 +489,7 @@ map  props
 | @Resource | 其作用与Autowired一样。其区别在于@Autowired默认按照Bean类型装配，而@Resource默认按照Bean实例名称进行装配。 |
 | @Qualifier | 与 @Autowired 注解配合使用，会将默认的按 Bean 类型装配修改为按 Bean 的实例名称装配，Bean的实例名称由 @Qualifier 注解的参数指定。 |
 
-==下面举一个实例：==
+下面举一个例子：
 1）创建DAO层接口
 
 ```java
@@ -591,9 +599,9 @@ public class UserControllerTests {
 | 作用范围 | `<bean id="" class="" scope="">`| @Scope设置作用范围 |
 | 适合场景 | Bean来自第三方 | Bean的实现类由用户自己开发 |
 
-注解的优势:  
-配置简单，维护方便（我们找到类，就相当于找到了对应的配置）。  
-XML的优势：   
+注解的优势: 
+配置简单，维护方便（我们找到类，就相当于找到了对应的配置）。 
+XML的优势： 
 修改时，不用改源码。不涉及重新编译和部署。
 
 ### 九、Spring新注解
@@ -639,9 +647,9 @@ public DataSource getDataSource() throws PropertyVetoException {
 ```
 
 ###  十、Spring 整合 Junit  
-1、导入spring整合junit的jar(坐标)  
-2、使用Junit提供的一个注解把原有的main方法替换了，替换成spring提供的 @Runwith  
-3、告知spring的运行器，spring和ioc创建是基于xml还是注解的，并且说明位置  
+1、导入spring整合junit的jar(坐标) 
+2、使用Junit提供的一个注解把原有的main方法替换了，替换成spring提供的 @Runwith 
+3、告知spring的运行器，spring和ioc创建是基于xml还是注解的，并且说明位置 
  @ContextConfiguration  
 * locations：指定xml文件的位置，加上classpath关键字，表示在类路径下
 * classes：指定注解类所在地位置

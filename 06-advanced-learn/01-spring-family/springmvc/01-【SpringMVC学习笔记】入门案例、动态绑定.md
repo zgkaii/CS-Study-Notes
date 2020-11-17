@@ -4,30 +4,30 @@
 是浏览器/服务器。
 在 JavaEE 开发中，几乎全都是基于 B/S 架构的开发，B/S架构又分成了三层架构：
 
-* 表现层（UI）：  
+* 表现层（UI）： 
 通俗讲就是展现给用户的界面，即用户在使用一个系统的时候他的所见所得。
-* 业务逻辑层（BLL）：  
+* 业务逻辑层（BLL）： 
 针对具体问题的操作，也可以说是对数据层的操作，对数据业务逻辑处理。 
-* 数据访问层（DAL）：  
+* 数据访问层（DAL）： 
 该层所做事务直接操作数据库，针对数据的增添、删除、修改、更新、查找等。 
 
 ##### 2.MVC模型
 
 MVC全称是Model View Controller，意为模型视图控制器，主要作用与表现层（UI）。
-* 视图（View）：  
+* 视图（View）： 
 负责界面的显示，以及与用户的交互功能，例如表单、网页等。
 
-* 控制器（Controller）：  
+* 控制器（Controller）： 
 可以理解为一个分发器，用来决定对于视图发来的请求，需要用哪一个模型来处理，以及处理完后需要跳回到哪一个视图。即用来连接视图和模型。
 
 实际开发中，通常用控制器对客户端的请求数据进行封装（如将form表单发来的若干个表单字段值，封装到一个实体对象中），然后调用某一个模型来处理此请求，最后再转发请求（或重定向）到视图（或另一个控制器）。
 
-* 模型（Model）：  
+* 模型（Model）： 
 模型持有所有的数据、状态和程序逻辑。模型接受视图数据的请求，并返回最终的处理结果。
 
 ##### 3.SpringMVC的概述
 SpringMVC 是一种基于 Java 的实现 MVC 设计模型的请求驱动类型的轻量级 Web 框架，属于 SpringFrameWork 的后续产品，已经融合在 Spring Web Flow 里面。Spring 框架提供了构建 Web 应用程序的全功
-能 MVC 模块。  
+能 MVC 模块。 
 使用 Spring 可插入的 MVC 架构，从而在使用 Spring 进行 WEB 开发时，可以选择使用 Spring的 Spring MVC 框架或集成其他 MVC 开发框架，如 Struts1(现在一般不用)，Struts2 等。  
 SpringMVC 已经成为目前最主流的 MVC 框架之一，并且随着 Spring3.0 的发布，全面超越 Struts2，成为最优秀的 MVC 框架。
 
@@ -212,7 +212,7 @@ URL:`http://localhost:8080/anno/testRequestParam?name=zhangsan`
 （2）**@RequestBody** 是用于获取HttpEntity（请求体）的内容（注意：不能用于GET请求）  
 * 属性：  
 required：是否必须有请求体，默认值是true。当取值为 true 时,get 请求方式会报错。如果取值为 false，get 请求得到是 null。 
- 
+
 示例代码：
 ```java
     @RequestMapping("/testRequestBody")
@@ -382,7 +382,7 @@ JSP:
 URL:`http://localhost:8080/anno/testSessionAttributes`    
 输出结果：  
 ![](https://img-blog.csdnimg.cn/20200917111630221.png#pic_center)  
-  
+
 URL:`http://localhost:8080/anno/getSessionAttributes`  
 测试结果：  
 ```shell script
@@ -417,33 +417,34 @@ REST（英文：Representational State Transfer，简称 REST）描述了一个�
 加简单轻量的方法设计和实现。值得注意的是 REST 并没有一个明确的标准，而更像是一种设计的风格。
 它本身并没有什么实用性，其核心价值在于如何设计出符合 REST 风格的网络接口。
 
-（2）restful 的优点  
+（2）restful 的优点 
 它结构清晰、符合标准、易于理解、扩展方便，所以正得到越来越多网站的采用。
 
-（3）restful 的特性：  
-**资源（Resources）**：  
-网络上的一个实体，或者说是网络上的一个具体信息。  
+（3）restful 的特性： 
+**资源（Resources）**： 
+网络上的一个实体，或者说是网络上的一个具体信息。 
 它可以是一段文本、一张图片、一首歌曲、一种服务，总之就是一个具体的存在。可以用一个 URI（统一
 资源定位符）指向它，每种资源对应一个特定的 URI 。要获取这个资源，访问它的 URI 就可以，因此 URI 即为每一个资源的独一无二的识别符。  
 
-**表现层（Representation）**：  
-把资源具体呈现出来的形式，叫做它的表现层 （Representation）。  
+**表现层（Representation）**： 
+把资源具体呈现出来的形式，叫做它的表现层 （Representation）。 
 比如，文本可以用 txt 格式表现，也可以用 HTML 格式、XML 格式、JSON 格式表现，甚至可以采用二进制格式。  
 
-**状态转化（State Transfer）**：  
-每发出一个请求，就代表了客户端和服务器的一次交互过程。  
+**状态转化（State Transfer）**： 
+每发出一个请求，就代表了客户端和服务器的一次交互过程。 
 HTTP 协议，是一个无状态协议，即所有的状态都保存在服务器端。因此，如果客户端想要操作服务器，
 必须通过某种手段，让服务器端发生“状态转化”（State Transfer）。而这种转化是建立在表现层之上的，所以
 就是 “表现层状态转化”。具体说，就是 HTTP 协议里面，四个表示操作方式的动词：GET 、POST 、PUT、
 DELETE。它们分别对应四种基本操作：GET 用来获取资源，POST 用来新建资源，PUT 用来更新资源，DELETE 用来
 删除资源。  
 
-restful 的示例：    
-/account/1 HTTP GET ： 得到 id = 1 的 account  
-/account/1 HTTP DELETE： 删除 id = 1 的 account  
+restful 的示例： 
+/account/1 HTTP GET ： 得到 id = 1 的 account 
+/account/1 HTTP DELETE： 删除 id = 1 的 account 
 /account/1 HTTP PUT： 更新 id = 1 的 account   
+
 ### 参考资料
-[三层架构与MVC模式](https://www.cnblogs.com/zdxster/p/5305187.html)  
-[SpringMVC执行原理](https://blog.csdn.net/GavinLi2588/article/details/78696867)  
-[SpringMVC中的参数绑定总结](https://blog.csdn.net/eson_15/article/details/51718633)  
+[三层架构与MVC模式](https://www.cnblogs.com/zdxster/p/5305187.html) 
+[SpringMVC执行原理](https://blog.csdn.net/GavinLi2588/article/details/78696867) 
+[SpringMVC中的参数绑定总结](https://blog.csdn.net/eson_15/article/details/51718633) 
 [SpringMVC参数绑定，这篇就够了！](https://www.cnblogs.com/haha12/p/11725287.html)

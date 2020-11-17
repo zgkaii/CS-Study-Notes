@@ -1,4 +1,4 @@
-### 一、：SpringMVC的异常处理
+### 一、SpringMVC的异常处理
  Controller调用service，service调用dao，异常都是向上抛出的，最终有DispatcherServlet找异常处理器进
 行异常的处理。
 <img src="https://img-blog.csdnimg.cn/20200917222310199.png" width="60%" alt=""/>
@@ -64,7 +64,7 @@ public class SysExceptionResolver implements HandlerExceptionResolver {
     }
 ```
 
-###  SpringMVC 中的拦截器
+###  二、SpringMVC 中的拦截器
 ##### 1. 拦截器的概述
 
 （1）SpringMVC框架中的拦截器用于对处理器进行预处理和后处理的技术。  

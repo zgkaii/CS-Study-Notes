@@ -136,8 +136,9 @@ John Washam的抽认卡网站：
   - [x] 数据链路层
   - [x] 网络层
   - [x] 传输层
-  - [x] 应用层
+  - [ ] 应用层
   
+* [TCP/IP详解 卷1：协议](http://www.52im.net/topic-tcpipvol1.html)
 * [计算机组成原理](https://www.bilibili.com/video/BV1BE411D7ii)
 * [操作系统](https://www.bilibili.com/video/BV1YE411D7nH)
 * [信息安全——复旦大学（MOOC 优质课程）](https://www.bilibili.com/video/BV1jJ411X7nN)
@@ -145,6 +146,7 @@ John Washam的抽认卡网站：
 相关书籍推荐：
 
 * [计算机网络（谢希仁）](https://book.douban.com/subject/2970300/)
+* [TCP/IP详解 卷1：协议](https://book.douban.com/subject/1088054/)
 * [编码的奥秘（Charles Petzold）](https://book.douban.com/subject/1024570/)
 * [深入理解计算机系统（Randal E.Bryant ）](https://book.douban.com/subject/5333562/)
 * [信息安全原理与实践](https://book.douban.com/subject/24733262/)
@@ -254,7 +256,6 @@ John Washam的抽认卡网站：
 - [ ] Hashtable
 - [ ] HashSet
 - [ ] TreeMap
-- [ ] ConcurrentHashMap
 
 > 待更新
 
@@ -279,6 +280,19 @@ John Washam的抽认卡网站：
 
 > 待深究
 
+## 前端
+
+* 前端基础
+  - [x] [HTML](https://www.runoob.com/html/html-tutorial.html)
+  - [x] [CSS布局学习指南](https://juejin.im/post/6844903634849759239)
+  - [ ] [JavaScript 教程](https://wangdoc.com/javascript/)
+  - [ ] [ES6 教程](https://wangdoc.com/es6/)
+* 模板引擎
+  - [ ] Thymeleaf
+* 前端框架
+  - [ ] React
+  - [ ] Vue
+
 
 
 待更新... ...
@@ -289,16 +303,11 @@ John Washam的抽认卡网站：
 
 - [ ] React学习
 - [ ] Response/Request...更新 
-- [ ] Spring/SpringBoot... 总结更新
 - [ ] [Swagger UI]([http://docs.swagger.io/swagger-core/current/apidocs/index.html?io/swagger/annotations](http://docs.swagger.io/swagger-core/current/apidocs/index.html?io/swagger/annotations) )
 - [ ] PostgreSQL 
 - [ ] [REST](https://zhuanlan.zhihu.com/p/90367875)
 
 - [ ] DTO——[java的几种对象(PO,VO,DAO,BO,POJO，DTO)解释](https://www.cnblogs.com/firstdream/archive/2012/04/13/2445582.html)
-
-
-
-
 
 
 

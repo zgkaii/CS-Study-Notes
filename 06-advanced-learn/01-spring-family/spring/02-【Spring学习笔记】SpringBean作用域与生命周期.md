@@ -208,7 +208,7 @@ public class GiraffeService {
 
 ```
 
-### 实现*Aware接口 在Bean中使用Spring框架的一些对象
+### 实现Aware接口 在Bean中使用Spring框架的一些对象
 
 有些时候我们需要在 Bean 的初始化中使用 Spring 框架自身的一些对象来执行一些操作，比如获取 ServletContext 的一些参数，获取 ApplicaitionContext 中的 BeanDefinition 的名字，获取 Bean 在容器中的名字等等。为了让 Bean 可以获取到框架自身的一些对象，Spring 提供了一组名为*Aware的接口。
 
@@ -296,7 +296,7 @@ public class CustomerBeanPostProcessor implements BeanPostProcessor {
 
 ### 总结
 
-所以。。。结合第一节控制台输出的内容，Spring Bean的生命周期是这样纸的：
+所以结合第一节控制台输出的内容，Spring Bean的生命周期是这样纸的：
 
 - Bean容器找到配置文件中 Spring Bean 的定义。
 - Bean容器利用Java Reflection API创建一个Bean的实例。

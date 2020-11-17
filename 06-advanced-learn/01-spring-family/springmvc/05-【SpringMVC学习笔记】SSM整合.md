@@ -9,7 +9,7 @@ SSM整合可以使用多种方式，咱们会选择XML + 注解的方式
 * 最后使用Spring整合MyBatis框架  
 
 ##### 2.创建数据库和表结构
-```shell script
+```mysql
 create database ssm;
 use ssm;
 create table account(
