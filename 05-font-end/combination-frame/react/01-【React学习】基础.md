@@ -68,15 +68,15 @@ React 是一个声明式，高效且灵活的用于构建用户界面的 JavaScr
 
 ### 1.3.1 JSX
 
-JSX全称`JavaScript XML`，它是React 定义的一种类似于 XML 的 JS 扩展语法（XML + JS）。它主要用来创建 React 虚拟 DOM（元素）对象。例如`var vDom = <h1>Hello JSX!</h1>`。
+JSX全称`JavaScript XML`，它是React 定义的一种类似于 XML 的 JS 扩展语法（XML + JS）。它**主要用来创建 React 虚拟 DOM**（元素）对象。例如`var vDom = <h1>Hello JSX!</h1>`。
 
 * 它即不是字符串，也不是 HTML/XML 标签
 * 它最终产生的就是一个 JS 对象
 
 基本语法规则：
 
-* 遇到 '<' 开头的代码，以标签的语法解析：html 同名标签转换为 html 同名元素，其它标签需要特别解析。
-* 遇到 '{' 开头的代码，以 JS 语法解析：**标签中的 js 代码必须用 {} 包含**。
+* 遇到 `<` 开头的代码，以标签的语法解析：html 同名标签转换为 html 同名元素，其它标签需要特别解析。
+* 遇到 `{`开头的代码，以 JS 语法解析：**标签中的 js 代码必须用 {} 包含**。
 
  也就是说，`js代码`中可以直接嵌套`<标签>`，但`<标签>`要嵌套`js代码` 需要放在 {} 中。
 
@@ -112,27 +112,21 @@ JSX全称`JavaScript XML`，它是React 定义的一种类似于 XML 的 JS 扩�
 
 * 虚拟 DOM 对象最终都会被 React 转换为真实的 DOM。
 
-* 使用虚拟DOM能**提高开发效率**。编码时基本只需要操作 React 的虚拟 DOM 的相关数据，React将其转换为真实DOM从而更新界面（因为虚拟 DOM 很“轻”，而真实 DOM 很“重”；真实 DOM 改变会重绘，而虚拟 DOM 变化不会更新界面，只有在渲染后才更新）
+* 使用虚拟DOM能**提高开发效率**。编码时基本只需要操作 React 的虚拟 DOM 的相关数据，React将其转换为真实DOM从而更新界面。（因为虚拟 DOM 很“轻”，而真实 DOM 很“重”；真实 DOM 改变会重绘，而虚拟 DOM 变化不会更新界面，只有在渲染后才更新）
 
 详细知识可以参考[【React深入】深入分析虚拟DOM的渲染原理和特性](https://segmentfault.com/a/1190000018891454)一文。
-
-> 在 Web 开发中，我们总需要将变化的数据实时反应到 UI 上，这时就需要对 DOM 进行操作。而复杂或频繁的DOM操作通常是性能瓶颈产生的原因，React 为此引入了虚拟 DOM（Virtual DOM）的机制：
->
-> 在浏览器端用 JS 实现了一套 DOM API。基于 React 进行开发时所有的 DOM 构造都是通过虚拟 DOM 进行，每当数据变化时，React 都会重新构建整个 DOM 树，然后 React 将当前整个 DOM 树和上一次的 DOM 树进行对比，得到 DOM 结构的区别，然后仅仅将需要变化的部分进行实际的浏览器 DOM 更新。而且 React 能够批处理虚拟 DOM 的刷新，在一个事件循环（Event Loop）内的两次数据变化会被合并，例如你连续的先将节点内容从 A 变成 B，然后又从 B 变成 A，React 会认为 UI 不发生任何变化，而如果通过手动控制，这种逻辑通常是极其复杂的。尽管每一次都需要构造完整的虚拟 DOM 树，但是因为虚拟 DOM 是内存数据，性能是极高的（很“轻”），而对实际 DOM 进行操作的仅仅是 Diff 部分，因而能达到提高性能的目的。
->
-> 这样，在保证性能的同时，开发者将不再需要关注某个数据的变化如何更新到一个或多个具体的 DOM 元素，而只需要关心在任意一个数据状态下，整个界面是如何 Render 的。
 
 ### 1.3.3 渲染虚拟 DOM(元素)
 
 语法：`ReactDOM.render(virtualDOM, containerDOM)`
 
-作用：将虚拟 DOM 元素渲染到页面中的真实容器 DOM 中显示
+作用：将虚拟 DOM 元素渲染到页面中的真实容器 DOM 中并显示
 
-参数说明
+参数说明：
 
-* 参数一：纯 js 或 jsx 创建的虚拟 DOM 对象
+* `virtualDOM`：纯 js 或 jsx 创建的虚拟 DOM 对象
 
-* 参数二：用来包含虚拟 DOM 元素的真实 DOM 元素对象(一般是一个 div)
+* `containerDOM`：用来包含虚拟 DOM 元素的真实 DOM 元素对象(一般是一个 div)
 
 ## 1.4 模块与组件、模块化与组件化的理解
 
@@ -140,15 +134,11 @@ JSX全称`JavaScript XML`，它是React 定义的一种类似于 XML 的 JS 扩�
 
 * 理解：向外提供特定功能的 js 程序，一般就是一个 js 文件
 
-* 为什么：js 代码很多很复杂
-
 * 作用：复用 js，简化 js 的编写，提高 js 运行效率
 
 **组件**
 
 * 理解：用来实现特定（局部）功能效果的代码集合（包含 html/css/js/图片 等）
-
-* 为什么：一个界面的功能很复杂
 
 * 作用：复用编码，简化项目编码，提高运行效率
 
@@ -164,12 +154,12 @@ JSX全称`JavaScript XML`，它是React 定义的一种类似于 XML 的 JS 扩�
 
 ## 2.1 自定义组件
 
-* **定义组件**的两种方式
+**定义组件**的两种方式
 
 ```js
-    /*方式1: 工厂函数组件(简单组件)*/
+    /*方式1: 函数组件(简单组件)*/
     function MyComponent () {
-      return <h2>工厂函数组件(简单组件)</h2>
+      return <h2>JavaScript 函数组件(简单组件)</h2>
     }
     /*方式2: ES6类组件(复杂组件)*/
     class MyComponent2 extends React.Component {
@@ -180,22 +170,22 @@ JSX全称`JavaScript XML`，它是React 定义的一种类似于 XML 的 JS 扩�
     }
 ```
 
-* **渲染组件**标签
+**渲染组件**标签
 
 ```js
     ReactDOM.render(<MyComponent />, document.getElementById('example1'))
     ReactDOM.render(<MyComponent2 />, document.getElementById('example2'))
 ```
 
-* 注意：
-  * 组件名必须首字母大写
-  * 虚拟 DOM 元素只能有一个根元素
-  * 虚拟 DOM 元素必须有结束标签
+注意：
+* 组件名必须首字母大写
+* 虚拟 DOM 元素只能有一个根元素
+* 虚拟 DOM 元素必须有结束标签
 
-* render() 渲染组件标签的基本流程：
-  * React 内部会创建组件实例对象
-  * 得到包含的虚拟 DOM 并解析为真实 DOM
-  * 插入到指定的页面元素内部
+render() 渲染组件标签的基本流程：
+* React 内部会创建组件实例对象
+* 得到包含的虚拟 DOM 并解析为真实 DOM
+* 插入到指定的页面元素内部
 
 ## 2.2 组件三大属性
 
@@ -229,11 +219,7 @@ this.setState({
 
 ### 2.2.2 props
 
-**理解**
-
 * 每个组件对象都会有 props（properties）属性，组件标签的所有属性都保存在 props 中
-
-**作用**
 
 * 通过标签属性从组件外向组件内传递变化的数据（组件内部不要修改 props 数据）
 
@@ -243,7 +229,7 @@ this.props.propertyName
 // 2.对props中的属性值进行类型限制和必要性限制
 Person.propTypes = { // 使用 prop-types 库
   name: PropTypes.string.isRequired,
-  age: PropTypes.number
+  age: PropTypes.number.isRequired
 }
 // 3.扩展属性：将对象的所有属性通过 props 传递
 <Person {...person} />
@@ -266,25 +252,25 @@ constructor(props) {
 
 ### 2.2.3 refs
 
-* 组件内的标签都可以定义 ref 属性来标识自己
+组件内的标签都可以定义 ref 属性来标识自己
 
-1.  `<input type="text" ref={input => this.msgInput = input} />`
+* `<input type="text" ref={input => this.msgInput = input} />`
 
-2.  ref 中的回调函数在组件初始化渲染完或卸载时自动调用（将 input 这个元素赋给组件实例对象的 this.msgInput）
+* ref 中的回调函数在组件初始化渲染完或卸载时自动调用（将 input 这个元素赋给组件实例对象的 this.msgInput）
 
-* 在组件中可以通过 this.msgInput.value 来得到对应的真实 DOM 元素的值
+在组件中可以通过 this.msgInput.value 来得到对应的真实 DOM 元素的值
 
-* 作用：通过 ref 获取组件内容特定标签对象，进行读取其相关数据
+作用：通过 ref 获取组件内容特定标签对象，进行读取其相关数据
 
 ### 2.2.4 事件处理
 
-* 通过 onXxx 属性指定组件的事件处理函数（如：onClick、onBlur，注意需要大写）
+通过 onXxx 属性指定组件的事件处理函数（如：onClick、onBlur，注意需要大写）
 
-1. React 使用的是自定义（合成）事件，而不是使用的原生 DOM 事件
+* React 使用的是自定义（合成）事件，而不是使用的原生 DOM 事件
 
-2. React 中的事件是通过事件委托方式处理的（委托给组件最外层的元素）
+* React 中的事件是通过事件委托方式处理的（委托给组件最外层的元素）
 
-* 通过 event.target 得到发生事件的 DOM 元素对象
+通过 event.target 得到发生事件的 DOM 元素对象
 
 ```js
 <input onFocus={this.handleFocus}/>
@@ -300,27 +286,24 @@ handleFocus(event) {
 
 * 在组件类中自定义的方法中 this 为 null
 
-1. 强制绑定 this：通过函数对象的 bind()
+  * 强制绑定 this：通过函数对象的 bind()
+  * 箭头函数（ES6模块化编码时才能使用）
 
-2. 箭头函数（ES6模块化编码时才能使用）
+## 2.3 **功能界面的组件化编码流程（==重要==）**
 
-## 2.3 组件的组合使用
+第一步：拆分组件——拆分界面，抽取组件（有几个组件）
 
-**功能界面的组件化编码流程（重要）**
+第二步：实现静态组件——使用组件实现静态页面效果（写 render）只有静态界面，没有动态数据和交互
 
-* 拆分组件：拆分界面，抽取组件（有几个组件）
-
-* 实现静态组件：使用组件实现静态页面效果（写 render）只有静态界面，没有动态数据和交互
-
-* 实现动态组件
-  * 动态显示初始化数据（数据定义在哪一个组件中）
-  * 交互功能（从绑定事件监听开始）
+第三步：实现动态组件
+* 动态显示初始化数据（数据定义在哪一个组件中）
+* 交互功能（从绑定事件监听开始）
 
 ## 2.4 收集表单数据
 
-* 包含表单的组件分类 
+包含表单的组件分类 
 
-1. **受控组件**：表单项输入数据能自动收集成状态（onChange）
+* **受控组件**：表单项输入数据能自动收集成状态（onChange）
 
 更贴近 react 思想，尽量少操作 DOM（一般更推荐这种写法）
 
@@ -328,7 +311,7 @@ handleFocus(event) {
 密码：<input type="password" value={this.state.pwd} onChange={this.handleChange} />
 ```
 
-2. **非受控组件**：需要时才手动读取表单输入框中的数据（ref）
+* **非受控组件**：需要时才手动读取表单输入框中的数据（ref）
 
 写起来轻松，但是操作了原生 DOM（this.nameInput.value）
 
@@ -340,23 +323,21 @@ handleFocus(event) {
 
 ### 2.5.1 生命周期流程图
 
-* 组件对象从创建到死亡会经历不同的生命周期阶段。
+组件对象从创建到死亡会经历不同的生命周期阶段。React 组件对象包含一系列的**勾子函数**（生命周期回调函数），在生命周期特定时刻回调。在定义组件时，我们可以重写特定的生命周期回调函数，做特定的工作。
 
-* React 组件对象包含一系列的**勾子函数**（生命周期回调函数），在生命周期特定时刻回调。
-
-* 在定义组件时，我们可以重写特定的生命周期回调函数，做特定的工作。
+React 在 v16.3 之前，生命周期流程如下：
 
 ![](https://img-blog.csdnimg.cn/2020111815355123.png)
 
 ### 2.5.2 生命周期详述
 
-（1）组件的三个生命周期状态
+1. 组件的三个生命周期状态
 
 - Mount：挂载过程，第一次将组件插入到真实 DOM
 - Update：更新过程，组件被重新渲染
 - Unmount：卸载过程，被移出真实 DOM
 
-（2）**生命周期流程**：
+2. **生命周期流程**：
 
 **创建阶段（第一次初始化渲染显示）**
 
@@ -364,7 +345,7 @@ handleFocus(event) {
 
 - constructor()：`super(props)` 指定 this，`this.state={}` 创建初始化状态（getDefaultProps、getInitialState）
 
-- componentWillMount()：组件将要挂载到页面上
+- componentWillMount()：组件将挂载到页面上
 
   - 可以在这里调用 setState() 方法修改 state
 
@@ -420,7 +401,7 @@ handleFocus(event) {
 
 > 由于 React 未来的版本中推出了异步渲染，在 `dom` 被挂载之前的阶段都可以被打断重来，导致 `componentWillMount`、`componentWillUpdate`、`componentWillReceiveProps` 在一次更新中可能会被触发多次，因此那些只希望触发一次的应该放在 `componentDidUpdate` 中。这也就是为什么要把异步请求放在 `componentDidMount` 中，而不是放在 `componentWillMount` 中的原因，为了向后兼容。
 
-**目前新的生命周期流程图：**
+**新的生命周期流程图：**
 
 ![](https://img-blog.csdnimg.cn/20201118153504347.png)
 
@@ -432,7 +413,7 @@ handleFocus(event) {
 
 它是一个**静态**函数，所以函数体内不能访问 this，输出完全由输入的参数 nextProps 和 prevState 来决定，如果 props 传入的内容不需要影响到 state，那么就需要返回一个 null，这个返回值是必须的。
 
-```
+```js
 static getDerivedStateFromProps(props, state) {
   if (props.currentRow !== state.lastRow) { 
     // 如果新的props的当前行大于之前的state的最后一行，就向下滚动
@@ -460,26 +441,21 @@ static getDerivedStateFromProps(props, state) {
 
 ## 2.6 虚拟 DOM 与 DOM Diff 算法
 
-### 2.6.1 基本原理图
-
-![image-20200823152235286](https://img-blog.csdnimg.cn/20200830142058100.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwNTA4ODMy,size_16,color_FFFFFF,t_70#pic_center)
-
 DOM Diff 能比较新旧虚拟 DOM 树，计算哪里改变，然后就只需要重绘变化的局部界面。
 
-### 2.6.2 DOM Diff分析
+![](https://img-blog.csdnimg.cn/20201118223235467.png)
+
+**DOM-diff**的过程：
+
+1. 用JS对象模拟DOM（虚拟DOM）
+2. 把此虚拟DOM转成真实DOM并插入页面中（render）
+3. 如果有事件发生修改了虚拟DOM，比较两棵虚拟DOM树的差异，得到差异对象（diff）
+4. 把差异对象应用到真正的DOM树上（patch）
 
 # 参考资料
 
 [React实战教程](https://www.bilibili.com/video/BV184411x7F9)
 
-[React中文文档](https://zh-hans.reactjs.org/docs/getting-started.html)
-
-[React 入门实例教程](https://www.ruanyifeng.com/blog/2015/03/react.html)
-
-[图解ES6中的React生命周期](https://juejin.im/post/6844903510538977287)
-
 [React 的生命周期变化](https://juejin.im/post/6844904005152276487)
 
 [让虚拟DOM和DOM-diff不再成为你的绊脚石](https://juejin.im/post/6844903806132568072)
-
-[虚拟 DOM 到底是什么？](https://segmentfault.com/a/1190000019510611)

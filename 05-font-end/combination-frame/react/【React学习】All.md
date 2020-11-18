@@ -1,8 +1,8 @@
-
 # 1 React入门
+
 ## 1.1 React基础认识
 
-用于构建用户界面的 JavaScript 库（只关注于 View），由 Facebook 开源。
+React 是一个声明式，高效且灵活的用于构建用户界面的 JavaScript 库，由 Facebook 开源。使用 React 可以将一些简短、独立的代码片段组合成复杂的 UI 界面，这些代码片段被称作“组件”。
 
 **特点**
 
@@ -14,27 +14,28 @@
 
 * 高效
 
-* 单向数据流
+* 单向响应的数据流
 
 **高效的原因**
 
-* 虚拟（virtual）DOM，不总是操作真实DOM。
+* 虚拟（virtual）DOM，不总是操作真实DOM。采用DOM Diff 算法，最小化页面重绘。
 
-* DOM Diff 算法，最小化页面重绘。
 
 ## 1.2 React基本使用
 
 **相关 js 库**
 
-1. **react.min.js** ——React 的核心库。
-2. **react-dom.min.js** ——提供与 DOM 相关的功能。
-3. **babel.min.js** ——Babel 可以将 ES6 代码转为 ES5 代码，这样我们就能在目前不支持 ES6 浏览器上执行 React 代码。Babel 内嵌了对 **JSX** 的支持。通过将 Babel 和 babel-sublime 包（package）一同使用可以让源码的语法渲染上升到一个全新的水平。
+* **react.min.js** ——React 的核心库。
+* **react-dom.min.js** ——提供与 DOM 相关的功能。
+* **babel.min.js** ——Babel 可以将 ES6 代码转为 ES5 代码，这样我们就能在目前不支持 ES6 浏览器上执行 React 代码。Babel 内嵌了对 **JSX** 的支持，凡是使用 JSX 的地方，都要在 script 标签中加上 type="text/babel" 。
 
-**使用 React 开发者工具调试**
+**React 开发者工具**
 
-* React DeveloperTools 浏览器插件。
+* [React DeveloperTools插件](https://github.com/facebook/react-devtools)。
 
-基本案例：
+![](https://img-blog.csdnimg.cn/2020111816474539.png)
+
+入门案例——HelloReact：
 
 ```html
 <!DOCTYPE html>
@@ -65,19 +66,32 @@
 
 ## 1.3 React JSX
 
-### 1.3.1 虚拟DOM
+### 1.3.1 JSX
 
-* 创建虚拟DOM（特别的 js 对象）的两种方式：
+JSX全称`JavaScript XML`，它是React 定义的一种类似于 XML 的 JS 扩展语法（XML + JS）。它**主要用来创建 React 虚拟 DOM**（元素）对象。例如`var vDom = <h1>Hello JSX!</h1>`。
+
+* 它即不是字符串，也不是 HTML/XML 标签
+* 它最终产生的就是一个 JS 对象
+
+基本语法规则：
+
+* 遇到 `<` 开头的代码，以标签的语法解析：html 同名标签转换为 html 同名元素，其它标签需要特别解析。
+* 遇到 `{`开头的代码，以 JS 语法解析：**标签中的 js 代码必须用 {} 包含**。
+
+ 也就是说，`js代码`中可以直接嵌套`<标签>`，但`<标签>`要嵌套`js代码` 需要放在 {} 中。
+
+### 1.3.2 虚拟DOM
+
+创建虚拟DOM（特别的 js 对象）的两种方式：
 
 （1）React 提供的 API 来创建（纯 JS，一般不用）
 
 ```js
   <script type="text/javascript">
-    // 1. 创建虚拟DOM
-    const msg = 'I Like You!'
-    const myId = 'Kai'
-    /*方式一: 纯JS创建虚拟DOM元素对象*/
-    const vDOM1 = React.createElement('h2', {id: myId}, msg.toUpperCase())
+    // 1. 纯JS创建虚拟DOM元素对象
+    const msg1 = 'I Like You!'
+    const myId1 = 'kai'
+    const vDOM1 = React.createElement('h2', {id: myId1}, msg1.toUpperCase())
     // 2. 渲染到真实页面
 	ReactDOM.render(vDOM2, document.getElementById('test1'))
   </script>
@@ -87,9 +101,10 @@
 
 ```js
   <script type="text/babel">
-    // 1. 创建虚拟DOM
-    /*方式二: JSX创建虚拟DOM元素对象*/
-    const vDOM2 = <h3 id={myId.toUpperCase()}>{msg.toLowerCase()}</h3>
+    // 1. JSX创建虚拟DOM元素对象
+    const msg1 = 'I Like You!'
+    const myId1 = 'kai'  
+    const vDOM2 = <h3 id={myId2.toUpperCase()}>{msg2.toLowerCase()}</h3>
     // 2. 渲染到真实页面
     ReactDOM.render(vDOM2, document.getElementById('test2'))
   </script>
@@ -97,53 +112,21 @@
 
 * 虚拟 DOM 对象最终都会被 React 转换为真实的 DOM。
 
-* 使用虚拟DOM能**提高开发效率**。编码时基本只需要操作 React 的虚拟 DOM 的相关数据，React将其转换为真实DOM从而更新界面（因为虚拟 DOM 很“轻”，而真实 DOM 很“重”；真实 DOM 改变会重绘，而虚拟 DOM 变化不会更新界面，只有在渲染后才更新）
+* 使用虚拟DOM能**提高开发效率**。编码时基本只需要操作 React 的虚拟 DOM 的相关数据，React将其转换为真实DOM从而更新界面。（因为虚拟 DOM 很“轻”，而真实 DOM 很“重”；真实 DOM 改变会重绘，而虚拟 DOM 变化不会更新界面，只有在渲染后才更新）
 
 详细知识可以参考[【React深入】深入分析虚拟DOM的渲染原理和特性](https://segmentfault.com/a/1190000018891454)一文。
 
-> 在 Web 开发中，我们总需要将变化的数据实时反应到 UI 上，这时就需要对 DOM 进行操作。而复杂或频繁的DOM操作通常是性能瓶颈产生的原因，React 为此引入了虚拟 DOM（Virtual DOM）的机制：
->
-> 在浏览器端用 JS 实现了一套 DOM API。基于 React 进行开发时所有的 DOM 构造都是通过虚拟 DOM 进行，每当数据变化时，React 都会重新构建整个 DOM 树，然后 React 将当前整个 DOM 树和上一次的 DOM 树进行对比，得到 DOM 结构的区别，然后仅仅将需要变化的部分进行实际的浏览器 DOM 更新。而且 React 能够批处理虚拟 DOM 的刷新，在一个事件循环（Event Loop）内的两次数据变化会被合并，例如你连续的先将节点内容从 A 变成 B，然后又从 B 变成 A，React 会认为 UI 不发生任何变化，而如果通过手动控制，这种逻辑通常是极其复杂的。尽管每一次都需要构造完整的虚拟 DOM 树，但是因为虚拟 DOM 是内存数据，性能是极高的（很“轻”），而对实际 DOM 进行操作的仅仅是 Diff 部分，因而能达到提高性能的目的。
->
-> 这样，在保证性能的同时，开发者将不再需要关注某个数据的变化如何更新到一个或多个具体的 DOM 元素，而只需要关心在任意一个数据状态下，整个界面是如何 Render 的。
-
-### 1.3.2 JSX
-
-JSX全称: JavaScript XML，它是React 定义的一种类似于 XML 的 JS 扩展语法 XML + JS。
-
-作用：用来创建 React 虚拟 DOM（元素）对象
-
-* `var vDom = <h1>Hello JSX!</h1>`
-* 注意1：它不是字符串，也不是 HTML/XML 标签
-* 注意2：它最终产生的就是一个 JS 对象
-
-标签名任意：HTML 标签或其它标签（可以自定义）
-
-标签属性任意：HTML 标签属性或其它（可以自定义）
-
-基本语法规则
-
-* 遇到 '<' 开头的代码，以标签的语法解析：html 同名标签转换为 html 同名元素，其它标签需要特别解析
-* 遇到 '{' 开头的代码，以 JS 语法解析：**标签中的 js 代码必须用 {} 包含**
-
- 也就是说：js 中可以直接嵌套<标签>，但标签要嵌套 js 需要放在 {} 中
-
-babel.js 的作用
-
-* 浏览器不能直接解析 JSX 代码，需要 babel 转译为纯 JS 的代码才能运行
-* 只要用了 JSX，都要在 script 标签中加上 `type="text/babel"` 来声明需要 babel 来处理
-
 ### 1.3.3 渲染虚拟 DOM(元素)
 
-* 语法：`ReactDOM.render(virtualDOM, containerDOM)`
+语法：`ReactDOM.render(virtualDOM, containerDOM)`
 
-* 作用：将虚拟 DOM 元素渲染到页面中的真实容器 DOM 中显示
+作用：将虚拟 DOM 元素渲染到页面中的真实容器 DOM 中并显示
 
-* 参数说明
+参数说明：
 
-  * 参数一：纯 js 或 jsx 创建的虚拟 dom 对象
+* `virtualDOM`：纯 js 或 jsx 创建的虚拟 DOM 对象
 
-  * 参数二：用来包含虚拟 DOM 元素的真实 dom 元素对象(一般是一个 div)
+* `containerDOM`：用来包含虚拟 DOM 元素的真实 DOM 元素对象(一般是一个 div)
 
 ## 1.4 模块与组件、模块化与组件化的理解
 
@@ -151,15 +134,11 @@ babel.js 的作用
 
 * 理解：向外提供特定功能的 js 程序，一般就是一个 js 文件
 
-* 为什么：js 代码很多很复杂
-
 * 作用：复用 js，简化 js 的编写，提高 js 运行效率
 
 **组件**
 
 * 理解：用来实现特定（局部）功能效果的代码集合（包含 html/css/js/图片 等）
-
-* 为什么：一个界面的功能很复杂
 
 * 作用：复用编码，简化项目编码，提高运行效率
 
@@ -175,12 +154,12 @@ babel.js 的作用
 
 ## 2.1 自定义组件
 
-* **定义组件**的两种方式
+**定义组件**的两种方式
 
 ```js
-    /*方式1: 工厂函数组件(简单组件)*/
+    /*方式1: 函数组件(简单组件)*/
     function MyComponent () {
-      return <h2>工厂函数组件(简单组件)</h2>
+      return <h2>JavaScript 函数组件(简单组件)</h2>
     }
     /*方式2: ES6类组件(复杂组件)*/
     class MyComponent2 extends React.Component {
@@ -191,22 +170,22 @@ babel.js 的作用
     }
 ```
 
-* **渲染组件**标签
+**渲染组件**标签
 
 ```js
     ReactDOM.render(<MyComponent />, document.getElementById('example1'))
     ReactDOM.render(<MyComponent2 />, document.getElementById('example2'))
 ```
 
-* 注意：
-  * 组件名必须首字母大写
-  * 虚拟 DOM 元素只能有一个根元素
-  * 虚拟 DOM 元素必须有结束标签
+注意：
+* 组件名必须首字母大写
+* 虚拟 DOM 元素只能有一个根元素
+* 虚拟 DOM 元素必须有结束标签
 
-* render() 渲染组件标签的基本流程：
-  * React 内部会创建组件实例对象
-  * 得到包含的虚拟 DOM 并解析为真实 DOM
-  * 插入到指定的页面元素内部
+render() 渲染组件标签的基本流程：
+* React 内部会创建组件实例对象
+* 得到包含的虚拟 DOM 并解析为真实 DOM
+* 插入到指定的页面元素内部
 
 ## 2.2 组件三大属性
 
@@ -240,11 +219,7 @@ this.setState({
 
 ### 2.2.2 props
 
-**理解**
-
 * 每个组件对象都会有 props（properties）属性，组件标签的所有属性都保存在 props 中
-
-**作用**
 
 * 通过标签属性从组件外向组件内传递变化的数据（组件内部不要修改 props 数据）
 
@@ -254,7 +229,7 @@ this.props.propertyName
 // 2.对props中的属性值进行类型限制和必要性限制
 Person.propTypes = { // 使用 prop-types 库
   name: PropTypes.string.isRequired,
-  age: PropTypes.number
+  age: PropTypes.number.isRequired
 }
 // 3.扩展属性：将对象的所有属性通过 props 传递
 <Person {...person} />
@@ -277,25 +252,25 @@ constructor(props) {
 
 ### 2.2.3 refs
 
-* 组件内的标签都可以定义 ref 属性来标识自己
+组件内的标签都可以定义 ref 属性来标识自己
 
-1.  `<input type="text" ref={input => this.msgInput = input} />`
+* `<input type="text" ref={input => this.msgInput = input} />`
 
-2. ref 中的回调函数在组件初始化渲染完或卸载时自动调用（将 input 这个元素赋给组件实例对象的 this.msgInput）
+* ref 中的回调函数在组件初始化渲染完或卸载时自动调用（将 input 这个元素赋给组件实例对象的 this.msgInput）
 
-* 在组件中可以通过 this.msgInput.value 来得到对应的真实 DOM 元素的值
+在组件中可以通过 this.msgInput.value 来得到对应的真实 DOM 元素的值
 
-* 作用：通过 ref 获取组件内容特定标签对象，进行读取其相关数据
+作用：通过 ref 获取组件内容特定标签对象，进行读取其相关数据
 
 ### 2.2.4 事件处理
 
-* 通过 onXxx 属性指定组件的事件处理函数（如：onClick、onBlur，注意需要大写）
+通过 onXxx 属性指定组件的事件处理函数（如：onClick、onBlur，注意需要大写）
 
-1. React 使用的是自定义（合成）事件，而不是使用的原生 DOM 事件
+* React 使用的是自定义（合成）事件，而不是使用的原生 DOM 事件
 
-2. React 中的事件是通过事件委托方式处理的（委托给组件最外层的元素）
+* React 中的事件是通过事件委托方式处理的（委托给组件最外层的元素）
 
-* 通过 event.target 得到发生事件的 DOM 元素对象
+通过 event.target 得到发生事件的 DOM 元素对象
 
 ```js
 <input onFocus={this.handleFocus}/>
@@ -311,27 +286,24 @@ handleFocus(event) {
 
 * 在组件类中自定义的方法中 this 为 null
 
-1. 强制绑定 this：通过函数对象的 bind()
+  * 强制绑定 this：通过函数对象的 bind()
+  * 箭头函数（ES6模块化编码时才能使用）
 
-2. 箭头函数（ES6模块化编码时才能使用）
+## 2.3 功能界面的组件化编码流程
 
-## 2.3 组件的组合使用
+第一步：拆分组件——拆分界面，抽取组件（有几个组件）
 
-**功能界面的组件化编码流程（重要）**
+第二步：实现静态组件——使用组件实现静态页面效果（写 render）只有静态界面，没有动态数据和交互
 
-* 拆分组件：拆分界面，抽取组件（有几个组件）
-
-* 实现静态组件：使用组件实现静态页面效果（写 render）只有静态界面，没有动态数据和交互
-
-* 实现动态组件
-  * 动态显示初始化数据（数据定义在哪一个组件中）
-  * 交互功能（从绑定事件监听开始）
+第三步：实现动态组件
+* 动态显示初始化数据（数据定义在哪一个组件中）
+* 交互功能（从绑定事件监听开始）
 
 ## 2.4 收集表单数据
 
-* 包含表单的组件分类 
+包含表单的组件分类 
 
-1. **受控组件**：表单项输入数据能自动收集成状态（onChange）
+* **受控组件**：表单项输入数据能自动收集成状态（onChange）
 
 更贴近 react 思想，尽量少操作 DOM（一般更推荐这种写法）
 
@@ -339,7 +311,7 @@ handleFocus(event) {
 密码：<input type="password" value={this.state.pwd} onChange={this.handleChange} />
 ```
 
-2. **非受控组件**：需要时才手动读取表单输入框中的数据（ref）
+* **非受控组件**：需要时才手动读取表单输入框中的数据（ref）
 
 写起来轻松，但是操作了原生 DOM（this.nameInput.value）
 
@@ -351,23 +323,21 @@ handleFocus(event) {
 
 ### 2.5.1 生命周期流程图
 
-* 组件对象从创建到死亡会经历不同的生命周期阶段。
+组件对象从创建到死亡会经历不同的生命周期阶段。React 组件对象包含一系列的**勾子函数**（生命周期回调函数），在生命周期特定时刻回调。在定义组件时，我们可以重写特定的生命周期回调函数，做特定的工作。
 
-* React 组件对象包含一系列的**勾子函数**（生命周期回调函数），在生命周期特定时刻回调。
-
-* 在定义组件时，我们可以重写特定的生命周期回调函数，做特定的工作。
+React 在 v16.3 之前，生命周期流程如下：
 
 ![](https://img-blog.csdnimg.cn/2020111815355123.png)
 
 ### 2.5.2 生命周期详述
 
-（1）组件的三个生命周期状态
+1. 组件的三个生命周期状态
 
 - Mount：挂载过程，第一次将组件插入到真实 DOM
 - Update：更新过程，组件被重新渲染
 - Unmount：卸载过程，被移出真实 DOM
 
-（2）**生命周期流程**：
+2. **生命周期流程**：
 
 **创建阶段（第一次初始化渲染显示）**
 
@@ -375,7 +345,7 @@ handleFocus(event) {
 
 - constructor()：`super(props)` 指定 this，`this.state={}` 创建初始化状态（getDefaultProps、getInitialState）
 
-- componentWillMount()：组件将要挂载到页面上
+- componentWillMount()：组件将挂载到页面上
 
   - 可以在这里调用 setState() 方法修改 state
 
@@ -431,7 +401,7 @@ handleFocus(event) {
 
 > 由于 React 未来的版本中推出了异步渲染，在 `dom` 被挂载之前的阶段都可以被打断重来，导致 `componentWillMount`、`componentWillUpdate`、`componentWillReceiveProps` 在一次更新中可能会被触发多次，因此那些只希望触发一次的应该放在 `componentDidUpdate` 中。这也就是为什么要把异步请求放在 `componentDidMount` 中，而不是放在 `componentWillMount` 中的原因，为了向后兼容。
 
-**目前新的生命周期流程图：**
+**新的生命周期流程图：**
 
 ![](https://img-blog.csdnimg.cn/20201118153504347.png)
 
@@ -443,7 +413,7 @@ handleFocus(event) {
 
 它是一个**静态**函数，所以函数体内不能访问 this，输出完全由输入的参数 nextProps 和 prevState 来决定，如果 props 传入的内容不需要影响到 state，那么就需要返回一个 null，这个返回值是必须的。
 
-```
+```js
 static getDerivedStateFromProps(props, state) {
   if (props.currentRow !== state.lastRow) { 
     // 如果新的props的当前行大于之前的state的最后一行，就向下滚动
@@ -471,44 +441,48 @@ static getDerivedStateFromProps(props, state) {
 
 ## 2.6 虚拟 DOM 与 DOM Diff 算法
 
-### 2.6.1 基本原理图
-
-![image-20200823152235286](https://img-blog.csdnimg.cn/20200830142058100.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwNTA4ODMy,size_16,color_FFFFFF,t_70#pic_center)
-
 DOM Diff 能比较新旧虚拟 DOM 树，计算哪里改变，然后就只需要重绘变化的局部界面。
 
-# 3 react 应用（基于 react 脚手架）
+![](https://img-blog.csdnimg.cn/20201118223235467.png)
 
-### 3.1 使用 create-react-app 创建 react 应用
+**DOM-diff**的过程：
 
-#### 3.1.1. react 脚手架
+1. 用JS对象模拟DOM（虚拟DOM）
+2. 把此虚拟DOM转成真实DOM并插入页面中（render）
+3. 如果有事件发生修改了虚拟DOM，比较两棵虚拟DOM树的差异，得到差异对象（diff）
+4. 把差异对象应用到真正的DOM树上（patch）
 
-1.xxx 脚手架：用来帮助程序员快速创建一个基于 xxx 库的模板项目
+# 3 react 脚手架
 
- a. 包含了所有需要的配置
+## 3.1 create-react-app
 
- b. 指定好了所有的依赖
+1. xxx 脚手架：用来帮助程序员快速创建一个基于 xxx 库的模板项目
+   *  包含了所有需要的配置
+   * 指定好了所有的依赖
+   * 可以直接安装/编译/运行一个简单效果
 
- c. 可以直接安装/编译/运行一个简单效果
+2. react 提供了一个用于创建 react 项目的脚手架库：[create-react-app](https://github.com/facebook/create-react-app)
 
-2.react 提供了一个用于创建 react 项目的脚手架库：`create-react-app`
+3. 项目的整体技术架构为：react + webpack + es6 + eslint
 
-3.项目的整体技术架构为：react + webpack + es6 + eslint
+4. 使用脚手架开发的项目的特点：模块化、组件化、工程化
 
-4.使用脚手架开发的项目的特点：模块化，组件化，工程化
+## 3.2 创建项目并启动
 
-#### 3.1.2 创建项目并启动
-
-```
+```shell
 npm i -g create-react-app // 全局安装create-react-app脚手架
 create-react-app hello-react // 创建一个react项目，项目名称是hello-react
 cd hello-react
 npm start // 启动项目
 ```
 
-## 四、react ajax
+启动后页面：
 
-### 4.1 理解
+![](https://img-blog.csdnimg.cn/20201118225032902.png)
+
+# 4 react ajax
+
+## 4.1 理解
 
 **前置说明**
 
@@ -524,19 +498,19 @@ npm start // 启动项目
 
 2.axios：轻量级，建议使用
 
- a. 封装了 XmlHttpRequest 对象的 ajax
+ 	a. 封装了 XmlHttpRequest 对象的 ajax
 
- b. 是 promise 风格
+ 	b. 是 promise 风格
 
- c. 既可以用在浏览器端又可以用在 node 服务器端
+​	 c. 既可以用在浏览器端又可以用在 node 服务器端
 
 3.fetch：原生函数，但老版本浏览器不支持
 
- a. 不再使用 XmlHttpRequest 对象提交 ajax 请求
+ 	a. 不再使用 XmlHttpRequest 对象提交 ajax 请求
 
- b. 为了兼容低版本的浏览器，可以引入兼容库 fetch.js
+ 	b. 为了兼容低版本的浏览器，可以引入兼容库 fetch.js
 
-### 4.2 axios
+## 4.2 axios
 
 **GET 请求**
 
@@ -577,7 +551,7 @@ axios.post('/user', {
 })))
 ```
 
-### 4.3 Fetch
+## 4.3 Fetch
 
 **GET 请求**
 
@@ -605,11 +579,11 @@ fetch(url, {
 })
 ```
 
-## 五、几个重要技术总结
+# 5 几个重要技术总结
 
-### 5.1 组件间通信
+## 5.1 组件间通信
 
-#### 5.1.1 方式一：通过 props 传递
+### 5.1.1 方式一：通过 props 传递
 
 1.共同的数据放在父组件上，特有的数据放在自己组件内部（state）
 
@@ -619,7 +593,7 @@ fetch(url, {
 
 4.函数数据 --> 子组件传递数据给父组件 --> 子组件调用函数
 
-#### 5.1.2 方式二：使用消息订阅-发布机制（subscribe-publish）
+### 5.1.2 方式二：使用消息订阅-发布机制（subscribe-publish）
 
 1.工具库：PubSubJS
 
@@ -634,13 +608,13 @@ PubSub.subscribe('delete', function(data){ }); //订阅消息，绑定监听
 PubSub.publish('delete', data) //发布消息，触发事件
 ```
 
-#### 5.1.3 方式三：redux
+### 5.1.3 方式三：redux
 
 在八、redux中
 
-### 5.2 事件监听理解
+## 5.2 事件监听理解
 
-#### 5.2.1 原生 DOM 事件
+### 5.2.1 原生 DOM 事件
 
 1.绑定事件监听
 
@@ -656,7 +630,7 @@ PubSub.publish('delete', data) //发布消息，触发事件
 
  c. 数据()
 
-#### 5.2.2 自定义事件(消息机制)
+### 5.2.2 自定义事件(消息机制)
 
 1.绑定事件监听
 
@@ -670,11 +644,11 @@ PubSub.publish('delete', data) //发布消息，触发事件
 
  b. 数据：会自动传递给回调函数
 
-## 六、react-router4
+# 6 react-router4
 
-### 6.1 理解
+## 6.1 理解
 
-#### 6.1.1 react-router
+### 6.1.1 react-router
 
 1.react 的一个插件库
 
@@ -682,7 +656,7 @@ PubSub.publish('delete', data) //发布消息，触发事件
 
 3.基于 react 的项目基本都会用到此库
 
-#### 6.1.2 SPA
+### 6.1.2 SPA
 
 1.单页 Web 应用（single page web application，SPA）
 
@@ -738,7 +712,7 @@ PubSub.publish('delete', data) //发布消息，触发事件
 - history.goForword()：前进到下一个历史记录
 - history.listen(function(location){})：监视历史记录的变化
 
-### 6.2 react-router 相关 API
+## 6.2 react-router 相关 API
 
 **组件**
 
@@ -767,7 +741,7 @@ PubSub.publish('delete', data) //发布消息，触发事件
 
 2.withRouter 函数：用 this.props.history.push('/detail') 去跳转页面，但是报 this.props.history 错误 undefined，请在此组件中使用 withRouter 将 history 传入到 props 上。
 
-### 6.3 路由使用
+## 6.3 路由使用
 
 1.下载适用于 web 的 react-router：:`npm install --save react-router-dom`
 
@@ -779,7 +753,7 @@ PubSub.publish('delete', data) //发布消息，触发事件
    - **路由**：`<Route>`
 3. 嵌套路由：`path='/home/news'`
 
-### 6.4 向路由组件传递参数数据
+## 6.4 向路由组件传递参数数据
 
 不能用 props 传递数据，因为加载组件用的不是标签的形式，而是：
 
@@ -796,17 +770,17 @@ const {id} = this.props.match.params
 
 这样就通过路由参数传递了数据，可以在 this.props.match.params 中获取
 
-## 七、react-ui
+# 7 react-ui
 
-### 7.1 最流行的开源 React UI 组件库
+## 7.1 最流行的开源 React UI 组件库
 
-#### 7.1.1 material-ui(国外)
+### 7.1.1 material-ui(国外)
 
 1.官网：http://www.material-ui.com/#/
 
 2.github：https://github.com/callemall/material-ui
 
-#### 7.1.2 ant-design(国内蚂蚁金服)
+### 7.1.2 ant-design(国内蚂蚁金服)
 
 1.PC官网：https://ant.design/index-cn
 
@@ -816,7 +790,7 @@ const {id} = this.props.match.params
 
 4.Github：https://github.com/ant-design/ant-design-mobile/
 
-### 7.2 ant-design-mobile 使用入门
+## 7.2 ant-design-mobile 使用入门
 
 **搭建 antd-mobile 的基本开发环境**
 
@@ -826,21 +800,21 @@ const {id} = this.props.match.params
 
 [按需加载](https://mobile.ant.design/docs/react/use-with-create-react-app-cn#按需加载)
 
-## 八、redux
+# 8 redux
 
-### 8.1 理解
+## 8.1 理解
 
-#### 8.1.1 redux 是什么？
+### 8.1.1 redux 是什么？
 
 1. redux 是一个独立专门用于做状态管理的 JS 库（不是 react 插件库）
 2. 它可以用在 react，angular，vue 等项目中，但基本与 react 配合使用
 3. 作用：集中式管理 react 应用中多个组件共享的状态
 
-#### 8.1.2 redux 工作流程
+### 8.1.2 redux 工作流程
 
 ![image-20200826085826481](https://img-blog.csdnimg.cn/20200830142119865.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwNTA4ODMy,size_16,color_FFFFFF,t_70#pic_center)
 
-#### 8.1.3 什么情况下需要使用 redux
+### 8.1.3 什么情况下需要使用 redux
 
 1. 总体原则：能不用就不用，如果不用比较吃力才考虑使用
 2. 某个组件的状态，需要共享
@@ -848,9 +822,9 @@ const {id} = this.props.match.params
 4. 一个组件需要改变全局状态
 5. 一个组件需要改变另一个组件的状态
 
-### 8.2 redux 的核心 API
+## 8.2 redux 的核心 API
 
-#### 8.2.1 createStore
+### 8.2.1 createStore
 
 1. 作用：创建包含指定 reducer 的 store 对象
 2. 编码 store.js：
@@ -862,7 +836,7 @@ import counter from './reducers/counter'
 const store = createStore(counter)
 ```
 
-#### 8.2.2 store 对象
+### 8.2.2 store 对象
 
 1. 作用：redux 库最核心的管理对象
 2. 它内部维护着：state、reducer
@@ -875,7 +849,7 @@ store.dispatch({type: 'INCREMENT', data: number}) // 分发action对象，通知
 store.subscribe(render) // 订阅监听，store中的状态变化就会调用进行重绘
 ```
 
-#### 8.2.3 applyMiddleware()
+### 8.2.3 applyMiddleware()
 
 1.作用：应用上基于 redux 的中间件（插件库）
 
@@ -891,7 +865,7 @@ const store = createStore(
 )
 ```
 
-#### 8.2.4 combineReducers()
+### 8.2.4 combineReducers()
 
 1.作用：合并多个 reducer 函数
 
@@ -905,9 +879,9 @@ export default combineReducers({
 })
 ```
 
-### 8.3 redux 的三个核心概念
+## 8.3 redux 的三个核心概念
 
-#### 8.3.1 action
+### 8.3.1 action
 
 1. 标识要执行行为的对象（**只是描述了有事情要发生，并没有描述如何去更新 state**）
 2. 包含2个方面的属性：
@@ -928,7 +902,7 @@ const action = {
 export const increment = (number) => ({type: 'INCREMENT', data: number})
 ```
 
-#### 8.3.2 reducer
+### 8.3.2 reducer
 
 1. **根据老的 state 和 action，产生新的 state** 的**纯函数**
 2. 例子：
@@ -950,7 +924,7 @@ export default function counter(state=0, action) {
    - **返回一个新的状态 state 给 store**
    - **不要修改原来的状态**
 
-#### 8.3.3 store
+### 8.3.3 store
 
 1. **将 state，action 与 reducer 联系在一起的对象**
 2. 如何得到此对象？
@@ -973,14 +947,14 @@ const store = createStore(reducer)
 
 2.编码不够简洁（经常重复写 this.props.store）
 
-### 8.4 react-redux
+## 8.4 react-redux
 
-#### 8.4.1 理解
+### 8.4.1 理解
 
 1. 一个 react 插件库
 2. 专门用来简化 react 应用中使用的 redux
 
-#### 8.4.2 React-Redux 将所有组件分成两大类
+### 8.4.2 React-Redux 将所有组件分成两大类
 
 1.UI 组件
 
@@ -995,7 +969,7 @@ const store = createStore(reducer)
 - **使用 Redux 的 API**
 - **一般保存在 containers 文件夹下**
 
-#### 8.4.3 相关 API
+### 8.4.3 相关 API
 
 1.**Provider：让所有组件都可以得到 state 数据**
 
@@ -1050,7 +1024,7 @@ import * as mapDispatchToProps from '../redux/actions'
 
 2.应用中又需要在 redux 中执行异步任务（ajax，定时器）
 
-### 8.5 redux 异步编程
+## 8.5 redux 异步编程
 
 下载 redux 插件（异步中间件）：npm install --save redux-thunk
 
@@ -1101,9 +1075,9 @@ const store = createStore(
 )
 ```
 
-### 8.7 纯函数和高阶函数
+## 8.7 纯函数和高阶函数
 
-#### 8.8.1 纯函数
+### 8.8.1 纯函数
 
 1.一类特别的函数：只要是同样的输入，必定得到同样的输出
 
@@ -1117,7 +1091,7 @@ const store = createStore(
 
 3.reducer 函数必须是一个纯函数
 
-#### 8.8.2 高阶函数
+### 8.8.2 高阶函数
 
 1.理解：一类特别的函数
 
