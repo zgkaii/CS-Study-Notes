@@ -1,8 +1,8 @@
-
 # 1 React入门
+
 ## 1.1 React基础认识
 
-用于构建用户界面的 JavaScript 库（只关注于 View），由 Facebook 开源。
+React 是一个声明式，高效且灵活的用于构建用户界面的 JavaScript 库，由 Facebook 开源。使用 React 可以将一些简短、独立的代码片段组合成复杂的 UI 界面，这些代码片段被称作“组件”。
 
 **特点**
 
@@ -14,27 +14,28 @@
 
 * 高效
 
-* 单向数据流
+* 单向响应的数据流
 
 **高效的原因**
 
-* 虚拟（virtual）DOM，不总是操作真实DOM。
+* 虚拟（virtual）DOM，不总是操作真实DOM。采用DOM Diff 算法，最小化页面重绘。
 
-* DOM Diff 算法，最小化页面重绘。
 
 ## 1.2 React基本使用
 
 **相关 js 库**
 
-1. **react.min.js** ——React 的核心库。
-2. **react-dom.min.js** ——提供与 DOM 相关的功能。
-3. **babel.min.js** ——Babel 可以将 ES6 代码转为 ES5 代码，这样我们就能在目前不支持 ES6 浏览器上执行 React 代码。Babel 内嵌了对 **JSX** 的支持。通过将 Babel 和 babel-sublime 包（package）一同使用可以让源码的语法渲染上升到一个全新的水平。
+* **react.min.js** ——React 的核心库。
+* **react-dom.min.js** ——提供与 DOM 相关的功能。
+* **babel.min.js** ——Babel 可以将 ES6 代码转为 ES5 代码，这样我们就能在目前不支持 ES6 浏览器上执行 React 代码。Babel 内嵌了对 **JSX** 的支持，凡是使用 JSX 的地方，都要在 script 标签中加上 type="text/babel" 。
 
-**使用 React 开发者工具调试**
+**React 开发者工具**
 
-* React DeveloperTools 浏览器插件。
+* [React DeveloperTools插件](https://github.com/facebook/react-devtools)。
 
-基本案例：
+![](https://img-blog.csdnimg.cn/2020111816474539.png)
+
+入门案例——HelloReact：
 
 ```html
 <!DOCTYPE html>
@@ -65,19 +66,32 @@
 
 ## 1.3 React JSX
 
-### 1.3.1 虚拟DOM
+### 1.3.1 JSX
 
-* 创建虚拟DOM（特别的 js 对象）的两种方式：
+JSX全称`JavaScript XML`，它是React 定义的一种类似于 XML 的 JS 扩展语法（XML + JS）。它主要用来创建 React 虚拟 DOM（元素）对象。例如`var vDom = <h1>Hello JSX!</h1>`。
+
+* 它即不是字符串，也不是 HTML/XML 标签
+* 它最终产生的就是一个 JS 对象
+
+基本语法规则：
+
+* 遇到 '<' 开头的代码，以标签的语法解析：html 同名标签转换为 html 同名元素，其它标签需要特别解析。
+* 遇到 '{' 开头的代码，以 JS 语法解析：**标签中的 js 代码必须用 {} 包含**。
+
+ 也就是说，`js代码`中可以直接嵌套`<标签>`，但`<标签>`要嵌套`js代码` 需要放在 {} 中。
+
+### 1.3.2 虚拟DOM
+
+创建虚拟DOM（特别的 js 对象）的两种方式：
 
 （1）React 提供的 API 来创建（纯 JS，一般不用）
 
 ```js
   <script type="text/javascript">
-    // 1. 创建虚拟DOM
-    const msg = 'I Like You!'
-    const myId = 'Kai'
-    /*方式一: 纯JS创建虚拟DOM元素对象*/
-    const vDOM1 = React.createElement('h2', {id: myId}, msg.toUpperCase())
+    // 1. 纯JS创建虚拟DOM元素对象
+    const msg1 = 'I Like You!'
+    const myId1 = 'kai'
+    const vDOM1 = React.createElement('h2', {id: myId1}, msg1.toUpperCase())
     // 2. 渲染到真实页面
 	ReactDOM.render(vDOM2, document.getElementById('test1'))
   </script>
@@ -87,9 +101,10 @@
 
 ```js
   <script type="text/babel">
-    // 1. 创建虚拟DOM
-    /*方式二: JSX创建虚拟DOM元素对象*/
-    const vDOM2 = <h3 id={myId.toUpperCase()}>{msg.toLowerCase()}</h3>
+    // 1. JSX创建虚拟DOM元素对象
+    const msg1 = 'I Like You!'
+    const myId1 = 'kai'  
+    const vDOM2 = <h3 id={myId2.toUpperCase()}>{msg2.toLowerCase()}</h3>
     // 2. 渲染到真实页面
     ReactDOM.render(vDOM2, document.getElementById('test2'))
   </script>
@@ -107,43 +122,17 @@
 >
 > 这样，在保证性能的同时，开发者将不再需要关注某个数据的变化如何更新到一个或多个具体的 DOM 元素，而只需要关心在任意一个数据状态下，整个界面是如何 Render 的。
 
-### 1.3.2 JSX
-
-JSX全称: JavaScript XML，它是React 定义的一种类似于 XML 的 JS 扩展语法 XML + JS。
-
-作用：用来创建 React 虚拟 DOM（元素）对象
-
-* `var vDom = <h1>Hello JSX!</h1>`
-* 注意1：它不是字符串，也不是 HTML/XML 标签
-* 注意2：它最终产生的就是一个 JS 对象
-
-标签名任意：HTML 标签或其它标签（可以自定义）
-
-标签属性任意：HTML 标签属性或其它（可以自定义）
-
-基本语法规则
-
-* 遇到 '<' 开头的代码，以标签的语法解析：html 同名标签转换为 html 同名元素，其它标签需要特别解析
-* 遇到 '{' 开头的代码，以 JS 语法解析：**标签中的 js 代码必须用 {} 包含**
-
- 也就是说：js 中可以直接嵌套<标签>，但标签要嵌套 js 需要放在 {} 中
-
-babel.js 的作用
-
-* 浏览器不能直接解析 JSX 代码，需要 babel 转译为纯 JS 的代码才能运行
-* 只要用了 JSX，都要在 script 标签中加上 `type="text/babel"` 来声明需要 babel 来处理
-
 ### 1.3.3 渲染虚拟 DOM(元素)
 
-* 语法：`ReactDOM.render(virtualDOM, containerDOM)`
+语法：`ReactDOM.render(virtualDOM, containerDOM)`
 
-* 作用：将虚拟 DOM 元素渲染到页面中的真实容器 DOM 中显示
+作用：将虚拟 DOM 元素渲染到页面中的真实容器 DOM 中显示
 
-* 参数说明
+参数说明
 
-  * 参数一：纯 js 或 jsx 创建的虚拟 dom 对象
+* 参数一：纯 js 或 jsx 创建的虚拟 DOM 对象
 
-  * 参数二：用来包含虚拟 DOM 元素的真实 dom 元素对象(一般是一个 div)
+* 参数二：用来包含虚拟 DOM 元素的真实 DOM 元素对象(一般是一个 div)
 
 ## 1.4 模块与组件、模块化与组件化的理解
 
@@ -212,16 +201,14 @@ babel.js 的作用
 
 ### 2.2.1 state
 
-**理解**
+* state 是组件对象最重要的属性，值是对象（可以包含多个数据）
 
-1.state 是组件对象最重要的属性，值是对象（可以包含多个数据）
+* 组件被称为"状态机"，通过更新组件的 state 来更新对应的页面显示（重新渲染组件）
 
-2.组件被称为"状态机"，通过更新组件的 state 来更新对应的页面显示（重新渲染组件）
+关于state状态的三个操作：
 
-**编码**
-
-```
-1.初始化状态
+```js
+// 1.初始化状态
 constructor (props) {
   super(props)
   this.state = {
@@ -244,22 +231,16 @@ this.setState({
 
 **理解**
 
-1.每个组件对象都会有 props（properties）属性
-
-2.组件标签的所有属性都保存在 props 中
+* 每个组件对象都会有 props（properties）属性，组件标签的所有属性都保存在 props 中
 
 **作用**
 
-1.通过标签属性从组件外向组件内传递变化的数据
+* 通过标签属性从组件外向组件内传递变化的数据（组件内部不要修改 props 数据）
 
-2.注意：组件内部不要修改 props 数据
-
-**编码**
-
-```
+```js
 // 1.内部读取某个属性值
 this.props.propertyName
-// 2.对 props 中的属性值进行类型限制和必要性限制
+// 2.对props中的属性值进行类型限制和必要性限制
 Person.propTypes = { // 使用 prop-types 库
   name: PropTypes.string.isRequired,
   age: PropTypes.number
@@ -268,7 +249,7 @@ Person.propTypes = { // 使用 prop-types 库
 <Person {...person} />
 // 4.默认属性
 Person.defaultProps = {
-  name: 'Mary'
+  name: 'LiSi'
 }
 // 5.组件类的构造函数
 constructor(props) {
@@ -277,37 +258,35 @@ constructor(props) {
 }
 ```
 
-**问题**
+组件的 props 和 state 属性区别：
 
-请区别一下组件的 props 和 state 属性
+* state：组件自身内部可变化的数据
 
-1.state：组件自身内部可变化的数据
-
-2.props：从组件外部向组件内部传递数据，组件内部只读不修改
+* props：从组件外部向组件内部传递数据，组件内部只读不修改
 
 ### 2.2.3 refs
 
-1.组件内的标签都可以定义 ref 属性来标识自己
+* 组件内的标签都可以定义 ref 属性来标识自己
 
- a. `<input type="text" ref={input => this.msgInput = input} />`
+1.  `<input type="text" ref={input => this.msgInput = input} />`
 
- b. ref 中的回调函数在组件初始化渲染完或卸载时自动调用（将 input 这个元素赋给组件实例对象的 this.msgInput）
+2.  ref 中的回调函数在组件初始化渲染完或卸载时自动调用（将 input 这个元素赋给组件实例对象的 this.msgInput）
 
-2.在组件中可以通过 this.msgInput.value 来得到对应的真实 DOM 元素的值
+* 在组件中可以通过 this.msgInput.value 来得到对应的真实 DOM 元素的值
 
-3.作用：通过 ref 获取组件内容特定标签对象，进行读取其相关数据
+* 作用：通过 ref 获取组件内容特定标签对象，进行读取其相关数据
 
 ### 2.2.4 事件处理
 
-1.通过 onXxx 属性指定组件的事件处理函数（如：onClick、onBlur，注意需要大写）
+* 通过 onXxx 属性指定组件的事件处理函数（如：onClick、onBlur，注意需要大写）
 
- a. React 使用的是自定义（合成）事件，而不是使用的原生 DOM 事件
+1. React 使用的是自定义（合成）事件，而不是使用的原生 DOM 事件
 
- b. React 中的事件是通过事件委托方式处理的（委托给组件最外层的元素）
+2. React 中的事件是通过事件委托方式处理的（委托给组件最外层的元素）
 
-2.通过 event.target 得到发生事件的 DOM 元素对象
+* 通过 event.target 得到发生事件的 DOM 元素对象
 
-```
+```js
 <input onFocus={this.handleFocus}/>
 
 handleFocus(event) {
@@ -317,99 +296,87 @@ handleFocus(event) {
 
 **注意**
 
-1.组件内置的方法中的 this 为组件对象
+* 组件内置的方法中的 this 为组件对象
 
-2.在组件类中自定义的方法中 this 为 null
+* 在组件类中自定义的方法中 this 为 null
 
- a. 强制绑定 this：通过函数对象的 bind()
+1. 强制绑定 this：通过函数对象的 bind()
 
- b. 箭头函数（ES6模块化编码时才能使用）
+2. 箭头函数（ES6模块化编码时才能使用）
 
-## 2.3 组件的组合
+## 2.3 组件的组合使用
 
-### 2.3.1 功能界面的组件化编码流程（无比重要）
+**功能界面的组件化编码流程（重要）**
 
-1.拆分组件：拆分界面，抽取组件（有几个组件）
+* 拆分组件：拆分界面，抽取组件（有几个组件）
 
-2.实现静态组件：使用组件实现静态页面效果（写 render）只有静态界面，没有动态数据和交互
+* 实现静态组件：使用组件实现静态页面效果（写 render）只有静态界面，没有动态数据和交互
 
-3.实现动态组件
-
- a. 动态显示初始化数据（数据定义在哪一个组件中）
-
- b. 交互功能（从绑定事件监听开始）
+* 实现动态组件
+  * 动态显示初始化数据（数据定义在哪一个组件中）
+  * 交互功能（从绑定事件监听开始）
 
 ## 2.4 收集表单数据
 
-**理解**
+* 包含表单的组件分类 
 
-1.问题：在 react 应用中，如何收集表单输入数据
-
-2.包含表单的组件分类
-
-a. **受控组件**：表单项输入数据能自动收集成状态（onChange）
+1. **受控组件**：表单项输入数据能自动收集成状态（onChange）
 
 更贴近 react 思想，尽量少操作 DOM（一般更推荐这种写法）
 
-```
+```js
 密码：<input type="password" value={this.state.pwd} onChange={this.handleChange} />
 ```
 
-b. **非受控组件**：需要时才手动读取表单输入框中的数据（ref）
+2. **非受控组件**：需要时才手动读取表单输入框中的数据（ref）
 
 写起来轻松，但是操作了原生 DOM（this.nameInput.value）
 
-```
+```js
 用户名：<input type="text" ref={input => this.nameInput = input} />
 ```
 
 ## 2.5 组件生命周期
 
-### 2.5.1 理解
+### 2.5.1 生命周期流程图
 
-1.组件对象从创建到死亡它会经历特定的生命周期阶段
+* 组件对象从创建到死亡会经历不同的生命周期阶段。
 
-2.React 组件对象包含一系列的**钩子函数**（生命周期回调函数），在生命周期特定时刻回调
+* React 组件对象包含一系列的**勾子函数**（生命周期回调函数），在生命周期特定时刻回调。
 
-3.我们在定义组件时，可以重写特定的生命周期回调函数，做特定的工作
+* 在定义组件时，我们可以重写特定的生命周期回调函数，做特定的工作。
 
-### 2.5.2 生命周期流程图
+![](https://img-blog.csdnimg.cn/2020111815355123.png)
 
-![image-20200823105645557](https://img-blog.csdnimg.cn/20200830142058207.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwNTA4ODMy,size_16,color_FFFFFF,t_70#pic_center)
+### 2.5.2 生命周期详述
 
-### 2.5.3 生命周期详述
-
-1.组件的三个生命周期状态：
+（1）组件的三个生命周期状态
 
 - Mount：挂载过程，第一次将组件插入到真实 DOM
 - Update：更新过程，组件被重新渲染
 - Unmount：卸载过程，被移出真实 DOM
 
-2.**生命周期流程**：
+（2）**生命周期流程**：
 
-1）创建阶段（第一次初始化渲染显示）
+**创建阶段（第一次初始化渲染显示）**
 
 > ReactDOM.render()
 
 - constructor()：`super(props)` 指定 this，`this.state={}` 创建初始化状态（getDefaultProps、getInitialState）
 
-- componentWillMount()
-
-  ：组件将要挂载到页面上
+- componentWillMount()：组件将要挂载到页面上
 
   - 可以在这里调用 setState() 方法修改 state
 
 - render()：创建虚拟 DOM 但是还没有挂载上去
 
-- componentDidMount()
-
-  ：已经挂载到页面上（初始界面已经渲染完毕）
+- componentDidMount()：已经挂载到页面上（初始界面已经渲染完毕）
 
   - 可以在这里通过 this.getDOMNode() 来进行访问 DOM 结构
-  - 可以在这里发送 ajax 请求
+- 可以在这里发送 ajax 请求
   - 添加监听器/订阅
 
-2）运行阶段（二次渲染）
+**运行阶段（二次渲染）**
 
 > 父组件传递的 `props` 发生更新，就会调用 componentWillReceiveProps()
 
@@ -417,9 +384,7 @@ b. **非受控组件**：需要时才手动读取表单输入框中的数据（r
 
 > `props` 改变或者调用 this.setState() 方法更新 `state`，都会触发组件的更新，调用后面的钩子函数
 
-- shouldComponentUpdata(nextProps, nextState)
-
-  ：接收一个新的 props 和 state，返回true/false，表示是否允许更新
+- shouldComponentUpdata(nextProps, nextState)：接收一个新的 props 和 state，返回true/false，表示是否允许更新
 
   - 通常情况下为了优化，需要对新的 props 以及 state 和原来的数据作对比，如果发生变化才更新
 
@@ -431,28 +396,25 @@ b. **非受控组件**：需要时才手动读取表单输入框中的数据（r
 
 除了首次 render 之后调用 `componentDidMount`，其它 render 结束之后都是调用 `componentDidUpdate`
 
-3）销毁阶段（移除组件）
+**销毁阶段（移除组件）**
 
 > 执行 ReactDOM.unmountComponentAtNode(containerDom) 用来使组件从真实 DOM 中卸载（开始销毁阶段）
 
-- componentWillUnmount()
-
-   
-
-  ：组件将要被移除时（移出前）回调
+- componentWillUnmount()：组件将要被移除时（移出前）回调
 
   - 一般在 `componentDidMount` 里面注册的事件需要在这里删除
 
-### 2.5.4 重要的勾子
+### 2.5.3 重要的勾子函数
 
-1. render()：初始化渲染时或更新渲染时调用
-2. componentDidMount()：开启监听，可以初始化一些异步操作：启动定时器/发送 ajax 请求
-3. componentWillUnmount()：做一些收尾工作，如：清理定时器
-4. componentWillReceiveProps()：当组件接收到（父元素传递的）新的 props 属性前调用
+* render()：初始化渲染时或更新渲染时调用
+
+* componentDidMount()：开启监听，可以初始化一些异步操作：启动定时器/发送 ajax 请求
+
+* componentWillUnmount()：做一些收尾工作，如：清理定时器
+
+* componentWillReceiveProps()：当组件接收到（父元素传递的）新的 props 属性前调用
 
 ### 2.5.5 **新的生命周期**
-
-**注意**
 
 `componentWillMount`、`componentWillReceiveProps` 和 `componentWillUpdate` 这三个生命周期函数都被添加了 UNSAFE_ 不安全标记，并且在 17.0 版本将会被删除。
 
@@ -460,7 +422,7 @@ b. **非受控组件**：需要时才手动读取表单输入框中的数据（r
 
 **目前新的生命周期流程图：**
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200830142058322.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwNTA4ODMy,size_16,color_FFFFFF,t_70#pic_center)
+![](https://img-blog.csdnimg.cn/20201118153504347.png)
 
 **getDerivedStateFromProps**
 
@@ -504,12 +466,20 @@ static getDerivedStateFromProps(props, state) {
 
 DOM Diff 能比较新旧虚拟 DOM 树，计算哪里改变，然后就只需要重绘变化的局部界面。
 
+### 2.6.2 DOM Diff分析
+
 # 参考资料
 
-[尚硅谷React实战教程全套完整版(轻松入门到精通)](https://www.bilibili.com/video/BV184411x7F9)
+[React实战教程](https://www.bilibili.com/video/BV184411x7F9)
 
-[React中文文档](https://react.docschina.org/)
-
-http://www.woc12138.com/article/55
+[React中文文档](https://zh-hans.reactjs.org/docs/getting-started.html)
 
 [React 入门实例教程](https://www.ruanyifeng.com/blog/2015/03/react.html)
+
+[图解ES6中的React生命周期](https://juejin.im/post/6844903510538977287)
+
+[React 的生命周期变化](https://juejin.im/post/6844904005152276487)
+
+[让虚拟DOM和DOM-diff不再成为你的绊脚石](https://juejin.im/post/6844903806132568072)
+
+[虚拟 DOM 到底是什么？](https://segmentfault.com/a/1190000019510611)
