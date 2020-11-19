@@ -8,7 +8,7 @@
 
 **正式开始之前**
 
-**1. 你不可能把所有的东西都记住**
+**1. 不可能把所有的东西都记住**
 
 与John Washam文章[记住计算机科学知识](https://startupnextdoor.com/retaining-computer-science-knowledge/)描述的一样，我经常是看了数小时的视频，并记录大量的笔记。一段时间过后，基本上忘却大部分的内容。
 
@@ -36,7 +36,7 @@ John Washam的抽认卡网站：
 
 ## 项目结构
 
-学习笔记都以Markdown文档格式放在到不同的文件夹下，结构如下：
+我的学习笔记都以Markdown文档格式放在到不同的文件夹下，结构如下：
 
 ```java
 学而时习之
@@ -128,8 +128,6 @@ John Washam的抽认卡网站：
 ------
 
 ## 计算机基础
-
-视频学习：
 
 * [计算机网络](https://www.bilibili.com/video/BV19E411D78Q)
   - [x] 物理层
@@ -290,12 +288,14 @@ John Washam的抽认卡网站：
 * 模板引擎
   - [ ] Thymeleaf
 * 前端框架
-  - [ ] React
-  - [ ] Vue
+  - [x] React
+    * React基础使用
+  - [x] Vue
+    * Vue基础使用
 
 
 
-待更新... ...
+> 待更新... ...
 
 ---
 

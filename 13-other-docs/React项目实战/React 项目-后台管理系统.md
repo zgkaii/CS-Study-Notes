@@ -9,6 +9,60 @@
 
 ![](https://img-blog.csdnimg.cn/20201117154323391.png)
 
+npm/yarn 常用命令	
+
+yarn 命令文档:https://yarnpkg.com/zh-Hans/docs/cli/ 
+
+npm 命令文档: https://docs.npmjs.com/cli-documentation/ 
+
+```
+## 设置淘宝镜像
+npm config set registry https://registry.npm.taobao.org
+yarn config set registry https://registry.npm.taobao.org
+## 初始化项目:
+yarn init -y
+npm init -y
+## 下载项目的所有声明的依赖:
+yarn
+npm install
+## 下载指定的运行时依赖包:
+yarn add webpack@3.2.1
+npm install webpack@3.2.1 -S
+## 下载指定的开发时依赖:
+yarn add webpack@3.2.1 -D
+npm install webpack@3.2.1 -D
+## 全局下载指定包:
+yarn global add webpack
+npm install webpack -g
+## 删除依赖包:
+yarn remove webpack
+npm remove webpack -S
+yarn global remove webpack
+npm remove webpack -g
+## 运行项目中配置的 script:
+yarn run xxx
+npm run xxx
+## 查看某个包的信息:
+yarn info xxx
+npm info xxx
+```
+
+ git 常用基本命令
+
+```
+git config --global user.name "username" //配置用户名 
+git config --global user.email "xx@gmail.com" //配置邮箱 
+git init //初始化生成一个本地仓库 
+git add . //添加到暂存区
+git commit –m "message" //提交到本地仓库 
+git remote add origin url //关联到远程仓库 
+git push origin master //推送本地 master 分支到远程 master 分支 
+git checkout -b dev //创建一个开发分支并切换到新分支 
+git push ogigin dev //推送本地 dev 分支到远程 dev 分支 
+git pull origin dev //从远程 dev 分支拉取到本地 dev 分支 
+git clone url //将远程仓库克隆下载到本地
+```
+
 # day01
 
 ## 1. 项目开发准备
@@ -17,9 +71,16 @@
     3). API接口/接口文档/测试接口
 
 ## 2. 启动项目开发
+
     1). 使用react脚手架创建项目
+        npm install -g create-react-app
+        create-react-app react-admin-client
+        cd react-admin-client
     2). 开发环境运行: npm start
-    3). 生产环境打包运行: npm run build   serve build
+    3). 生产环境打包运行: 
+    	npm run build
+        npm install -g serve 
+    	serve build
 
 ## 3. git管理项目
     1). 创建远程仓库
@@ -38,8 +99,8 @@
         git add .
         git commit -m "xxx"
         git push origin dev
-    6). 新的同事: 克隆仓库
-        git clone url
+    6). 另外一台电脑：克隆仓库
+        git clone xxx(url)
         git checkout -b dev origin/dev
         git pull origin dev
     7). 如果远程修改
@@ -47,25 +108,37 @@
 
 ## 4. 创建项目的基本结构
     api: ajax请求的模块
+    assets:公共资源
     components: 非路由组件
     pages: 路由组件
+    config:配置
+    utils:工具模块
+    
     App.js: 应用的根组件
     index.js: 入口js
 
 ## 5 引入antd
-    下载antd的包
+
+    下载antd的包   参考文档: https://ant.design/docs/react/use-with-create-react-app-cn
+    下载组件库包  yarn add antd
+    
+    下载依赖模 yarn add react-app-rewired customize-cra babel-plugin-import 
+    
     按需打包: 只打包import引入组件的js/css
         下载工具包
         config-overrides.js
         package.json
-    自定义主题
+    自定义主题 yarn add less less-loader
         下载工具包
         config-overrides.js
     使用antd的组件
         根据antd的文档编写
 
 ## 6. 引入路由
-    下载包: react-router-dom
+
+![](https://img-blog.csdnimg.cn/20201119141625478.png)
+
+    下载包: yarn add react-router-dom
     拆分应用路由:
       Login: 登陆
       Admin: 后台管理界面
@@ -639,3 +712,6 @@
         b. 原因: 项目根路径后的path路径会被当作后台路由路径, 去请求对应的后台路由, 但没有
         c. 解决: 使用自定义中间件去读取返回index页面展现
 
+# 学习清单
+
+[前端 React 后台项目实战视频教程全集](https://www.bilibili.com/video/BV1st41137hg)

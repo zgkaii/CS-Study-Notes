@@ -31,9 +31,11 @@
 	POST
 
 ### 参数类型
-	|参数		|是否必选 |类型     |说明
-	|username    |Y       |string   |用户名
-	|password    |Y       |string   |密码
+
+|参数|是否必选 |类型|说明|
+|--|--|--|--|
+|username    |Y |string   |用户名|
+|password    |Y |string   |密码|
 
 ### 返回示例：
 	成功:
