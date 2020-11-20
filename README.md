@@ -317,7 +317,6 @@ John Washam的抽认卡网站：
 ## 任务清单
 
 - [ ] React学习
-- [ ] Response/Request...更新 
 - [ ] [Swagger UI]([http://docs.swagger.io/swagger-core/current/apidocs/index.html?io/swagger/annotations](http://docs.swagger.io/swagger-core/current/apidocs/index.html?io/swagger/annotations) )
 - [ ] PostgreSQL 
 - [ ] [REST](https://zhuanlan.zhihu.com/p/90367875)

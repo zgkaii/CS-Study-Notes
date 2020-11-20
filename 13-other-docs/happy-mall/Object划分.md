@@ -1,3 +1,5 @@
+[java的几种对象(PO,VO,DAO,BO,POJO，DTO)解释](https://www.cnblogs.com/firstdream/archive/2012/04/13/2445582.html)
+
 1、PO(persistant object)持久对象  
 PO 就是对应数据库中某个表中的一条记录，多个记录可以用PO的集合。
 PO 中不应该包含任何对数据库中的操作。
