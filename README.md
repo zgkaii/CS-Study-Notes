@@ -54,14 +54,14 @@ John Washam的抽认卡网站：
 |     	  ├── Mysql
 |     	  └── Oracle
 ├── 开发工具
-├── Java基础
-|    ├── JavaSE
+├── JavaSE
+|    ├── Java基础
 |    ├── JVM
 |    ├── 并发编程
 |    ├── 设计模式
 |    ├── Java新特性
 |    └── 源码学习
-├── JavaWeb
+├── JavaEE
 |	 └── JDBC
 ├── 前端
 |    ├── 前端基础
@@ -72,13 +72,13 @@ John Washam的抽认卡网站：
 |    |    ├── Thymeleaf
 |    |    └── FreeMarker
 |    └── 组合框架
-|    	   ├── Vue
-|    	   └── React
+|    	  ├── Vue
+|    	  └── React
+├── Spring全家桶
+|    ├── Spring
+| 	 ├── SpringMVC
+| 	 └── SprinBoot
 ├── 进阶学习
-|    ├── Spring全家桶
-|    |    ├── Spring
-|    | 	  ├── SpringMVC
-|    | 	  └── SprinBoot
 |    ├── 服务器
 |    |	  ├── Web服务器
 |    |	  └── 应用服务器
@@ -111,17 +111,17 @@ John Washam的抽认卡网站：
 |    └── 虚拟化/容器化
 |    	  ├── 容器技术
 |    	  └── 容器编排技术
-├── 大数据
-|    ├── Hadoop
-|    └── Spark
 ├── 运维
 |    ├── CND加速
 |    ├── 代码质量检验
 |    └── 日志分析/收集
-├── 面试
+├── 大数据
+|    ├── Hadoop
+|    └── Spark
 ├── Python学习
-├── 错误记录
-└── 其他  
+├── 面试
+└── 其他
+     └── 错误记录
 ```
 
 ## Let‘s go!!!

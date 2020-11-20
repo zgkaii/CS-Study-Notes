@@ -276,7 +276,7 @@ public class HelloWorld {
 
 常量一般都有自己的业务含义,**不要害怕长度过长而进行省略或者缩写**。如，用户消息缓存过期时间的表示，那种方式更佳清晰，交给你来评判。
 
-## 通用命名规则[#](https://www.cnblogs.com/liqiangchn/p/12000361.html#450918152)
+通用命名规则[#](https://www.cnblogs.com/liqiangchn/p/12000361.html#450918152)
 
 1. 尽量不要使用拼音；杜绝拼音和英文混用。对于一些通用的表示或者难以用英文描述的可以采用拼音，一旦采用拼音就坚决不能和英文混用。
    正例： BeiJing， HangZhou

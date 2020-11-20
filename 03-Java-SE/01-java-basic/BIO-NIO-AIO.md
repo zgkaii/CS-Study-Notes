@@ -1,28 +1,3 @@
-熟练掌握 BIO,NIO,AIO 的基本概念以及一些常见问题是你准备面试的过程中不可或缺的一部分，另外这些知识点也是你学习 Netty 的基础。
-
-<!-- MarkdownTOC -->
-
-- [BIO,NIO,AIO 总结](#bionioaio-总结)
-  - [1. BIO \(Blocking I/O\)](#1-bio-blocking-io)
-    - [1.1 传统 BIO](#11-传统-bio)
-    - [1.2 伪异步 IO](#12-伪异步-io)
-    - [1.3 代码示例](#13-代码示例)
-    - [1.4 总结](#14-总结)
-  - [2. NIO \(New I/O\)](#2-nio-new-io)
-    - [2.1 NIO 简介](#21-nio-简介)
-    - [2.2 NIO的特性/NIO与IO区别](#22-nio的特性nio与io区别)
-      - [1)Non-blocking IO（非阻塞IO）](#1non-blocking-io（非阻塞io）)
-      - [2)Buffer\(缓冲区\)](#2buffer缓冲区)
-      - [3)Channel \(通道\)](#3channel-通道)
-      - [4)Selectors\(选择器\)](#4selectors选择器)
-    - [2.3  NIO 读数据和写数据方式](#23-nio-读数据和写数据方式)
-    - [2.4 NIO核心组件简单介绍](#24-nio核心组件简单介绍)
-    - [2.5 代码示例](#25-代码示例)
-  - [3. AIO  \(Asynchronous I/O\)](#3-aio-asynchronous-io)
-  - [参考](#参考)
-
-<!-- /MarkdownTOC -->
-
 
 # BIO,NIO,AIO 总结
 
