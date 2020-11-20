@@ -1,8 +1,6 @@
->  本文由 JavaGuide 翻译自 https://www.baeldung.com/jvm-parameters，并对文章进行了大量的完善补充。翻译不易，如需转载请注明出处为：   作者： 。
-
 ## 1.概述
 
-在本篇文章中，你将掌握最常用的 JVM 参数配置。如果对于下面提到了一些概念比如堆、
+在本篇文章中，你将掌握最常用的 JVM 参数配置。如果对于下面提到了一些比如堆、垃圾回收相关概念。
 
 ## 2.堆内存相关
 
@@ -126,8 +124,6 @@ JVM具有四种类型的*GC*实现：
 -Xloggc:/path/to/gc.log
 ```
 
-
-
 ## 推荐阅读
 
 - [CMS GC 默认新生代是多大？](https://www.jianshu.com/p/832fc4d4cb53)
@@ -135,3 +131,5 @@ JVM具有四种类型的*GC*实现：
 - [从实际案例聊聊Java应用的GC优化-美团技术团队](https://tech.meituan.com/2017/12/29/jvm-optimize.html)
 - [JVM性能调优详解](https://www.choupangxia.com/2019/11/11/interview-jvm-gc-08/) （2019-11-11）
 - [JVM参数使用手册](https://segmentfault.com/a/1190000010603813)
+
+* [Guide to the Most Important JVM Parameters](https://www.baeldung.com/jvm-parameters)
