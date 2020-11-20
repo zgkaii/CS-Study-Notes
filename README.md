@@ -316,12 +316,13 @@ John Washam的抽认卡网站：
 
 ## 任务清单
 
-- [ ] React学习
-- [ ] [Swagger UI]([http://docs.swagger.io/swagger-core/current/apidocs/index.html?io/swagger/annotations](http://docs.swagger.io/swagger-core/current/apidocs/index.html?io/swagger/annotations) )
-- [ ] PostgreSQL 
-- [ ] [REST](https://zhuanlan.zhihu.com/p/90367875)
-
-- [ ] DTO——[java的几种对象(PO,VO,DAO,BO,POJO，DTO)解释](https://www.cnblogs.com/firstdream/archive/2012/04/13/2445582.html)
+* React学习
+  * [ ] React v16.13.1
+  * [ ] Material-UI
+  * [ ] react-redux
+* [ ] [Swagger UI]([http://docs.swagger.io/swagger-core/current/apidocs/index.html?io/swagger/annotations](http://docs.swagger.io/swagger-core/current/apidocs/index.html?io/swagger/annotations) )使用
+* [ ] [REST](https://zhuanlan.zhihu.com/p/90367875)
+* [ ] DTO——[java的几种对象(PO,VO,DAO,BO,POJO，DTO)解释](https://www.cnblogs.com/firstdream/archive/2012/04/13/2445582.html)
 
 
 

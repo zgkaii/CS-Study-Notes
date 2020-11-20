@@ -23,7 +23,7 @@
 
 ## 4.性能分析工具合集
 
-<img src="Linux_performance/linux_xn.png" alt="img" style="zoom:60%;" />
+![](https://img-blog.csdnimg.cn/20201120160728348.png)
 
 ### CPU
 

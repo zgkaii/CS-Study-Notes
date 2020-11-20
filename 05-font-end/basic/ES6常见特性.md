@@ -214,14 +214,14 @@ ECMAScript是浏览器脚本语言的规范。ES6，是于2015.06发布的一个
         console.log(person1);// { 23, 张三 }
 ```
 （3）对象函数属性简写
-![](https://img-blog.csdnimg.cn/20200731155515701.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_Q1NETkDljYHpl64=,size_16,color_FFFFFF,t_70)
+![](https://img-blog.csdnimg.cn/20200731155515701.png)
 （4）拓展运算符（...）用于取出参数对象所有可遍历属性然后拷贝到当前对象。
-![](https://img-blog.csdnimg.cn/20200731160343354.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_Q1NETkDljYHpl64=,size_16,color_FFFFFF,t_70)
+![](https://img-blog.csdnimg.cn/20200731160343354.png)
 
 ## 7、数组新增方法：map和reduce
-![](https://img-blog.csdnimg.cn/20200803092904706.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_Q1NETkDljYHpl64=,size_16,color_FFFFFF,t_70)
+![](https://img-blog.csdnimg.cn/20200803092904706.png)
 ## 8、Promise
-![](https://img-blog.csdnimg.cn/20200803103925108.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_Q1NETkDljYHpl64=,size_16,color_FFFFFF,t_70)
+![](https://img-blog.csdnimg.cn/20200803103925108.png)
 
 ## 9、模块化
 * hello.js
