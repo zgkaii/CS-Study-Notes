@@ -16,13 +16,13 @@
 
 为了解决善忘的问题，可以制作不同的抽认卡帮助学习。
 
-John Washam的抽认卡网站：
+John Washam的抽认卡：
 
 - [抽认卡页面的代码仓库](https://github.com/jwasham/computer-science-flash-cards)
 - [抽认卡数据库 ── 旧 1200 张](https://github.com/jwasham/computer-science-flash-cards/blob/master/cards-jwasham.db)
 - [抽认卡数据库 ── 新 1800 张](https://github.com/jwasham/computer-science-flash-cards/blob/master/cards-jwasham-extreme.db)
 
-另外推荐支持多平台的软件[Anki](http://ankisrs.net/)与国内的[记乎](http://www.geefoo.cn/)。
+另外推荐支持多平台的软件——[Anki](http://ankisrs.net/)，大陆相似功能APP有[记乎](http://www.geefoo.cn/)。
 
 **3. 复习、复习、再复习**
 
@@ -52,8 +52,8 @@ John Washam的抽认卡网站：
 |     	  ├── Mysql
 |     	  └── Oracle
 ├── 开发工具
-├── JavaSE
-|    ├── Java基础
+├── Java基础
+|    ├── JavaSE
 |    ├── JVM
 |    ├── 并发编程
 |    ├── 设计模式
@@ -119,13 +119,12 @@ John Washam的抽认卡网站：
 ├── Python学习
 ├── 面试
 └── 其他
-	 ├── 《左耳听风》  	
+     ├── 感悟  
+     ├── 《左耳听风》栏目
      └── 错误记录
 ```
 
 ## Let‘s go!!!
-
----
 
 ## 任务清单
 
@@ -141,15 +140,7 @@ John Washam的抽认卡网站：
 
 
 
-
-
-
-
-
-
-
-
-
+每日12:00准时入睡
 
 
 
