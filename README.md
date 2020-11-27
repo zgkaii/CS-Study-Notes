@@ -91,10 +91,10 @@ John Washam的抽认卡：
 |    |    |	  └── JPA
 |    |	  ├── 连接池
 |    |	  └── 分库列表
-|    ├── 搜索引擎
-|    |	  ├── ElasticSearch
-|    |	  ├── Solr
-|    |	  └── Lucene
+|    └── 搜索引擎
+|     	  ├── ElasticSearch
+|     	  ├── Solr
+|     	  └── Lucene
 ├── 分布式/微服务
 |    ├── 服务注册/发现
 |    ├── 网关
@@ -117,6 +117,7 @@ John Washam的抽认卡：
 |    ├── Hadoop
 |    └── Spark
 ├── Python学习
+├── Golang学习
 ├── 面试
 └── 其他
      ├── 感悟  
@@ -125,24 +126,6 @@ John Washam的抽认卡：
 ```
 
 ## Let‘s go!!!
-
-## 任务清单
-
-* React学习
-  * [ ] React v16.13.1
-  * [ ] Material-UI
-  * [ ] react-redux
-* [ ] [Swagger UI]([http://docs.swagger.io/swagger-core/current/apidocs/index.html?io/swagger/annotations](http://docs.swagger.io/swagger-core/current/apidocs/index.html?io/swagger/annotations) )使用
-* [ ] [REST](https://zhuanlan.zhihu.com/p/90367875)
-* [ ] DTO——[java的几种对象(PO,VO,DAO,BO,POJO，DTO)解释](https://www.cnblogs.com/firstdream/archive/2012/04/13/2445582.html)
-
-
-
-
-
-每日12:00准时入睡
-
-
 
 
 
