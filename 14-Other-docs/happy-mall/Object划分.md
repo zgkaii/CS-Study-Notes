@@ -36,3 +36,5 @@ Business Object：业务对象
 
 为业务层提供接口，此对象用于访问数据库。通常和 PO 结合使用，DAO中包含了各种数据库的操作方法，通过它的方法，结合 PO 对数据库进行相关的操作。 
 在业务逻辑与数据库资源中间，配合 VO，提供数据库的 CRUD 操作。   
+
+[什么是JavaBean、bean? 什么是POJO、PO、DTO、VO、BO ? 什么是EJB、EntityBean？](https://blog.csdn.net/chenchunlin526/article/details/69939337)
