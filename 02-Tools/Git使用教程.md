@@ -129,7 +129,6 @@ Git 有三种状态，你的文件可能处于其中之一：
     主体部分当然也可以有几段，但是一定要注意换行和句子不要太长。因为这样在使用 "git log" 的时候会有缩进比较好看。
 
 提交的标题行描述应该尽量的清晰和尽量的一句话概括。这样就方便相关的 Git 日志查看工具显示和其他人的阅读。
-    
 ### 推送改动到远程仓库
 
 - 如果你还没有克隆现有仓库，并欲将你的仓库连接到某个远程服务器，你可以使用如下命令添加：·`git remote add origin <server>` ,比如我们要让本地的一个仓库和 Github 上创建的一个仓库关联可以这样`git remote add origin https://github.com/Snailclimb/test.git` 
@@ -154,7 +153,69 @@ Git 有三种状态，你的文件可能处于其中之一：
 git log --author=bob
 ```
 
-### 撤销操作
+### 分支
+
+分支是用来将特性开发绝缘开来的。在你创建仓库的时候，*master* 是“默认的”分支。在其他分支上进行开发，完成后再将它们合并到主分支上。
+
+我们通常在开发新功能、修复一个紧急 bug 等等时候会选择创建分支。单分支开发好还是多分支开发好，还是要看具体场景来说。
+
+创建一个名字叫做 test 的分支
+
+```shell script
+git branch test
+```
+
+切换当前分支到 test（当你切换分支的时候，Git 会重置你的工作目录，使其看起来像回到了你在那个分支上最后一次提交的样子。 Git 会自动添加、删除、修改文件以确保此时你的工作目录和这个分支最后一次提交时的样子一模一样）
+
+```shell script
+git checkout test
+```
+
+<div align="center">  
+<img src="https://my-blog-to-use.oss-cn-beijing.aliyuncs.com/2019-3切换分支.png" width="500px"/>
+</div>
+
+你也可以直接这样创建分支并切换过去(上面两条命令的合写)
+
+```shell script
+git checkout -b feature_x
+```
+
+切换到主分支
+
+```shell script
+git checkout master
+```
+
+合并分支(可能会有冲突)
+
+```shell script
+ git merge test
+```
+
+把新建的分支删掉
+
+```shell script
+git branch -d feature_x
+```
+
+将分支推送到远端仓库（推送成功后其他人可见）：
+
+```shell script
+git push origin 
+```
+
+### .gitignore 文件
+
+忽略以下文件：
+
+- 操作系统自动生成的文件，比如缩略图；
+- 编译生成的中间文件，比如 Java 编译产生的 .class 文件；
+- 自己的敏感信息，比如存放口令的配置文件。
+
+不需要全部自己编写，可以到 [https://github.com/github/gitignore](https://github.com/github/gitignore) 中进行查询。
+
+### git撤销&回滚操作(git reset 和 get revert)
 
 有时候我们提交完了才发现漏掉了几个文件没有添加，或者提交信息写错了。 此时，可以运行带有 `--amend` 选项的提交命令尝试重新提交：
 
@@ -181,63 +242,74 @@ git fetch origin
 git reset --hard origin/master
 ```
 
-### 分支
+##### 情况一：文件已修改，还未执行git add操作(working tree内撤销)
 
-分支是用来将特性开发绝缘开来的。在你创建仓库的时候，*master* 是“默认的”分支。在其他分支上进行开发，完成后再将它们合并到主分支上。
-
-我们通常在开发新功能、修复一个紧急 bug 等等时候会选择创建分支。单分支开发好还是多分支开发好，还是要看具体场景来说。
-
-创建一个名字叫做 test 的分支
-
-```console
-git branch test
+```shell script
+$ git checkout -- fileName
+$ git checkout *
 ```
 
-切换当前分支到 test（当你切换分支的时候，Git 会重置你的工作目录，使其看起来像回到了你在那个分支上最后一次提交的样子。 Git 会自动添加、删除、修改文件以确保此时你的工作目录和这个分支最后一次提交时的样子一模一样）
+##### 情况二：对多个文件执行了git add操作，但只想提交其中一部分文件
 
-```console
-git checkout test
+```shell script
+$ git add *
+$ git status
 ```
 
-<div align="center">  
-<img src="https://my-blog-to-use.oss-cn-beijing.aliyuncs.com/2019-3切换分支.png" width="500px"/>
-</div>
+取消暂存
 
-你也可以直接这样创建分支并切换过去(上面两条命令的合写)
-
-```console
-git checkout -b feature_x
+```shell script
+$ git reset HEAD <filename>
 ```
 
-切换到主分支
+##### 情况三：执行了git add操作，撤销对文件的修改（index内回滚）
 
-```
-git checkout master
-```
-
-合并分支(可能会有冲突)
-
-```java
- git merge test
+```shell script
+# 取消暂存
+git reset HEAD fileName
+# 撤销修改
+git checkout fileName
 ```
 
-把新建的分支删掉
+##### 情况四：修改的文件已被git commit，但想再次修改不再产生新的commit
 
-```
-git branch -d feature_x
+```shell script
+# 修改最后一次提交
+$ git add sample.txt
+$ git commit --amend -m"说明"
 ```
 
-将分支推送到远端仓库（推送成功后其他人可见）：
+##### 情况五：已在本地进行多次git commit操作，撤销到其中某次commit
 
+```shell script
+$ git reset [--hard|soft|mixed|merge|keep] [commit|HEAD]
 ```
-git push origin 
+
+##### 情况六：执行add&commit后，但还未push
+
+```shell script
+# 撤销到commit前版本
+$ git reset --soft HEAD^
+# 撤销到add前版本
+$ git reset --hard HEAD^
+# commit时注释写错，可用其他方法修改注释：
+$ git commit --amend
+```
+
+##### 情况七：撤销commit时不小心回滚到add前版本，所有修改丢失
+
+```shell script
+# 查看撤销前版本号
+$ git reflog
+# 恢复回滚前
+$ git reset --hard <commit_id>
 ```
 
 ## 推荐
 
 **在线演示学习工具：**
 
-「补充，来自[issue729](https://github.com/Snailclimb/JavaGuide/issues/729)」Learn Git Branching https://oschina.gitee.io/learn-git-branching/   。该网站可以方便的演示基本的git操作，讲解得明明白白。每一个基本命令的作用和结果。
+[Learn Git Branching](https://oschina.gitee.io/learn-git-branching/ ) 。该网站可以方便的演示基本的git操作，讲解得明明白白。每一个基本命令的作用和结果。
 
 **推荐阅读：**
 

@@ -1,3 +1,5 @@
+> 文章来源——[https://juejin.im/post/6844903557016076302](https://juejin.im/post/6844903557016076302)
+
 ### Lombok注解说明
 
 - val：用在局部变量前面，相当于将变量声明为final
@@ -268,9 +270,3 @@ public class GetterLazyExample {
     }
 }
 ```
-
-
-
-
-
-[转自https://juejin.im/post/6844903557016076302](https://juejin.im/post/6844903557016076302)

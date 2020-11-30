@@ -7,7 +7,8 @@
 
 ## 鉴别模型
 一个单纯鉴别系统的模型
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426200107925.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0Nhb3lhbmdfSGU=,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426200107925.png)
+
 ## 鉴别系统的组成
 鉴别编码器和鉴别译码器可抽象为鉴别函数。一个安全的鉴别系统，需满足
 1) 接收者能够检验和证实消息的合法性、真实性和完整性
@@ -26,12 +27,13 @@
 ## 加密认证
 用完整信息的密文作为对信息的鉴别
 ### 对称密码体制加密认证
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426200342670.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0Nhb3lhbmdfSGU=,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426200342670.png)
 ### 公钥密码体制加密认证
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426200508176.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0Nhb3lhbmdfSGU=,size_16,color_FFFFFF,t_70)
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426200527417.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0Nhb3lhbmdfSGU=,size_16,color_FFFFFF,t_70)
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426200543446.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0Nhb3lhbmdfSGU=,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426200508176.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426200527417.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426200543446.png)
 公钥密码体制加密认证
+
 - 使用公开密钥加密信息的明文只能提供保密而不能提供认证。为了提供认证，发送者A用私钥对信息的明文进行加密，任意接收者都可以用A的公钥解密。
 - 采用这样的结构既可提供了认证，也可提供数字签名。因为只有A 能够产生该密文，其它任何一方都不能产生该密文。
      - 从效果上看A 已经用私钥对信息的明文进行了签名。
@@ -58,9 +60,10 @@ MAC函数类似于加密函数，主要区别在于MAC 函数不需要可逆性�
 
 因为收发双方共享相同的密钥，上述过程只提供认证而不提供保密，也不能提供数字签名
 ### MAC的基本用法
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426200932938.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0Nhb3lhbmdfSGU=,size_16,color_FFFFFF,t_70)
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426200939217.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0Nhb3lhbmdfSGU=,size_16,color_FFFFFF,t_70)
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426200944908.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0Nhb3lhbmdfSGU=,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426200932938.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426200939217.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426200944908.png)
+
 #### HMAC简介
 ash函数用来构造MAC：HMAC为其中之一
 # 散列函数：
@@ -75,11 +78,13 @@ h=H(M)是定长的散列值或称为消息摘要。
 
 由于函数本身公开，传送过程中对散列值需要另外的加密保护(如果没有对散列值的保护，篡改者可以在修改消息的同时修改散列值，从而使散列值的认证功能失效)。
 ## 散列函数的基本用法：消息认证
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426093437730.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0Nhb3lhbmdfSGU=,size_16,color_FFFFFF,t_70)
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426093515385.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0Nhb3lhbmdfSGU=,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426093437730.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426093515385.png)
+
 ## 散列函数的基本用法：数字签名
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426093527401.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0Nhb3lhbmdfSGU=,size_16,color_FFFFFF,t_70)
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426093620468.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0Nhb3lhbmdfSGU=,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426093527401.png)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426093620468.png)
+
 ## 散列函数的基本用法：其他应用
 单向口令文件
 
@@ -141,14 +146,14 @@ P = 1 - 365\*364\*363\*…*(365-n+1)/365~n~
 Ron Rivest于1990年提出MD4
 几乎被所有hash函数使用
 
-
 具体做法：
 把原始消息M分成一些固定长度的块Y~i~
 最后一块padding并使其包含消息M长度
 设定初始值CV~0~
 重复使用压缩函数f，CV~i~ = f(CV~i-1~,Y~i-1~)
 最后一个CV~i~为hash值
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426194401839.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0Nhb3lhbmdfSGU=,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426194401839.png)
+
 ## MD5算法、SHA算法
 ### MD5简介
 Merkle于1989年提出hash function模型
@@ -175,7 +180,7 @@ admin 的摘要：
 32位：21232f297a57a5a743894a0e4a801fc3 
 
 ### SHA简介
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426194500901.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0Nhb3lhbmdfSGU=,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426194500901.png)
 SHA-512逻辑
 步骤1 附加填充位：消息长为模1024与896同余
 步骤2 附加长度：最后128位：128位无符号整数表明消息的长度
@@ -240,7 +245,7 @@ A可以否认发过该消息，B无法证明A确实发了该消息。
 ## 数字签名算法
 ### 普通数字签名算法
 #### RSA 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426201934400.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0Nhb3lhbmdfSGU=,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426201934400.png)
 A的公钥私钥对{KUa||KRa}
 A对消息M签名: SA=EKRa(M)
 问题：
@@ -274,7 +279,7 @@ EIGamal签名方案由T.ElGamal于1985年提出，其变体用于DSS中，其安
 计算r：r = g^k^ mod p
 计算s：s = (H(M) – xr)k^-1^ mod p – 1，到此，签名结果为(r，s)
  把消息和签名结果(M，r，s)发给接收者
- 
+
 ##### EIGamal签名方案认证过程
  取得发送方的公钥y；
 预查合法性：若1≤r≤p－1，继续；否则，签名不合法
@@ -301,7 +306,7 @@ DSA
 椭圆曲线的数字签名算法ECDSA 
 
 与RSA不同，DSA算法是一种密钥方案，但不能用于加密或密钥交换。DSA的安全性建立在离散对数的困难性上。
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426212407328.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0Nhb3lhbmdfSGU=,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426212407328.png)
 全局公开密钥分量
 p：素数，其中2^L-1^<p<2^L^，512<=L<1024，且L为64的倍数：即比特长度在512到1024之间，长度增量为64比特
 q：(p-1)的素因子，其中2^159^<q<2^160^，比特长度为160
@@ -334,7 +339,7 @@ H(M)：使用SHA-1生成的M的散列码
 M '，r '，s ' ：接收到的M、r、s版本
 
 DSS签名和验证
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426212857613.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0Nhb3lhbmdfSGU=,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426212857613.png)
 
 DSS的特点
 DSS的签名比验证快得多
@@ -392,7 +397,7 @@ Z：用ZIP算法数据压缩
 R64：用radix64转换到ASCII格式
 
 1. 认证 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426213150652.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0Nhb3lhbmdfSGU=,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426213150652.png)
 说明：
 1、 SHA-1生成消息的160的HASH码
 2、SHA-1和RSA结合提供了一个高效的数字签名方案
@@ -408,7 +413,7 @@ R64：用radix64转换到ASCII格式
 用会话密钥解密恢复消息M
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/2019042621323283.png)
 加密：保密与鉴别同时运用
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426213249456.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0Nhb3lhbmdfSGU=,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426213249456.png)
 
 3. 数据压缩
 压缩的位置：发生在签名后、加密前。
@@ -428,10 +433,10 @@ PGP自动分段并在接收时自动恢复。
 签名只需一次，在第一段中。
 
 ## PGP消息的传送与接收
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426213413694.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0Nhb3lhbmdfSGU=,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426213413694.png)
 
 ## 发送消息的格式
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426213429526.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0Nhb3lhbmdfSGU=,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426213429526.png)
 
 ## PGP密钥需求
 PGP使用四种类型的密钥：一次性会话的常规密钥，公钥，私钥，基于口令短语的常规密钥。
@@ -473,12 +478,12 @@ PGP在每一个节点上提供一对数据结构：
 私有密钥：密钥对的私有部分（该字段加密）
 用户ID：该字段的典型值是用户的邮件地址，用户也可为每个密钥对选择不同的名字
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426213618347.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0Nhb3lhbmdfSGU=,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426213618347.png)
 
 ## 公开密钥环
 UserID：公钥的拥有者。多个UserID可以对应一个公钥。
 公钥环可以用UserID或KeyID索引。
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426213636577.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0Nhb3lhbmdfSGU=,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426213636577.png)
 
 ## PGP —报文传输过程
 签名：
@@ -491,7 +496,7 @@ PGP产生一个会话密钥，并加密消息
 PGP用接收者userid从公钥环中获取其公钥
 构造消息的会话密钥部分
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426213659614.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0Nhb3lhbmdfSGU=,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426213659614.png)
 
 ## PGP —报文接收过程
 解密消息
@@ -503,7 +508,7 @@ PGP恢复会话密钥，并解密消息
 用消息的签名部分中的KeyID作为索引，从公钥环中获取发送者的公钥
 PGP恢复被传输过来的消息摘要
 PGP对于接收到的消息作摘要，并与上一步的结果作比较
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426213731713.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0Nhb3lhbmdfSGU=,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190426213731713.png)
 
 ## 公钥管理问题
 由于PGP重在广泛地在正式或非正式环境下应用，没有建立严格的公钥管理模式。

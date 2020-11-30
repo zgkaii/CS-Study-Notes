@@ -468,7 +468,7 @@ FOR I IN 1 . . 3 LOOP
 END LOOP ;
 ```
 范例：用三种方式分别输出1-10
-```oracle
+```Oracle
 ---while 
 DECLARE
   i NUMBER(2) :=1;
