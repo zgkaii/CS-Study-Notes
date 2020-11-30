@@ -1,7 +1,3 @@
-https://blog.csdn.net/wei83523408/article/details/60472168
-
-https://blog.jetbrains.com/idea/2020/03/top-15-intellij-idea-shortcuts/
-
 # Eclipse与IDEA常用快捷键对比
 
 |    Eclipse    |        IDEA         |            英文描述             |              中文描述               |
@@ -25,21 +21,3 @@ https://blog.jetbrains.com/idea/2020/03/top-15-intellij-idea-shortcuts/
 | alt+上/下箭头 | alt+shift+上/下箭头 |     Code->Move Line Up/Down     |            移动一行代码             |
 |    ctrl+/     |       ctrl+/        |     Other->Fix doc comment      |              方法注释               |
 |  ctrl+alt+s   |     alt+insert      |            Generate             |    生成getter,setter,tostring等     |
-
-Windows:  
-控制面板：直接control panel  
-画图：直接mspaint  
-程序卸载：直接appwiz.cpl  
-系统配置：CMD+msconfig  
-计算机管理：直接compmgmt.msc  
-
-Pycharm:  
-Alt+Ctrl+Enter :插入空行  
-Alt+7：查看模块类结构  Ctrl+F12  
-Alt+Ctrl+L：自动对齐  
-Ctrl+Shift +F：全局搜索  
-
-VSCODE:  
-html打开server Alt+L Alt+O  
-代码对齐 Alt+Shift+F  
-代码结构 ctrl+shift+O  
