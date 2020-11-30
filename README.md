@@ -22,7 +22,7 @@ John Washam的抽认卡：
 - [抽认卡数据库 ── 旧 1200 张](https://github.com/jwasham/computer-science-flash-cards/blob/master/cards-jwasham.db)
 - [抽认卡数据库 ── 新 1800 张](https://github.com/jwasham/computer-science-flash-cards/blob/master/cards-jwasham-extreme.db)
 
-另外推荐支持多平台的软件——[Anki](http://ankisrs.net/)，大陆相似功能APP有[记乎](http://www.geefoo.cn/)。
+另外推荐支持多平台的软件——[Anki](http://ankisrs.net/)，中国国内相似功能APP推荐——[记乎](http://www.geefoo.cn/)。
 
 **3. 复习、复习、再复习**
 
@@ -34,10 +34,8 @@ John Washam的抽认卡：
 
 ## 项目结构
 
-笔记都以Markdown文档格式放在到不同的文件夹下，结构如下：
-
 ```java
-学而时习之
+Cs-Notes-Kz
 ├── 基础学习
 |    ├── 计算机网络
 |    ├── 操作系统
@@ -117,10 +115,12 @@ John Washam的抽认卡：
 |    ├── Hadoop
 |    └── Spark
 ├── Python学习
+|    ├── 基础学习
+|    └── Django
 ├── Golang学习
 ├── 面试
 └── 其他
-     ├── 感悟  
+     ├── 个人感悟  
      ├── 《左耳听风》栏目
      └── 错误记录
 ```
