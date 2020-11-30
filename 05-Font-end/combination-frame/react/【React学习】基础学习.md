@@ -4,16 +4,16 @@
 
 React 是一个声明式，高效且灵活的用于构建用户界面的 JavaScript 库，由 Facebook 开源。使用 React 可以将一些简短、独立的代码片段组合成复杂的 UI 界面，这些代码片段被称作“组件”。
 
-**特点**
+传统的Web UI开发的主要问题——DOM API关注太多细节。
+
+![](https://img-blog.csdnimg.cn/2020113020122088.png)
+
+而React的特点：
 
 * Declarative（声明式编码）
-
 * Component-Based（组件化编码）
-
 * Learn Once，Write Anywhere（支持客户端与服务器渲染，React-Native）
-
 * 高效
-
 * 单向响应的数据流
 
 **高效的原因**
