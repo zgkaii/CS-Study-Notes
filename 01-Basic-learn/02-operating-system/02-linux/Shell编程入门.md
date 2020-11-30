@@ -1,36 +1,3 @@
-
-<!-- MarkdownTOC -->
-
-- [Shell 编程入门](#shell-编程入门)
-  - [走进 Shell 编程的大门](#走进-shell-编程的大门)
-    - [为什么要学Shell？](#为什么要学shell)
-    - [什么是 Shell？](#什么是-shell)
-    - [Shell 编程的 Hello World](#shell-编程的-hello-world)
-  - [Shell 变量](#shell-变量)
-    - [Shell 编程中的变量介绍](#shell-编程中的变量介绍)
-    - [Shell 字符串入门](#shell-字符串入门)
-    - [Shell 字符串常见操作](#shell-字符串常见操作)
-    - [Shell 数组](#shell-数组)
-  - [Shell 基本运算符](#shell-基本运算符)
-    - [算数运算符](#算数运算符)
-    - [关系运算符](#关系运算符)
-    - [逻辑运算符](#逻辑运算符)
-    - [布尔运算符](#布尔运算符)
-    - [字符串运算符](#字符串运算符)
-    - [文件相关运算符](#文件相关运算符)
-  - [shell流程控制](#shell流程控制)
-    - [if 条件语句](#if-条件语句)
-    - [for 循环语句](#for-循环语句)
-    - [while 语句](#while-语句)
-  - [shell 函数](#shell-函数)
-    - [不带参数没有返回值的函数](#不带参数没有返回值的函数)
-    - [有返回值的函数](#有返回值的函数)
-    - [带参数的函数](#带参数的函数)
-
-<!-- /MarkdownTOC -->
-
-# Shell 编程入门
-
 ## 走进 Shell 编程的大门
 
 ### 为什么要学Shell？
@@ -50,7 +17,6 @@
 ### 什么是 Shell？
 
 简单来说“Shell编程就是对一堆Linux命令的逻辑化处理”。
-
 
 W3Cschool 上的一篇文章是这样介绍 Shell的，如下图所示。
 ![什么是 Shell？](http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-11-26/19456505.jpg)
