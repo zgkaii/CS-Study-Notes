@@ -118,6 +118,7 @@ Cs-Notes-Kz
 |    ├── 基础学习
 |    └── Django
 ├── Golang学习
+├── C学习
 ├── Linux学习
 ├── 面试
 └── 其他
@@ -270,13 +271,13 @@ OWASP 是一个开源的、非盈利的全球性安全组织，致力于应用�
 
 **2. 前端开发相关**
 
-- [CSS Guidelines](https://cssguidelin.es)，CSS 容易学，但是不好写，这篇规范会教导如何写出一个健全的、可管理的，并可以扩展的 CSS。
-- [Scalable and Modular Architecture for CSS](https://smacss.com/)，这是一本教学如何写出可扩展和模块化的 CSS 的电子书，非常不错。
+- [CSS Guidelines](https://cssguidelin.es)，CSS 容易学，但是不好写，这篇规范会教写一个健全的、可管理的，并可以扩展的 CSS。
+- [Scalable and Modular Architecture for CSS](https://smacss.com/)，这是一本教写可扩展和模块化的 CSS 的电子书，非常不错。
 - [Frontend Guidelines](https://github.com/bendc/frontend-guidelines)，一些和 HTML、CSS、JavaScript 相关的最佳实践。
 - [Sass Guidelines](https://sass-guidelin.es)，Sass 作为 CSS 的补充，其要让 CSS 变得更容易扩展。然而，也变得更灵活，这意味着可以被更容易滥用。这里这篇 " 富有主见 " 的规范值得你一读。
 - [Airbnb CSS / Sass Styleguide](https://github.com/airbnb/css)， Airbnb 的 CSS/Sass 规范。
 - 说了 Sass 就不得不说 LESS，这里有几篇和 LESS 相关的：[LESS Coding Guidelines](https://gist.github.com/radermacher/f84b24af816111faf0ef)、[LESS Coding Guidelines](https://github.com/odoo/odoo/wiki/LESS-coding-guidelines)、[LESS coding standard](http://devdocs.magento.com/guides/v2.0/coding-standards/code-standard-less.html)。
-- [HTML Style Guide](https://github.com/marcobiedermann/html-style-guide)，一个教导如何写出性能更高，结构更好，容易编程和扩展的 HTML 的规范。
+- [HTML Style Guide](https://github.com/marcobiedermann/html-style-guide)，一个教写性能更高，结构更好，容易编程和扩展的 HTML 的规范。
 - [HTML + CSS Code Guide](http://codeguide.co)，如何写出比较灵活、耐用、可持续改进的 HTML 和 CSS 的规范。
 - [CoffeeScript Style Guide](https://github.com/polarmobile/coffeescript-style-guide)，CoffeeScript 的最佳实践和编程规范。
 - [Google HTML/CSS Style Guide](https://google.github.io/styleguide/htmlcssguide.html)，Google 的 HTML/CSS 的编程规范。
