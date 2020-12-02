@@ -1,10 +1,10 @@
 ## 1 问题引出
 
-HashMap不是线程安全的，在并发情况下会造成Race Condition，从而导致死循环（可参考[JAVA HASHMAP的死循环](https://coolshell.cn/articles/9606.html)一文）。在并发场景下要保证线程安全可以使用 `Collections.synchronizedMap()` 方法来包装HashMap。
-
-HashTable使用synchronized来保证线程安全，所有访问HashTable的线程都必须竞争同一把锁，在线程竞争激烈的情况下效率非常低下。
+HashMap不是线程安全的，在并发情况下 会造成Race Condition，从而导致死循环（可参考[JAVA HASHMAP的死循环](https://coolshell.cn/articles/9606.html)一文）。在并发场景下要保证线程安全可以使用 `Collections.synchronizedMap()` 方法来包装HashMap。HashTable使用synchronized来保证线程安全，所有访问HashTable的线程都必须竞争同一把锁，在线程竞争激烈的情况下效率也非常低下。
 
 基于此，ConcurrentHashMap应运而生。在 ConcurrentHashMap 中，无论是读操作还是写操作都能保证很高的性能：在进行读操作时(几乎)不需要加锁，而在写操作时通过**锁分段技术**（JDK1.7）只对所操作的段加锁而不影响客户端对其它段的访问。
+
+下面就通过源码分析，深刻理解ConcurrentHashMap为什么是线程安全的。
 
 ## 2 ConcurrentHashMap结构
 
@@ -12,7 +12,7 @@ HashTable使用synchronized来保证线程安全，所有访问HashTable的线�
 
 ![s](https://img-blog.csdnimg.cn/20201111105642652.png)
 
-Java 7 中 ConcurrentHashMap 的存储结构如上图，ConcurrnetHashMap 由很多个 Segment  组合，而每一个 Segment 是一个类似于 HashMap 的结构，所以每一个 HashMap 的内部可以进行扩容。但是 Segment 的个数一旦**初始化就不能改变**，默认 Segment 的个数是 16 个，你也可以认为 ConcurrentHashMap 默认支持最多 16 个线程并发。
+Java 7 中 ConcurrentHashMap 的存储结构如上图，ConcurrnetHashMap 由很多个 Segment  组合，而每一个 Segment 是一个类似于 HashMap 的结构，是一种数组和链表结构，可以进行扩容。一个Segment里包含一个 HashEntry数组，每个HashEntry是一个链表结构的元素，每个Segment 守护着一个HashEntry数组里的元素，当对HashEntry数组的数据进行修改时，必须首先获得与它对应的Segment锁。但是 Segment 的个数一旦**初始化就不能改变**，默认 Segment 的个数是 16 个，可以认为 ConcurrentHashMap 默认支持最多 16 个线程并发。
 
 ### 2.2 JDK1.8
 
@@ -26,19 +26,19 @@ Java 7 中 ConcurrentHashMap 的存储结构如上图，ConcurrnetHashMap 由很
 
 #### 3.1.1 初始化
 
-通过 ConcurrentHashMap 的无参构造探寻 ConcurrentHashMap 的初始化流程。
+下面通过ConcurrentHashMap 的无参构造函数探寻 ConcurrentHashMap 的初始化流程。
 
 ```java
     /**
      * Creates a new, empty map with a default initial capacity (16),
      * load factor (0.75) and concurrencyLevel (16).
      */
-    public ConcurrentHashMap() {
+	public ConcurrentHashMap() {
         this(DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR, DEFAULT_CONCURRENCY_LEVEL);
     }
 ```
 
-无参构造中调用了有参构造，传入了三个参数的默认值，他们的值是。
+无参构造中调用了有参构造，传入了三个参数的默认值：
 
 ```java
     /**
@@ -57,7 +57,7 @@ Java 7 中 ConcurrentHashMap 的存储结构如上图，ConcurrnetHashMap 由很
     static final int DEFAULT_CONCURRENCY_LEVEL = 16;
 ```
 
-接着看下这个有参构造函数的内部实现逻辑。
+查看有参构造函数，可知ConcurrentHashMap的初始化是通过initialCapacity、loadFactor 和concurrencyLevel等几个参数来初始化segment数组、段偏移量 segmentShift、段掩码segmentMask和每个segment里的HashEntry数组而实现的。
 
 ```java
 @SuppressWarnings("unchecked")
@@ -65,7 +65,7 @@ public ConcurrentHashMap(int initialCapacity,float loadFactor, int concurrencyLe
     // 参数校验
     if (!(loadFactor > 0) || initialCapacity < 0 || concurrencyLevel <= 0)
         throw new IllegalArgumentException();
-    // 校验并发级别大小，大于 1<<16，重置为 65536
+    // 校验并发级别大小，大于MAX_SEGMENTS=（1<<16），重置为 65536
     if (concurrencyLevel > MAX_SEGMENTS)
         concurrencyLevel = MAX_SEGMENTS;
     // Find power-of-two sizes best matching arguments
@@ -105,10 +105,10 @@ public ConcurrentHashMap(int initialCapacity,float loadFactor, int concurrencyLe
 总结一下在 Java 7 中 ConcurrnetHashMap 的初始化逻辑。
 
 1. 必要参数校验。
-2. 校验并发级别 concurrencyLevel 大小，如果大于最大值，重置为最大值。无惨构造**默认值是 16.**
+2. 校验并发级别 concurrencyLevel 大小，如果大于最大值，重置为最大值。无参构造**默认值是 16.**
 3. 寻找并发级别 concurrencyLevel 之上最近的 **2 的幂次方**值，作为初始化容量大小，**默认是 16**。
 4. 记录 segmentShift 偏移量，这个值为【容量 =  2 的N次方】中的 N，在后面 Put 时计算位置时会用到。**默认是 32 - sshift = 28**.
-5. 记录 segmentMask，默认是 ssize - 1 = 16 -1 = 15.
+5. 记录 segmentMask，默认是 ssize - 1 = 16 - 1 = 15.
 6. **初始化 segments[0]**，**默认大小为 2**，**负载因子 0.75**，**扩容阀值是 2*0.75=1.5**，插入第二个值时才会进行扩容。
 
 #### 3.1.2 put
@@ -375,7 +375,7 @@ private void rehash(HashEntry<K,V> node) {
 }
 ```
 
-有些同学可能会对最后的两个 for 循环有疑惑，这里第一个 for 是为了寻找这样一个节点，这个节点后面的所有 next 节点的新位置都是相同的。然后把这个作为一个链表赋值到新位置。第二个 for 循环是为了把剩余的元素通过头插法插入到指定位置链表。这样实现的原因可能是基于概率统计，有深入研究的同学可以发表下意见。
+这里第一个 for 是为了寻找这样一个节点，这个节点后面的所有 next 节点的新位置都是相同的。然后把这个作为一个链表赋值到新位置。第二个 for 循环是为了把剩余的元素通过头插法插入到指定位置链表。
 
 #### 3.1.4 get
 
@@ -417,7 +417,7 @@ public V get(Object key) {
 private final Node<K,V>[] initTable() {
     Node<K,V>[] tab; int sc;
     while ((tab = table) == null || tab.length == 0) {
-        ／／　如果 sizeCtl < 0 ,说明另外的线程执行CAS 成功，正在进行初始化。
+        //　如果 sizeCtl < 0 ,说明另外的线程执行CAS 成功，正在进行初始化。
         if ((sc = sizeCtl) < 0)
             // 让出 CPU 使用权
             Thread.yield(); // lost initialization race; just spin
