@@ -1,23 +1,100 @@
-# Eclipse与IDEA常用快捷键对比
+# IDEA常用快捷键
 
-|    Eclipse    |        IDEA         |            英文描述             |              中文描述               |
-| :-----------: | :-----------------: | :-----------------------------: | :---------------------------------: |
-| ctrl+shift+r  |    ctrl+shift+n     | Navigate->File 找工作空间的文件 |                                     |
-| ctrl+shift+t  |       ctrl+n        |         Navigate->Class         |              找类定义               |
-| ctrl+shift+g  |       alt+f7        |     Edit->Find->Find Usages     | 查找方法在哪里调用.变量在哪里被使用 |
-|    ctrl+t     |       ctrl+t        |     Other->Hierarchy Class      |            看类继承结构             |
-|    ctrl+o     |      ctrl+f12       |    Navigate->File Structure     |        搜索一个类里面的方法         |
-|  shift+alt+z  |     ctrl+alt+t      |       Code->Surround With       |          生成常见的代码块           |
-|  shift+alt+l  |     ctrl+alt+v      |   Refactor->Extract->Variable   |              抽取变量               |
-|  shift+alt+m  |     ctrl+alt+m      |    Refactor->Extract->Method    |              抽取方法               |
-|  alt+左箭头   |   ctrl+alt+左箭头   |         Navigate->Back          |         回退上一个操作位置          |
-|  alt+右箭头   |   ctrl+alt+右键头   |        Navigate->Forward        |         前进上一个操作位置          |
-|   ctrl+home   |      ctrl+home      |    Move Caret to Text Start     |            回到类最前面             |
-|   ctrl+end    |      ctrl+end       |     Move Caret to Text End      |            回到类最后面             |
-|    ctrl+e     |       ctrl+e        |       View->Recent Files        |           最近打开的文件            |
-|     alt+/     |     ctrl+space      |     Code->Completion->Basic     |            提示变量生成             |
-|    ctrl+1     |      alt+enter      |  Other->Show Intention Actions  |           提示可能的操作            |
-|    ctrl+h     |    ctrl+shift+f     |          Find in Path           |              全局搜索               |
-| alt+上/下箭头 | alt+shift+上/下箭头 |     Code->Move Line Up/Down     |            移动一行代码             |
-|    ctrl+/     |       ctrl+/        |     Other->Fix doc comment      |              方法注释               |
-|  ctrl+alt+s   |     alt+insert      |            Generate             |    生成getter,setter,tostring等     |
+## 搜索
+
+| 快捷键           | 作用           |
+| ---------------- | -------------- |
+| Ctrl + F         | 当前文件里查询 |
+| Ctrl + Shift + F | 全局搜索       |
+| Ctrl +R          | 当前文件替换   |
+| Ctrl + Shift + R | 全局替换       |
+| Ctrl + Shift + N | 查找文件       |
+| Ctrl + N         | 查找类         |
+
+## 查看
+
+| 快捷键                      | 作用                                 |
+| --------------------------- | ------------------------------------ |
+| Ctrl + O                    | 查看可以重写的父类方法并选择重写     |
+| Ctrl + E/Ctrl +Shift + E    | 显示最近浏览或编辑过的文件           |
+| Alt＋←/→                    | 页面切换                             |
+| F11                         | 添加/删除当前书签                    |
+| Shift + F11                 | 显示所有书签                         |
+| Ctrl + Alt + Shift + U      | 查看类的继承关系图（UML图）          |
+| Ctrl + H                    | 查看类的继承关系                     |
+| Ctrl + Shift + V            | 打开历史粘贴板                       |
+| Ctrl + Q                    | 查看注释文档                         |
+| Alt + F1                    | 可以将正在编辑的元素在各个面板中定位 |
+| Ctrl + Shift + F7/Ctrl + F7 | 高亮当前元素在当前文件中的使用       |
+| Alt + Shift + C             | 对比最近修改的代码                   |
+| Alt + 6                     | 查看所有TODO                         |
+| Ctrl + Alt + S              | 打开设置界面                         |
+
+## 代码操作
+
+| 快捷键                     | 作用                                               |
+| -------------------------- | -------------------------------------------------- |
+| Ctrl + Alt + L             | 代码格式化                                         |
+| Ctrl + Y                   | 删除行                                             |
+| Ctrl + D                   | 复制粘贴当前行到下一行                             |
+| Ctrl＋W                    | 选择单词继而语句继而行继而函数                     |
+| Alt＋↑/↓                   | 方法间快速移动                                     |
+| Ctrl + P                   | 显示方法的参数信息                                 |
+| Ctrl + F12                 | 浮动窗显示类结构，通过输入关键词完成快速定位类元素 |
+| Ctrl+ Alt + ←/→            | 将光标移到前或后编辑历史记录处                     |
+| Shift + Alt + ↑/↓          | 当前行上下移动                                     |
+| Ctrl + G                   | 通过行号跳转到指定的行                             |
+| Ctrl ＋ Shift ＋ Space     | 给出命名相关的智能提示                             |
+| Ctrl + Alt + Space         | 类名或接口名提示                                   |
+| Alt + 鼠标左键             | 列选择                                             |
+| Ctrl + Shift + U           | 字母大小写转换                                     |
+| Crtl + Alt + M             | 将一段代码抽取成方法                               |
+| Shift + F6                 | 重命名变量、文件、类等                             |
+| Ctrl + /                   | 注释（//）                                         |
+| Ctrl + Shift + /           | 注释（/**/）                                       |
+| Alt + 1/Ctrl + Shift + F12 | 切换Project面板打开关闭状态                        |
+| Ctrl＋[ / ]                | 跳到大括号的开头/结尾                              |
+| F2/Shift + F2              | 高亮错误或警告快速定位                             |
+| Ctrl + Alt + O             | 优化导入的类和包                                   |
+| Ctrl＋Shift＋Insert        | 选择历史剪贴板内容并插入                           |
+| Ctrl＋Shift＋Backspace     | 跳转到上次编辑的地方                               |
+| Ctrl + B/Alt + 鼠标左键    | 打开光标处的类或方法                               |
+| Alt + Enter                | 万能键，会根据场景弹出需要的内容，比如补全代码     |
+| 滚轮点击变量/方法/类       | 快速进入变量/方法/类的定义处                       |
+| (Shift + Ctrl) + Alt + J   | 快速选中同文本                                     |
+
+## 生成代码
+
+| 快捷键         | 作用                                                         |
+| -------------- | ------------------------------------------------------------ |
+| Alt＋Insert    | 生成构造器/Getter/Setter等                                   |
+| Ctrl＋Alt＋T   | 把代码包在一块内，例如try/catch                              |
+| Ctrl＋Alt＋V   | 引入方法返回值对应的变量 （跟自动Ctrl+Enter后选择引入变量差不多） |
+| Ctrl + Alt + F | 将局部变量抽取成全局变量                                     |
+
+## git操作
+
+| 快捷键           | 作用               |
+| ---------------- | ------------------ |
+| Ctrl + T         | 拉取代码           |
+| Ctrl + K         | 提交代码到本地     |
+| Ctrl + Shift + K | 推送代码到远程仓库 |
+
+## 运行代码
+
+| 快捷键      | 作用  |
+| ----------- | ----- |
+| Shift + F9  | DEBUG |
+| Shift + F10 | RUN   |
+
+## 调试
+
+| 快捷键            | 作用                                                         |
+| ----------------- | ------------------------------------------------------------ |
+| F8                | 下一步                                                       |
+| F7                | 进入当前方法                                                 |
+| Alt + Shift + F7  | 强制进入当前方法，强制进入使用F7时IDEA会跳过那些第三方或JDK的代码 |
+| Shift + F8        | 跳出方法                                                     |
+| Ctrl + F8         | 给当前行打上/取消断点                                        |
+| Ctrl + Shift + F8 | 查看所有断点                                                 |
+| F9                | 跳到下一个断点                                               |
