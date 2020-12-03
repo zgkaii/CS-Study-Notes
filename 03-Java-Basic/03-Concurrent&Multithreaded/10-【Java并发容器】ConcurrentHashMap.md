@@ -1,10 +1,12 @@
 ## 1 问题引出
 
-HashMap不是线程安全的，在并发情况下 会造成Race Condition，从而导致死循环（可参考[JAVA HASHMAP的死循环](https://coolshell.cn/articles/9606.html)一文）。在并发场景下要保证线程安全可以使用 `Collections.synchronizedMap()` 方法来包装HashMap。HashTable使用synchronized来保证线程安全，所有访问HashTable的线程都必须竞争同一把锁，在线程竞争激烈的情况下效率也非常低下。
+HashMap不是线程安全的，在并发情况下可能会造成Race Condition，形成环形链表从而导致死循环（可参考[JAVA HASHMAP的死循环](https://coolshell.cn/articles/9606.html)一文）。在并发场景下要保证线程安全可以使用 `Collections.synchronizedMap()` 方法来包装HashMap。
+
+HashTable使用synchronized来保证线程安全，所有访问HashTable的线程都必须竞争同一把锁，在线程竞争激烈的情况下效率非常低下。
 
 基于此，ConcurrentHashMap应运而生。在 ConcurrentHashMap 中，无论是读操作还是写操作都能保证很高的性能：在进行读操作时(几乎)不需要加锁，而在写操作时通过**锁分段技术**（JDK1.7）只对所操作的段加锁而不影响客户端对其它段的访问。
 
-下面就通过源码分析，深刻理解ConcurrentHashMap为什么是线程安全的。
+下面就通过源码分析，理解下ConcurrentHashMap为什么是线程安全的。
 
 ## 2 ConcurrentHashMap结构
 
@@ -26,13 +28,9 @@ Java 7 中 ConcurrentHashMap 的存储结构如上图，ConcurrnetHashMap 由很
 
 #### 3.1.1 初始化
 
-下面通过ConcurrentHashMap 的无参构造函数探寻 ConcurrentHashMap 的初始化流程。
+ConcurrentHashMap的无参构造函数：
 
 ```java
-    /**
-     * Creates a new, empty map with a default initial capacity (16),
-     * load factor (0.75) and concurrencyLevel (16).
-     */
 	public ConcurrentHashMap() {
         this(DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR, DEFAULT_CONCURRENCY_LEVEL);
     }
@@ -65,14 +63,13 @@ public ConcurrentHashMap(int initialCapacity,float loadFactor, int concurrencyLe
     // 参数校验
     if (!(loadFactor > 0) || initialCapacity < 0 || concurrencyLevel <= 0)
         throw new IllegalArgumentException();
-    // 校验并发级别大小，大于MAX_SEGMENTS=（1<<16），重置为 65536
+    // 校验并发级别大小，大于MAX_SEGMENTS=(1<<16)，重置为 65536
     if (concurrencyLevel > MAX_SEGMENTS)
         concurrencyLevel = MAX_SEGMENTS;
     // Find power-of-two sizes best matching arguments
-    // 2的多少次方
     int sshift = 0;
     int ssize = 1;
-    // 这个循环可以找到 concurrencyLevel 之上最近的 2的次方值
+    // 这个循环可以找到 >=concurrencyLevel 的最小2的次方值
     while (ssize < concurrencyLevel) {
         ++sshift;
         ssize <<= 1;
@@ -84,12 +81,13 @@ public ConcurrentHashMap(int initialCapacity,float loadFactor, int concurrencyLe
     // 设置容量
     if (initialCapacity > MAXIMUM_CAPACITY)
         initialCapacity = MAXIMUM_CAPACITY;
-    // c = 容量 / ssize ，默认 16 / 16 = 1，这里是计算每个 Segment 中的类似于 HashMap 的容量
+    // c = 容量 / ssize ，默认 16 / 16 = 1,计算每个 Segment 中的类似于 HashMap 的容量
     int c = initialCapacity / ssize;
     if (c * ssize < initialCapacity)
         ++c;
     int cap = MIN_SEGMENT_TABLE_CAPACITY;
-    //Segment 中的类似于 HashMap 的容量至少是2或者2的倍数
+    // 默认 MIN_SEGMENT_TABLE_CAPACITY 是 2
+    // Segment 中的类似于 HashMap 的容量至少是2或者2的倍数
     while (cap < c)
         cap <<= 1;
     // create segments and segments[0]
@@ -104,10 +102,10 @@ public ConcurrentHashMap(int initialCapacity,float loadFactor, int concurrencyLe
 
 总结一下在 Java 7 中 ConcurrnetHashMap 的初始化逻辑。
 
-1. 必要参数校验。
-2. 校验并发级别 concurrencyLevel 大小，如果大于最大值，重置为最大值。无参构造**默认值是 16.**
+1. 先进行参数校验。
+2. 校验并发级别 concurrencyLevel 大小，如果大于最大值，则将并发级别设为最大值。无参构造**默认值是 16.**
 3. 寻找并发级别 concurrencyLevel 之上最近的 **2 的幂次方**值，作为初始化容量大小，**默认是 16**。
-4. 记录 segmentShift 偏移量，这个值为【容量 =  2 的N次方】中的 N，在后面 Put 时计算位置时会用到。**默认是 32 - sshift = 28**.
+4. 记录 segmentShift 偏移量，这个值为【容量 =  2<sup>N</sup>】中的 N，在后面 Put 时计算位置时会用到。**默认是 32 - sshift = 28**.
 5. 记录 segmentMask，默认是 ssize - 1 = 16 - 1 = 15.
 6. **初始化 segments[0]**，**默认大小为 2**，**负载因子 0.75**，**扩容阀值是 2*0.75=1.5**，插入第二个值时才会进行扩容。
 
@@ -116,41 +114,24 @@ public ConcurrentHashMap(int initialCapacity,float loadFactor, int concurrencyLe
 接着上面的初始化参数继续查看 put 方法源码。
 
 ```java
-/**
- * Maps the specified key to the specified value in this table.
- * Neither the key nor the value can be null.
- *
- * <p> The value can be retrieved by calling the <tt>get</tt> method
- * with a key that is equal to the original key.
- *
- * @param key key with which the specified value is to be associated
- * @param value value to be associated with the specified key
- * @return the previous value associated with <tt>key</tt>, or
- *         <tt>null</tt> if there was no mapping for <tt>key</tt>
- * @throws NullPointerException if the specified key or value is null
- */
 public V put(K key, V value) {
     Segment<K,V> s;
     if (value == null)
         throw new NullPointerException();
+    // 1. 计算 key 的 hash 值
     int hash = hash(key);
-    // hash 值无符号右移 28位（初始化时获得），然后与 segmentMask=15 做与运算
-    // 其实也就是把高4位与segmentMask（1111）做与运算
+    // 2.根据 hash 值找到 Segment 数组中的位置 j
+    // 	 hash 值无符号右移 28位（初始化时获得），然后与 segmentMask=15 做与运算
+    //   其实也就是把高4位与segmentMask（1111）做与运算
     int j = (hash >>> segmentShift) & segmentMask;
     if ((s = (Segment<K,V>)UNSAFE.getObject          // nonvolatile; recheck
          (segments, (j << SSHIFT) + SBASE)) == null) //  in ensureSegment
-        // 如果查找到的 Segment 为空，初始化
+        // 3.如果查找到的 Segment 为空，初始化
         s = ensureSegment(j);
+    // 4.插入新值到Segment中
     return s.put(key, hash, value, false);
 }
 
-/**
- * Returns the segment for the given index, creating it and
- * recording in segment table (via CAS) if not already present.
- *
- * @param k the index
- * @return the segment
- */
 @SuppressWarnings("unchecked")
 private Segment<K,V> ensureSegment(int k) {
     final Segment<K,V>[] ss = this.segments;
@@ -170,7 +151,7 @@ private Segment<K,V> ensureSegment(int k) {
         if ((seg = (Segment<K,V>)UNSAFE.getObjectVolatile(ss, u)) == null) { // recheck
             // 再次检查 u 位置的 Segment 是否为null，因为这时可能有其他线程进行了操作
             Segment<K,V> s = new Segment<K,V>(lf, threshold, tab);
-            // 自旋检查 u 位置的 Segment 是否为null
+            // 自旋检查 u 位置的 Segment 是否为null。如果当前线程 CAS 失败，这里的 while 循环是为了将 seg 赋值返回。
             while ((seg = (Segment<K,V>)UNSAFE.getObjectVolatile(ss, u))
                    == null) {
                 // 使用CAS 赋值，只会成功一次
@@ -189,15 +170,19 @@ private Segment<K,V> ensureSegment(int k) {
 
 2. 如果指定位置的 Segment 为空，则初始化这个 Segment.
 
-   **初始化 Segment 流程：**
+**初始化 Segment 流程：**
 
-   1. 检查计算得到的位置的 Segment 是否为null.
-   2. 为 null 继续初始化，使用 Segment[0] 的容量和负载因子创建一个 HashEntry 数组。
-   3. 再次检查计算得到的指定位置的 Segment 是否为null.
-   4. 使用创建的 HashEntry 数组初始化这个 Segment.
-   5. 自旋判断计算得到的指定位置的 Segment 是否为null，使用 CAS 在这个位置赋值为 Segment.
+* 检查计算得到的位置的 Segment 是否为null.
 
-3. Segment.put 插入 key,value 值。
+* 为 null 继续初始化，使用 Segment[0] 的容量和负载因子创建一个 HashEntry 数组。
+
+* 再次检查计算得到的指定位置的 Segment 是否为null.
+
+* 使用创建的 HashEntry 数组初始化这个 Segment.
+
+* 自旋判断计算得到的指定位置的 Segment 是否为null，使用 CAS 在这个位置赋值为 Segment.
+
+* Segment.put 插入 key，value 值。
 
 上面探究了获取 Segment 段和初始化 Segment 段的操作。最后一行的 Segment 的 put 方法还没有查看，继续分析。
 
@@ -298,7 +283,7 @@ private HashEntry<K,V> scanAndLockForPut(K key, int hash, V value) {
                 e = e.next;
         }
         else if (++retries > MAX_SCAN_RETRIES) {
-            // 自旋达到指定次数后，阻塞等到只到获取到锁
+            // 自旋达到指定次数后，阻塞等到直到获取到锁
             lock();
             break;
         }
@@ -411,9 +396,6 @@ public V get(Object key) {
 #### 3.2.1 初始化 initTable
 
 ```java
-/**
- * Initializes table, using the size recorded in sizeCtl.
- */
 private final Node<K,V>[] initTable() {
     Node<K,V>[] tab; int sc;
     while ((tab = table) == null || tab.length == 0) {
@@ -442,8 +424,8 @@ private final Node<K,V>[] initTable() {
 
 从源码中可以发现 ConcurrentHashMap 的初始化是通过**自旋和 CAS** 操作完成的。里面需要注意的是变量 `sizeCtl` ，它的值决定着当前的初始化状态。
 
-1. -1  说明正在初始化
-2. -N 说明有N-1个线程正在进行扩容
+1. `-1`  说明正在初始化
+2. `-N` 说明有`N-1`个线程正在进行扩容
 3. 表示 table 初始化大小，如果 table 没有初始化
 4. 表示 table 容量，如果 table　已经初始化。
 
@@ -581,14 +563,16 @@ public V get(Object key) {
 
 ### 4 总结
 
-Java7 中 ConcruuentHashMap 使用的分段锁，也就是每一个 Segment 上同时只有一个线程可以操作，每一个 Segment 都是一个类似 HashMap 数组的结构，它可以扩容，它的冲突会转化为链表。但是 Segment 的个数一但初始化就不能改变。
+Java7 中 ConcruuentHashMap 使用的分段锁，也就是每一个 Segment 上同时只有一个线程可以操作，每一个 Segment 都是一个类似 HashMap 数组的结构，它可以扩容，它的冲突会转化为链表。但是 **Segment 的个数一但初始化就不能改变**。
 
 Java8 中的 ConcruuentHashMap  使用的 Synchronized 锁加 CAS 的机制。结构也由 Java7 中的 **Segment 数组 + HashEntry 数组 + 链表** 进化成了  **Node 数组 + 链表 / 红黑树**，Node 是类似于一个 HashEntry 的结构。它的冲突再达到一定大小时会转化成红黑树，在冲突小于一定数量时又退回链表。
 
-有些同学可能对 Synchronized 的性能存在疑问，其实 Synchronized 锁自从引入锁升级策略后，性能不再是问题，有兴趣的同学可以自己了解下 Synchronized 的**锁升级**。
-
 ## 参考
 
-[Java7/8 中的 HashMap 和 ConcurrentHashMap 全解析](https://www.javadoop.com/post/hashmap)
+* 《并发编程的艺术》
 
-[深入理解ConcurrentHashMap（JDK1.8）](https://blog.csdn.net/qq_31709249/article/details/106952137)
+* [Java7/8 中的 HashMap 和 ConcurrentHashMap 全解析](https://www.javadoop.com/post/hashmap)
+
+* [深入理解ConcurrentHashMap（JDK1.8）](https://blog.csdn.net/qq_31709249/article/details/106952137)
+
+* [ConcurrentHashMap实现原理及源码分析](https://www.cnblogs.com/chengxiao/p/6842045.html)
