@@ -1,10 +1,3 @@
-- [ ] HashMap与HashTable
-- [ ] ConcurrentHashMap详解
-- [ ] ConcurrentLinkedQueue
-- [ ] 阻塞队列
-- [ ] CopyOnWriteArrayList
-- [ ] ConcurrentSkipListMap
-
 ## 一 JDK 提供的并发容器简介
 
 并发编程大师Doug Lea开发了非常多的并发容器和框架，这些容器大部分在 `java.util.concurrent` 包中。
