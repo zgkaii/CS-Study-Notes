@@ -1,6 +1,6 @@
-# 1 UML
+# 1 UML概述
 
-## 1.1 基本介绍
+## 1.1 简述
 
 UML——Unified modeling language UML (**统一建模语言**)，是一种用于软件系统分析和设计的语言工具，它用于帮助软件开发人员进行思考和记录思路的结果。
 
@@ -16,9 +16,9 @@ IDEA中自己绘制UML则需安装插件`PlantUML`：
 
 ![](https://img-blog.csdnimg.cn/20201203224135306.png)
 
-安装`PlantUML`插件后还需要[安装Graphviz](https://segmentfault.com/a/1190000022789556)才能正常显示，其详细使用可参考——[PlantUML语言参考指引](http://plantuml.com/zh/guide)。`PlantUML`功能强大，如果嫌弃IDEA上使用 `PlantUML`还是有点麻烦，也可以用在线作图工具，如：`ProcessOn`，`WebChart`。
+安装`PlantUML`插件后还需要[安装Graphviz](https://segmentfault.com/a/1190000022789556)才能正常显示，其详细使用可参考——[PlantUML语言参考指引](http://plantuml.com/zh/guide)。`PlantUML`功能强大，但如果嫌弃在IDEA上使用 `PlantUML`麻烦的话，也可以用在线作图工具，如：`ProcessOn`，`WebChart`。
 
-## 1.2 UML 图
+## 1.2 UML 图分类
 
 画 UML 图与写文章差不多，都是把自己的思想描述给别人看，关键在于思路和条理，UML 图大致分类：
 
@@ -98,7 +98,7 @@ Class10 *-- Class11:组合
 六种关系中，从弱到强依次是：
 依赖关系 < 关联关系 < 聚合关系 < 组合关系 < 实现关系 = 泛化关系
 
-# 3 UML时序图
+# 3 UML 时序图
 
 # 参考
 
