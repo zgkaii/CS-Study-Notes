@@ -50,15 +50,25 @@ Cs-Notes-Kz
 |     	  ├── Mysql
 |     	  └── Oracle
 ├── 开发工具
-├── Java基础
+├── Java
 |    ├── JavaSE
 |    ├── JVM
 |    ├── 并发编程
 |    ├── 设计模式
 |    ├── Java新特性
-|    └── 源码学习
-├── JavaEE
-|	 └── JDBC
+|    ├── 源码分析
+|    ├── JavaEE
+|    └── Spring全家桶
+|		  ├── Spring
+|    	  ├── SpringMVC
+|    	  ├── SprinBoot
+|		  └── SprinCloud
+├── Python
+|    ├── 基础学习
+|    └── Django
+├── Golang
+├── C
+├── Linux
 ├── 前端
 |    ├── 前端基础
 |    |    ├── HTML
@@ -70,10 +80,6 @@ Cs-Notes-Kz
 |    └── 组合框架
 |    	  ├── Vue
 |    	  └── React
-├── Spring全家桶
-|    ├── Spring
-| 	 ├── SpringMVC
-| 	 └── SprinBoot
 ├── 进阶学习
 |    ├── 服务器
 |    |	  ├── Web服务器
@@ -114,12 +120,6 @@ Cs-Notes-Kz
 ├── 大数据
 |    ├── Hadoop
 |    └── Spark
-├── Python学习
-|    ├── 基础学习
-|    └── Django
-├── Golang学习
-├── C学习
-├── Linux学习
 ├── 面试
 └── 其他
      ├── 个人感悟  
