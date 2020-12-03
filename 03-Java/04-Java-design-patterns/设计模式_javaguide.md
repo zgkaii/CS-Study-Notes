@@ -82,3 +82,6 @@
 - **模板方法模式：**
 - **访问者模式：**
 
+# 参考
+
+* [Graphic Design Patterns](https://design-patterns.readthedocs.io/zh_CN/latest/index.html#)
