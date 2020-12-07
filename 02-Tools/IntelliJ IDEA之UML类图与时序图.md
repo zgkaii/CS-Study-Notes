@@ -16,7 +16,7 @@ UML 本身是一套符号的规定，就像数学符号和化学符号一样，�
 
 ![](https://img-blog.csdnimg.cn/20201203224135306.png)
 
-同时还需要[安装Graphviz](https://segmentfault.com/a/1190000022789556)才能正常显示，PlantUML的详细使用可参考——[PlantUML语言参考指引](http://plantuml.com/zh/guide)。`PlantUML`功能强大，但如果嫌弃在IDEA上使用 `PlantUML`麻烦的话，也可以用在线作图工具，如：`ProcessOn`，`WebChart`。
+同时还需要[安装Graphviz](https://segmentfault.com/a/1190000022789556)才能正常显示，PlantUML的详细使用可参考——[PlantUML语言参考指引](http://plantuml.com/zh/guide)。`PlantUML`功能强大，但如果嫌弃在IDEA上使用 `PlantUML`麻烦的话，也可以用在线作图工具，如：[ProcessOn](https://www.processon.com/)，[WebChart](https://www.webchartnow.com/)。
 
 ## 1.2 UML 图分类
 
