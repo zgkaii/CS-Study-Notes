@@ -1,12 +1,12 @@
-# 1 模式
+# 定义
 
-## 1.1 定义
+# 结构
 
-## 1.2 结构
+**类图**
 
-## 1.3 实现
+# 实现
 
-## 1.4 总结
+# 总结
 
 **优点**
 
@@ -15,3 +15,6 @@
 **适用场景**
 
 # 参考
+
+* [图说设计模式](https://design-patterns.readthedocs.io/zh_CN/latest/index.html#)
+* [软件设计模式概述](http://c.biancheng.net/view/1317.html)
