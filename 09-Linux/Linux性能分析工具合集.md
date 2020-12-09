@@ -1,6 +1,6 @@
 # Linux性能分析工具合集
 
-> 本文由读者投稿，原文地址：[https://ysshao.cn/Linux/Linux_performance/](https://ysshao.cn/Linux/Linux_performance/) 。
+> 原文地址：[https://ysshao.cn/Linux/Linux_performance/](https://ysshao.cn/Linux/Linux_performance/) 。
 
 ## 1. 背景
 
@@ -49,7 +49,7 @@ a. on-CPU：执行中，执行中的时间通常又分为用户态时间user和�
 
 uptime 命令可以用来查看服务器已经运行了多久，当前登录的用户有多少，以及服务器在过去的1分钟、5分钟、15分钟的系统平均负载值
 
-<img src="Linux_performance\image-20200604180851790.png" alt="image-20200604180851790" style="zoom:95%;" />
+![image-20200604180851790](https://ysshao.cn/Linux/Linux_performance/image-20200604180851790.png)
 
 第一项是当前时间，up 表示系统正在运行，6:47是系统启动的总时间，最后是系统的负载load信息
 
@@ -59,7 +59,7 @@ w 同上，增加了具体登陆了那些用户及登陆时间。
 
 常用来监控[Linux](http://lib.csdn.net/base/linux)的系统状况，比如cpu、内存的使用，显示系统上正在运行的进程。
 
-<img src="Linux_performance\image-20200604181133355.png" alt="image-20200604181133355" style="zoom:76%;" />
+![image-20200604181133355](https://ysshao.cn/Linux/Linux_performance/image-20200604181133355.png)
 
 1. **系统运行时间和平均负载：**
 
@@ -171,7 +171,7 @@ w 同上，增加了具体登陆了那些用户及登陆时间。
 
 ​	一般vmstat工具的使用是通过两个数字参数来完成的，第一个参数是采样的时间间隔数，单位是秒，第二个参数是采样的次数，如:
 
-<img src="Linux_performance\image-20200604203027136.png" alt="image-20200604203027136" style="zoom:75%;" />
+![image-20200604203027136](https://ysshao.cn/Linux/Linux_performance/image-20200604203027136.png)
 
 每个参数的含义：
 
@@ -360,17 +360,17 @@ sar -r  #查看内存使用情况
 
 详解：
 
-kbmemfree  空闲的物理内存大小
+kbmemfree 空闲的物理内存大小
 
-kbmemused  使用中的物理内存大小
+kbmemused 使用中的物理内存大小
 
 %memused 物理内存使用率
 
-kbbuffers 内核中作为缓冲区使用的物理内存大小，kbbuffers和kbcached:这两个值就是free命令中的buffer							和cache. 
+kbbuffers 内核中作为缓冲区使用的物理内存大小，kbbuffers和kbcached:这两个值就是free命令中的buffer 和cache.
 
 kbcached 缓存的文件大小
 
-kbcommit  保证当前系统正常运行所需要的最小内存，即为了确保内存不溢出而需要的最少内存（物理内存							+Swap分区）
+kbcommit 保证当前系统正常运行所需要的最小内存，即为了确保内存不溢出而需要的最少内存（物理内存 +Swap分区）
 
 commt 这个值是kbcommit与内存总量（物理内存+swap分区）的一个百分比的值
 
@@ -418,7 +418,7 @@ Command：task命令名
 
 iostat工具将对系统的磁盘操作活动进行监视。它的特点是汇报磁盘活动统计情况，同时也会汇报出CPU使用情况
 
-<img src="Linux_performance\iostat.png" alt="image-20200604203027136" style="zoom:55%;" />
+![image-20200604203027136](https://ysshao.cn/Linux/Linux_performance/iostat.png)
 
 CPU属性
 
@@ -604,13 +604,13 @@ netstat` `-an | ``awk` `'/^tcp/ {++S[$NF]} END {for (a in S) print a,S[a]} '
 
 一个正常的TCP连接，都会有三个阶段:1、TCP三次握手;2、数据传送;3、TCP四次挥手
 
-<img src="Linux_performance\tcpconn.png" alt="在这里插入图片描述" style="zoom:40%;" />
+![在这里插入图片描述](https://ysshao.cn/Linux/Linux_performance/tcpconn.png)
 
 
 
 **TCP的连接释放**
 
-<img src="Linux_performance\tcpclose.png" alt="在这里插入图片描述" style="zoom:80%;" />
+![在这里插入图片描述](https://ysshao.cn/Linux/Linux_performance/tcpclose.png)
 
 ```
 LISTEN：侦听来自远方的TCP端口的连接请求

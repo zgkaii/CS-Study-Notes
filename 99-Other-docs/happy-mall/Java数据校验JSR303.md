@@ -1,4 +1,5 @@
-#JSR303数据校验
+# JSR303数据校验
+
 ### 步骤1：使用校验注解
 在Java中提供了一系列的校验方式，它这些校验方式在“javax.validation.constraints”包中，提供了如@Email，@NotNull等注解。
 在非空处理方式上提供了@NotNull，@NotBlank和@NotEmpty:  

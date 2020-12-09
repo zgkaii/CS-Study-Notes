@@ -25,7 +25,7 @@
 
 _玩玩电脑游戏还是必须要有 Windows 的，所以我现在是一台 Windows 用于玩游戏，一台 Mac 用于平时日常开发和学习使用。_
 
-![windows](images/windows.png)
+![](https://img-blog.csdnimg.cn/20201209211659262.png)
 
 #### 1.2.2. Unix
 
@@ -33,7 +33,7 @@ _玩玩电脑游戏还是必须要有 Windows 的，所以我现在是一台 Win
 
 目前这款操作系统已经逐渐逐渐退出操作系统的舞台。
 
-![unix](images/unix.png)
+![](https://img-blog.csdnimg.cn/20201209211659348.png)
 
 #### 1.2.3. Linux
 
@@ -43,13 +43,11 @@ _玩玩电脑游戏还是必须要有 Windows 的，所以我现在是一台 Win
 >
 > **很多人更倾向使用 “GNU/Linux” 一词来表达人们通常所说的 “Linux”。**
 
-![linux](images/linux.png)
+![](https://img-blog.csdnimg.cn/20201209211659148.png)
 
 #### 1.2.4. Mac OS
 
 苹果自家的操作系统，编程体验和 Linux 相当，但是界面、软件生态以及用户体验各方面都要比 Linux 操作系统更好。
-
-![macos](images/macos.png)
 
 ### 1.3. 操作系统的内核（Kernel）
 
@@ -63,6 +61,8 @@ _玩玩电脑游戏还是必须要有 Windows 的，所以我现在是一台 Win
 
 1. **操作系统的内核（Kernel）是操作系统的核心部分，它负责系统的内存管理，硬件设备的管理，文件系统的管理以及应用程序的管理。**
 2. **操作系统的内核是连接应用程序和硬件的桥梁，决定着操作系统的性能和稳定性。**
+
+![](https://img-blog.csdnimg.cn/20201209211659254.png)
 
 ### 1.4. 中央处理器（CPU，Central Processing Unit）
 
@@ -120,7 +120,7 @@ _玩玩电脑游戏还是必须要有 Windows 的，所以我现在是一台 Win
 - **Linux 本质是指 Linux 内核** ： 严格来讲，Linux 这个词本身只表示 Linux 内核，单独的 Linux 内核并不能成为一个可以正常工作的操作系统。所以，就有了各种 Linux 发行版。
 - **Linux 之父** ： 一个编程领域的传奇式人物，真大佬！我辈崇拜敬仰之楷模。他是 **Linux 内核** 的最早作者，随后发起了这个开源项目，担任 Linux 内核的首要架构师。他还发起了 Git 这个开源项目，并为主要的开发者。
 
-![Linux](images/Linux之父.png)
+![](https://img-blog.csdnimg.cn/20201209211659416.png)
 
 ### 2.2. Linux 诞生
 
@@ -130,7 +130,7 @@ _玩玩电脑游戏还是必须要有 Windows 的，所以我现在是一台 Win
 
 1991 年，Linus Torvalds 开源了 Linux 内核。Linux 以一只可爱的企鹅作为标志，象征着敢作敢为、热爱生活。
 
-![OPINION: Make the switch to a Linux operating system | Opinion ...](images/Linux-Logo.png)
+![](https://img-blog.csdnimg.cn/2020120921165972.png)
 
 ### 2.3. 常见 Linux 发行版本有哪些？
 
@@ -170,7 +170,7 @@ Linux 的发行版本可以大体分为两类：
 - **inode** ：记录文件的属性信息，可以使用 stat 命令查看 inode 信息。
 - **block** ：实际文件的内容，如果一个文件大于一个块时候，那么将占用多个 block，但是一个块只能存放一个文件。（因为数据是由 inode 指向的，如果有两个文件的数据存放在同一个块中，就会乱套了）
 
-![文件inode信息](images/文件inode信息.png)
+![](https://img-blog.csdnimg.cn/20201209211659260.png)
 
 ### 3.3. Linux 文件类型
 
@@ -191,7 +191,7 @@ Linux 支持很多文件类型，其中非常重要的文件类型有: **普通�
 **Linux 的目录结构如下：**
 
 Linux 文件系统的结构层次鲜明，就像一棵倒立的树，最顶层是其根目录：
-![Linux的目录结构](images/Linux目录树.png)
+![](https://img-blog.csdnimg.cn/20201209211658906.png)
 
 **常见目录说明：**
 
@@ -275,11 +275,11 @@ Linux 中的打包文件一般是以.tar 结尾的，压缩的命令一般是以
 
 示例：在随意某个目录下`ls -l`
 
-![](images/Linux权限命令.png)
+![](https://img-blog.csdnimg.cn/20201209211658913.png)
 
 第一列的内容的信息解释如下：
 
-![](images/Linux权限解读.png)
+![](https://img-blog.csdnimg.cn/2020120921165991.png)
 
 > 下面将详细讲解文件的类型、Linux 中权限以及文件有所有者、所在组、其它组具体是什么？
 
@@ -331,7 +331,7 @@ Linux 中的打包文件一般是以.tar 结尾的，压缩的命令一般是以
 
 **`chmod u=rwx,g=rw,o=r aaa.txt`** 或者 **`chmod 764 aaa.txt`**
 
-![](images/修改文件权限.png)
+![](https://img-blog.csdnimg.cn/20201209211658821.png)
 
 **补充一个比较常用的东西:**
 
