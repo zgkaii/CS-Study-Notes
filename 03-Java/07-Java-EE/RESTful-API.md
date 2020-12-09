@@ -112,6 +112,7 @@ GET    /classes?page=1&size=10 //指定第1页，每页10个数据
 - [[译] RESTful API 设计最佳实践](https://juejin.im/entry/59e460c951882542f578f2f0)
 - [那些年，我们一起误解过的 REST](https://segmentfault.com/a/1190000016313947)
 - [Testing RESTful Services in Java: Best Practices](https://phauer.com/2016/testing-RESTful-services-java-best-practices/)
+- [一文搞懂 RESTful API](https://xie.infoq.cn/article/ea83211ad22d0efe7299c3f11)
 
 **Spring 中使用 HATEOAS：**
 
