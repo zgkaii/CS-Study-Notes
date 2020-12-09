@@ -285,7 +285,7 @@ static int hash(int h) {
 
 `TreeMap` 和`HashMap` 都继承自`AbstractMap` ，但是需要注意的是`TreeMap`它还实现了`NavigableMap`接口和`SortedMap` 接口。
 
-![](./images/TreeMap继承结构.png)
+![](https://img-blog.csdnimg.cn/20201210014508982.png)
 
 实现 `NavigableMap` 接口让 `TreeMap` 有了对集合内元素的搜索的能力。
 
@@ -384,7 +384,7 @@ ConcurrentHashMap 和 Hashtable的区别主要体现在实现线程安全的方�
 
 **JDK1.8 的 ConcurrentHashMap：**
 
-![Java8 ConcurrentHashMap 存储结构（图片来自 javadoop）](./images/java8_concurrenthashmap.png)
+![](https://img-blog.csdnimg.cn/20201210014559982.png)
 
 JDK1.8 的 `ConcurrentHashMap` 不在是 **Segment 数组 + HashEntry 数组 + 链表**，而是 **Node 数组 + 链表 / 红黑树**。不过，Node 只能用于链表的情况，红黑树的情况需要使用 **`TreeNode`**。当冲突链表达到一定长度时，链表会转换成红黑树。
 
@@ -752,7 +752,7 @@ final void checkForComodification() {
 
 我们再来趁热打铁，看一个阿里巴巴手册相关的规定：
 
-![](images/ad28e3ba-e419-4724-869c-73879e604da1.png)
+![](https://img-blog.csdnimg.cn/2020121001450996.png)
 
 有了前面讲的基础，我们应该知道：使用 `Iterator` 提供的 `remove` 方法，可以修改到 `expectedModCount` 的值。所以，才不会再抛出`ConcurrentModificationException` 异常。
 
