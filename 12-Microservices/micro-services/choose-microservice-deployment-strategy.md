@@ -12,7 +12,7 @@
 
 下图展示的是这种架构：
 
-![deployment-strategy-1](./images/deployment-strategy-1.png)
+<img src="https://img-blog.csdnimg.cn/20201211004341447.png" style="zoom: 67%;" />
 
 这种模式有一些参数，一个参数代表每个服务实例由多少进程构成。例如，需要在 Apache Tomcat Server 上部署一个 Java 服务实例作为 web 应用。一个 Node.js 服务实例可能有一个父进程和若干个子进程构成。
 
@@ -40,7 +40,7 @@
 
 但是用单虚拟机单实例模式，一般将服务打包成虚拟机映像（image），例如一个 Amazon EC2 AMI。每个服务实例是一个使用此映像启动的 VM（例如，EC2 实例）。下图展示了此架构：
 
-![deployment-strategy-2](./images/deployment-strategy-2.png)
+<img src="https://img-blog.csdnimg.cn/20201211004341445.png" style="zoom: 67%;" />
 
 Netfix 采用这种架构部署 video streaming service。Netfix 使用 Aminator 将每个服务打包成一个 EC2 AMI。每个运行服务实例就是一个 EC2 实例。
 
@@ -72,7 +72,7 @@ CloudNative 公司有一个用于创建 EC2 AMI 的 SaaS 应用，Bakery。用�
 
 下图展示了这种模式：
 
-![deployment-strategy-3](./images/deployment-strategy-3.png)
+<img src="https://img-blog.csdnimg.cn/20201211005446834.png" style="zoom:67%;" />
 
 使用这种模式需要将服务打包成容器映像。一个容器映像是一个运行包含服务所需库和应用的文件系统 ​。某些容器映像由完整的 linux 根文件系统组成，其它则是轻量级的。例如，为了部署 Java 服务，需要创建包含 Java 运行库的容器映像，也许还要包含 Apache Tomcat server，以及编译过的 Java 应用。
 
