@@ -242,14 +242,14 @@ git fetch origin
 git reset --hard origin/master
 ```
 
-##### 情况一：文件已修改，还未执行git add操作(working tree内撤销)
+**情况一：文件已修改，还未执行git add操作(working tree内撤销)**
 
 ```shell script
 $ git checkout -- fileName
 $ git checkout *
 ```
 
-##### 情况二：对多个文件执行了git add操作，但只想提交其中一部分文件
+**情况二：对多个文件执行了git add操作，但只想提交其中一部分文件**
 
 ```shell script
 $ git add *
@@ -262,7 +262,7 @@ $ git status
 $ git reset HEAD <filename>
 ```
 
-##### 情况三：执行了git add操作，撤销对文件的修改（index内回滚）
+**情况三：执行了git add操作，撤销对文件的修改（index内回滚）**
 
 ```shell script
 # 取消暂存
@@ -271,7 +271,7 @@ git reset HEAD fileName
 git checkout fileName
 ```
 
-##### 情况四：修改的文件已被git commit，但想再次修改不再产生新的commit
+**情况四：修改的文件已被git commit，但想再次修改不再产生新的commit**
 
 ```shell script
 # 修改最后一次提交
@@ -279,13 +279,13 @@ $ git add sample.txt
 $ git commit --amend -m"说明"
 ```
 
-##### 情况五：已在本地进行多次git commit操作，撤销到其中某次commit
+**情况五：已在本地进行多次git commit操作，撤销到其中某次commit**
 
 ```shell script
 $ git reset [--hard|soft|mixed|merge|keep] [commit|HEAD]
 ```
 
-##### 情况六：执行add&commit后，但还未push
+**情况六：执行add&commit后，但还未push**
 
 ```shell script
 # 撤销到commit前版本
@@ -296,7 +296,7 @@ $ git reset --hard HEAD^
 $ git commit --amend
 ```
 
-##### 情况七：撤销commit时不小心回滚到add前版本，所有修改丢失
+**情况七：撤销commit时不小心回滚到add前版本，所有修改丢失**
 
 ```shell script
 # 查看撤销前版本号
