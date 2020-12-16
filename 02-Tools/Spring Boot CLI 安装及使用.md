@@ -23,7 +23,7 @@ Spring CLI v2.4.0
 - 通过 Intellij IDEA 使用
 - 通过 Spring Boot CLI 使用
 
-### 使用 Spring Boot CLI 初始化 Spring Boot
+## 使用 Spring Boot CLI 初始化 Spring Boot项目
 
 ```
 spring init
@@ -49,7 +49,7 @@ spring init -dweb,jpa,security --build gradle
 
 > 注意：-d和依赖之间没有空格，否则就变成 了下载一个ZIP文件，文件名是web,data-jpa。
 
-### spring init 相关命令
+## spring init 相关命令
 
 - -d 或 --dependencies，指定依赖
 
@@ -80,3 +80,27 @@ spring help init
 ```
 spring init --list
 ```
+
+常见参数：
+
+| 参数         | 说明                                                         | 默认值                       |
+| ------------ | ------------------------------------------------------------ | ---------------------------- |
+| name         | 项目名                                                       | demo                         |
+| package-name | 项目包名                                                     | com.example.demo             |
+| description  | 项目描述                                                     | Demo project for Spring Boot |
+| artifactId   | 项目的唯一的标识符，实际对应项目的名称                       | demo                         |
+| groupId      | 项目组织                                                     | com.example                  |
+| javaVersion  | Java语言版本                                                 | 1.8                          |
+| packaging    | 项目打包类型                                                 | jar                          |
+| type         | 项目类型，可选择gradle-build、gradle-project、<br/>maven-build、maven-project。 | maven-project                |
+
+例如，要创建一个readinglist项目：
+
+```shell
+$ spring init --name readinglist --artifactId readinglist --groupId org.spring --language java --boot-version 2.4.1.RELEASE --type maven-project --dependencies web,thymeleaf,devtools --extract 01-readinglist
+```
+
+最终会生成这样的项目结构：
+
+![](https://img-blog.csdnimg.cn/202012162134262.png)
+
