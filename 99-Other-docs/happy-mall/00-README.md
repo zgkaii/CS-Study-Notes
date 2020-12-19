@@ -14,13 +14,13 @@
 
 ### 模块数据库
 
-|  模块   | 说明  | 对应数据库  |
-|  :----:  | :----:  |  :----:  |
-|  mall-coupon   | 优惠卷服务  | mall_sms |
-|  mall-member   | 会员服务  | mall_ums |
-|  mall-order   | 订单服务  | mall_oms |
-|  mall-product   | 商品服务  | mall_pms |
-|  mall-ware   | 仓储服务  | mall_wms |
+|  模块   | 说明  | 对应数据库  | port |
+|  :----:  | :----:  |  :----:  |  ------  |
+|  mall-coupon   | 优惠卷服务  | mall_sms | 7000 |
+|  mall-member   | 会员服务  | mall_ums | 8000 |
+|  mall-order   | 订单服务  | mall_oms | 9000 |
+|  mall-product   | 商品服务  | mall_pms | 10000 |
+|  mall-ware   | 仓储服务  | mall_wms | 11000 |
 
 ### 后端技术  
 
