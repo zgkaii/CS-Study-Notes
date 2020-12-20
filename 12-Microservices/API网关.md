@@ -1,6 +1,6 @@
-> 点击关注[公众号](#公众号)及时获取笔主最新更新文章，并可免费领取本文档配套的《Java面试突击》以及Java工程师必备学习资源。
->
-> 本文授权转载自：[https://github.com/javagrowing/JGrowing/blob/master/服务端开发/浅析如何设计一个亿级网关.md](https://github.com/javagrowing/JGrowing/blob/master/服务端开发/浅析如何设计一个亿级网关.md)。
+
+
+> 文章来源：[https://github.com/javagrowing/JGrowing/blob/master/服务端开发/浅析如何设计一个亿级网关.md](https://github.com/javagrowing/JGrowing/blob/master/服务端开发/浅析如何设计一个亿级网关.md)。
 
 # 1.背景
 ## 1.1 什么是API网关

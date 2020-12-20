@@ -6,7 +6,7 @@
 | ---------------- | -------------- |
 | Ctrl + F         | 当前文件里查询 |
 | Ctrl + Shift + F | 全局搜索       |
-| Ctrl +R          | 当前文件替换   |
+| Ctrl + R         | 当前文件替换   |
 | Ctrl + Shift + R | 全局替换       |
 | Ctrl + Shift + N | 查找文件       |
 | Ctrl + N         | 查找类         |

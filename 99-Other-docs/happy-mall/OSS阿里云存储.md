@@ -58,7 +58,7 @@ accessKeyId和accessKeySecret需要创建一个RAM账号：
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         // 上传文件流。
         InputStream inputStream = new FileInputStream("C:\\Users\\Administrator\\Pictures\\timg.jpg");
-        ossClient.putObject("jdmall-images", "time.jpg", inputStream);
+        ossClient.putObject("mall-images", "time.jpg", inputStream);
         // 关闭OSSClient。
         ossClient.shutdown();
         System.out.println("上传成功.");
@@ -85,10 +85,10 @@ access-key: LTAI4G4W1RA4JXz2QhoDwHhi
 ```
 （4）注入OSSClient并进行文件上传下载等操作
 ![](https://cdn.nlark.com/yuque/0/2020/png/512093/1591341338521-bf752315-b0fc-4722-8681-84c7ac1336e0.png#align=left&display=inline&height=405&margin=%5Bobject%20Object%5D&originHeight=405&originWidth=1264&status=done&style=none&width=1264)
-但是这样来做还是比较麻烦，如果以后的上传任务都交给jdmall-product来完成，显然耦合度高。最好单独新建一个Module来完成文件上传任务。
+但是这样来做还是比较麻烦，如果以后的上传任务都交给mall-product来完成，显然耦合度高。最好单独新建一个Module来完成文件上传任务。
 ### 其他方式
-#### 1）新建jdmall-third-party
-#### 2）添加依赖，将原来jdmall-common中的“spring-cloud-starter-alicloud-oss”依赖移动到该项目中
+#### 1）新建mall-third-party
+#### 2）添加依赖，将原来mall-common中的“spring-cloud-starter-alicloud-oss”依赖移动到该项目中
 ```xml
 <dependency>
             <groupId>com.alibaba.cloud</groupId>
@@ -96,7 +96,7 @@ access-key: LTAI4G4W1RA4JXz2QhoDwHhi
             <version>2.2.0.RELEASE</version>
         </dependency>
         <dependency>
-            <groupId>com.bigdata.jdmall</groupId>
+            <groupId>com.bigdata.mall</groupId>
             <artifactId>jdmall-common</artifactId>
             <version>1.0-SNAPSHOT</version>
             <exclusions>
@@ -152,14 +152,14 @@ server:
   port: 30000
 spring:
   application:
-    name: jdmall-third-party
+    name: mall-third-party
   cloud:
     nacos:
       discovery:
         server-addr: 192.168.137.14:8848
 logging:
   level:
-    com.bigdata.jdmall.product: debug
+    com.bigdata.mall.product: debug
 ```
 bootstrap.properties
 ```properties
@@ -172,7 +172,7 @@ spring.cloud.nacos.config.extension-configs[0].refresh=true
 ```
 #### 6） 编写测试类
 ```java
-package com.bigdata.jdmall.thirdparty;
+package com.bigdata.mall.thirdparty;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.OSSClientBuilder;
@@ -197,7 +197,7 @@ class jdmallThirdPartyApplicationTests {
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
          //上传文件流。
         InputStream inputStream = new FileInputStream("C:\\Users\\Administrator\\Pictures\\timg.jpg");
-        ossClient.putObject("jdmall-images", "time3.jpg", inputStream);
+        ossClient.putObject("mall-images", "time3.jpg", inputStream);
         // 关闭OSSClient。
         ossClient.shutdown();
         System.out.println("上传成功.");
@@ -215,9 +215,9 @@ class jdmallThirdPartyApplicationTests {
 1. 应用服务器返回上传Policy和签名给用户。
 1. 用户直接上传数据到OSS。
 
-编写“com.bigdata.jdmall.thirdparty.controller.OssController”类：
+编写“com.bigdata.mall.thirdparty.controller.OssController”类：
 ```java
-package com.bigdata.jdmall.thirdparty.controller;
+package com.bigdata.mall.thirdparty.controller;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.common.utils.BinaryUtil;
 import com.aliyun.oss.model.MatchMode;
@@ -278,13 +278,13 @@ public class OssController {
 ```
 测试： [http://localhost:30000/oss/policy](http://localhost:30000/oss/policy)
 ```
-{"accessid":"LTAI4G4W1RA4JXz2QhoDwHhi","policy":"eyJleHBpcmF0aW9uIjoiMjAyMC0wNC0yOVQwMjo1ODowNy41NzhaIiwiY29uZGl0aW9ucyI6W1siY29udGVudC1sZW5ndGgtcmFuZ2UiLDAsMTA0ODU3NjAwMF0sWyJzdGFydHMtd2l0aCIsIiRrZXkiLCIyMDIwLTA0LTI5LyJdXX0=","signature":"s42iRxtxGFmHyG40StM3d9vOfFk=","dir":"2020-04-29/","host":"https://jdmall-images.oss-cn-shanghai.aliyuncs.com","expire":"1588129087"}
+{"accessid":"LTAI4G4W1RA4JXz2QhoDwHhi","policy":"eyJleHBpcmF0aW9uIjoiMjAyMC0wNC0yOVQwMjo1ODowNy41NzhaIiwiY29uZGl0aW9ucyI6W1siY29udGVudC1sZW5ndGgtcmFuZ2UiLDAsMTA0ODU3NjAwMF0sWyJzdGFydHMtd2l0aCIsIiRrZXkiLCIyMDIwLTA0LTI5LyJdXX0=","signature":"s42iRxtxGFmHyG40StM3d9vOfFk=","dir":"2020-04-29/","host":"https://mall-images.oss-cn-shanghai.aliyuncs.com","expire":"1588129087"}
 ```
 以后在上传文件时的访问路径为“ http://localhost:88/api/thirdparty/oss/policy”，
-在“jdmall-gateway”中配置路由规则：
+在“mall-gateway”中配置路由规则：
 ```yaml
 - id: third_party_route
-          uri: lb://jdmall-gateway
+          uri: lb://mall-gateway
           predicates:
             - Path=/api/thirdparty/**
           filters:
@@ -311,7 +311,7 @@ PS D:\Project\jdmall\renren-fast-vue\src\components\upload>
 开始执行上传，但是在上传过程中，出现了如下的问题：
 ![](https://cdn.nlark.com/yuque/0/2020/png/512093/1591341338677-4f3196df-ae7e-4b30-88c2-cbe46c4632e1.png#align=left&display=inline&height=72&margin=%5Bobject%20Object%5D&originHeight=72&originWidth=1729&status=done&style=none&width=1729)
 ```
-Access to XMLHttpRequest at 'http://jdmall-images.oss-cn-shanghai.aliyuncs.com/' from origin 'http://localhost:8001' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+Access to XMLHttpRequest at 'http://mall-images.oss-cn-shanghai.aliyuncs.com/' from origin 'http://localhost:8001' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.
 ```
 这又是一个跨域的问题，解决方法就是在阿里云上开启跨域访问：
 ![](https://cdn.nlark.com/yuque/0/2020/png/512093/1591341338714-c99d4d6f-413b-4c1e-9897-4ab65195f98e.png#align=left&display=inline&height=616&margin=%5Bobject%20Object%5D&originHeight=616&originWidth=1861&status=done&style=none&width=1861)

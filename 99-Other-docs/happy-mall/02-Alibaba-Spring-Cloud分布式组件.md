@@ -7,7 +7,7 @@
         <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
     </dependency>
 ```
-2、在应用的 /src/main/resources/application.properties 配置文件中配置 Nacos Server 地址与服务模块名
+2、在应用的 /src/main/resources/application.yml 配置文件中配置 Nacos Server 地址与服务模块名
 
 ```properties
 spring:
@@ -19,6 +19,7 @@ spring:
     name: mall-coupon #注册中心 模块服务名
 ```
 3、使用 @EnableDiscoveryClient 注解开启服务注册与发现功能
+
 ```java
 @EnableDiscoveryClient
 @SpringBootApplication //开启服务发现客户端
@@ -29,8 +30,11 @@ public class MallCouponApplication {
     }
 }
 ```
- 访问[http://127.0.0.1:8848/nacos/](http://127.0.0.1:8848/nacos/),
- 在服务管理-服务列表可以查看所有运行的实例。
+同上，在mall-member中也注解开启服务注册与发现功能。
+
+启动[nacos](https://github.com/alibaba/nacos)，访问[http://127.0.0.1:8848/nacos/](http://127.0.0.1:8848/nacos/)，在**服务管理-服务列表**可以查看所有运行的实例。
+
+![](https://img-blog.csdnimg.cn/20201220232048109.png)
 
  ## 二、OpenFeign远程调用
  以member会员服务远程调用coupon仓储服务为例：  
@@ -42,7 +46,8 @@ public class MallCouponApplication {
         </dependency>
  ```
 2、编写一个接口，告诉SpringCLoud这个接口需要调用远程服务
-修改“com\jd\mall\coupon\controller\CouponController.java”，添加以下controller方法：
+mall-coupon中修改“com\happy\mall\coupon\controller\CouponController.java”，添加以下controller方法：
+
 ```yml
 @RequestMapping("/member/list")
 public R memberCoupons(){
@@ -51,7 +56,7 @@ public R memberCoupons(){
     return R.ok().put("coupons",Arrays.asList(couponEntity));
 }
 ```
-新建“com\jd\mall\member\feign\CouponFeignService.java”接口
+mall-member中新建“com\happy\mall\member\feign\CouponFeignService.java”接口
 ```java
 @FeignClient("mall-coupon")//告诉SpringCloud这个接口需要调用远程服务
 public interface CouponFeignService {
@@ -60,11 +65,12 @@ public interface CouponFeignService {
 }
 ```
 3、开启远程调用功能
-修改“com\jd\mall\member\MallMemberApplication.java”类，添加上"@EnableFeignClients"：
+mall-member中修改“com\happy\mall\member\MallMemberApplication.java”类，添加上"@EnableFeignClients"：
+
 ```java
 @SpringBootApplication
 @EnableDiscoveryClient
-@EnableFeignClients(basePackages = "com.jd.mall.member.feign")
+@EnableFeignClients(basePackages = "com.happy.mall.member.feign")
 public class MallMemberApplication {
 
     public static void main(String[] args) {
@@ -72,7 +78,7 @@ public class MallMemberApplication {
     }
 }
 ```
-在com\jd\mall\member\controller\MemberController.java编写测试方法
+mall-member中于com\happy\mall\member\controller\MemberController.java编写测试方法
 ```yml
     @Autowired
     CouponFeignService couponFeignService;
@@ -88,11 +94,11 @@ public class MallMemberApplication {
 4、查看  
 访问[http://localhost:8000/member/member/coupons](http://localhost:8000/member/member/coupons)
 ![](https://cdn.nlark.com/yuque/0/2020/png/512093/1591341334279-1282e3ff-1786-4648-8dff-8dd7672bb341.png#align=left&display=inline&height=200&margin=%5Bobject%20Object%5D&originHeight=200&originWidth=1212&status=done&style=none&width=1212)
-停止“jdmall-coupon”服务，能够看到注册中心显示该服务的健康值为0：
+停止“mall-coupon”服务，能够看到注册中心显示该服务的健康值为0：
 ![](https://cdn.nlark.com/yuque/0/2020/png/512093/1591341334391-bcd0cc89-fcfc-4640-923f-d97ecaf454ba.png#align=left&display=inline&height=415&margin=%5Bobject%20Object%5D&originHeight=415&originWidth=1409&status=done&style=none&width=1409)
 再次访问：[http://localhost:8000/member/member/coupons](http://localhost:8000/member/member/coupons)
 ![](https://cdn.nlark.com/yuque/0/2020/png/512093/1591341334471-334ddb93-08aa-4d86-ab4e-22619d03f367.png#align=left&display=inline&height=266&margin=%5Bobject%20Object%5D&originHeight=266&originWidth=1098&status=done&style=none&width=1098)
-启动“jdmall-coupon”服务，再次访问，又恢复了正常。
+启动“mall-coupon”服务，再次访问，又恢复了正常。
 
 ## 三、配置中心（Nacos Config）
 [Nacos三种配置加载方方案](https://github.com/alibaba/spring-cloud-alibaba/blob/master/spring-cloud-alibaba-docs/src/main/asciidoc-zh/nacos-config.adoc)
@@ -248,16 +254,16 @@ coupon.user.age=20
 ## 四、GatewayAPI网关
 1、使用Spring Intitializr创建模块
 * Project Metadata 
-  * Group: com.jd.mall
+  * Group: com.happy.mall
   * Artifact: mall-gateway
-  * Package: com.jd.mall.gateway
+  * Package: com.happy.mall.gateway
 * Dependencies添加依赖 
   * Spring Cloud Routing-Gateway
 
 2、添加依赖
 ```yaml
 <dependency>
-    <groupId>com.jd.mall</groupId>
+    <groupId>com.happy.mall</groupId>
     <artifactId>mall-common</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 </dependency>
