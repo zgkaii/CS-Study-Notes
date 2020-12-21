@@ -21,8 +21,8 @@ spring:
 3、使用 @EnableDiscoveryClient 注解开启服务注册与发现功能
 
 ```java
-@EnableDiscoveryClient
-@SpringBootApplication //开启服务发现客户端
+@EnableDiscoveryClient//开启服务发现客户端
+@SpringBootApplication
 public class MallCouponApplication {
 
     public static void main(String[] args) {
@@ -30,13 +30,15 @@ public class MallCouponApplication {
     }
 }
 ```
-同上，在mall-member中也注解开启服务注册与发现功能。
-
 启动[nacos](https://github.com/alibaba/nacos)，访问[http://127.0.0.1:8848/nacos/](http://127.0.0.1:8848/nacos/)，在**服务管理-服务列表**可以查看所有运行的实例。
 
 ![](https://img-blog.csdnimg.cn/20201220232048109.png)
 
+停止“mall-coupon”服务，能够看到注册中心显示该服务的健康值为0：
+![](https://img-blog.csdnimg.cn/20201221214602297.png)
+
  ## 二、OpenFeign远程调用
+
  以member会员服务远程调用coupon仓储服务为例：  
  1、member服务模块中引入open-feign
  ```yml
@@ -91,13 +93,13 @@ mall-member中于com\happy\mall\member\controller\MemberController.java编写测
         return memberCoupons.put("member",memberEntity).put("coupons",memberCoupons.get("coupons"));
     }
 ```
-4、查看  
+4、查看
 访问[http://localhost:8000/member/member/coupons](http://localhost:8000/member/member/coupons)
-![](https://cdn.nlark.com/yuque/0/2020/png/512093/1591341334279-1282e3ff-1786-4648-8dff-8dd7672bb341.png#align=left&display=inline&height=200&margin=%5Bobject%20Object%5D&originHeight=200&originWidth=1212&status=done&style=none&width=1212)
-停止“mall-coupon”服务，能够看到注册中心显示该服务的健康值为0：
-![](https://cdn.nlark.com/yuque/0/2020/png/512093/1591341334391-bcd0cc89-fcfc-4640-923f-d97ecaf454ba.png#align=left&display=inline&height=415&margin=%5Bobject%20Object%5D&originHeight=415&originWidth=1409&status=done&style=none&width=1409)
-再次访问：[http://localhost:8000/member/member/coupons](http://localhost:8000/member/member/coupons)
+<img src="https://img-blog.csdnimg.cn/20201221213754583.png" style="zoom:80%;" />
+
+停止“mall-coupon”服务，再次访问：[http://localhost:8000/member/member/coupons](http://localhost:8000/member/member/coupons)
 ![](https://cdn.nlark.com/yuque/0/2020/png/512093/1591341334471-334ddb93-08aa-4d86-ab4e-22619d03f367.png#align=left&display=inline&height=266&margin=%5Bobject%20Object%5D&originHeight=266&originWidth=1098&status=done&style=none&width=1098)
+
 启动“mall-coupon”服务，再次访问，又恢复了正常。
 
 ## 三、配置中心（Nacos Config）
@@ -121,7 +123,7 @@ mall-member中于com\happy\mall\member\controller\MemberController.java编写测
 coupon.user.name="张三"
 coupon.user.age=20
 ```
-（4）从 Nacos Config 中获取相应的配置，并添加在 Spring Environment 的 PropertySources 中。这里我们使用 @Value 注解来将对应的配置注入到 SampleController 的 userName 和 age 字段，并添加 @RefreshScope 打开动态刷新功能
+（4）从 Nacos Config 中获取相应的配置，并添加在 Spring Environment 的 PropertySources 中。这里我们使用 @Value 注解来将对应的配置注入到 CouponController 的 userName 和 age 字段。
  ```yml
     @Value("${coupon.user.name}")
     private String name;
@@ -137,10 +139,12 @@ coupon.user.age=20
 访问：[http://localhost:7000/coupon/coupon/test](http://localhost:7000/coupon/coupon/test)
 ![](https://cdn.nlark.com/yuque/0/2020/png/512093/1591341334525-d99419de-8f9e-4fc4-ba71-f976e1b6cff7.png#align=left&display=inline&height=107&margin=%5Bobject%20Object%5D&originHeight=107&originWidth=1075&status=done&style=none&width=1075)
 这样做存在的一个问题，如果频繁的修改application.properties，就需要频繁重新打包部署。下面我们将采用Nacos的配置中心来解决这个问题。
+
 ### 2、读取nacos配置文件
  （1）在nacos配置管理 | 配置列表 创建mall-coupon.properties
- ![](https://img-blog.csdnimg.cn/20200729210220485.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0tBSVpfTEVBUk4=,size_16,color_FFFFFF,t_70)
- （2）添加刷新注解
+ ![](https://img-blog.csdnimg.cn/20200729210220485.png)
+ （2）并添加 @RefreshScope 打开动态刷新功能
+
  ```java
  @RefreshScope
  public class CouponController {
@@ -156,7 +160,6 @@ coupon.user.age=20
      "name":"zhangsan2",
      "age":20
  }
- 
  ```
  能够看到读取到了nacos 中的最新的配置信息，并且在指明了相同的配置信息时，配置中心中设置的值优先于本地配置。
  ### 3、Namespace方案
@@ -253,6 +256,7 @@ coupon.user.age=20
 
 ## 四、GatewayAPI网关
 1、使用Spring Intitializr创建模块
+
 * Project Metadata 
   * Group: com.happy.mall
   * Artifact: mall-gateway
@@ -263,11 +267,10 @@ coupon.user.age=20
 2、添加依赖
 ```yaml
 <dependency>
-    <groupId>com.happy.mall</groupId>
+    <groupId>com.happy.common</groupId>
     <artifactId>mall-common</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 </dependency>
-
 ```
 排除数据源相关配置：
 ```java
@@ -280,8 +283,9 @@ public class MallGatewayApplication {
     }
 }
 ```
-3、开启服务注册发现  
+3、开启服务注册发现
 （1）配置nacos的注册中心地址(application.properties)
+
 ```yaml
 spring.cloud.nacos.discovery.server-addr=127.0.0.1:8848
 spring.application.name=mall-gateway
@@ -289,16 +293,17 @@ server.port=88
 ```
 (2)nacos配置中心
 创建gateway命名空间，创建bootstrap.properties文件
+
 ```yaml
 spring.application.name=mall-coupon
 
 spring.cloud.nacos.config.server-addr=127.0.0.1:8848
 spring.cloud.nacos.config.namespace=c7cb33d9-2a43-47b2-9c8a-eb32955f605a
-
 ```
-![](https://img-blog.csdnimg.cn/20200729224116766.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0tBSVpfTEVBUk4=,size_16,color_FFFFFF,t_70)
+![](https://img-blog.csdnimg.cn/20200729224116766.png)
 
 4、编写网关配置文件（application.yml）
+
 ```yaml
 spring:
   cloud:
