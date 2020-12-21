@@ -1,8 +1,8 @@
 ##### 1.创建Spring工程
 ```
-GroupId:com.kai
+GroupId:org.spring
 ArtifacttId:001_helloworld
-package:com.kai.demo
+package:org.spring.learn
 dependencies:Spring Web、Spring Actuator
 ```
 ##### 2.创建测试方法hello()
@@ -25,20 +25,22 @@ public class Application {
 
 - 运行Application
 - 打开本地Terminal
+  * 可以根据查看 Actuator监控（[Spring Boot Actuator监控使用详解](https://juejin.cn/post/6844904000832159751)）
+
 ```shell
-C:\WorkSpace\IdeaProjects\spring-learn>curl http://localhost:8080/hello
+C:\WorkSpace\IdeaProjects\spring-family>curl http://localhost:8080/hello
 Hello World!
-C:\WorkSpace\IdeaProjects\spring-learn>curl http://localhost:8080/actuator/health
+C:\WorkSpace\IdeaProjects\spring-family>curl http://localhost:8080/actuator/health
 {"status":"UP"}
 ```
 - maven打包并测试
 ```shell script
-C:\WorkSpace\IdeaProjects\spring-learn>cd 001-helloworld  (切换到pom.xml所在目录）
+C:\WorkSpace\IdeaProjects\spring-family>cd 001-helloworld  (切换到pom.xml所在目录）
 
-C:\WorkSpace\IdeaProjects\spring-learn\001-helloworld>mvn clean package -Dmaven.test.skip
+C:\WorkSpace\IdeaProjects\spring-family\001-helloworld>mvn clean package -Dmaven.test.skip
 [INFO] Scanning for projects...
 [INFO]
-[INFO] -----------------------< com.kai:001-helloworld >-----------------------
+[INFO] -----------------------< org.spring:001-helloworld >-----------------------
 [INFO] Building 001-helloworld 0.0.1-SNAPSHOT
 [INFO] --------------------------------[ jar ]---------------------------------
        ---------------------------------snip-----------------------------------
@@ -49,13 +51,13 @@ C:\WorkSpace\IdeaProjects\spring-learn\001-helloworld>mvn clean package -Dmaven.
 [INFO] Finished at: 2020-09-03T16:57:46+08:00
 [INFO] ------------------------------------------------------------------------
 
-C:\WorkSpace\IdeaProjects\spring-learn\001-helloworld>cd target
+C:\WorkSpace\IdeaProjects\spring-family\001-helloworld>cd target
 
-C:\WorkSpace\IdeaProjects\spring-learn\001-helloworld\target>dir
+C:\WorkSpace\IdeaProjects\spring-family\001-helloworld\target>dir
  驱动器 D 中的卷是 Data
  卷的序列号是 B8A9-CEA2
 
- C:\WorkSpace\IdeaProjects\spring-learn\001-helloworld\target 目录
+ C:\WorkSpace\IdeaProjects\spring-family\001-helloworld\target 目录
 
 2020/09/03  20:35    <DIR>          .
 2020/09/03  20:35    <DIR>          ..
@@ -68,8 +70,8 @@ C:\WorkSpace\IdeaProjects\spring-learn\001-helloworld\target>dir
                2 个文件     18,423,233 字节
                6 个目录 298,277,195,776 可用字节
 
-C:\WorkSpace\IdeaProjects\spring-learn\001-helloworld\target>java -jar 001-helloworld-0.0.1-SNAPSHOT.jar
+C:\WorkSpace\IdeaProjects\spring-family\001-helloworld\target>java -jar 001-helloworld-0.0.1-SNAPSHOT.jar
 ```
 打开Google，访问http://localhost:8080/hello
 
-![helloworld](https://img-blog.csdnimg.cn/20200903171001190.png#pic_center)
+![helloworld](https://img-blog.csdnimg.cn/20200903171001190.png)
