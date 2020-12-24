@@ -184,7 +184,7 @@ coupon.user.age=20
    datasource:
      username: root
      password: root
-     url: jdbc:mysql://192.168.56.10:3306/jdmall_sms
+     url: jdbc:mysql://192.168.56.10:3306/mall_sms
      driver-class-name: com.mysql.jdbc.Driver
    cloud:
      nacos:
@@ -208,7 +208,7 @@ coupon.user.age=20
    datasource:
      username: root
      password: root
-     url: jdbc:mysql://192.168.56.10:3306/jdmall_sms
+     url: jdbc:mysql://192.168.56.10:3306/mall_sms
      driver-class-name: com.mysql.jdbc.Driver
  ```
  * mybatis.yml，分组设置为dev
