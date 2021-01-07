@@ -74,6 +74,19 @@ Java的体系结构：
 
 <img src="https://img-blog.csdnimg.cn/20201005202622207.png" style="zoom:80%;" />
 
+**JDK——Java Development ToolKit（Java开发工具包）**是整个JAVA的核心，包括了Java运行环境（Java Runtime Envirnment），一堆Java工具和Java基础的类库。
+
+最主流的JDK是Sun公司发布的JDK，除了Sun之外，还有很多公司和组织都开发了属于自己的JDK，例如国外IBM公司开发了属于自己的JDK，国内淘宝也开发了属于自己的JDK，各个组织开发自己的JDK都是为了在某些方面得到一些提高，以适应自己的需求。
+ JDK有以下三种版本：
+
+- J2SE，standard edition，标准版，是通常用的一个版本。
+- J2EE，enterpsise edition，企业版，使用这种JDK开发J2EE应用程序。
+- J2ME，micro edition，主要用于移动设备、嵌入式设备上的Java应用程序。
+
+**JRE——Java Runtime Enviromental（Java运行时环境）**，也就是我们说的Java平台，所有的Java程序都要在JRE下才能运行。包括JVM和Java核心类库和支持文件。与JDK相比，它不包含开发工具：编译器、调试器和其他工具。
+
+**JVM——Java Virtual Mechinal（JAVA虚拟机）**。JVM是JRE的一部分，它是一个虚构出来的计算机，是通过在实际的计算机上仿真模拟各种计算机功能来实现的。JVM有自己完善的硬件架构，如处理器、堆栈、寄存器等，还具有相应的指令系统。JVM的主要工作是解释自己的质量集（即字节码）并映射到本地的CPU的指令集或OS的系统调用。Java语言是跨平台运行的，其实就是不同的操作系统，使用不同的JVM映射规则，让其与操作系统无关，完成了跨平台性。JVM对上层的Java源文件是不关心的，它关注的只是由源文件生成的类文件。类文件的组成包括JVM指令集，符合表以及一些补助信息。
+
 ### 2.4 JVM整体结构
 
 - HotSpot VM是目前市面上高性能虚拟机的代表作之一。
