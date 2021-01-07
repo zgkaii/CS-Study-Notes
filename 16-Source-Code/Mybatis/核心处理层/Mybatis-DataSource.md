@@ -31,7 +31,7 @@ public interface DataSourceFactory {
 
 类图如下
 
-![image-20191223081023730](../../../images/mybatis/image-20191223081023730.png)
+![](https://img-blog.csdnimg.cn/20210107133324535.png)
 
 - `setProperties`会将下列标签放入`datasource`中
 
@@ -321,8 +321,8 @@ public class PooledDataSourceFactory extends UnpooledDataSourceFactory {
 
 从类图上或者代码中我们可以发现`PooledDataSourceFactory`是继承`UnpooledDataSourceFactory`那么方法应该也是`UnpooledDataSourceFactory`的。看看设置属性方法
 
-![image-20191223083610214](../../../images/mybatis/image-20191223083610214.png)
+![](https://img-blog.csdnimg.cn/20210107133516411.png)
 
 方法直接走完
 
-![image-20191223083732972](../../../images/mybatis/image-20191223083732972.png)
+![](https://img-blog.csdnimg.cn/20210107133545444.png)

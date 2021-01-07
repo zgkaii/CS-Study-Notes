@@ -94,6 +94,6 @@
 
 ```
 
-![image-20191218191512184](../../../images/mybatis/image-20191218191512184.png)
+![](https://img-blog.csdnimg.cn/20210107135432592.png)
 
-![image-20191218191550550](../../../images/mybatis/image-20191218191550550.png)
+![](https://img-blog.csdnimg.cn/20210107135459438.png)

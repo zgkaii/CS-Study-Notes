@@ -319,4 +319,4 @@ public class Thread implements Runnable {
 
 之前一直对线程状态 及 状态切换的概念模糊不清，现在通过源码中对线程状态的定义，我们可以画张图来重新回顾一下，以使我们对其有更加深刻的理解。
 
-![avatar](../../../images/JDK1.8/ThreadStatusChange.png)
+![](https://img-blog.csdnimg.cn/20210107131247496.png)

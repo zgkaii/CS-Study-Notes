@@ -114,17 +114,18 @@ public static void registerGlobalNacosProperties(AnnotationAttributes attributes
   ```java
   registerGlobalNacosProperties((Map<?, ?>) globalPropertiesAttributes, registry,
         propertyResolver, beanName)
+  ```
 
 
       	public static void registerGlobalNacosProperties(Map<?, ?> globalPropertiesAttributes,
-  			BeanDefinitionRegistry registry, PropertyResolver propertyResolver,
-  			String beanName) {
-  		// 占位符解析成具体的配置信息
-  		Properties globalProperties = resolveProperties(globalPropertiesAttributes,
-  				propertyResolver);
-  		// 单例注册
-  		registerSingleton(registry, beanName, globalProperties);
-  	}
+    		BeanDefinitionRegistry registry, PropertyResolver propertyResolver,
+    		String beanName) {
+    	// 占位符解析成具体的配置信息
+    	Properties globalProperties = resolveProperties(globalPropertiesAttributes,
+    			propertyResolver);
+    	// 单例注册
+    	registerSingleton(registry, beanName, globalProperties);
+    }
 
   ```
 
@@ -132,7 +133,7 @@ public static void registerGlobalNacosProperties(AnnotationAttributes attributes
 
 ## registerNacosCommonBeans
 
-```
+  ```
 public static void registerNacosCommonBeans(BeanDefinitionRegistry registry) {
    // Register NacosApplicationContextHolder Bean
    registerNacosApplicationContextHolder(registry);
@@ -146,7 +147,7 @@ public static void registerNacosCommonBeans(BeanDefinitionRegistry registry) {
   2. 设置构造参数
   3. 注册对象
 
-```java
+​```java
 public static void registerInfrastructureBean(BeanDefinitionRegistry registry,
       String beanName, Class<?> beanClass, Object... constructorArgs) {
    // Build a BeanDefinition for NacosServiceFactory class
@@ -410,7 +411,7 @@ class BeatTask implements Runnable {
 
         Random random = new Random(System.currentTimeMillis());
         int index = random.nextInt(servers.size());
-
+    
         for (int i = 0; i < servers.size(); i++) {
             // 获取nacos所在的ip+port地址
             String server = servers.get(index);

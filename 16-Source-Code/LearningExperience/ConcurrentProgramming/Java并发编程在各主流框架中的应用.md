@@ -7,12 +7,12 @@ JVM 规范 定义了 Java 内存模型 来屏蔽掉各种操作系统、虚拟�
 ### 工作内存和主内存
 
 Java 内存模型 规定所有的变量都存储在主内存中，每个线程都有自己独立的工作内存，工作内存保存了 对应该线程使用的变量的主内存副本拷贝。线程对这些变量的操作都在自己的工作内存中进行，不能直接操作主内存 和 其他工作内存中存储的变量或者变量副本。线程间的变量传递需通过主内存来完成，三者的关系如下图所示。
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200221000348294.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM4MDM4Mzk2,size_16,color_FFFFFF,t_70)
+![](https://img-blog.csdnimg.cn/20200221000348294.png)
 
 ### Java 内存操作协议
 
 Java 内存模型定义了 8 种操作来完成主内存和工作内存的变量访问，具体如下。
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200221001115193.png)
+![](https://img-blog.csdnimg.cn/20200221001115193.png)
 
 - read：把一个变量的值从主内存传输到线程的工作内存中，以便随后的 load 动作使用。
 - load：把从主内存中读取的变量值载入工作内存的变量副本中。

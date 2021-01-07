@@ -6,7 +6,7 @@
 
 ## addDefaultConstructor
 
-- mybatis 的反射相关内容在`org.apache.ibatis.reflection` 下存放. 本片主要讲解`org.apache.ibatis.reflection.Reflector`类, 先看一下该类的属性
+- mybatis 的反射相关内容在`org.apache.ibatis.reflection` 下存放. 本文主要讲解`org.apache.ibatis.reflection.Reflector`类, 先看一下该类的属性。
 
 ```java
 public class Reflector {
@@ -151,13 +151,13 @@ class HfReflectorTest {
 
 - 准备工作完成了开始进行 debug , 在`org.apache.ibatis.reflection.Reflector#addDefaultConstructor`这个方法上打上断点
 
-  ![1575890354400](../../../images/mybatis/1575890354400.png)
+  ![](https://img-blog.csdnimg.cn/2021010713585928.png)
 
   观察`constructors`属性存在两个方法,这两个方法就是我在`People`类中的构造方法.
 
   根据语法内容我们应该对`parameterTypes`属性进行查看
 
-  ![1575890475839](../../../images/mybatis/1575890475839.png)
+  ![](https://img-blog.csdnimg.cn/20210107135919632.png)
 
 可以发现空参构造的`parameterTypes`长度是 0.因此可以确认`org.apache.ibatis.reflection.Reflector#addDefaultConstructor`方法获取了空参构造
 
@@ -283,17 +283,17 @@ class HfReflectorTest {
 
 - 照旧我们进行 debug 当前方法为`toString`方法
 
-  ![1575891988804](../../../images/mybatis//1575891988804.png)
+  ![](https://img-blog.csdnimg.cn/20210107135942570.png)
 
   从返回结果可以看到`sb.toString`返回的是： `返回值类型#方法名`
 
-  ![1575892046692](../../../images/mybatis//1575892046692.png)
+  ![](https://img-blog.csdnimg.cn/20210107140006315.png)
 
   上图返回结果为`void#setName:java.lang.String` 命名规则：`返回值类型#方法名称:参数列表`
 
   回过头看看`uniqueMethods`里面是什么
 
-  ![1575892167982](../../../images/mybatis//1575892167982.png)
+  ![](https://img-blog.csdnimg.cn/20210107140051412.png)
 
   方法签名:方法
 
@@ -321,11 +321,11 @@ class HfReflectorTest {
 
   目标明确了就直接在
 
-  ![1575892414120](../../../images/mybatis//1575892414120.png)
+  ![](https://img-blog.csdnimg.cn/20210107140113568.png)
 
   这里打断点了
 
-  ![1575892511471](../../../images/mybatis//1575892511471.png)
+  ![](https://img-blog.csdnimg.cn/20210107140135183.png)
 
   在进入循环之前回率先加载本类的所有可见方法
 
@@ -338,15 +338,15 @@ class HfReflectorTest {
 
   接下来断点继续往下走
 
-  ![1575892645405](../../../images/mybatis//1575892645405.png)
+  ![](https://img-blog.csdnimg.cn/20210107140157335.png)
 
   走到这一步我们来看看`currentClass.getSuperclass()`是不是上一级的类
 
-  ![1575892687076](../../../images/mybatis//1575892687076.png)
+  ![](https://img-blog.csdnimg.cn/20210107140216706.png)
 
   通过断点可见这个`currentClass`现在是`People`类,根据之前所说的最终`uniqueMethods`应该存在父类的方法
 
-  ![1575892763661](../../../images/mybatis//1575892763661.png)
+  ![](https://img-blog.csdnimg.cn/20210107140238424.png)
 
   可以看到父类的方法也都存在了
 
@@ -423,4 +423,4 @@ class HfReflectorTest {
 
 - 下图为一个类的解析结果
 
-![1575894218362](../../../images/mybatis/1575894218362.png)
+![](https://img-blog.csdnimg.cn/2021010714030731.png)

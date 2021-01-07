@@ -172,7 +172,7 @@ public class ParamNameResolver {
 ```
 
 如果不写`@Param`称则返回
-![image-20191219083223084](assets/image-20191219083223084.png)
+![](https://img-blog.csdnimg.cn/20210107135149540.png)
 
 ```java
     List<HsSell> list(@Param("ID") Integer id);
@@ -180,9 +180,9 @@ public class ParamNameResolver {
 
 - 写`@Param`返回
 
-![image-20191219083344439](../../../images/mybatis/image-20191219083344439.png)
+![](https://img-blog.csdnimg.cn/20210107135217524.png)
 
-![image-20191219083354873](../../../images/mybatis/image-20191219083354873.png)
+![](https://img-blog.csdnimg.cn/20210107135237186.png)
 
 - `org.apache.ibatis.reflection.ParamNameResolver#getNamedParams`
 
@@ -190,14 +190,14 @@ public class ParamNameResolver {
       List<HsSell> list( Integer id);
   ```
 
-![image-20191219084455292](../../../images/mybatis/image-20191219084455292.png)
+![](https://img-blog.csdnimg.cn/20210107135300255.png)
 
 ```java
     List<HsSell> list(@Param("ID") Integer id);
 ```
 
-​ 写上`@Param`
+ 写上`@Param`
 
-![image-20191219084943102](../../../images/mybatis/image-20191219084943102.png)
+![](https://img-blog.csdnimg.cn/20210107135322150.png)
 
-![image-20191219085131167](../../../images/mybatis/image-20191219085131167.png)
+![](https://img-blog.csdnimg.cn/20210107135342396.png)

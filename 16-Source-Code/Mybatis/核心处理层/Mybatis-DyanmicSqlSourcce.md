@@ -19,9 +19,9 @@
 
 ```
 
-![image-20191219151247240](../../../images/mybatis/image-20191219151247240.png)
+![](https://img-blog.csdnimg.cn/20210107133634336.png)
 
-![image-20191219151408597](../../../images/mybatis/image-20191219151408597.png)
+![](https://img-blog.csdnimg.cn/20210107133702348.png)
 
 ```java
 public class MixedSqlNode implements SqlNode {
@@ -48,7 +48,7 @@ public class MixedSqlNode implements SqlNode {
 
   `org.apache.ibatis.scripting.xmltags.IfSqlNode#apply`
 
-![image-20191219152254274](../../../images/mybatis/image-20191219152254274.png)
+![](https://img-blog.csdnimg.cn/20210107133730756.png)
 
 ```java
 /**
@@ -85,7 +85,7 @@ public class StaticTextSqlNode implements SqlNode {
 
 - 解析`trim`标签
 
-![image-20191219152502960](../../../images/mybatis/image-20191219152502960.png)
+![](https://img-blog.csdnimg.cn/20210107133757700.png)
 
 - 在解析`trim`的时候会往下解析下级标签
 
@@ -100,7 +100,7 @@ public class StaticTextSqlNode implements SqlNode {
       }
   ```
 
-![image-20191219152655746](../../../images/mybatis/image-20191219152655746.png)
+![](https://img-blog.csdnimg.cn/20210107133824718.png)
 
 ```JAVA
     @Override
@@ -154,17 +154,17 @@ public class StaticTextSqlNode implements SqlNode {
 
 ```
 
-![image-20191219153341466](../../../images/mybatis/image-20191219153341466.png)
+![](https://img-blog.csdnimg.cn/20210107133850460.png)
 
 存在返回`true`
 
 执行完成就得到了一个 sql
 
-![image-20191219153553127](../../../images/mybatis/image-20191219153553127.png)
+![](https://img-blog.csdnimg.cn/2021010713391442.png)
 
 继续执行`org.apache.ibatis.scripting.xmltags.DynamicSqlSource#getBoundSql`方法
 
-![image-20191219155129772](../../../images/mybatis/image-20191219155129772.png)
+![](https://img-blog.csdnimg.cn/20210107134342426.png)
 
 - 发送 sql`org.apache.ibatis.executor.SimpleExecutor#doQuery`
 
@@ -250,7 +250,7 @@ public class StaticTextSqlNode implements SqlNode {
       - `org.apache.ibatis.executor.BaseExecutor#doQuery`
       - `org.apache.ibatis.executor.SimpleExecutor#doQuery`
 
-![image-20191219160832704](../../../images/mybatis/image-20191219160832704.png)
+![](https://img-blog.csdnimg.cn/20210107134426369.png)
 
 ```java
     private Statement prepareStatement(StatementHandler handler, Log statementLog) throws SQLException {
@@ -267,7 +267,7 @@ public class StaticTextSqlNode implements SqlNode {
 
 ```
 
-![image-20191219160908212](../../../images/mybatis/image-20191219160908212.png)
+![](https://img-blog.csdnimg.cn/20210107134447576.png)
 
 - `org.apache.ibatis.executor.statement.BaseStatementHandler#prepare`
   - `org.apache.ibatis.executor.statement.PreparedStatementHandler#instantiateStatement`
@@ -317,7 +317,7 @@ public class StaticTextSqlNode implements SqlNode {
 
 - 接下来需要考虑的问题是如何将`?`换成我们的参数`2`
 
-  ![image-20191219161555793](../../../images/mybatis/image-20191219161555793.png)
+  ![](https://img-blog.csdnimg.cn/2021010713451068.png)
 
 - `org.apache.ibatis.executor.statement.StatementHandler#parameterize`
   - `org.apache.ibatis.executor.statement.RoutingStatementHandler#parameterize`
@@ -326,11 +326,11 @@ public class StaticTextSqlNode implements SqlNode {
         - `org.apache.ibatis.executor.parameter.ParameterHandler`
           - `org.apache.ibatis.scripting.defaults.DefaultParameterHandler#setParameters`
 
-![image-20191219162258040](../../../images/mybatis/image-20191219162258040.png)
+![](https://img-blog.csdnimg.cn/20210107134532685.png)
 
 这样就拿到了`value`的值
 
-![image-20191219162506920](../../../images/mybatis/image-20191219162506920.png)
+![](https://img-blog.csdnimg.cn/20210107134554464.png)
 
 准备工作就绪了发送就可以了
 
@@ -357,11 +357,11 @@ public class StaticTextSqlNode implements SqlNode {
     - `org.apache.ibatis.executor.resultset.ResultSetHandler#handleResultSets`
     - `org.apache.ibatis.executor.resultset.DefaultResultSetHandler#handleResultSets`
 
-![image-20191219163628214](../../../images/mybatis/image-20191219163628214.png)
+![](https://img-blog.csdnimg.cn/20210107134616971.png)
 
-![image-20191219163640968](../../../images/mybatis/image-20191219163640968.png)
+![](https://img-blog.csdnimg.cn/2021010713464640.png)
 
-![image-20191219163957488](../../../images/mybatis/image-20191219163957488.png)
+![](https://img-blog.csdnimg.cn/20210107134708671.png)
 
 处理后结果如上
 

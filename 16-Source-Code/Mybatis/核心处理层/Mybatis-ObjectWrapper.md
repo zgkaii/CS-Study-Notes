@@ -6,7 +6,7 @@
 
 类图：
 
-![image-20191223100956713](../../../images/mybatis/image-20191223100956713.png)
+![](https://img-blog.csdnimg.cn/20210107134931125.png)
 
 ```java
 public interface ObjectWrapper {
