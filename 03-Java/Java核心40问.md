@@ -22,10 +22,6 @@ Java文件执行过程：
 
 ![Java程序运行流程](https://img-blog.csdnimg.cn/img_convert/03efc6df62fa56a1cbb692e9f7ea8537.png)
 
-
-
-
-
 Java语言最为显著的特性有两方面，一个是**跨平台的特性**，即“一次书写，到处执行”(Write Once,Run Anywhere)；另一是**垃圾回收**（GC，Garage Collection）机制，通过使用垃圾收集器（Garbage Collector），大部分情况下，程序员不需要自己操心内存的分配和回收。
 
 
@@ -48,7 +44,7 @@ Java语言最为显著的特性有两方面，一个是**跨平台的特性**，
 
 09 对比Hashtable、HashMap、TreeMap有什么不同？
 
-10 如何保证集合是线程安全的 ConcurrentHashMap如何实现高效地线程安全
+10 如何保证集合是线程安全的 ConcurrentHashMap如何实现高效地线程安全?
 
 11 Java提供了哪些IO方式？ NIO如何实现多路复用？
 
