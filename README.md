@@ -1,8 +1,8 @@
 ## 写在最前 
 
-[John Washam](https://startupnextdoor.com/author/john/) 记录了从Web开发者（自学、非计算机科学学位）蜕变至 Google软件工程师所制定的学习历程[coding-interview-university](https://github.com/jwasham/coding-interview-university)。
+[John Washam](https://startupnextdoor.com/author/john/) 记录了自己从Web开发者（自学、非计算机科学学位）蜕变至 Google软件工程师的学习历程[coding-interview-university](https://github.com/jwasham/coding-interview-university)。
 
-受其启发，我根据自身情况及诉求，也制定了学习计划。希望通过接下来长时间的学习与实践，打通任督二脉，对计算机科学有体系的理解，逐渐蜕变为一位优秀的软件工程师。
+受其启发，我也根据自身情况及诉求制定了学习计划。希望通过接下来长时间的学习与实践，打通任督二脉，对计算机科学有体系的理解，逐渐蜕变为一位优秀的软件工程师。
 
 ## 正式开始之前
 
@@ -22,7 +22,7 @@ John Washam的抽认卡：
 - [抽认卡数据库 ── 旧 1200 张](https://github.com/jwasham/computer-science-flash-cards/blob/master/cards-jwasham.db)
 - [抽认卡数据库 ── 新 1800 张](https://github.com/jwasham/computer-science-flash-cards/blob/master/cards-jwasham-extreme.db)
 
-另外推荐支持多平台的软件——[Anki](http://ankisrs.net/)，中国国内相似功能APP推荐——[记乎](http://www.geefoo.cn/)。
+另外推荐支持多平台的软件——[Anki](http://ankisrs.net/)，相似功能APP推荐——[记乎](http://www.geefoo.cn/)。
 
 **复习、复习、再复习**
 
@@ -35,32 +35,30 @@ John Washam的抽认卡：
 ## 项目结构
 
 ```java
-Cs-Notes-Kz
+CS-Notes-Kz
 ├── 计算机理论知识
 |    ├── 计算机网络
 |    ├── 操作系统
-|    ├── 信息安全
-|    ├── 计算机组成原理
 |    ├── 数据结构与算法
 |    |	  ├── 数据结构
 |    |	  ├── 算法
 |    |	  └── LeetCode
-|    └── 数据库原理
+|    ├── 信息安全
+|    └── 其他
 ├── 开发工具
 ├── Java
 |    ├── JavaSE
+|    ├── 多线程&&并发编程
 |    ├── JVM
-|    ├── 并发编程
-|    ├── 设计模式
+|    ├── Java设计模式
 |    ├── Java新特性
 |    ├── JavaEE
-|    └── Spring全家桶
-|         ├── Spring
-|         ├── SpringMVC
-|         └── SprinBoot
+|    ├── Spring全家桶
+|    |    ├── Spring
+|    |    ├── SpringMVC
+|    |    └── SprinBoot
+|    └── 其他
 ├── Python
-|    ├── 基础
-|    └── Django
 ├── Golang
 ├── C
 ├── 前端
@@ -79,6 +77,7 @@ Cs-Notes-Kz
 |    └── 设计原则
 ├── Linux
 ├── 数据库
+|    ├── 数据库基础
 |    ├── 关系型数据库
 |    |    ├── Mysql
 |    |    └── Oracle
@@ -113,13 +112,11 @@ Cs-Notes-Kz
 |    └── 日志分析/收集
 ├── 机器学习/人工智能
 ├── 大数据
-|    ├── Hadoop
-|    └── Spark
 ├── 源码分析
 ├── 面试
-└── 其他
-     ├── 错误记录
-     └── 感悟
+├── 其他
+└── images
 ```
 
 ## Let's go!!!
+
