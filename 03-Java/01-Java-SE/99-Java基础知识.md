@@ -258,7 +258,7 @@ class GeneratorImpl<T> implements Generator<String>{
 ```java
    public static < E > void printArray( E[] inputArray )
    {         
-         for ( E element : inputArray ){        
+         for ( E element : inputArray ){  
             System.out.printf( "%s ", element );
          }
          System.out.println();
@@ -380,7 +380,7 @@ public native int hashCode();
 
 **3)为什么重写 `equals` 时必须重写 `hashCode` 方法？**
 
-如果两个对象相等，则 hashcode 一定也是相同的。两个对象相等,对两个对象分别调用 equals 方法都返回 true。但是，两个对象有相同的 hashcode 值，它们也不一定是相等的 。**因此，equals 方法被覆盖过，则 `hashCode` 方法也必须被覆盖。**
+如果两个对象相等，则 hashcode 一定也是相同的。两个对象相等，对两个对象分别调用 equals 方法都返回 true。但是，两个对象有相同的 hashcode 值，它们也不一定是相等的 。**因此，equals 方法被覆盖过，则 `hashCode` 方法也必须被覆盖。**
 
 >  `hashCode()`的默认行为是对堆上的对象产生独特值。如果没有重写 `hashCode()`，则该 class 的两个对象无论如何都不会相等（即使这两个对象指向相同的数据）
 
@@ -1096,15 +1096,7 @@ String s = input.readLine();
 
 #### 3.2.1. Java 异常类层次结构图
 
-![](images/Java异常类层次结构图.png)
-
-
-<p style="font-size:13px;text-align:right">图片来自：https://simplesnippets.tech/exception-handling-in-java-part-1/</p>
-
-![](images/Java异常类层次结构图2.png)
-
-
-<p style="font-size:13px;text-align:right">图片来自：https://chercher.tech/java-programming/exceptions-java</p>
+![异常](https://img-blog.csdnimg.cn/20200901133406242.png)
 
 在 Java 中，所有的异常都有一个共同的祖先 java.lang 包中的 **Throwable 类**。Throwable： 有两个重要的子类：**Exception（异常）** 和 **Error（错误）** ，二者都是 Java 异常处理的重要子类，各自都包含大量子类。
 

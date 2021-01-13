@@ -381,7 +381,6 @@ T reduce(T identity, BinaryOperator<T> accumulator);
 <U> U reduce(U identity,
                  BiFunction<U, ? super T, U> accumulator,
                  BinaryOperator<U> combiner);
-
 ```
 
 基本使用：

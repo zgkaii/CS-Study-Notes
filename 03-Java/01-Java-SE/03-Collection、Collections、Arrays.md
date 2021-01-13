@@ -81,8 +81,6 @@ public class ListTest {
 
 ### 3.2 `LinkedList`集合
 
-
-
 ![](https://img-blog.csdnimg.cn/20200926154414229.png)
 
 `java.util.LinkedList`是一个继承于`AbstractSequentialList`的**双向链表**。它也可以被当作堆栈、队列或双端队列进行操作。
