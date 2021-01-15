@@ -36,15 +36,15 @@ John Washam的抽认卡：
 
 ```java
 CS-Notes-Kz
-├── 计算机理论知识
+├── 计算机基础
 |    ├── 计算机网络
 |    ├── 操作系统
-|    ├── 数据结构与算法
-|    |	  ├── 数据结构
-|    |	  ├── 算法
-|    |	  └── LeetCode
 |    ├── 信息安全
 |    └── 其他
+├── 数据结构与算法
+|	  ├── 数据结构
+|	  ├── 算法
+|	  └── LeetCode
 ├── 开发工具
 ├── Java
 |    ├── JavaSE
@@ -55,8 +55,8 @@ CS-Notes-Kz
 |    ├── JavaEE
 |    ├── Spring全家桶
 |    |    ├── Spring
-|    |    ├── SpringMVC
-|    |    └── SprinBoot
+|    |    ├── SprinBoot
+|    |    └── SpringMVC
 |    └── 其他
 ├── Python
 ├── Golang
