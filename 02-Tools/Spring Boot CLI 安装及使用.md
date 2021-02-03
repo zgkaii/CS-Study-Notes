@@ -102,5 +102,5 @@ $ spring init --name readinglist --artifactId readinglist --groupId org.spring -
 
 最终会生成这样的项目结构：
 
-![](https://img-blog.csdnimg.cn/202012162134262.png)
+<img src="../images/tools/202012162134262.png" style="zoom:80%;" />
 

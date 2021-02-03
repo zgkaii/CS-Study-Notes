@@ -4,17 +4,17 @@
 
 * 下载JDK 11。
 
-![](https://img-blog.csdnimg.cn/20201125110547465.png)
+![](../../images/bug-error/20201125110547465.png)
 
 Java 11 升级是为了运行 VS Code for Java，更具体地说，它是运行 Language Server for Java 扩展的要求。但这不意味项目也需要升级到 Java 11 。也就是说可以继续使用 1.5 或更高版本开发项目。项目使用的 JDK 和运行 VS Code for Java 的 JDK 是分别通过 java.configuration.runtimes和 java.home 来进行配置的。
 
 * 打开Vs Code打开“设置”并搜索 `javahome`。
 
-![](https://img-blog.csdnimg.cn/20201125111308593.png)
+![](../../images/bug-error/20201125111308593.png)
 
 * 编辑`workspace`下的`settings.json`。
 
-![](https://img-blog.csdnimg.cn/20201125113133499.png)
+![](../../images/bug-error/20201125113133499.png)
 
 * 重启Vs Code，会看到：
 
@@ -24,11 +24,11 @@ Java 11 升级是为了运行 VS Code for Java，更具体地说，它是运行 
 
 * 打开java.configuration.runtimes配置项目JDK。
 
-![](https://img-blog.csdnimg.cn/20201125122412490.png)
+![](../../images/bug-error/20201125122412490.png)
 
 查看`User`下的`setting.json`：
 
-![](https://img-blog.csdnimg.cn/20201125122447420.png)
+![](../../images/bug-error/20201125122447420.png)
 
 也就是说，**用户设置**jdk仍是jdk 8，它应用于所有打开的任何VS Code 项目，即所有项目仍默认使用Java 8编译项目。
 

@@ -390,4 +390,3 @@ function mapDispatchToProps(dispatch: Dispatch<void>) {
 
 1. https://github.com/acdlite/flux-standard-action [↩](https://qiita.com/IzumiSy/items/b7d8a96eacd2cd8ad510#fnref1)
 2. https://medium.com/@dan_abramov/smart-and-dumb-components-7ca2f9a7c7d0 [↩](https://qiita.com/IzumiSy/items/b7d8a96eacd2cd8ad510#fnref2)
-3. いやいや、そこはredux-sagaっしょ！ という人もいるかもしれませんが、ここでは省略します。 [↩](https://qiita.com/IzumiSy/items/b7d8a96eacd2cd8ad510#fnref3)

@@ -18,11 +18,11 @@ OS name: "windows 10", version: "10.0", arch: "amd64", family: "windows"
 ```
 ##### 4、配置settings文件找到conf文件夹中的settings.xml文件
 （1）添加本地仓库
-```shell
+```xml
 <localRepository>C:\My_workspace\my_maven_local_repository</localRepository>
 ```
 （2）添加镜像仓库
-```shell
+```xml
  <mirrors>
  <mirror>  
   <id>alimaven</id>  
@@ -33,7 +33,7 @@ OS name: "windows 10", version: "10.0", arch: "amd64", family: "windows"
  </mirrors>
 ```
 （3）配置JDK
-```shell
+```xml
  <profile>
         <id>jdk-1.8</id>
         <activation>
@@ -48,6 +48,6 @@ OS name: "windows 10", version: "10.0", arch: "amd64", family: "windows"
   </profile>
 ```
 ##### 5、IDEA中Maven的设置
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200728164250370.png)
+![](../images/tools/20200728164250370.png)
 
 配置完成。

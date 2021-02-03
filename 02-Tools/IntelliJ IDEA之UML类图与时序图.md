@@ -1,3 +1,22 @@
+- [1 UML概述](#1-uml概述)
+  - [1.1 简述](#11-简述)
+  - [1.2 UML 图分类](#12-uml-图分类)
+- [2 UML 类图](#2-uml-类图)
+  - [2.1 依赖（Dependency）](#21-依赖dependency)
+  - [2.2 关联（Association）](#22-关联association)
+  - [2.3 聚合（Aggregation）](#23-聚合aggregation)
+  - [2.4 组合（Composition）](#24-组合composition)
+  - [2.5 泛化（Generalization）](#25-泛化generalization)
+  - [2.6 实现（Realization）](#26-实现realization)
+- [3 UML 时序图](#3-uml-时序图)
+  - [3.1 角色（Actor）](#31-角色actor)
+  - [3.2 对象（Object）](#32-对象object)
+  - [3.3 生命线（Lifeline）](#33-生命线lifeline)
+  - [3.4 控制焦点（Focus of Control）](#34-控制焦点focus-of-control)
+  - [3.5 消息（Message）](#35-消息message)
+  - [3.6 自关联消息（Self-Message）](#36-自关联消息self-message)
+- [参考](#参考)
+
 # 1 UML概述
 
 ## 1.1 简述
@@ -6,15 +25,15 @@ UML——Unified modeling language UML (**统一建模语言**)，是一种用�
 
 UML 本身是一套符号的规定，就像数学符号和化学符号一样，这些符号用于描述软件模型中的各个元素和他们之间的关系，比如类、接口、实现、泛化、依赖、组合、聚合等。在IDEA中，选中Class文件，右键单击`Diagrams`，之后再点击`Show Diagrams`，或者快捷键`Ctrl+Alt+Shift+U`，则会生产类图：
 
-![](https://img-blog.csdnimg.cn/2020120322233277.png)
+<img src="../images/tools/2020120322233277.png" style="zoom:80%;" />
 
 工具栏（Toolbar）：
 
-<img src="https://img-blog.csdnimg.cn/20201203223034966.png" style="zoom:80%;" />
+<img src="../images/tools/20201203223034966.png" style="zoom: 80%;" />
 
 在IDEA中绘制UML则需安装插件`PlantUML`：
 
-![](https://img-blog.csdnimg.cn/20201203224135306.png)
+![](../images/tools/20201203224135306.png)
 
 同时还需要[安装Graphviz](https://segmentfault.com/a/1190000022789556)才能正常显示，PlantUML的详细使用可参考——[PlantUML语言参考指引](http://plantuml.com/zh/guide)。`PlantUML`功能强大，但如果嫌弃在IDEA上使用 `PlantUML`麻烦的话，也可以用在线作图工具，如：[ProcessOn](https://www.processon.com/)，[WebChart](https://www.webchartnow.com/)。
 
@@ -61,13 +80,13 @@ Class11 <|.. Class12:实现
 
 生成的类图如下：
 
-<img src="https://img-blog.csdnimg.cn/2020120412371091.png" style="zoom:80%;" />
+<img src="../images/tools/2020120412371091.png" style="zoom:67%;" />
 
 “可见性”表示该属性对类外的元素是否可见，包括公有（Public）、私有（Private）、受保护（Protected）和朋友（Friendly）4 种，在类图中分别用符号`+`、`-`、`#`、`~`表示。
 
 例如：
 
-<img src="https://img-blog.csdnimg.cn/20201204101431364.png" style="zoom:80%;" />
+![](../images/tools/20201204101431364.png)
 
 ## 2.1 依赖（Dependency）
 
@@ -75,7 +94,7 @@ Class11 <|.. Class12:实现
 
 在UML类图中，依赖关系用带箭头的虚线表示，箭头从使用类指向被依赖的类。例如，人是依赖于手机进行语言传送的。
 
-<img src="https://img-blog.csdnimg.cn/20201204103912771.png" style="zoom:80%;" />
+<img src="../images/tools/20201204103912771.png" style="zoom:80%;" />
 
 ## 2.2 关联（Association）
 
@@ -85,7 +104,7 @@ Class11 <|.. Class12:实现
 
 例如，老师和学生之间的关系是双向的，一个老师可以有多个学生，一个学生也可以有多个老师。学生和课程之间是单向的，一个学生会学习多门课程，而课程是一个抽象的概念，它不拥有学生。
 
-<img src="https://img-blog.csdnimg.cn/20201204110535968.png" style="zoom:80%;" />
+<img src="../images/tools/20201204110535968.png" style="zoom: 80%;" />
 
 ## 2.3 聚合（Aggregation）
 
@@ -93,7 +112,7 @@ Class11 <|.. Class12:实现
 
 聚合关系在类中是通过成员对象来体现的，成员是整体的一部分，成员也可以脱离整体而存在。聚合关系可以用带空心菱形的实线来表示，菱形指向整体。
 
-<img src="https://img-blog.csdnimg.cn/20201204111242321.png" style="zoom:80%;" />
+<img src="../images/tools/20201204111242321.png" style="zoom:80%;" />
 
 ## 2.4 组合（Composition）
 
@@ -101,7 +120,7 @@ Class11 <|.. Class12:实现
 
 在UML类图中，用带实心菱形的实线来表示组合关系，菱形指向整体。
 
-<img src="https://img-blog.csdnimg.cn/20201204111858154.png" style="zoom:80%;" />
+<img src="../images/tools/20201204111858154.png" style="zoom:80%;" />
 
 ## 2.5 泛化（Generalization）
 
@@ -109,7 +128,7 @@ Class11 <|.. Class12:实现
 
 例如，父类动物有一个吃的方法，小鸟和小狗都继承于动物类，小鸟有它特有的方法飞行，而狮子有特有的方法奔跑。
 
-<img src="https://img-blog.csdnimg.cn/20201204112402751.png" style="zoom:80%;" />
+<img src="../images/tools/20201204112402751.png" style="zoom:80%;" />
 
 ## 2.6 实现（Realization）
 
@@ -117,7 +136,7 @@ Class11 <|.. Class12:实现
 
 实现关系使用带空心三角箭头的虚线来表示，箭头从实现类指向接口。例如，汽车和船实现了交通工具。
 
-<img src="https://img-blog.csdnimg.cn/20201204112711465.png" style="zoom:80%;" />
+<img src="../images/tools/20201204112711465.png" style="zoom:80%;" />
 
 # 3 UML 时序图
 
@@ -125,23 +144,23 @@ Class11 <|.. Class12:实现
 
 时序图包括的建模元素主要有：对象（Actor）、生命线（Lifeline）、控制焦点（Focus of control）、消息（Message）等等。
 
+> IDEA 可使用`SequenceDiagram`插件绘制时序图
+
 ## 3.1 角色（Actor）
 
 系统角色，可以是人、机器甚至其他的系统或者子系统。
 
-<img src="https://img-blog.csdnimg.cn/20201204153537282.png" style="zoom:80%;" />
+<img src="../images/tools/20201204153537282.png" style="zoom:80%;" />
 
 ## 3.2 对象（Object）
 
  对象包括三种命名方式：
 
 * 第一种方式包括**对象名和类名**。在时序图中，用`ObjectName:ClassName`表示；
-
 * 第二种方式**只显示类名**，即表示他是一个匿名对象，即表示它是一个匿名对象。在时序图中，用`:ClassName`表示；
-
 * 第三种方式**只显示对象名不显示类名**。在时序图中，就用`ObjectName`表示。
 
-<img src="https://img-blog.csdnimg.cn/20201204155727247.png" style="zoom:80%;" />
+<img src="../images/tools/20201204155727247.png" style="zoom:80%;" />
 
 ## 3.3 生命线（Lifeline）
 
@@ -151,7 +170,7 @@ Class11 <|.. Class12:实现
 
 又称为**激活期**，表示时间段的符号，在这个时间段内对象将执行相应的操作，用小矩形表示。PlantUML中使用关键字 activate 和 deactivate来表示参与者的生命活动。 一旦参与者被激活，它的生命线就会显示出来。
 
-<img src="https://img-blog.csdnimg.cn/20201204160504393.png" style="zoom:80%;" />
+<img src="../images/tools/20201204160504393.png" style="zoom:80%;" />
 
 ##  3.5 消息（Message）
 
@@ -165,7 +184,7 @@ Class11 <|.. Class12:实现
 
  表示方法的自身调用以及一个对象内的一个方法调用另外一个方法。
 
-<img src="https://img-blog.csdnimg.cn/2020120416295419.png" style="zoom:80%;" />
+<img src="../images/tools/2020120416295419.png" style="zoom:80%;" />
 
 # 参考
 

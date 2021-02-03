@@ -4,7 +4,7 @@
 
 React 是一个声明式，高效且灵活的用于构建用户界面的 JavaScript 库，由 Facebook 开源。使用 React 可以将一些简短、独立的代码片段组合成复杂的 UI 界面，这些代码片段被称作“组件”。
 
-传统的Web UI开发的主要问题——DOM API关注太多细节。
+传统的Web UI开发的主要问题——DOM API关注太多细节，应用程序状态分散在各处f难以追踪和维护。
 
 ![](https://img-blog.csdnimg.cn/2020113020122088.png)
 
@@ -68,7 +68,7 @@ React 是一个声明式，高效且灵活的用于构建用户界面的 JavaScr
 
 ### 1.3.1 JSX
 
-JSX全称`JavaScript XML`，它是React 定义的一种类似于 XML 的 JS 扩展语法（XML + JS）。它**主要用来创建 React 虚拟 DOM**（元素）对象。例如`var vDom = <h1>Hello JSX!</h1>`。
+JSX全称`JavaScript XML`，它是React 定义的一种类似于 XML 的 JS 扩展语法（XML + JS）。**JSX不是模板语言，而只是一种语法糖**，它**主要用来创建 React 虚拟 DOM**（元素）对象。例如`var vDom = <h1>Hello JSX!</h1>`。
 
 * 它即不是字符串，也不是 HTML/XML 标签
 * 它最终产生的就是一个 JS 对象
@@ -80,11 +80,17 @@ JSX全称`JavaScript XML`，它是React 定义的一种类似于 XML 的 JS 扩�
 
  也就是说，`js代码`中可以直接嵌套`<标签>`，但`<标签>`要嵌套`js代码` 需要放在 {} 中。
 
+约定：
+
+* React认为小写的tag是原生DOM节点，如div
+* 大写字母开头为自定义组件
+* JSX标记可以直接使用属性语法，例如<menu.Item/>
+
 ### 1.3.2 虚拟DOM
 
 创建虚拟DOM（特别的 js 对象）的两种方式：
 
-（1）React 提供的 API 来创建（纯 JS，一般不用）
+（1）React 提供的 API 来创建（纯 JS，**一般不用**）
 
 ```js
   <script type="text/javascript">
@@ -178,16 +184,24 @@ JSX全称`JavaScript XML`，它是React 定义的一种类似于 XML 的 JS 扩�
 ```
 
 注意：
+
 * 组件名必须首字母大写
 * 虚拟 DOM 元素只能有一个根元素
 * 虚拟 DOM 元素必须有结束标签
 
 render() 渲染组件标签的基本流程：
+
 * React 内部会创建组件实例对象
 * 得到包含的虚拟 DOM 并解析为真实 DOM
 * 插入到指定的页面元素内部
 
 ## 2.2 组件三大属性
+
+![](https://img-blog.csdnimg.cn/20201201093534588.png)
+
+* React组件一般不提供方法，而是某种状态机。组成View主要是外部传入属性props与内部状态state组成。
+* React组件可以理解为一个纯函数
+* 单向数据绑定
 
 ### 2.2.1 state
 
@@ -291,13 +305,24 @@ handleFocus(event) {
 
 ## 2.3 功能界面的组件化编码流程
 
-第一步：拆分组件——拆分界面，抽取组件（有几个组件）
+**第一步**：拆分组件——拆分目标界面，分析组件（有几个组件）
 
-第二步：实现静态组件——使用组件实现静态页面效果（写 render）只有静态界面，没有动态数据和交互
+**第二步**：实现静态UI——使用组件实现静态页面效果（写 render）只有静态界面，没有动态数据和交互
 
-第三步：实现动态组件
+**第三步**：实现动态交互
+
 * 动态显示初始化数据（数据定义在哪一个组件中）
 * 交互功能（从绑定事件监听开始）
+
+**创建组件原则——单一职责原则**
+
+* 每个组件只做一件事
+* 如果组件很复杂，就应该拆成小组件
+
+**数据状态管理——DRY原则**
+
+* 能计算得到的状态就k要单独存储
+* 组件尽量无状态，所需数据通过props获取
 
 ## 2.4 收集表单数据
 
@@ -401,7 +426,7 @@ React 在 v16.3 之前，生命周期流程如下：
 
 > 由于 React 未来的版本中推出了异步渲染，在 `dom` 被挂载之前的阶段都可以被打断重来，导致 `componentWillMount`、`componentWillUpdate`、`componentWillReceiveProps` 在一次更新中可能会被触发多次，因此那些只希望触发一次的应该放在 `componentDidUpdate` 中。这也就是为什么要把异步请求放在 `componentDidMount` 中，而不是放在 `componentWillMount` 中的原因，为了向后兼容。
 
-**新的生命周期流程图：**
+React 在 v16.3 及之后，**新的生命周期流程图：**
 
 ![](https://img-blog.csdnimg.cn/20201118153504347.png)
 
@@ -439,6 +464,10 @@ static getDerivedStateFromProps(props, state) {
 
 > 与 `componentDidUpdate` 一起，这个新的生命周期涵盖过时的 `componentWillUpdate` 的所有用例。
 
+**shouldComponentUpdate**
+
+功能：决定 Virtual DOM 是否要重绘 ，一般可以由 PureComponent自动实现 ，典型的使用场景：性能优化。
+
 ## 2.6 虚拟 DOM 与 DOM Diff 算法
 
 DOM Diff 能比较新旧虚拟 DOM 树，计算哪里改变，然后就只需要重绘变化的局部界面。
@@ -458,8 +487,8 @@ DOM Diff 能比较新旧虚拟 DOM 树，计算哪里改变，然后就只需要
 
 1. xxx 脚手架：用来帮助程序员快速创建一个基于 xxx 库的模板项目
    *  包含了所有需要的配置
-   * 指定好了所有的依赖
-   * 可以直接安装/编译/运行一个简单效果
+   *  指定好了所有的依赖
+   *  可以直接安装/编译/运行一个简单效果
 
 2. react 提供了一个用于创建 react 项目的脚手架库：[create-react-app](https://github.com/facebook/create-react-app)
 
@@ -470,10 +499,10 @@ DOM Diff 能比较新旧虚拟 DOM 树，计算哪里改变，然后就只需要
 ## 3.2 创建项目并启动
 
 ```shell
-npm i -g create-react-app // 全局安装create-react-app脚手架
-create-react-app hello-react // 创建一个react项目，项目名称是hello-react
+npm i -g create-react-app 		// 全局安装create-react-app脚手架
+create-react-app hello-react 	// 创建一个react项目，项目名称是hello-react
 cd hello-react
-npm start // 启动项目
+npm start					    // 启动项目
 ```
 
 启动后页面：
@@ -499,7 +528,7 @@ npm start // 启动项目
 2.axios：轻量级，建议使用
 
  	a. 封装了 XmlHttpRequest 对象的 ajax
-
+ 	
  	b. 是 promise 风格
 
 ​	 c. 既可以用在浏览器端又可以用在 node 服务器端
@@ -507,7 +536,7 @@ npm start // 启动项目
 3.fetch：原生函数，但老版本浏览器不支持
 
  	a. 不再使用 XmlHttpRequest 对象提交 ajax 请求
-
+ 	
  	b. 为了兼容低版本的浏览器，可以引入兼容库 fetch.js
 
 ## 4.2 axios
