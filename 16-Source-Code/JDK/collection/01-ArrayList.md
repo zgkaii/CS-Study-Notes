@@ -1,10 +1,10 @@
-## 1. AzrrayList简介
+## 1. ArrayList简介
 
-`java.util.ArrayList` 是一个**数组队列**，相当于 **动态数组**。与Java中的数组相比，它具有**容量能动态增长、元素增删慢、查找快**的特点。
+`java.util.ArrayList` 是一个**数组队列**，相当于 **动态数组**。与J数组相比，它具有**容量能动态增长、元素增删慢、查找快**的特点。
 
-![](https://img-blog.csdnimg.cn/20201107204840817.png)
+<img src="../../../images/collection/github-doocs.png" style="zoom:80%;" />
 
-`ArrayList`继承于 **`AbstractList`**，实现了 **`List`**、 **`RandomAccess`**、 **`Cloneable`**、**`java.io.Serializable`** 这些接口。
+`ArrayList`继承于 **`AbstractList`**，实现了 **`List`**、 **`RandomAccess`**、 **`Cloneable`**、**`java.io.Serializable`** 接口。
 
 ```java
 public class ArrayList<E> extends AbstractList<E>
@@ -14,8 +14,8 @@ public class ArrayList<E> extends AbstractList<E>
 ```
 
 - `ArrayList` 继承了`AbstractList`抽象方法，实现了List接口，提供了相关的**添加、删除、修改、遍历**等功能。
-- `RandomAccess` 是一个标志接口，表明实现这个这个接口的 List 集合是支持**快速随机访问**的。在 `ArrayList` 中，我们即可以通过元素的序号快速获取元素对象，这就是快速随机访问。
-- `ArrayList` 实现了 `Cloneable` 接口，即覆盖了函数`clone()`，能被克隆。
+- `RandomAccess` 是一个标志接口，表明实现这个这个接口的 List 集合是支持**快速随机访问**的。在 `ArrayList` 中，我们即可以通过元素的序号快速获取元素对象，这就是快速随机访问。在 `Collections.binarySearch()` 方法中，它要判断传入的list 是否 `RamdomAccess` 的实例，如果是，调用 `Collections.indexedBinarySearch(list, key)` 方法，如果不是，那么调用 `Collections.iteratorBinarySearch(list, key)` 方法。
+- `ArrayList` 实现了 `Cloneable` 接口，可以调用 `Object.clone()` 方法返回该对象的浅拷贝。
 - `ArrayList` 实现了` java.io.Serializable `接口，这意味着`ArrayList`支持序列化，能通过序列化去传输。
 
 > Tips：**`ArrayList`中的操作不是线程安全的**！建议在单线程中才使用`ArrayList`，多线程中选择使用Vector或者`CopyOnWriteArrayList`。
@@ -58,7 +58,7 @@ protected transient int modCount = 0;
 
 -  `length`属性是针对数组而言的，比如下面源码中`elementData.length`表示`elementData`数组的长度。
 -  `length()` 方法是针对字符串而言的，可以调用 `length()` 获取字符串长度。
--  `size()` 方法是针对泛型集合而言的，可以调用`size()`来获取集合中个数。
+-  `size()` 方法是针对泛型集合而言的，可以调用`size()`来获取集合中保存的元素个数。
 
 这样，就很好理解为什么size不是ArrayList的长度了，不易记混。
 
@@ -96,7 +96,7 @@ ArrayList有三种初始化方式：
     public ArrayList(Collection<? extends E> c) {
         // 将集合转换为数组
         elementData = c.toArray();
-        // 如果数组的长度size不等于0
+        // 如果集合size/数组长度 不等于0
         if ((size = elementData.length) != 0) {
             // 如果返回的不是Object类型数据
             if (elementData.getClass() != Object[].class)
@@ -110,11 +110,31 @@ ArrayList有三种初始化方式：
     }
 ```
 
-从上面的分析中看出**EMPTY_ELEMENTDATA与DEFAULTCAPACITY_EMPTY_ELEMENTDATA的区别**。
+可见，`ArrayList`的初始化分三种情况：
 
-EMPTY_ELEMENTDATA表示在我们实例化对象时指定了容量就是0，当添加1个元素后，那么elementData.length=1。
+* 无参构造函数初始化时，直接内部把数组初始化为`DEFAULTCAPACITY_EMPTY_ELEMENTDATA`空数组。在第一次添加元素时，再初始化为默认容量是 `10` 的数组。
+* 指定容量大小进行初始化时，容量大于`0`则初始化成指定容量的数组；如果容量等于0则初始化为默认空数组`EMPTY_ELEMENTDATA`。否则则抛出异常。
+* 如果使用`Collection`实例来初始化，容量不为空则调用`toArray()` 方法来初始化 `elementData`；如果为空则初始化为默认空数组`EMPTY_ELEMENTDATA`。
 
-DEFAULTCAPACITY_EMPTY_ELEMENTDATA表示实例化时是无参构造，未指定容量，在调用add方法添加第1个元素后会默认扩容容量为10，即elementData.length=10。
+从上面的分析中可以看出**EMPTY_ELEMENTDATA**与**DEFAULTCAPACITY_EMPTY_ELEMENTDATA**的区别：
+
+* `EMPTY_ELEMENTDATA`表示实例化对象时指定了容量为0，当添加1个元素后，那么`elementData.length=1`。
+* `DEFAULTCAPACITY_EMPTY_ELEMENTDATA`表示实例化时是无参构造，未指定容量，在调用add方法添加第1个元素后会默认扩容容量为10，即`elementData.length=10`。
+
+>  `ArrayList`中所有添加元素的方法（详见 2.3），都调用了`ensureCapacityInternal() `方法，查看源码：
+
+```java
+    private void ensureCapacityInternal(int minCapacity) {
+        ensureExplicitCapacity(calculateCapacity(elementData, minCapacity));
+    }
+    
+    private static int calculateCapacity(Object[] elementData, int minCapacity) {
+        if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {
+            return Math.max(DEFAULT_CAPACITY, minCapacity);// DEFAULT_CAPACITY == 10
+        }
+        return minCapacity;
+    }
+```
 
 ### 2.3 添加元素
 
@@ -178,7 +198,9 @@ DEFAULTCAPACITY_EMPTY_ELEMENTDATA表示实例化时是无参构造，未指定�
     }
 ```
 
-源码中大量调用了`arraycopy()`方法，其具体使用可以参考[由 System.arraycopy 引发的巩固：对象引用 与 对象 的区别](https://juejin.im/post/6844903502901149703)一文。
+可以看出，在指定位置添加元素，实际就是将指定坐标位置以及右侧所有元素向后移动一位，腾出空间存放新元素；向 `ArrayList` 中添加集合实例，则是集合示例转化成数组，然后利用`arraycopy()`数组拷贝的方式来高效完成添加工作。
+
+> `arraycopy()`方法，其具体使用可以参考[由 System.arraycopy 引发的巩固：对象引用 与 对象 的区别](https://juejin.im/post/6844903502901149703)一文。
 
 ### 2.4 删除元素
 
@@ -274,7 +296,7 @@ DEFAULTCAPACITY_EMPTY_ELEMENTDATA表示实例化时是无参构造，未指定�
 
 ### 2.5 ArrayList扩容机制
 
-可以发现，ArrayList添加元素时，都会调用ensureCapacityInternal方法。
+2.2 已经提到过，ArrayList添加元素时，都会调用ensureCapacityInternal方法。
 
 以add(E e)方法为例：
 
@@ -315,22 +337,24 @@ DEFAULTCAPACITY_EMPTY_ELEMENTDATA表示实例化时是无参构造，未指定�
         modCount++;
 
         if (minCapacity - elementData.length > 0)
-            //调用grow方法进行真正地扩容
+            // 调用grow方法进行真正地扩容
             grow(minCapacity);
     }
 ```
 
-1. 当添加第1个元素到 ArrayList 中时，minCapacity 为size+1=0，elementData还是空的list，elementData.length=0 ，所有会执行`return Math.max(DEFAULT_CAPACITY, minCapacity);`，minCapacity变为10。此时，`minCapacity - elementData.length > 0`成立，所以会进入 `grow(minCapacity)` 方法真正扩容。
+假定我们调用无参构造函数初始化，直接内部把数组初始化为`DEFAULTCAPACITY_EMPTY_ELEMENTDATA`空数组。
 
-2. 当添加第2个元素时，minCapacity 为 size+1 =2，由于elementData.length在添加第一个元素后已经扩容成10了。此时，`minCapacity - elementData.length > 0` 不成立，不会执行`grow(minCapacity)` 方法，即不会扩容。
+* 当添加第1个元素到 ArrayList 中时，minCapacity 为size+1=1，elementData还是`DEFAULTCAPACITY_EMPTY_ELEMENTDATA`空数组，elementData.length=0 ，所有会执行`return Math.max(DEFAULT_CAPACITY, minCapacity)`，minCapacity变为10。此时，`minCapacity - elementData.length > 0`成立，所以会进入 `grow(minCapacity)` 方法真正扩容。
 
-3. 添加第 3、4、5......到第10个元素时，依然不会扩容，数组容量还是为10。
+* 当添加第2个元素时，minCapacity 为 size+1 =2，由于elementData.length在添加第一个元素后已经扩容成10了。此时，`minCapacity - elementData.length > 0` 不成立，不会执行`grow(minCapacity)` 方法，即不会扩容。
+
+* 添加第 3、4、5......到第10个元素时，依然不会扩容，数组容量还是为10。
 
 直到添加第11个元素，`minCapacity - elementData.length > 0` 成立，执行grow 方法进行扩容。
 
 #### 2.5.2 `grow()` 
 
-grow方法是整个ArrayList扩容的核心：
+grow方法是`ArrayList`扩容的核心：
 
 ```java
     private void grow(int minCapacity) {//11
@@ -343,12 +367,12 @@ grow方法是整个ArrayList扩容的核心：
         if (newCapacity - minCapacity < 0)
             // 直接最小需求容量当作数组的新容量
             newCapacity = minCapacity;
-       //如果minCapacity大于最大容量，则新容量则为`Integer.MAX_VALUE`，否则，新容量大小则为 MAX_ARRAY_SIZE 即为 `Integer.MAX_VALUE - 8`。
+       //如果minCapacity大于最大容量，则新容量则为`Integer.MAX_VALUE`;否则，新容量大小则为 MAX_ARRAY_SIZE 即为 `Integer.MAX_VALUE - 8`。
         // 新容量大于MAX_ARRAY_SIZE,
         if (newCapacity - MAX_ARRAY_SIZE > 0)
             // 执行hugeCapacity()方法
             newCapacity = hugeCapacity(minCapacity);
-
+		// minCapacity is usually close to size, so this is a win:
         elementData = Arrays.copyOf(elementData, newCapacity);
     }
 
@@ -376,9 +400,9 @@ grow方法是整个ArrayList扩容的核心：
 
 ### 2.6 `ensureCapacity`
 
-从上面源码分析，在使用Arraylist初始化容量时，就会通过一系列逻辑判断后再进行扩容。如果数据量很大，运行效率岂不是很低。
+从上面源码分析，在使用ArrayList初始化容量时，就会通过一系列逻辑判断后再进行扩容。如果数据量很大，运行效率岂不是很低。
 
-而`ensureCapacity()`方法，就是让我们预先设置Arraylist的大小，这样就可以大大提高初始化速度了。 
+而`ensureCapacity()`方法，就是让我们预先设置ArrayList的大小，这样就可以大大提高初始化速度了。 
 
 ```java
     public void ensureCapacity(int minCapacity) {
@@ -399,11 +423,12 @@ grow方法是整个ArrayList扩容的核心：
 
 **最好在 add 大量元素之前用 `ensureCapacity` 方法，以减少增量重新分配的次数**。
 
-下面就来测试一下使用`ensureCapacity`前后的区别：
+下面测试一下使用`ensureCapacity`前后的区别：
 
 ```java
 public class EnsureCapacityTest {
     public static void main(String[] args) {
+        
         ArrayList<Object> list = new ArrayList<Object>();
         final int minCapacity = 10000000;
         long startTime = System.currentTimeMillis();
@@ -416,8 +441,8 @@ public class EnsureCapacityTest {
         list = new ArrayList<Object>();
         long startTime1 = System.currentTimeMillis();
         list.ensureCapacity(minCapacity);
-        for (int i = 0; i < minCapacity; i++) {
-            list.add(i);
+        for (int j = 0; j < minCapacity; j++) {
+            list.add(j);
         }
         long endTime1 = System.currentTimeMillis();
         System.out.println("使用ensureCapacity耗时：" + (endTime1 - startTime1));
@@ -428,7 +453,7 @@ public class EnsureCapacityTest {
 运行结果：
 
 ```java
-不使用ensureCapacity耗时：2471
+不使用ensureCapacity耗时：2590
 使用ensureCapacity耗时：289
 ```
 

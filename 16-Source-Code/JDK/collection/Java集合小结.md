@@ -25,7 +25,7 @@ String first = ss[0]; // 可以获取String对象
 
 因此，Java中提供了集合类（又称容器类）来保存、盛装各种类型的数据。
 
-![](https://img-blog.csdnimg.cn/20201107144953860.png)
+![](../../../images/collection/集合框架.png)
 
 > 虚线框为接口，蓝色框为抽象类，黑色实线框为具体实现类。
 
@@ -90,7 +90,7 @@ public interface Iterator<E> {
 
 # 2 Collection子接口之List
 
-<img src="https://img-blog.csdnimg.cn/20201107160012809.png" style="zoom:50%;" />
+<img src="../../../images/collection/集合.png" style="zoom:50%;" />
 
 ## 2.1 Arraylist和Vector区别
 
@@ -109,11 +109,11 @@ public interface Iterator<E> {
 
 **双向链表：** 包含两个指针，一个 prev 指向前一个节点，一个 next 指向后一个节点。
 
-![](https://img-blog.csdnimg.cn/20201107160432215.png)
+![](../../../images/collection/双向链表.png)
 
 **双向循环链表：** 最后一个节点的 next 指向 head，而 head 的 prev 指向最后一个节点，构成一个环。
 
-![](https://img-blog.csdnimg.cn/20201107160457158.png)
+![](../../../images/collection/双向循环链表.png)
 
 ### 2.2.2 RandomAccess 接口
 
@@ -174,7 +174,7 @@ TreeSet 底层使用红黑树，能够按照添加元素的顺序进行遍历，
 
 # 4 Map接口
 
-<img src="https://img-blog.csdnimg.cn/20201107161502389.png" style="zoom:50%;" />
+<img src="../../../images/collection/Map.png" style="zoom:50%;" />
 
 ### 4.1 HashMap的底层实现
 
@@ -215,13 +215,13 @@ static int hash(int h) {
 
 所谓 **“拉链法”** 就是：将链表和数组相结合。也就是说创建一个链表数组，数组中每一格就是一个链表。若遇到哈希冲突，则将冲突的值加到链表中即可。
 
-![](https://img-blog.csdnimg.cn/20201109212426593.png)
+![](../../../images/collection/hashmap17.png)
 
 #### 4.1.2 JDK1.8 之后
 
 相比于之前的版本， JDK1.8 之后在解决哈希冲突时有了较大的变化，当链表长度大于阈值（默认为 8）（将链表转换成红黑树前会判断，如果当前数组的长度小于 64，那么会选择先进行数组扩容，而不是转换为红黑树）时，将链表转化为红黑树，以减少搜索时间。
 
-![](https://img-blog.csdnimg.cn/20201109213850718.png)
+![](../../../images/collection/hashmap18.png)
 
 > TreeMap、TreeSet 以及 JDK1.8 之后的 HashMap 底层都用到了红黑树。红黑树就是为了解决二叉查找树的缺陷，因为二叉查找树在某些情况下会退化成一个线性结构。
 
@@ -285,7 +285,7 @@ static int hash(int h) {
 
 `TreeMap` 和`HashMap` 都继承自`AbstractMap` ，但是需要注意的是`TreeMap`它还实现了`NavigableMap`接口和`SortedMap` 接口。
 
-![](https://img-blog.csdnimg.cn/20201210014508982.png)
+![](../../../images/collection/20201210014508982.png)
 
 实现 `NavigableMap` 接口让 `TreeMap` 有了对集合内元素的搜索的能力。
 
@@ -374,17 +374,17 @@ ConcurrentHashMap 和 Hashtable的区别主要体现在实现线程安全的方�
 
 **HashTable:**
 
-![HashTable全表锁](https://my-blog-to-use.oss-cn-beijing.aliyuncs.com/2019-6/HashTable全表锁.png)
+![HashTable全表锁](../../../images/collection/HashTable全表锁.png)
 
 <p style="text-align:right;font-size:13px;color:gray">http://www.cnblogs.com/chengxiao/p/6842045.html></p>
 
 **JDK1.7 的 ConcurrentHashMap：**
 
-![JDK1.7的ConcurrentHashMap](https://my-blog-to-use.oss-cn-beijing.aliyuncs.com/2019-6/ConcurrentHashMap分段锁.jpg)
+![JDK1.7的ConcurrentHashMap](../../../images/collection/ConcurrentHashMap分段锁.jpg)
 
 **JDK1.8 的 ConcurrentHashMap：**
 
-![](https://img-blog.csdnimg.cn/20201210014559982.png)
+![](../../../images/collection/20201210014559982.png)
 
 JDK1.8 的 `ConcurrentHashMap` 不在是 **Segment 数组 + HashEntry 数组 + 链表**，而是 **Node 数组 + 链表 / 红黑树**。不过，Node 只能用于链表的情况，红黑树的情况需要使用 **`TreeNode`**。当冲突链表达到一定长度时，链表会转换成红黑树。
 
@@ -628,7 +628,7 @@ public static <T> List<T> asList(T... a) {
 
 `Arrays.asList()`将数组转换为集合后,底层其实还是数组，《阿里巴巴 Java 开发手册》对于这个方法有如下描述：
 
-![阿里巴巴Java开发手-Arrays.asList()方法](<https://my-blog-to-use.oss-cn-beijing.aliyuncs.com/2019-6/阿里巴巴Java开发手-Arrays.asList()方法.png>)
+![阿里巴巴Java开发手-Arrays.asList()方法](<../../../images/collection/阿里巴巴Java开发手-Arrays.asList()方法.png>)
 
 #### 5.2.1.3 使用时的注意事项总结
 
@@ -752,7 +752,7 @@ final void checkForComodification() {
 
 我们再来趁热打铁，看一个阿里巴巴手册相关的规定：
 
-![](https://img-blog.csdnimg.cn/2020121001450996.png)
+![](../../../images/collection/2020121001450996.png)
 
 有了前面讲的基础，我们应该知道：使用 `Iterator` 提供的 `remove` 方法，可以修改到 `expectedModCount` 的值。所以，才不会再抛出`ConcurrentModificationException` 异常。
 

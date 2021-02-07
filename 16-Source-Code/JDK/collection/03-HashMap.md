@@ -1,7 +1,7 @@
 ## 1 HashMap简介
 HashMap 是一个散列表，它存储的内容是键值对(key-value)映射。它继承了AbstractMap，实现了Map、Cloneable、`java.io.Serializable`接口。
 
-<img src="https://img-blog.csdnimg.cn/20201108151702116.png" style="zoom: 80%;" />
+<img src="../../../images/collection/20201108151702116.png" style="zoom: 80%;" />
 
 HashMap的实现是不同步的，这意味着**线程不安全**。并发的环境下建议使用`ConcurrentHashMap`。
 
@@ -23,7 +23,7 @@ JDK1.7中HashMap是**数组+链表**结合在一起使用的**链表散列**。H
 
 所谓 **“拉链法”** 就是，将链表和数组相结合。也就是说创建一个链表数组，数组中每一格就是一个链表。若遇到哈希冲突，则将冲突的值加到链表中即可。
 
-![](https://img-blog.csdnimg.cn/20201109212426593.png)
+![](../../../images/collection/hashmap17.png)
 
 HashMap在JDK1.7中详细实现可参考[深入理解HashMap（jdk7）](https://juejin.im/post/6844903903595593741)一文。
 
@@ -35,7 +35,7 @@ HashMap在JDK1.7中详细实现可参考[深入理解HashMap（jdk7）](https://
 
 也就是说，JDK1.8之后，HashMap底层数据结构是**数组+链表+红黑树**。
 
-![](https://img-blog.csdnimg.cn/20201109213850718.png)
+![](../../../images/collection/hashmap18.png)
 
 **Node节点类源码:**
 
@@ -325,7 +325,7 @@ tab[i = (n - 1) & hash]
 
 这时候，”扰动函数“的价值就体现出来了。
 
-![](https://img-blog.csdnimg.cn/img_convert/e65b38bc4f21af766926790f1b34387b.png)
+![](../../../images/collection/e65b38bc4f21af766926790f1b34387b.png)
 
 右位移16位，正好是32的一半，自己的高半区与低半区做异或，就是**为了混合原始哈希码的高位与低位，以此来加大低位随机性**。而混合后的低位参杂了高位部分特征，高位信息也参入了寻址计算（进行扰动）。
 
@@ -418,7 +418,7 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
 
 具体流程如下：
 
-![](https://img-blog.csdnimg.cn/20201110215433701.png)
+![](../../../images/collection/20201110215433701.png)
 
 ### 3.6 resize()
 
@@ -569,7 +569,7 @@ hash2 =  0000 0000 0000 0000 0000 1111 0001 1110
 
 至于新增位是0还是1，可以认为是随机的，这样就均匀的把之前碰撞的节点分散到新旧桶中。
 
-![](https://img-blog.csdnimg.cn/20201110223616725.png)
+![](../../../images/collection/20201110223616725.png)
 
 **小结**：
 

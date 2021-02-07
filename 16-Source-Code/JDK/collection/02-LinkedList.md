@@ -2,7 +2,7 @@
 
 `LinkedList`是一个实现了<font color="red">List接口</font>和<font color="red">Deque接口</font>的<font color="red">双端链表</font>。
 
-<img src="https://img-blog.csdnimg.cn/20201108105348736.png"  />
+<img src="../../../images/collection/20201108105348736.png" style="zoom:80%;" />
 
 `LinkedList`继承于 **`AbstractSequentialList`**，实现了 **`List`**、 **`Deque`**、 **`Cloneable`**、**`java.io.Serializable`** 接口。
 
@@ -28,7 +28,7 @@ transient Node<E> last;
 
 可以发现LinkedList是基于双向链表实现的，使用 Node 存储链表节点信息。
 
-![](https://img-blog.csdnimg.cn/20201108111123539.png)
+![](../../../images/collection/20201108111123539.png)
 
 ```java
     private static class Node<E> {
@@ -46,7 +46,7 @@ transient Node<E> last;
 
 因此LinkedList的结构如下：
 
-![](https://img-blog.csdnimg.cn/20201108111340847.png)
+![](../../../images/collection/20201108111340847.png)
 
 ## 3 构造方法
 
