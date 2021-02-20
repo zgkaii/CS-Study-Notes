@@ -63,8 +63,19 @@ public int findMaxConsecutiveOnes(int[] nums) {
 
 [Leetcode](https://leetcode.com/problems/plus-one/) / [力扣](https://leetcode-cn.com/problems/plus-one/)
 
-```
-
+```java
+    public int[] plusOne(int[] digits) {
+        for (int i = digits.length - 1; i >= 0; i--) {
+            if (digits[i] < 9) {
+                digits[i]++;
+                return digits;
+            }
+            digits[i] = 0;
+        }
+        digits = new int[digits.length + 1];
+        digits[0] = 1;
+        return digits;
+    }
 ```
 
 ## 4. 删除排序数组中的重复项
@@ -73,8 +84,24 @@ public int findMaxConsecutiveOnes(int[] nums) {
 
 [Leetcode](https://leetcode.com/problems/remove-duplicates-from-sorted-array/) / [力扣](https://leetcode-cn.com/problems/remove-duplicates-from-sorted-array/)
 
-```
+```java
+     /**
+     * 双指针法
+     * 数组有序，重复的元素一定会相邻。
+     */
+	public int removeDuplicates(int[] nums) {
+        if (nums == null || nums.length == 0) return 0;
+        int p = 0, q = 1;
 
+        while (q < nums.length) {
+            if (nums[p] != nums[q]) {
+                nums[p + 1] = nums[q];
+                p++;
+            }
+            q++;
+        }
+        return p + 1;
+    }
 ```
 
 ## 5. 合并两个有序数组
