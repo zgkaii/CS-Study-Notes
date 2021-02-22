@@ -4,18 +4,6 @@
 
 [Leetcode](https://leetcode.com/problems/intersection-of-two-linked-lists/description/) / [力扣](https://leetcode-cn.com/problems/intersection-of-two-linked-lists/description/)
 
-例如以下示例中 A 和 B 两个链表相交于 c1：
-
-```html
-A:          a1 → a2
-                    \
-                      c1 → c2 → c3
-                    /
-B:    b1 → b2 → b3
-```
-
-要求时间复杂度为 O(N)，空间复杂度为 O(1)。如果不存在交点则返回 null。
-
 设 A 的长度为 a + c，B 的长度为 b + c，其中 c 为尾部公共部分长度，可知 a + c + b = b + c + a。
 
 当访问 A 链表的指针访问到链表尾部时，令它从链表 B 的头部开始访问链表 B；同样地，当访问 B 链表的指针访问到链表尾部时，令它从链表 A 的头部开始访问链表 A。这样就能控制访问 A 和 B 两个链表的指针能同时访问到交点。
@@ -43,7 +31,7 @@ B:    b1 → b2 → b3
 
 [Leetcode](https://leetcode.com/problems/reverse-linked-list/description/) / [力扣](https://leetcode-cn.com/problems/reverse-linked-list/description/)
 
-递归
+递归：
 
 ```java
 public ListNode reverseList(ListNode head) {
@@ -58,7 +46,7 @@ public ListNode reverseList(ListNode head) {
 }
 ```
 
-头插法
+头插法：
 
 ```java
 public ListNode reverseList(ListNode head) {
@@ -73,7 +61,7 @@ public ListNode reverseList(ListNode head) {
 }
 ```
 
-双指针
+双指针：
 
 ```java
     public ListNode reverseList(ListNode head) {
@@ -135,7 +123,76 @@ public ListNode reverseList(ListNode head) {
     }
 ```
 
-#  4. 从有序链表中删除重复节点
+# 4. 环形链表
+
+141\. Linked List Cycle（Easy）
+
+[Leetcode](https://leetcode.com/problems/linked-list-cycle/) / [力扣](https://leetcode-cn.com/problems/linked-list-cycle/)
+
+```java
+    public boolean hasCycle(ListNode head) {
+        if (head == null || head.next == null) return false;
+        ListNode slow = head, fast = head.next;
+        
+        while (slow != fast) {
+            if (fast == null || fast.next == null) return false;
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        return true;
+    }
+```
+
+#  5. 回文链表
+
+234\. Palindrome Linked List (Easy)
+
+[Leetcode](https://leetcode.com/problems/palindrome-linked-list/description/) / [力扣](https://leetcode-cn.com/problems/palindrome-linked-list/description/)
+
+题目要求：以 **O(1)** 的空间复杂度来求解。
+
+“快慢指针“：
+
+* 找到前半部分链表的尾节点。
+* 反转后半部分链表。
+* 判断是否回文。
+* 恢复链表。
+* 返回结果。
+
+```java
+	public boolean isPalindrome2(ListNode head) {
+        // 1 ->2->2->1->null => 1->2->2->1->null => 1->2  null<-2<-1  (偶数节点)
+        // s/f                        s     f       h              s
+        // 1 ->2->3->2->1->null => 1->2->3->2->1->null => 1->2 3<-2<-1 (奇数节点)
+        // s/f                           s        f       h          s
+        ListNode fast = head, slow = head;
+        while (fast != null && fast.next != null) {
+            fast = fast.next.next;
+            slow = slow.next;
+        }
+        if (fast != null) slow = slow.next;
+
+        slow = reverse(slow);
+        while (slow != null && head.val == slow.val) {
+            head = head.next;
+            slow = slow.next;
+        }
+        return slow == null;
+    }
+
+    private ListNode reverse(ListNode head) {
+        ListNode prev = null;
+        while (head != null) {
+            ListNode next = head.next;
+            head.next = prev;
+            prev = head;
+            head = next;
+        }
+        return prev;
+    }
+```
+
+#  6. 从有序链表中删除重复节点
 
 83\. Remove Duplicates from Sorted List (Easy)
 
@@ -146,7 +203,7 @@ Given 1->1->2, return 1->2.
 Given 1->1->2->3->3, return 1->2->3.
 ```
 
-递归
+递归：
 
 ```java
 public ListNode deleteDuplicates(ListNode head) {
@@ -156,7 +213,7 @@ public ListNode deleteDuplicates(ListNode head) {
 }
 ```
 
-迭代
+迭代：
 
 ```java
     public ListNode deleteDuplicates(ListNode head) {
@@ -174,7 +231,7 @@ public ListNode deleteDuplicates(ListNode head) {
     }
 ```
 
-#  5. 删除链表的倒数第 n 个节点
+#  7. 删除链表的倒数第 n 个节点
 
 19\. Remove Nth Node From End of List (Medium)
 
@@ -185,7 +242,7 @@ Given linked list: 1->2->3->4->5, and n = 2.
 After removing the second node from the end, the linked list becomes 1->2->3->5.
 ```
 
-"快慢指针"
+"快慢指针"：
 
 ```java
     public ListNode removeNthFromEnd(ListNode head, int n) {
@@ -204,7 +261,7 @@ After removing the second node from the end, the linked list becomes 1->2->3->5.
     }
 ```
 
-#  6. 交换链表中的相邻结点
+#  8. 交换链表中的相邻结点
 
 24\. Swap Nodes in Pairs (Medium)
 
@@ -254,7 +311,7 @@ Given 1->2->3->4, you should return the list as 2->1->4->3.
 	}
 ```
 
-#  7. 链表求和
+#  9. 两数相加 II
 
 445\. Add Two Numbers II (Medium)
 
@@ -295,78 +352,13 @@ private Stack<Integer> buildStack(ListNode l) {
 }
 ```
 
-#  8. 回文链表
-
-234\. Palindrome Linked List (Easy)
-
-[Leetcode](https://leetcode.com/problems/palindrome-linked-list/description/) / [力扣](https://leetcode-cn.com/problems/palindrome-linked-list/description/)
-
-题目要求：以 **O(1)** 的空间复杂度来求解。
-
-“快慢指针“
-
-* 找到前半部分链表的尾节点。
-* 反转后半部分链表。
-* 判断是否回文。
-* 恢复链表。
-* 返回结果。
-
-```java
-public boolean isPalindrome(ListNode head) {
-    if (head == null || head.next == null) return true;
-    ListNode slow = head, fast = head.next;
-    while (fast != null && fast.next != null) {
-        slow = slow.next;
-        fast = fast.next.next;
-    }
-    if (fast != null) slow = slow.next;  // 偶数节点，让 slow 指向下一个节点
-    cut(head, slow);                     // 切成两个链表
-    return isEqual(head, reverse(slow));
-}
-
-private void cut(ListNode head, ListNode cutNode) {
-    while (head.next != cutNode) {
-        head = head.next;
-    }
-    head.next = null;
-}
-
-private ListNode reverse(ListNode head) {
-    ListNode newHead = null;
-    while (head != null) {
-        ListNode nextNode = head.next;
-        head.next = newHead;
-        newHead = head;
-        head = nextNode;
-    }
-    return newHead;
-}
-
-private boolean isEqual(ListNode l1, ListNode l2) {
-    while (l1 != null && l2 != null) {
-        if (l1.val != l2.val) return false;
-        l1 = l1.next;
-        l2 = l2.next;
-    }
-    return true;
-}
-```
-
-#  9. 分隔链表
+#  10. 分隔链表
 
 725\. Split Linked List in Parts(Medium)
 
 [Leetcode](https://leetcode.com/problems/split-linked-list-in-parts/description/) / [力扣](https://leetcode-cn.com/problems/split-linked-list-in-parts/description/)
 
-```html
-Input:
-root = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], k = 3
-Output: [[1, 2, 3, 4], [5, 6, 7], [8, 9, 10]]
-Explanation:
-The input has been split into consecutive parts with size difference at most 1, and earlier parts are a larger size than the later parts.
-```
-
-题目描述：把链表分隔成 k 部分，每部分的长度都应该尽可能相同，排在前面的长度应该大于等于后面的。
+题目要求：把链表分隔成 k 部分，每部分的长度都应该尽可能相同，排在前面的长度应该大于等于后面的。
 
 ```java
 public ListNode[] splitListToParts(ListNode root, int k) {
@@ -394,7 +386,7 @@ public ListNode[] splitListToParts(ListNode root, int k) {
 }
 ```
 
-#  10. 链表元素按奇偶聚集
+#  11. 链表元素按奇偶聚集
 
 328\. Odd Even Linked List (Medium)
 
@@ -406,29 +398,213 @@ Given 1->2->3->4->5->NULL,
 return 1->3->5->2->4->NULL.
 ```
 
+题目要求：算法的空间复杂度应为 O(1)，时间复杂度应为 O(n)，n为节点总数。
+
 ```java
-public ListNode oddEvenList(ListNode head) {
-    if (head == null) {
+    public ListNode oddEvenList(ListNode head) {
+        // 按奇偶分离链表，再合并链表
+        // 1->2->3->4->5->null => 1->3->5  2->4->null => 1->3->5->2->4->null
+        if(head == null || head.next == null) return head;
+        ListNode odd = head, even = head.next, evenHead = even;
+        
+        while(odd.next != null && even.next != null){
+            odd.next = even.next;
+            odd = odd.next;
+            even.next = odd.next;
+            even = even.next;
+        }
+        odd.next = evenHead;
         return head;
     }
-    ListNode odd = head, even = head.next, evenHead = even;
-    while (even != null && even.next != null) {
-        odd.next = odd.next.next;
-        odd = odd.next;
-        even.next = even.next.next;
-        even = even.next;
+```
+
+# 12. 环形链表 II
+
+142\. Linked List Cycle II (Medium)
+
+[Leetcode](https://leetcode.com/problems/linked-list-cycle-ii/) / [力扣](https://leetcode-cn.com/problems/linked-list-cycle-ii/)
+
+题目进阶：空间复杂度O(1)
+
+```java
+    public ListNode detectCycle(ListNode head) {
+        if (head == null || head.next == null) return null;
+        // 双指针:速度fast = 2*slow  同时从head出发，设入口点为p,相遇点为w
+        //      |p       
+        // 3 -> 2 -> 0 -> 4 -> 1
+        //       \            /
+        //         4 <- 6 <- 5  
+        //         |w         
+        // 距离: head->p: A, p->w: B, w->p: C
+        // slow : A + B, fast = A + 2B + C => A = C
+        // 所以在相遇后,slow继续运行,从与fast的相遇点到环入口点(C),另一个 slow2 刚好与slow在环入口点相遇(A)
+        ListNode slow = head, fast = head;
+        while (fast != null && fast.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+            while (slow == fast) {
+                ListNode slow2 = head;
+                while (slow != slow2) {
+                    slow = slow.next;
+                    slow2 = slow2.next;
+                }
+                return slow;
+            }
+        }
+        return null;
     }
-    odd.next = evenHead;
-    return head;
+```
+
+# 13. LRU 缓存机制
+
+146\. LRU Cache(Medium)
+
+[Leetcode](https://leetcode.com/problems/lru-cache/) / [力扣](https://leetcode-cn.com/problems/lru-cache/)
+
+```java
+public class LRUCache {
+    private int capacity;
+    private int size;
+    private DLinkedNode head, tail;
+    private Map<Integer, DLinkedNode> cache = new HashMap<>();
+
+    public LRUCache(int capacity) {
+        this.capacity = capacity;
+        this.size = 0;
+        // 伪头部和伪尾部标记界限
+        head = new DLinkedNode();
+        tail = new DLinkedNode();
+        head.next = tail;
+        tail.prev = head;
+    }
+
+    public int get(int key) {
+        DLinkedNode node = cache.get(key);
+        if (node == null) {
+            return -1;
+        }
+        // key存在，先通过哈希表定位，再移到头部
+        moveToHead(node);
+        return node.value;
+    }
+
+    public void put(int key, int value) {
+        DLinkedNode node = cache.get(key);
+        if (node == null) {
+            // key不存在，双链表头部创建新节点
+            DLinkedNode newNode = new DLinkedNode(key, value);
+            cache.put(key, newNode);
+            addToHead(newNode);
+            ++size;
+            // 超容，删除双链表尾节点，删除哈希表中对应项
+            if (size > capacity) {
+                DLinkedNode tail = removeTail();
+                cache.remove(tail.key);
+                --size;
+            }
+            // 哈希表定位，修改value，移到头部
+        } else {
+            node.value = value;
+            moveToHead(node);
+        }
+    }
+
+    private void addToHead(DLinkedNode node) {
+        node.prev = head;
+        node.next = head.next;
+        node.next.prev = node;
+        head.next = node;
+    }
+
+    private void removeNode(DLinkedNode node) {
+        node.prev.next = node.next;
+        node.next.prev = node.prev;
+    }
+
+    private void moveToHead(DLinkedNode node) {
+        removeNode(node);
+        addToHead(node);
+    }
+
+    private DLinkedNode removeTail() {
+        DLinkedNode res = tail.prev;
+        removeNode(res);
+        return res;
+    }
+}
+
+class DLinkedNode {
+    public int key;
+    public int value;
+
+    DLinkedNode prev;
+    DLinkedNode next;
+
+    public DLinkedNode() {
+    }
+
+    public DLinkedNode(int key, int value) {
+        this.key = key;
+        this.value = value;
+    }
 }
 ```
 
-# [2. 两数相加](https://leetcode-cn.com/problems/add-two-numbers/)
+# 14. 复制带随机指针的链表
 
-# [141. 环形链表](https://leetcode-cn.com/problems/linked-list-cycle/)
+138\. Copy List with Random Pointer（Medium）
 
-# [142. 环形链表 II](https://leetcode-cn.com/problems/linked-list-cycle-ii/)
+[Leetcode](https://leetcode.com/problems/copy-list-with-random-pointer/) / [力扣](https://leetcode-cn.com/problems/copy-list-with-random-pointer/)
 
-# [146. LRU 缓存机制](https://leetcode-cn.com/problems/lru-cache/)
+```java
 
-# [25. K 个一组翻转链表](https://leetcode-cn.com/problems/reverse-nodes-in-k-group/)
+```
+
+# 15. K 个一组翻转链表
+
+25\. Reverse Nodes in k-Group（Hard）
+
+[Leetcode](https://leetcode.com/problems/reverse-nodes-in-k-group/) / [力扣](https://leetcode-cn.com/problems/reverse-nodes-in-k-group/)
+
+题目要求：使用常数的额外空间；不能只是单纯的改变节点内部的值，而是需要实际进行节点交换。
+
+```java
+    public ListNode reverseKGroup1(ListNode head, int k) {
+        ListNode dummy = new ListNode(0);
+        // 1->2->3->4->5  k=2
+        // 1.声明一个哑节点dummy
+        dummy.next = head;
+        // 2.pre和end指向同一个前驱节点上
+        ListNode pre = dummy, end = dummy;
+        while (end.next != null) {
+            // 3.获取翻转链表片段 start -> ... -> end
+            for (int i = 0; i < k && end != null; i++) {
+                end = end.next;
+            }
+            if (end == null) break;
+            ListNode next = end.next;
+            // 孤立需翻转链表片段
+            end.next = null;
+            ListNode start = pre.next;
+            // 4.翻转链表 dummy -> end -> ... -> start
+            pre.next = reverse(pre);
+            // 5.连接翻转后链表，pre和end指向同一个前驱节点上
+            start.next = next;
+            pre = start;
+            end = pre;
+        }
+        return dummy.next;
+    }
+
+    public ListNode reverse(ListNode head) {
+        ListNode prev = null;
+        while (head != null) {
+            ListNode next = head.next;
+            head.next = prev;
+            prev = head;
+            head = next;
+        }
+        return prev;
+    }
+```
+
