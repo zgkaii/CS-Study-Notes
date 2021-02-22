@@ -40,25 +40,27 @@ A:          a1 → a2       d1 → d2
 B:    b1 → b2 → b3        e1 → e2
 ```
 
-
-
 要求时间复杂度为 O(N)，空间复杂度为 O(1)。如果不存在交点则返回 null。
 
 设 A 的长度为 a + c，B 的长度为 b + c，其中 c 为尾部公共部分长度，可知 a + c + b = b + c + a。
 
 当访问 A 链表的指针访问到链表尾部时，令它从链表 B 的头部开始访问链表 B；同样地，当访问 B 链表的指针访问到链表尾部时，令它从链表 A 的头部开始访问链表 A。这样就能控制访问 A 和 B 两个链表的指针能同时访问到交点。
 
+> 两者速度一致，相同时间走的路程一致，那么会同一时间到达终点。
+
 如果不存在交点，那么 a + b = b + a，以下实现代码中 l1 和 l2 会同时为 null，从而退出循环。
 
 ```java
-public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
-    ListNode l1 = headA, l2 = headB;
-    while (l1 != l2) {
-        l1 = (l1 == null) ? headB : l1.next;
-        l2 = (l2 == null) ? headA : l2.next;
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        if (headA == null || headB == null) return null;
+
+        ListNode p1 = headA, p2 = headB;
+        while (p1 != p2) {
+            p1 = (p1 == null) ? headB : p1.next;
+            p2 = (p2 == null) ? headA : p2.next;
+        }
+        return p1;
     }
-    return l1;
-}
 ```
 
 如果只是判断是否存在交点，那么就是另一个问题，即 [编程之美 3.6]() 的问题。有两种解法：
@@ -76,13 +78,13 @@ public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
 
 ```java
 public ListNode reverseList(ListNode head) {
-    if (head == null || head.next == null) {
-        return head;
-    }
+    if (head == null || head.next == null) return head;
+    
     ListNode next = head.next;
-    ListNode newHead = reverseList(next);
-    next.next = head;
-    head.next = null;
+    ListNode newHead = reverseList(next);// 从当前节点的下一个结点开始递归调用。
+    next.next = head;// head挂到next节点的后面就完成了链表的反转。
+    head.next = null;// 这里head相当于变成了尾结点,尾结点都是为空的,否则会构成环。
+    
     return newHead;
 }
 ```
@@ -102,24 +104,66 @@ public ListNode reverseList(ListNode head) {
 }
 ```
 
+双指针
+
+```java
+    public ListNode reverseList(ListNode head) {
+        ListNode cur = head, end = null;
+        
+        while (cur != null) {
+            ListNode tmp = cur.next;// 每次访问的原链表节点都会成为新链表的头结点
+            cur.next = end;
+            end = cur;// 更新新链表
+            cur = tmp;
+        }
+        return end;
+    }
+```
+
 #  3. 归并两个有序的链表
 
 21\. Merge Two Sorted Lists (Easy)
 
 [Leetcode](https://leetcode.com/problems/merge-two-sorted-lists/description/) / [力扣](https://leetcode-cn.com/problems/merge-two-sorted-lists/description/)
 
+递归：
+
 ```java
-public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
-    if (l1 == null) return l2;
-    if (l2 == null) return l1;
-    if (l1.val < l2.val) {
-        l1.next = mergeTwoLists(l1.next, l2);
-        return l1;
-    } else {
-        l2.next = mergeTwoLists(l1, l2.next);
-        return l2;
+    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+		if(l1 == null) return l2;
+		if(l2 == null) return l1;
+		if(l1.val < l2.val){
+			l1.next = mergeTwoLists(l1.next, l2);
+			return l1;
+		} else{
+			l2.next = mergeTwoLists(l1, l2.next);
+			return l2;
+		}
     }
-}
+```
+
+迭代：
+
+```java
+    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        if (l1 == null) return l2;
+        if (l2 == null) return l1;
+
+        ListNode dummy = new ListNode(0);
+        ListNode cur = dummy;
+        while(l1 != null && l2!= null){
+            if(l1.val <= l2.val){
+                cur.next = l1;
+                l1 = l1.next;
+            }else {
+                cur.next = l2;
+                l2 = l2.next;
+            }
+            cur = cur.next;
+        }
+        cur.next = (l1 == null) ? l2 : l1;
+        return dummy.next;
+    }
 ```
 
 #  4. 从有序链表中删除重复节点
@@ -133,12 +177,32 @@ Given 1->1->2, return 1->2.
 Given 1->1->2->3->3, return 1->2->3.
 ```
 
+递归
+
 ```java
 public ListNode deleteDuplicates(ListNode head) {
     if (head == null || head.next == null) return head;
     head.next = deleteDuplicates(head.next);
     return head.val == head.next.val ? head.next : head;
 }
+```
+
+迭代
+
+```java
+    public ListNode deleteDuplicates(ListNode head) {
+         ListNode cur = head;
+        
+         while(cur != null) {
+        	 if (cur.next == null) break;
+        	 if (cur.val == cur.next.val) {
+        		 cur.next = cur.next.next;
+        	 } else {
+        		 cur = cur.next;
+        	 }
+         }
+         return head;
+    }
 ```
 
 #  5. 删除链表的倒数第 n 个节点
