@@ -1,19 +1,3 @@
-<!-- GFM-TOC -->
-* [1. 找出两个链表的交点](#1-找出两个链表的交点)
-* [2. 链表反转](#2-链表反转)
-* [3. 归并两个有序的链表](#3-归并两个有序的链表)
-* [4. 从有序链表中删除重复节点](#4-从有序链表中删除重复节点)
-* [5. 删除链表的倒数第 n 个节点](#5-删除链表的倒数第-n-个节点)
-* [6. 交换链表中的相邻结点](#6-交换链表中的相邻结点)
-* [7. 链表求和](#7-链表求和)
-* [8. 回文链表](#8-回文链表)
-* [9. 分隔链表](#9-分隔链表)
-* [10. 链表元素按奇偶聚集](#10-链表元素按奇偶聚集)
-<!-- GFM-TOC -->
-
-
-链表是空节点，或者有一个值和一个指向下一个链表的指针，因此很多链表问题可以用递归来处理。
-
 #  1. 找出两个链表的交点
 
 160\. Intersection of Two Linked Lists (Easy)
@@ -24,20 +8,10 @@
 
 ```html
 A:          a1 → a2
-                    ↘
+                    \
                       c1 → c2 → c3
-                    ↗
+                    /
 B:    b1 → b2 → b3
-```
-
-但是不会出现以下相交的情况，因为每个节点只有一个 next 指针，也就只能有一个后继节点，而以下示例中节点 c 有两个后继节点。
-
-```html
-A:          a1 → a2       d1 → d2
-                    ↘  ↗
-                      c
-                    ↗  ↘
-B:    b1 → b2 → b3        e1 → e2
 ```
 
 要求时间复杂度为 O(N)，空间复杂度为 O(1)。如果不存在交点则返回 null。
@@ -62,11 +36,6 @@ B:    b1 → b2 → b3        e1 → e2
         return p1;
     }
 ```
-
-如果只是判断是否存在交点，那么就是另一个问题，即 [编程之美 3.6]() 的问题。有两种解法：
-
-- 把第一个链表的结尾连接到第二个链表的开头，看第二个链表是否存在环；
-- 或者直接比较两个链表的最后一个节点是否相同。
 
 #  2. 链表反转
 
@@ -216,21 +185,23 @@ Given linked list: 1->2->3->4->5, and n = 2.
 After removing the second node from the end, the linked list becomes 1->2->3->5.
 ```
 
+"快慢指针"
+
 ```java
-public ListNode removeNthFromEnd(ListNode head, int n) {
-    ListNode fast = head;
-    while (n-- > 0) {
-        fast = fast.next;
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        // 1,2,3,4,5,null  =>  1,2,3,4,5,null   n = 2
+        // p     q                 p       q
+        ListNode p = head, q = head;
+        while (n-- > 0) q = q.next;
+        if(q == null) return q.next;
+        while (q.next != null) {
+            q = q.next;
+            p = p.next;
+        }
+        // 1,2,3,5,null
+        p.next = p.next.next;
+        return head;
     }
-    if (fast == null) return head.next;
-    ListNode slow = head;
-    while (fast.next != null) {
-        fast = fast.next;
-        slow = slow.next;
-    }
-    slow.next = slow.next.next;
-    return head;
-}
 ```
 
 #  6. 交换链表中的相邻结点
@@ -245,22 +216,42 @@ Given 1->2->3->4, you should return the list as 2->1->4->3.
 
 题目要求：不能修改结点的 val 值，O(1) 空间复杂度。
 
-```java
-public ListNode swapPairs(ListNode head) {
-    ListNode node = new ListNode(-1);
-    node.next = head;
-    ListNode pre = node;
-    while (pre.next != null && pre.next.next != null) {
-        ListNode l1 = pre.next, l2 = pre.next.next;
-        ListNode next = l2.next;
-        l1.next = next;
-        l2.next = l1;
-        pre.next = l2;
+递归：
 
-        pre = l1;
+* 时间复杂度O(n)，空间复杂度O(n)
+
+
+```java
+    public ListNode swapPairs(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        ListNode newHead = head.next;
+        head.next = swapPairs(newHead.next);
+        newHead.next = head;
+        return newHead;
     }
-    return node.next;
-}
+```
+
+迭代：
+
+* 时间复杂度O(n)，空间复杂度O(1)
+
+```java
+	public ListNode swapPairs(ListNode head) {
+        ListNode dummyHead = new ListNode(0);
+        dummyHead.next = head;
+        ListNode temp = dummyHead;
+        while (temp.next != null && temp.next.next != null) {
+            ListNode node1 = temp.next;
+            ListNode node2 = temp.next.next;
+            temp.next = node2;
+            node1.next = node2.next;
+            node2.next = node1;
+            temp = node1;
+        }
+        return dummyHead.next;
+	}
 ```
 
 #  7. 链表求和
@@ -310,9 +301,15 @@ private Stack<Integer> buildStack(ListNode l) {
 
 [Leetcode](https://leetcode.com/problems/palindrome-linked-list/description/) / [力扣](https://leetcode-cn.com/problems/palindrome-linked-list/description/)
 
-题目要求：以 O(1) 的空间复杂度来求解。
+题目要求：以 **O(1)** 的空间复杂度来求解。
 
-切成两半，把后半段反转，然后比较两半是否相等。
+“快慢指针“
+
+* 找到前半部分链表的尾节点。
+* 反转后半部分链表。
+* 判断是否回文。
+* 恢复链表。
+* 返回结果。
 
 ```java
 public boolean isPalindrome(ListNode head) {
@@ -426,3 +423,12 @@ public ListNode oddEvenList(ListNode head) {
 }
 ```
 
+# [2. 两数相加](https://leetcode-cn.com/problems/add-two-numbers/)
+
+# [141. 环形链表](https://leetcode-cn.com/problems/linked-list-cycle/)
+
+# [142. 环形链表 II](https://leetcode-cn.com/problems/linked-list-cycle-ii/)
+
+# [146. LRU 缓存机制](https://leetcode-cn.com/problems/lru-cache/)
+
+# [25. K 个一组翻转链表](https://leetcode-cn.com/problems/reverse-nodes-in-k-group/)
