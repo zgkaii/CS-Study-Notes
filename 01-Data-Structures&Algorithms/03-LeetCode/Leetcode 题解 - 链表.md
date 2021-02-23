@@ -361,29 +361,23 @@ private Stack<Integer> buildStack(ListNode l) {
 题目要求：把链表分隔成 k 部分，每部分的长度都应该尽可能相同，排在前面的长度应该大于等于后面的。
 
 ```java
-public ListNode[] splitListToParts(ListNode root, int k) {
-    int N = 0;
-    ListNode cur = root;
-    while (cur != null) {
-        N++;
-        cur = cur.next;
-    }
-    int mod = N % k;
-    int size = N / k;
-    ListNode[] ret = new ListNode[k];
-    cur = root;
-    for (int i = 0; cur != null && i < k; i++) {
-        ret[i] = cur;
-        int curSize = size + (mod-- > 0 ? 1 : 0);
-        for (int j = 0; j < curSize - 1; j++) {
-            cur = cur.next;
+    public ListNode[] splitListToParts(ListNode root, int k) {
+        ListNode[] parts = new ListNode[k];
+        int len = 0;
+        for (ListNode node = root; node != null; node = node.next)
+            len++;
+        int n = len / k, r = len % k; // n : minimum guaranteed part size; r : extra nodes spread to the first r parts;
+        ListNode node = root, prev = null;
+        for (int i = 0; node != null && i < k; i++, r--) {
+            parts[i] = node;
+            for (int j = 0; j < n + (r > 0 ? 1 : 0); j++) {
+                prev = node;
+                node = node.next;
+            }
+            prev.next = null;
         }
-        ListNode next = cur.next;
-        cur.next = null;
-        cur = next;
+        return parts;        
     }
-    return ret;
-}
 ```
 
 #  11. 链表元素按奇偶聚集
@@ -556,8 +550,97 @@ class DLinkedNode {
 
 [Leetcode](https://leetcode.com/problems/copy-list-with-random-pointer/) / [力扣](https://leetcode-cn.com/problems/copy-list-with-random-pointer/)
 
-```java
+回溯：
 
+* 时间复杂度O(n) 空间复杂度O(n)
+
+```java
+    public Node copyRandomList1(Node head) {
+        if (head == null) return null;
+        // 如果我们已经处理了当前节点，那么我们只需返回它的克隆版本。
+        if (this.visited.containsKey(head)) {
+            return this.visited.get(head);
+        }
+        // 创建一个值与旧节点相同的新节点(即复制节点)。
+        Node node = new Node(head.val, null, null);
+
+        // 将此值保存在HashMap中。因为遍历过程中可能由于随机指针的随机性而导致循环,这里将有助于我们避免循环。
+        this.visited.put(head, node);
+
+        // 从下一个指针开始递归复制剩余的链表,然后从随机指针开始递归复制。
+        // 因此我们有两个独立的递归调用,最后我们为创建的新节点更新了下一个指针和随机指针。
+        node.next = this.copyRandomList1(head.next);
+        node.random = this.copyRandomList1(head.random);
+        return node;
+    }
+```
+
+进阶：
+
+* 时间复杂度O(n) 空间复杂度O(1)
+
+```java
+    public Node copyRandomList(Node head) {
+        if (head == null) return null;
+        //        —————————                        —————————————————————             ———————————
+        //       |         |                      |                     |           |           |
+        //  1 -> 2 -> 3 -> 4   => 1 -> 1‘ -> 2 -> 2’ -> 3 -> 3‘ -> 4 -> 4’ => 1' -> 2' -> 3' -> 4'
+        //  |         |                |                     |                |           |
+        //   —————————                  —————————————————————                  ———————————
+        // 第一步：将每个拷贝节点都放在原来对应节点的旁边。
+        Node iter = head, next;
+        while (iter != null) {
+            next = iter.next;
+            Node copy = new Node(iter.val);
+
+            iter.next = copy;
+            copy.next = next;
+            iter = next;
+        }
+
+        // 第二步：为拷贝节点分配随机指针。
+        iter = head;
+        while (iter != null) {
+            if (iter.random != null) {
+                iter.next.random = iter.random.next;
+            }
+            iter = iter.next.next;
+        }
+
+        // 第三步：恢复原始链表,提取克隆链表。
+        iter = head;
+        Node pseudoHead = new Node(0);
+        Node copy, copyIter = pseudoHead;
+
+        while (iter != null) {
+            next = iter.next.next;
+            // 提取克隆链表
+            copy = iter.next;
+            copyIter.next = copy;
+            copyIter = copy;
+            // 保存原始链表
+            iter.next = next;
+
+            iter = next;
+        }
+        return pseudoHead.next;
+    }
+
+    class Node {
+        int val;
+        Node next;
+        Node random;
+
+        public Node(int val, Node next, Node random) {
+            this.val = val;
+            this.next = next;
+            this.random = random;
+        }
+
+        public Node(int val) {
+            this.val = val;
+        }
+    }
 ```
 
 # 15. K 个一组翻转链表
