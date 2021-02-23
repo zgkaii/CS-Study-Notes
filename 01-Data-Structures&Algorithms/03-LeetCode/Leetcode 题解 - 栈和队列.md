@@ -18,31 +18,32 @@
 栈的顺序为后进先出，而队列的顺序为先进先出。使用两个栈实现队列，一个元素需要经过两个栈才能出队列，在经过第一个栈时元素顺序被反转，经过第二个栈时再次被反转，此时就是先进先出顺序。
 
 ```java
-class MyQueue {
-
+public class MyQueue {
     private Stack<Integer> in = new Stack<>();
     private Stack<Integer> out = new Stack<>();
+    private int front;
+
+    public MyQueue() {
+        in = new Stack<>();
+        out = new Stack<>();
+    }
 
     public void push(int x) {
+        if (in.empty()) front = x;
         in.push(x);
     }
 
     public int pop() {
-        in2out();
+        if (out.isEmpty()) {
+            while (!in.isEmpty())
+                out.push(in.pop());
+        }
         return out.pop();
     }
 
     public int peek() {
-        in2out();
+        if (out.isEmpty()) return front;
         return out.peek();
-    }
-
-    private void in2out() {
-        if (out.isEmpty()) {
-            while (!in.isEmpty()) {
-                out.push(in.pop());
-            }
-        }
     }
 
     public boolean empty() {
@@ -61,7 +62,6 @@ class MyQueue {
 
 ```java
 class MyStack {
-
     private Queue<Integer> queue;
 
     public MyStack() {
@@ -179,22 +179,27 @@ Input: [73, 74, 75, 71, 69, 72, 76, 73]
 Output: [1, 1, 4, 2, 1, 1, 0, 0]
 ```
 
+单调栈：
+
+* 时间复杂度O(n)，空间复杂度O(n)
+
 在遍历数组时用栈把数组中的数存起来，如果当前遍历的数比栈顶元素来的大，说明栈顶元素的下一个比它大的数就是当前元素。
 
 ```java
-public int[] dailyTemperatures(int[] temperatures) {
-    int n = temperatures.length;
-    int[] dist = new int[n];
-    Stack<Integer> indexs = new Stack<>();
-    for (int curIndex = 0; curIndex < n; curIndex++) {
-        while (!indexs.isEmpty() && temperatures[curIndex] > temperatures[indexs.peek()]) {
-            int preIndex = indexs.pop();
-            dist[preIndex] = curIndex - preIndex;
+    public int[] dailyTemperatures(int[] T) {
+        if (T == null || T.length == 0) return null;
+
+        int[] res = new int[T.length];
+        Stack<Integer> stack = new Stack<>();
+        for (int cur = 0; cur < T.length; cur++) {
+            while (!stack.isEmpty() && T[cur] > T[stack.peek()]) {
+                int pre = stack.pop();
+                res[pre] = cur - pre;
+            }
+            stack.add(cur);
         }
-        indexs.add(curIndex);
+        return res;
     }
-    return dist;
-}
 ```
 
 # 6. 下一个更大元素 II
