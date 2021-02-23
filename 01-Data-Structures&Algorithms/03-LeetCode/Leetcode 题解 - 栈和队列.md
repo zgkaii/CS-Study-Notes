@@ -1,12 +1,13 @@
-<!-- GFM-TOC -->
-* [1. 用栈实现队列](#1-用栈实现队列)
-* [2. 用队列实现栈](#2-用队列实现栈)
-* [3. 最小值栈](#3-最小值栈)
-* [4. 用栈实现括号匹配](#4-用栈实现括号匹配)
-* [5. 数组中元素与下一个比它大的元素之间的距离](#5-数组中元素与下一个比它大的元素之间的距离)
-* [6. 循环数组中比当前元素大的下一个元素](#6-循环数组中比当前元素大的下一个元素)
-<!-- GFM-TOC -->
+# 目录
 
+- [1. 用栈实现队列](#1-用栈实现队列)
+- [2. 用队列实现栈](#2-用队列实现栈)
+- [3. 最小值栈](#3-最小值栈)
+- [4. 有效的括号](#4-有效的括号)
+- [5. 每日温度](#5-每日温度)
+- [6. 下一个更大元素 II](#6-下一个更大元素-ii)
+- [7. 接雨水](#7-接雨水)
+- [8. 循环数组中比当前元素大的下一个元素](#8-循环数组中比当前元素大的下一个元素)
 
 # 1. 用栈实现队列
 
@@ -132,7 +133,7 @@ class MinStack {
 
 对于实现最小值队列问题，可以先将队列使用栈来实现，然后就将问题转换为最小值栈，这个问题出现在 编程之美：3.7。
 
-# 4. 用栈实现括号匹配
+# 4. 有效的括号
 
 20\. Valid Parentheses (Easy)
 
@@ -167,7 +168,7 @@ public boolean isValid(String s) {
 }
 ```
 
-# 5. 数组中元素与下一个比它大的元素之间的距离
+# 5. 每日温度
 
 739\. Daily Temperatures (Medium)
 
@@ -196,7 +197,7 @@ public int[] dailyTemperatures(int[] temperatures) {
 }
 ```
 
-# 6. 循环数组中比当前元素大的下一个元素
+# 6. 下一个更大元素 II
 
 503\. Next Greater Element II (Medium)
 
@@ -230,4 +231,18 @@ public int[] nextGreaterElements(int[] nums) {
     return next;
 }
 ```
+
+# 7. 接雨水
+
+42\. Trapping Rain Water (Hard）
+
+[Leetcode](https://leetcode.com/problems/trapping-rain-water/) / [力扣](https://leetcode-cn.com/problems/trapping-rain-water/)
+
+
+
+# 8. 循环数组中比当前元素大的下一个元素
+
+84\. Largest Rectangle in Histogram (Hard)
+
+[Leetcode](https://leetcode.com/problems/largest-rectangle-in-histogram/) / [力扣](https://leetcode-cn.com/problems/largest-rectangle-in-histogram/)
 
