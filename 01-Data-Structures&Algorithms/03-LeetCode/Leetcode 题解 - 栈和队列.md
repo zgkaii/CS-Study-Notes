@@ -218,18 +218,36 @@ Output: [1, 1, 4, 2, 1, 1, 0, 0]
 
 [Leetcode](https://leetcode.com/problems/largest-rectangle-in-histogram/) / [力扣](https://leetcode-cn.com/problems/largest-rectangle-in-histogram/)
 
+单调栈：
+
+* 时间复杂度O(n)，空间复杂度O(n)
+
 ```java
     public int largestRectangleArea(int[] h) {
-        int cur = 0, maxArea = 0, len = h.length;
+		// 维护一个单调栈，栈内存储数组下标，只有和h[left] > right = s.peek()时,才能确定left元素的右边界
+        // [2,1,5,6,2,3]
+        // left = 0  =>  stack:0  
+        // left = 1  =>  stack:null  height:2 width:1 => Area:1  stack:1
+		// left = 2  =>  										 stack:1,2
+        // left = 3  =>  										 stack:1,2,3
+        // left = 4  =>  stack:1,2   height:6 width:1 => Area:6  stack:1,2,4
+        // left = 5  =>  									     stack:1,2,4,5	  
+        // 							 height:3 width:1 => Area:3  stack:1,2,4
+        // 						     height:2 width:3 => Area:6  stack:1,2
+        // 							 height:5 width:2 => Area:10 stack:1
+        // 							 height:1 width:6 => Area:6  stack:null       
+        int len = h.length, left = 0, maxArea = 0;
         Stack<Integer> s = new Stack<>();
-
-        while (cur < len) {
-            while (!s.isEmpty() && h[cur] < h[s.peek()]) {
-                maxArea = Math.max(maxArea, h[s.pop()] * (cur - (s.isEmpty() ? 0 : s.peek() + 1)));
+        
+        while (left < len) {
+            while (!s.isEmpty() && h[left] < h[s.peek()]) {
+                // int height = h[s.pop()];
+                // int width = left - (s.isEmpty ? 0 : s.peek() + 1);
+                maxArea = Math.max(maxArea, h[s.pop()] * (left - (s.isEmpty() ? 0 : s.peek() + 1)));
             }
-            s.push(cur++);
+            s.push(left++);
         }
-
+        
         while (!s.isEmpty()) {
             maxArea = Math.max(maxArea, h[s.pop()] * (len - (s.isEmpty() ? 0 : s.peek() + 1)));
         }
@@ -248,7 +266,7 @@ Output: [1, 1, 4, 2, 1, 1, 0, 0]
 
 ```java
     public int trap(int[] h) {
-        // 1.暴力解法：双指针遍历(慢)
+        // 暴力解法：双指针遍历(慢)
         int rain = 0, len = h.length;
         for (int i = 1; i < len - 1; i++) {
             int maxLeft = 0, maxRight = 0;
@@ -298,19 +316,33 @@ Output: [1, 1, 4, 2, 1, 1, 0, 0]
 
 动态规划：
 
+* 时间复杂度O(n)，空间复杂度O(n)
+
 ```java
     public int trap(int[] height) {
-        if (height.length <= 2) return 0;
-        int res = 0, left = 1, right = height.length - 2;
-        int leftMax = height[0];
-        int rightMax = height[height.length - 1];
-        while (left <= right) {
-            if (leftMax <= rightMax) {
-                res += Math.max(0, leftMax - height[left]);
-                leftMax = Math.max(leftMax, height[left++]);
+        if (height == null || height.length == 0) return 0;
+        // leftMax 从左开始的最高柱,rightMax 从右边开始的最高柱
+        int res = 0, leftMax = Integer.MIN_VALUE, rightMax = Integer.MIN_VALUE;
+        // 双指针扫描数组
+        // leftMax和rightMax中间的柱都不影响当前位置可以捕获多少水
+        // [4,2,0,3,2,5]
+        // left:0 ,right:5  ,leftMax:4 ,rightMax:5, res:0 + 2
+        // left:1 ,right:5  ,leftMax:4 ,rightMax:5, res:0 + 2
+        // left:2 ,right:5  ,leftMax:4 ,rightMax:5, res:2 + 4
+        // left:3 ,right:5  ,leftMax:4 ,rightMax:5, res:6 + 1
+        // left:4 ,right:5  ,leftMax:4 ,rightMax:5, res:7 + 2
+        // left:5 ,right:5  ,leftMax:4 ,rightMax:5, res:9 + 0
+        for (int left = 0, right = height.length - 1; left <= right; ) {
+            leftMax = Math.max(leftMax, height[left]);
+            rightMax = Math.max(rightMax, height[right]);
+            // 木桶原理求得最小高度
+            if (leftMax < rightMax) {
+                // 注意减去当前位置的柱高度
+                res += leftMax - height[left];
+                left++;
             } else {
-                res += Math.max(0, rightMax - height[right]);
-                rightMax = Math.max(rightMax, height[right--]);
+                res += rightMax - height[right];
+                right--;
             }
         }
         return res;
