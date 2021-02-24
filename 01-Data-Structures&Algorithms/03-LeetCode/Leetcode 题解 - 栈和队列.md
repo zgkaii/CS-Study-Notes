@@ -97,41 +97,33 @@ class MyStack {
 [Leetcode](https://leetcode.com/problems/min-stack/description/) / [力扣](https://leetcode-cn.com/problems/min-stack/description/)
 
 ```java
-class MinStack {
-
-    private Stack<Integer> dataStack;
-    private Stack<Integer> minStack;
-    private int min;
-
-    public MinStack() {
-        dataStack = new Stack<>();
-        minStack = new Stack<>();
-        min = Integer.MAX_VALUE;
-    }
+public class MinStack {
+    int min = Integer.MAX_VALUE;
+    Stack<Integer> stack = new Stack<>();
 
     public void push(int x) {
-        dataStack.add(x);
-        min = Math.min(min, x);
-        minStack.add(min);
+        if (x <= min) {
+            stack.push(min);
+            min = x;
+        }
+        stack.push(x);
     }
 
     public void pop() {
-        dataStack.pop();
-        minStack.pop();
-        min = minStack.isEmpty() ? Integer.MAX_VALUE : minStack.peek();
+        if (stack.pop() == min) {
+            min = stack.pop();
+        }
     }
 
     public int top() {
-        return dataStack.peek();
+        return stack.peek();
     }
 
     public int getMin() {
-        return minStack.peek();
+        return min;
     }
 }
 ```
-
-对于实现最小值队列问题，可以先将队列使用栈来实现，然后就将问题转换为最小值栈，这个问题出现在 编程之美：3.7。
 
 # 4. 有效的括号
 
@@ -146,26 +138,19 @@ Output : true
 ```
 
 ```java
-public boolean isValid(String s) {
-    Stack<Character> stack = new Stack<>();
-    for (char c : s.toCharArray()) {
-        if (c == '(' || c == '{' || c == '[') {
-            stack.push(c);
-        } else {
-            if (stack.isEmpty()) {
-                return false;
-            }
-            char cStack = stack.pop();
-            boolean b1 = c == ')' && cStack != '(';
-            boolean b2 = c == ']' && cStack != '[';
-            boolean b3 = c == '}' && cStack != '{';
-            if (b1 || b2 || b3) {
+        Stack<Character> stack = new Stack<Character>();
+        for (char c : s.toCharArray()) {
+            if (c == '(') {
+                stack.push(')');
+            } else if (c == '{') {
+                stack.push('}');
+            } else if (c == '[') {
+                stack.push(']');
+            } else if (stack.isEmpty() || stack.pop() != c) {
                 return false;
             }
         }
-    }
-    return stack.isEmpty();
-}
+        return stack.isEmpty();
 ```
 
 # 5. 每日温度
@@ -208,46 +193,126 @@ Output: [1, 1, 4, 2, 1, 1, 0, 0]
 
 [Leetcode](https://leetcode.com/problems/next-greater-element-ii/description/) / [力扣](https://leetcode-cn.com/problems/next-greater-element-ii/description/)
 
-```text
-Input: [1,2,1]
-Output: [2,-1,2]
-Explanation: The first 1's next greater number is 2;
-The number 2 can't find next greater number;
-The second 1's next greater number needs to search circularly, which is also 2.
-```
-
 与 739. Daily Temperatures (Medium) 不同的是，数组是循环数组，并且最后要求的不是距离而是下一个元素。
 
 ```java
-public int[] nextGreaterElements(int[] nums) {
-    int n = nums.length;
-    int[] next = new int[n];
-    Arrays.fill(next, -1);
-    Stack<Integer> pre = new Stack<>();
-    for (int i = 0; i < n * 2; i++) {
-        int num = nums[i % n];
-        while (!pre.isEmpty() && nums[pre.peek()] < num) {
-            next[pre.pop()] = num;
+    public int[] nextGreaterElements(int[] nums) {
+        int N = nums.length;
+        int[] res = new int[N];
+        Arrays.fill(res, -1);
+        Stack<Integer> stack = new Stack<>();
+        for (int i = 0; i < N * 2; i++) {
+            int num = nums[i % N];
+            while (!stack.isEmpty() && nums[stack.peek()] < num) {
+                res[stack.pop()] = num;
+            }
+            if (i < N) stack.push(i % N);
         }
-        if (i < n){
-            pre.push(i);
-        }
+        return res;
     }
-    return next;
-}
 ```
 
-# 7. 接雨水
-
-42\. Trapping Rain Water (Hard）
-
-[Leetcode](https://leetcode.com/problems/trapping-rain-water/) / [力扣](https://leetcode-cn.com/problems/trapping-rain-water/)
-
-
-
-# 8. 循环数组中比当前元素大的下一个元素
+# 7. 柱状图中最大的矩形
 
 84\. Largest Rectangle in Histogram (Hard)
 
 [Leetcode](https://leetcode.com/problems/largest-rectangle-in-histogram/) / [力扣](https://leetcode-cn.com/problems/largest-rectangle-in-histogram/)
 
+```java
+    public int largestRectangleArea(int[] h) {
+        int cur = 0, maxArea = 0, len = h.length;
+        Stack<Integer> s = new Stack<>();
+
+        while (cur < len) {
+            while (!s.isEmpty() && h[cur] < h[s.peek()]) {
+                maxArea = Math.max(maxArea, h[s.pop()] * (cur - (s.isEmpty() ? 0 : s.peek() + 1)));
+            }
+            s.push(cur++);
+        }
+
+        while (!s.isEmpty()) {
+            maxArea = Math.max(maxArea, h[s.pop()] * (len - (s.isEmpty() ? 0 : s.peek() + 1)));
+        }
+        
+        return maxArea;
+    }
+```
+
+# 8. 接雨水
+
+42\. Trapping Rain Water (Hard）
+
+[Leetcode](https://leetcode.com/problems/trapping-rain-water/) / [力扣](https://leetcode-cn.com/problems/trapping-rain-water/)
+
+暴力解法：
+
+```java
+    public int trap(int[] h) {
+        // 1.暴力解法：双指针遍历(慢)
+        int rain = 0, len = h.length;
+        for (int i = 1; i < len - 1; i++) {
+            int maxLeft = 0, maxRight = 0;
+            // 查找h[i]左边界最大值
+            for (int k = i; k >= 0; k--) {
+                maxLeft = Math.max(maxLeft, h[k]);
+            }
+            // 查找h[i]右边界最大值
+            for (int j = i; j < len; j++) {
+                maxRight = Math.max(maxRight, h[j]);
+            }
+            rain += Math.min(maxLeft, maxRight) - h[i];
+        }
+        return rain;
+    }
+```
+
+单独递减栈：
+
+```java
+    public int trap(int[] height) {
+        if (height == null || height.length < 2) return 0;
+        // 维护一个单独递减栈
+        Stack<Integer> stack = new Stack<>();
+        int rain = 0, len = height.length;
+        for (int i = 0; i < len; i++) {
+            // 栈顶元素小于当前元素,弹栈;大于则将当前元素压栈
+            while (!stack.isEmpty() && height[stack.peek()] < height[i]) {
+                // 有多个相同数值，只留一个
+                int cur = stack.pop();
+                while (!stack.isEmpty() && height[stack.peek()] == height[cur]) {
+                    stack.pop();
+                }
+                // 计算雨水量
+                if (!stack.isEmpty()) {
+                    int top = stack.peek();
+                    // int w = i - top - 1;
+                    // int h = Math.min(height[top] - height[cur], height[i] - height[cur]);
+                    rain += Math.min(height[top] - height[cur], height[i] - height[cur]) * (i - top - 1);
+                }
+            }
+            stack.push(i);
+        }
+        return rain;
+    }
+```
+
+动态规划：
+
+```java
+    public int trap(int[] height) {
+        if (height.length <= 2) return 0;
+        int res = 0, left = 1, right = height.length - 2;
+        int leftMax = height[0];
+        int rightMax = height[height.length - 1];
+        while (left <= right) {
+            if (leftMax <= rightMax) {
+                res += Math.max(0, leftMax - height[left]);
+                leftMax = Math.max(leftMax, height[left++]);
+            } else {
+                res += Math.max(0, rightMax - height[right]);
+                rightMax = Math.max(rightMax, height[right--]);
+            }
+        }
+        return res;
+    }
+```
