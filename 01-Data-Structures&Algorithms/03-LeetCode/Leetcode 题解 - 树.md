@@ -50,8 +50,7 @@
 
 ```java
 public int maxDepth(TreeNode root) {
-    if (root == null) return 0;
-    return Math.max(maxDepth(root.left), maxDepth(root.right)) + 1;
+    return root == null ? 0 : Math.max(maxDepth(root.left), maxDepth(root.right)) + 1;
 }
 ```
 
@@ -61,15 +60,11 @@ public int maxDepth(TreeNode root) {
 
 [Leetcode](https://leetcode.com/problems/balanced-binary-tree/description/) / [力扣](https://leetcode-cn.com/problems/balanced-binary-tree/description/)
 
-```html
-    3
-   / \
-  9  20
-    /  \
-   15   7
-```
-
 平衡树左右子树高度差都小于等于 1
+
+自底向上递归：
+
+* Time O(n), Space O(n)
 
 ```java
 private boolean result = true;
