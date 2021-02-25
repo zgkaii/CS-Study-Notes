@@ -67,20 +67,21 @@ public int maxDepth(TreeNode root) {
 * Time O(n), Space O(n)
 
 ```java
-private boolean result = true;
+    public boolean isBalanced(TreeNode root) {
+        return height(root) != -1 ;
+    }
 
-public boolean isBalanced(TreeNode root) {
-    maxDepth(root);
-    return result;
-}
+    public int height(TreeNode node) {
+        if (node == null) return 0;
+        
+        int l = height(node.left);
+        if (l == -1) return -1;
+        int r = height(node.right);
+        if (r == -1) return -1;
 
-public int maxDepth(TreeNode root) {
-    if (root == null) return 0;
-    int l = maxDepth(root.left);
-    int r = maxDepth(root.right);
-    if (Math.abs(l - r) > 1) result = false;
-    return 1 + Math.max(l, r);
-}
+        if (l - r > 1 || l - r < -1) return -1;
+        return Math.max(l, r) + 1;
+    } 
 ```
 
 ## 3. 两节点的最长路径
@@ -89,33 +90,21 @@ public int maxDepth(TreeNode root) {
 
 [Leetcode](https://leetcode.com/problems/diameter-of-binary-tree/description/) / [力扣](https://leetcode-cn.com/problems/diameter-of-binary-tree/description/)
 
-```html
-Input:
-
-         1
-        / \
-       2  3
-      / \
-     4   5
-
-Return 3, which is the length of the path [4,2,1,3] or [5,2,1,3].
-```
-
 ```java
-private int max = 0;
+    private int max = 0;
+    
+    public int diameterOfBinaryTree(TreeNode root) {
+        depth(root);
+        return max;
+    }
 
-public int diameterOfBinaryTree(TreeNode root) {
-    depth(root);
-    return max;
-}
+    public int depth(TreeNode node) {
+        if (node == null) return 0;
+        int l = depth(node.left), r = depth(node.right);
+        max = Math.max(max, l + r);
 
-private int depth(TreeNode root) {
-    if (root == null) return 0;
-    int leftDepth = depth(root.left);
-    int rightDepth = depth(root.right);
-    max = Math.max(max, leftDepth + rightDepth);
-    return Math.max(leftDepth, rightDepth) + 1;
-}
+        return Math.max(l, r) + 1;
+    }
 ```
 
 ## 4. 翻转树
@@ -125,13 +114,15 @@ private int depth(TreeNode root) {
 [Leetcode](https://leetcode.com/problems/invert-binary-tree/description/) / [力扣](https://leetcode-cn.com/problems/invert-binary-tree/description/)
 
 ```java
-public TreeNode invertTree(TreeNode root) {
-    if (root == null) return null;
-    TreeNode left = root.left;  // 后面的操作会改变 left 指针，因此先保存下来
-    root.left = invertTree(root.right);
-    root.right = invertTree(left);
-    return root;
-}
+    public TreeNode invertTree(TreeNode root) {
+        if (root == null) return null;
+
+        TreeNode tmp = root.left;// 后面的操作会改变 left 指针，因此先保存下来
+        root.left = invertTree(root.right);
+        root.right = invertTree(tmp);
+
+        return root;
+    }
 ```
 
 ## 5. 归并两棵树
@@ -140,33 +131,18 @@ public TreeNode invertTree(TreeNode root) {
 
 [Leetcode](https://leetcode.com/problems/merge-two-binary-trees/description/) / [力扣](https://leetcode-cn.com/problems/merge-two-binary-trees/description/)
 
-```html
-Input:
-       Tree 1                     Tree 2
-          1                         2
-         / \                       / \
-        3   2                     1   3
-       /                           \   \
-      5                             4   7
-
-Output:
-         3
-        / \
-       4   5
-      / \   \
-     5   4   7
-```
-
 ```java
-public TreeNode mergeTrees(TreeNode t1, TreeNode t2) {
-    if (t1 == null && t2 == null) return null;
-    if (t1 == null) return t2;
-    if (t2 == null) return t1;
-    TreeNode root = new TreeNode(t1.val + t2.val);
-    root.left = mergeTrees(t1.left, t2.left);
-    root.right = mergeTrees(t1.right, t2.right);
-    return root;
-}
+    public TreeNode mergeTrees(TreeNode root1, TreeNode root2) {
+        if (root1 == null && root2 == null) return null;
+        if (root1 == null) return root2;
+        if (root2 == null) return root1;
+
+        TreeNode root = new TreeNode(root1.val + root2.val);
+        root.left = mergeTrees(root1.left, root2.left);
+        root.right = mergeTrees(root1.right, root2.right);
+
+        return root;
+    }
 ```
 
 ## 6. 判断路径和是否等于一个数
@@ -404,30 +380,52 @@ private int dfs(TreeNode root){
 }
 ```
 
-## 13. 间隔遍历
+## 13. 打家劫舍 III（间隔遍历）
 
 337\. House Robber III (Medium)
 
 [Leetcode](https://leetcode.com/problems/house-robber-iii/description/) / [力扣](https://leetcode-cn.com/problems/house-robber-iii/description/)
 
-```html
-     3
-    / \
-   2   3
-    \   \
-     3   1
-Maximum amount of money the thief can rob = 3 + 3 + 1 = 7.
-```
+暴力递归：
 
 ```java
-public int rob(TreeNode root) {
-    if (root == null) return 0;
-    int val1 = root.val;
-    if (root.left != null) val1 += rob(root.left.left) + rob(root.left.right);
-    if (root.right != null) val1 += rob(root.right.left) + rob(root.right.right);
-    int val2 = rob(root.left) + rob(root.right);
-    return Math.max(val1, val2);
-}
+    public int rob(TreeNode root) {
+        if (root == null) return 0;
+        
+        int val1 = root.val;
+        if (root.left != null) val1 += rob(root.left.left) + rob(root.left.right);
+        if (root.right != null) val1 += rob(root.right.left) + rob(root.right.right);
+        int val2 = rob(root.left) + rob(root.right);
+        return Math.max(val1, val2);
+    }
+```
+
+动态规划：
+
+* Time O(n), Space O(n)
+
+```java
+    public int rob(TreeNode root) {
+        // 当前节点偷，那么两子节点就不能选择偷;当前节点不偷，两子节点只需拿最多的钱(两个孩子节点偷不偷没关系)
+        // 偷:左孩子能偷到的钱 + 右孩子能偷到的钱
+        // 不偷：左孩子选择自己不偷时能得到的钱 + 右孩子选择不偷时能得到的钱 + 当前节点的钱数
+        // int[] res = new int[2] 0 代表不偷，1 代表偷
+        int[] res = dfs(root);
+        return Math.max(res[0], res[1]);
+    }
+
+    private int[] dfs(TreeNode root) {
+        if (root == null) return new int[2]{0, 0};
+
+        int[] left = dfs(root.left);
+        int[] right = dfs(root.right);
+        int[] res = new int[2];
+
+        res[0] = Math.max(left[0], left[1]) + Math.max(right[0], right[1]);
+        res[1] = root.val + left[0] + right[0];
+
+        return res;
+    }
 ```
 
 ## 14. 找出二叉树中第二小的节点
