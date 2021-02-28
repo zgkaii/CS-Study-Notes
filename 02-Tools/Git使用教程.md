@@ -305,6 +305,8 @@ $ git reflog
 $ git reset --hard <commit_id>
 ```
 
+> 详细请看：https://zhuanlan.zhihu.com/p/42929114
+
 ## 推荐
 
 **在线演示学习工具：**
