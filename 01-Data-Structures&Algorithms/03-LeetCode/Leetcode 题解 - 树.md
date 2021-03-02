@@ -1,4 +1,5 @@
 <!-- GFM-TOC -->
+
 * [递归](#递归)
     * [1. 树的高度](#1-树的高度)
     * [2. 平衡树](#2-平衡树)
@@ -403,58 +404,53 @@ private int dfs(TreeNode root){
 [Leetcode](https://leetcode.com/problems/average-of-levels-in-binary-tree/description/) / [力扣](https://leetcode-cn.com/problems/average-of-levels-in-binary-tree/description/)
 
 ```java
-public List<Double> averageOfLevels(TreeNode root) {
-    List<Double> ret = new ArrayList<>();
-    if (root == null) return ret;
-    Queue<TreeNode> queue = new LinkedList<>();
-    queue.add(root);
-    while (!queue.isEmpty()) {
-        int cnt = queue.size();
-        double sum = 0;
-        for (int i = 0; i < cnt; i++) {
-            TreeNode node = queue.poll();
-            sum += node.val;
-            if (node.left != null) queue.add(node.left);
-            if (node.right != null) queue.add(node.right);
+    public List<Double> averageOfLevels(TreeNode root) {
+        List<Double> res = new ArrayList<>();
+        if (root == null) return res;
+
+        // 保存上一层节点，先进先出，确保上一层节点比下一层节点先遍历
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+
+        // 队列为空，说明上层所有节点都没有叶子节点
+        while (!queue.isEmpty()) {
+            double sum = 0.0;
+            int size = queue.size();
+
+            for (int i = 0; i < size; i++) {
+                TreeNode node = queue.poll();
+                sum += node.val;
+                // 把下一层的所有非空节点加入队列
+                if (node.left != null) queue.add(node.left);
+                if (node.right != null) queue.add(node.right);
+            }
+            res.add(sum / size);
         }
-        ret.add(sum / cnt);
+        return res;
     }
-    return ret;
-}
 ```
 
 ## 2. 得到左下角的节点
 
-513\. Find Bottom Left Tree Value (Easy)
+513\. Find Bottom Left Tree Value (Medium)
 
 [Leetcode](https://leetcode.com/problems/find-bottom-left-tree-value/description/) / [力扣](https://leetcode-cn.com/problems/find-bottom-left-tree-value/description/)
 
-```html
-Input:
-
-        1
-       / \
-      2   3
-     /   / \
-    4   5   6
-       /
-      7
-
-Output:
-7
-```
-
 ```java
-public int findBottomLeftValue(TreeNode root) {
-    Queue<TreeNode> queue = new LinkedList<>();
-    queue.add(root);
-    while (!queue.isEmpty()) {
-        root = queue.poll();
-        if (root.right != null) queue.add(root.right);
-        if (root.left != null) queue.add(root.left);
+    public int findBottomLeftValue(TreeNode root) {
+        if (root.left == null && root.right == null) return root.val;
+
+        // 广度优先遍历
+        LinkedList<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+        while (!queue.isEmpty()) {
+            root = queue.poll();
+            // 先右后左
+            if (root.right != null) queue.add(root.right);
+            if (root.left != null) queue.add(root.left);
+        }
+        return root.val;
     }
-    return root.val;
-}
 ```
 
 # 前中后序遍历
