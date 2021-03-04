@@ -574,6 +574,39 @@ public List<Integer> inorderTraversal(TreeNode root) {
 }
 ```
 
+## 4. BFS实现二叉树的层序遍历
+
+102\. Binary Tree Level Order Traversal (Medium)
+
+[Leetcode](https://leetcode.com/problems/binary-tree-level-order-traversal/) / [力扣](https://leetcode-cn.com/problems/binary-tree-level-order-traversal/)
+
+```java
+    public List<List<Integer>> levelOrder(TreeNode root) {
+        List<List<Integer>> res = new ArrayList<>();
+        if (root == null) return res;
+
+        LinkedList<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+        while (queue.size() > 0) {
+            int size = queue.size();
+            ArrayList<Integer> level = new ArrayList<>();
+
+            for (int i = 0; i < size; ++i) {
+                TreeNode node = queue.poll();
+                level.add(node.val);
+                if (node.left != null) {
+                    queue.add(node.left);
+                }
+                if (node.right != null) {
+                    queue.add(node.right);
+                }
+            }
+            res.add(level);
+        }
+        return res;
+    }
+```
+
 # BST
 
 二叉查找树（BST）：根节点大于等于左子树所有节点，小于等于右子树所有节点。
@@ -767,18 +800,18 @@ public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
 [Leetcode](https://leetcode.com/problems/convert-sorted-array-to-binary-search-tree/description/) / [力扣](https://leetcode-cn.com/problems/convert-sorted-array-to-binary-search-tree/description/)
 
 ```java
-public TreeNode sortedArrayToBST(int[] nums) {
-    return toBST(nums, 0, nums.length - 1);
-}
+    public TreeNode sortedArrayToBST(int[] nums) {
+        return toBST(nums, 0, nums.length - 1);
+    }
 
-private TreeNode toBST(int[] nums, int sIdx, int eIdx){
-    if (sIdx > eIdx) return null;
-    int mIdx = (sIdx + eIdx) / 2;
-    TreeNode root = new TreeNode(nums[mIdx]);
-    root.left =  toBST(nums, sIdx, mIdx - 1);
-    root.right = toBST(nums, mIdx + 1, eIdx);
-    return root;
-}
+    private TreeNode toBST(int[] nums, int lo, int hi){
+        if (lo > hi) return null;
+        int mid = lo + hi >>> 1;
+        TreeNode root = new TreeNode(nums[mid]);
+        root.left =  toBST(nums, lo, mid - 1);
+        root.right = toBST(nums, mid + 1, hi);
+        return root;
+    }
 ```
 
 ## 7. 根据有序链表构造平衡的二叉查找树
