@@ -20,35 +20,37 @@ Output : [0, 2]
 ```
 
 ```java
-public List<Integer> diffWaysToCompute(String input) {
-    List<Integer> ways = new ArrayList<>();
-    for (int i = 0; i < input.length(); i++) {
-        char c = input.charAt(i);
-        if (c == '+' || c == '-' || c == '*') {
-            List<Integer> left = diffWaysToCompute(input.substring(0, i));
-            List<Integer> right = diffWaysToCompute(input.substring(i + 1));
-            for (int l : left) {
-                for (int r : right) {
-                    switch (c) {
-                        case '+':
-                            ways.add(l + r);
-                            break;
-                        case '-':
-                            ways.add(l - r);
-                            break;
-                        case '*':
-                            ways.add(l * r);
-                            break;
+    Map<String, List<Integer>> map = new HashMap<>();
+
+    public List<Integer> diffWaysToCompute(String input) {
+        if (map.containsKey(input)) return map.get(input);
+        List<Integer> res = new LinkedList<>();
+        for (int i = 0; i < input.length(); i++) {
+            char ch = input.charAt(i);
+            if (ch == '-' || ch == '*' || ch == '+') {
+                // 分解子问题 （1）2*3-4与5（2）2*3与4*5（3）2与3-4*5
+                String part1 = input.substring(0, i);
+                String part2 = input.substring(i + 1);
+                // 进一步分解子问题，直到不能分解 （1.1）2*3与4 （1.2）2与3-4 ...
+                List<Integer> leftPart = diffWaysToCompute(input.substring(0, i));
+                List<Integer> rightPart = diffWaysToCompute(input.substring(0, i));
+                // 组合计算
+                for (Integer l : leftPart) {
+                    for (Integer r : rightPart) {
+                        if(ch == '+') 
+                            res.add(l + r);
+                        if(ch == '-')
+                            res.add(l - r);
+                        if(ch == '*')
+                            res.add(l * r);    
                     }
                 }
             }
         }
+        if (res.isEmpty()) res.add(Integer.valueOf(input));
+        map.put(input, res); // 添加映射以减少进行重复计算的时间
+        return res;
     }
-    if (ways.size() == 0) {
-        ways.add(Integer.valueOf(input));
-    }
-    return ways;
-}
 ```
 
 # 2. 不同的二叉搜索树
