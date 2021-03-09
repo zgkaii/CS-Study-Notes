@@ -110,3 +110,100 @@ private List<TreeNode> generateSubtrees(int s, int e) {
     return res;
 }
 ```
+
+# 3.数组中的逆序对
+
+[[剑指 Offer 51. 数组中的逆序对](https://leetcode-cn.com/problems/shu-zu-zhong-de-ni-xu-dui-lcof/)](https://leetcode-cn.com/problems/shu-zu-zhong-de-ni-xu-dui-lcof/)
+
+在数组中的两个数字，如果前面一个数字大于后面的数字，则这两个数字组成一个逆序对。输入一个数组，求出这个数组中的逆序对的总数。
+
+```java
+    public int reversePairs(int[] nums) {
+        if (nums.length < 2) 
+            return 0;
+        int[] tmp = new int[nums.length];// 临时数组用于归并
+        return mergeSort(nums, tmp, 0, nums.length - 1);
+    }
+
+    public int mergeSort(int[] nums, int[] tmp, int left, int right) {
+        // 终止条件,子数组长度为1，停止划分
+        if (left >= right) 
+            return 0;
+        // 递归划分左子数组与右子数组
+        int mid = left + right >>> 1;
+        int res = mergeSort(nums, tmp, left, mid) + mergeSort(nums, tmp, mid + 1, right);
+        //  合并阶段 idx为临时数组的移动指针
+        int i = left, j = mid + 1, idx = left, count = 0;
+        // 左右两数组都还剩有数字未排序时
+        while (i <= mid && j <= right) {
+            if (nums[i] > nums[j]) {
+                tmp[idx++] = nums[j];
+                count = j - mid; // 统计j->mid 之间，比nums[i]小的元素个数
+                j++;
+            } else {
+                tmp[idx++] = nums[i];
+                res += count;
+                i++;
+            }
+        }
+        // 左右两数组有一边已经移动完毕，剩下另一边可进行快速移动
+        while (i <= mid) {
+            tmp[idx++] = nums[i];
+            res += count;
+            i++;
+        }
+        
+        while (j <= right) 
+            tmp[idx++] = nums[j++];
+
+        // 将tep中的数还原回原nums中
+        for (int k = left; k <= right; ++k)
+            nums[k] = tmp[k];
+        
+        return res;
+    }
+```
+
+更好理解的写法：
+
+```java
+    public int reversePairs(int[] nums) {
+        if (nums == null || nums.length < 2)
+            return 0;
+        int[] tmp = new int[nums.length];// 临时数组用于归并
+        return mergeSort(nums, tmp, 0, nums.length - 1);
+    }
+ 
+    public int mergeSort(int[] nums, int[] tmp, int left, int right) {
+        if (left == right) // 终止条件,子数组长度为1，停止划分
+            return 0;
+        int mid = left + (right - left >>> 1);
+        // 递归划分左子数组与右子数组
+        return mergeSort(nums, tmp, left, mid) 
+            + mergeSort(nums, tmp, mid + 1, right) 
+            + mergeCross(nums, tmp, left, mid, right);
+    }
+	// 合并阶段
+    public int mergeCross(int[] nums, int[] tmp, int left, int mid, int right) {
+        // pos待归并数组的起始位置
+        int pos = 0, i = left, j = mid + 1, res = 0;
+		// 左右两个子区间都未遍历完
+        while (i <= mid && j <= right) {
+            res += nums[i] <= nums[j] ? 0 : mid - i + 1;
+            tmp[pos++] = nums[i] <= nums[j] ? nums[i++] : nums[j++];
+        }
+        // 左半部分元素有剩余
+        while (i <= mid)
+            tmp[pos++] = nums[i++];
+		// 右半部分元素有剩余
+        while (j <= right) 
+            tmp[pos++] = nums[j++];
+        // 用临时数组tmp赋值回numsk
+        for (int k = left; k <= right; k++) {
+            nums[k] = tmp[i - left];
+        }
+        return res;
+    }
+```
+
+> 时间复杂度：O(nlog n)，空间复杂度：O(n)
