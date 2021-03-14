@@ -123,7 +123,7 @@ hello World!!
 mkdir $GOPATH/src/golang.org/x/
 
 # 下载源码
-go get -d github.com/golang/tools
+go get -d github.com/golang/tools //timeout的话可以设置代理：go env -w GOPROXY=https://goproxy.cn
 
 # copy 
 cp $GOPATH/src/github.com/golang/tools $GOPATH/src/golang.org/x/ -rf
