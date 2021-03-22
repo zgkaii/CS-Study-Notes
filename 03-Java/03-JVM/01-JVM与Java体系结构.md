@@ -3,19 +3,22 @@
 随着Java以及Java社区的不断壮大，Java也早已不再是简简单单的一门计算机语言了，它更是一个平台、一种文化、一个社区。
 
 - 作为一个平台，Java虚拟机扮演着举足轻重的作用
+  
   - Groovy、Scala、JRuby、Kotlin等都是Java平台的一部分。
+  
 - 作为一种文化，Java几乎成为了“开源”的代名词。
   - 第三方开源软件和框架。如Tomcat、Struts，MyBatis，Spring等。
   - 就连JDK和JVM自身也有不少开源的实现，如openJDK、Harmony。
+  
 - 作为一个社区
   * Java拥有全世界最多的技术拥护者和开源社区支持，有数不清的论坛和资料。
   * 应用广泛，从桌面应用软件、嵌入式开发到企业级应用、后台服务器、中间件，都可以看到Java的身影。
-
-![](https://img-blog.csdnimg.cn/20201005161011148.png)
+  
+  <div align="center"> <img src="..\..\images\jvm\runanywhere.png" width="600px"></div>
 
 每个语言都需要转换成字节码文件，最后转换的字节码文件都能通过Java虚拟机进行运行和处理。
 
-<img src="https://img-blog.csdnimg.cn/20201005161126652.png" style="zoom:67%;" />
+<div align="center"> <img src="..\..\images\jvm\20201005161126652.png" width="600px"></div>
 
 随着Java7的正式发布，Java虚拟机的设计者们通过JSR-292规范基本实现在Java虚拟机平台上运行非Java语言编写的程序。
 
@@ -23,7 +26,7 @@ Java虚拟机根本不关心运行在其内部的程序到底是使用何种编�
 
 **字节码**
 
-我们平时说的java字节码，指的是用java语言编译成的字节码。准确的说任何能在jvm平台上执行的字节码格式都是一样的。所以应该统称为：**jvm字节码**。
+我们平时说的java字节码（Java bytecode），指的是用java语言编译成的字节码。准确的说任何能在jvm平台上执行的字节码格式都是一样的。所以应该统称为：**jvm字节码**。
 
 不同的编译器，可以编译出相同的字节码文件，字节码文件也可以在不同的JVM上运行。
 
@@ -37,20 +40,18 @@ Java平台上的多语言混合编程正成为主流，通过特定领域的语�
 
 对这些运行于Java虚拟机之上Java之外的语言，来自系统级的、底层的支持正在迅速增强，以JSR-292为核心的一系列项目和功能改进（如Da Vinci Machine项目、Nashorn引擎、InvokeDynamic指令、java.lang.invoke包等），推动Java虚拟机从“Java语言的虚拟机”向 “多语言虚拟机”的方向发展。
 
-## 二、虚拟机与Java虚拟机
+## 二、Java虚拟机体系结构
 
-### 2.1 虚拟机
+### 2.1 虚拟机与Java虚拟机
 
-虚拟机（Virtual Machine），就是一台虚拟的计算机。它是一款软件，用来执行一系列虚拟计算机指令。大体上，虚拟机可以分为**系统虚拟机**和**程序虚拟机**。
+**虚拟机**（Virtual Machine），就是一台虚拟的计算机。它是一款软件，用来执行一系列虚拟计算机指令。大体上，虚拟机可以分为**系统虚拟机**和**程序虚拟机**。
 
 - 大名鼎鼎的Visual Box，Mware就属于系统虚拟机，它们完全是对物理计算机的仿真，提供了一个可运行完整操作系统的软件平台。
 - 程序虚拟机的典型代表就是Java虚拟机，它专门为执行单个计算机程序而设计，在Java虚拟机中执行的指令我们称为Java字节码指令。
 
 无论是系统虚拟机还是程序虚拟机，在上面运行的软件都被限制于虚拟机提供的资源中。
 
-### 2.2 Java虚拟机
-
-Java虚拟机是一台执行Java字节码的虚拟计算机，它拥有独立的运行机制，其运行的Java字节码也未必由Java语言编译而成。
+**Java虚拟机**（Java Virtual Machine）是一台执行Java字节码的虚拟计算机，它拥有独立的运行机制，其运行的Java字节码也未必由Java语言编译而成。
 
 JVM平台的各种语言可以共享Java虚拟机带来的**跨平台性、优秀的垃圾回器，以及可靠的即时编译器**。
 
@@ -64,46 +65,48 @@ Java虚拟机就是二进制字节码的运行环境，负责装载字节码到�
 - 自动内存管理
 - 自动垃圾回收功能
 
-### 2.3 JVM的位置
+### 2.2 JVM体系结构
 
 JVM是运行在操作系统之上的，它与硬件没有直接的交互。
 
-<img src="https://img-blog.csdnimg.cn/20201005164955443.png" style="zoom:67%;" />
+**JDK**（Java Development Kit） 是用于开发Java应用程序的软件工具集合，主要包括了Java运行时环境（JRE）和一些Java开发工具（例如解释器`java.exe`、编译器`javac.exe`、打包工具`jar.exe`、文档生成器`javadoc.exe`等）。
 
-Java的体系结构：
+**JRE**（Java Runtime Environmet）提供Java应用程序执行时所需的环境，由Java虚拟机（JVM）、核心类（lib）及支持文件组成。
 
-<img src="https://img-blog.csdnimg.cn/20201005202622207.png" style="zoom:80%;" />
+**JVM**（Java Virtual Machine）就即所谓的Java虚拟机，它的主要工作是解释Java 程序生成的字节码文件（`xxx.class`）并将其映射到本地的CPU的指令集或OS的系统调用中。Java语言之所以能跨平台运行，是因为不同的操作系统使用不同的JVM映射规则，让其与操作系统无关，完成了跨平台性。
 
-**JDK——Java Development ToolKit（Java开发工具包）**是整个JAVA的核心，包括了Java运行环境（Java Runtime Envirnment），一堆Java工具和Java基础的类库。
+* Java虚拟机根本不关心运行在其内部的程序到底是使用何种编程语言编写的，它只关心**“字节码”文件**。也就是说Java虚拟机拥有语言无关性，并不会单纯地与Java语言“终身绑定”，**只要其他编程语言的编译结果满足并包含Java虚拟机的内部指令集、符号表以及其他的辅助信息，它就是一个有效的字节码文件，就能够被虚拟机所识别并装载运行**（例如Kotlin、Groovy等语言）。
 
-最主流的JDK是Sun公司发布的JDK，除了Sun之外，还有很多公司和组织都开发了属于自己的JDK，例如国外IBM公司开发了属于自己的JDK，国内淘宝也开发了属于自己的JDK，各个组织开发自己的JDK都是为了在某些方面得到一些提高，以适应自己的需求。
- JDK有以下三种版本：
+**三者之间关系**：`JDK > JRE > JVM`。
 
-- J2SE，standard edition，标准版，是通常用的一个版本。
-- J2EE，enterpsise edition，企业版，使用这种JDK开发J2EE应用程序。
-- J2ME，micro edition，主要用于移动设备、嵌入式设备上的Java应用程序。
+```html
+JDK = JRE + tools
+JRE = JVM + libraries
+```
 
-**JRE——Java Runtime Enviromental（Java运行时环境）**，也就是我们说的Java平台，所有的Java程序都要在JRE下才能运行。包括JVM和Java核心类库和支持文件。与JDK相比，它不包含开发工具：编译器、调试器和其他工具。
+<div align="center"> <img src="..\..\images\jvm\jvm.image" width="600px"> </div>
 
-**JVM——Java Virtual Mechinal（JAVA虚拟机）**。JVM是JRE的一部分，它是一个虚构出来的计算机，是通过在实际的计算机上仿真模拟各种计算机功能来实现的。JVM有自己完善的硬件架构，如处理器、堆栈、寄存器等，还具有相应的指令系统。JVM的主要工作是解释自己的质量集（即字节码）并映射到本地的CPU的指令集或OS的系统调用。Java语言是跨平台运行的，其实就是不同的操作系统，使用不同的JVM映射规则，让其与操作系统无关，完成了跨平台性。JVM对上层的Java源文件是不关心的，它关注的只是由源文件生成的类文件。类文件的组成包括JVM指令集，符合表以及一些补助信息。
+> 注意：jdk 9版本后就不存在jre了。
 
-### 2.4 JVM整体结构
+HotSpot VM是目前市面上高性能虚拟机的代表作之一，它采用解释器与即时编译器并存的架构。
 
-- HotSpot VM是目前市面上高性能虚拟机的代表作之一。
-- 它采用解释器与即时编译器并存的架构。
-- 在今天，Java程序的运行性能早已脱胎换骨，已经达到了可以和C/C++程序一较高下的地步。
+JVM主要被分为三个子系统：
 
-<img src="https://img-blog.csdnimg.cn/20201005165116595.png" style="zoom:67%;" />
+* 类加载器子系统
+* 运行时数据区
+* 执行引擎
 
-执行引擎包含三部分：解释器，及时编译器，垃圾回收器。
+不同jdk版本JVM体系结构也有略微差别：
 
-### 2.5 Java代码执行流程
+* jdk7 之前版本
 
-<img src="https://img-blog.csdnimg.cn/20201005165116576.png" style="zoom:80%;" />
+<div align="center"> <img src="..\..\images\jvm\JVM体系结构-jdk7.png" width="800px"> </div>
 
-只是能生成被Java虚拟机所能解释的字节码文件，那么理论上就可以自己设计一套代码了
+* jdk8 之后版本
 
-### 2.6 JVM的架构模型
+<div align="center"> <img src="..\..\images\jvm\JVM体系结构-jdk8.png" width="800px"> </div>
+
+### 2.4 JVM的架构模型
 
 Java编译器输入的指令流基本上是一种**基于栈**的指令集架构，另外一种指令集架构则是**基于寄存器**的指令集架构。
 
