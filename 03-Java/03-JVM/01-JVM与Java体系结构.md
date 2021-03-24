@@ -1,6 +1,6 @@
 # 一、Java生态圈
 
-Java 是一种面向对象、静态类型、编译执行， 有 VM/GC 和运行时、跨平台的高级语言。
+Java 是一种**面向对象、静态类型、编译执行， 有 VM/GC 和运行时、跨平台**的高级语言。
 
 随着Java以及Java社区的不断壮大，Java也早已不再是简简单单的一门计算机语言了，它更是一个平台、一种文化、一个社区。
 
@@ -18,9 +18,9 @@ Java 是一种面向对象、静态类型、编译执行， 有 VM/GC 和运行�
   
   <div align="center"> <img src="..\..\images\jvm\runanywhere.png" width="600px"></div>
 
-每个语言都需要转换成字节码文件，最后转换的字节码文件都能通过Java虚拟机进行运行和处理。
+不管那类编程语言，只要能转换成Java字节码文件，那么都能通过Java虚拟机进行运行和处理。
 
-<div align="center"> <img src="..\..\images\jvm\20201005161126652.png" width="600px"></div>
+<div align="center"> <img src="..\..\images\jvm\20201005161126652.png" width="500px"></div>
 
 随着Java7的正式发布，Java虚拟机的设计者们通过JSR-292规范基本实现在Java虚拟机平台上运行非Java语言编写的程序。
 
@@ -57,7 +57,9 @@ Java平台上的多语言混合编程正成为主流，通过特定领域的语�
 
 JVM平台的各种语言可以共享Java虚拟机带来的**跨平台性、优秀的垃圾回器，以及可靠的即时编译器**。
 
-Java技术的核心就是Java虚拟机（JVM，Java Virtual Machine），因为所有的Java程序都运行在Java虚拟机内部。Java虚拟机就是二进制字节码的运行环境，负责装载字节码到其内部，解释/编译为对应平台上的机器指令执行。每一条Java指令，Java虚拟机规范中都有详细定义，如怎么取操作数，怎么处理操作数，处理结果放在哪里。
+Java技术的核心就是Java虚拟机（JVM，Java Virtual Machine）。Java虚拟机就是二进制字节码的运行环境，负责装载字节码到其内部，解释/编译为对应平台上的机器指令执行。每一条Java指令，Java虚拟机规范中都有详细定义，如怎么取操作数，怎么处理操作数，处理结果放在哪里。
+
+Java虚拟机的特点是：
 
 - 一次编译，到处运行
 - 自动内存管理
@@ -84,25 +86,19 @@ JRE = JVM + libraries
 
 > 注意：jdk 9版本后就不存在jre了。
 
-HotSpot VM是目前市面上高性能虚拟机的代表作之一，它采用解释器与即时编译器并存的架构。
+JVM主要被分为三个子系统：**类加载器子系统、运行时数据区与执行引擎**。
 
-JVM主要被分为三个子系统：
+不同jdk版本JVM体系结构也有略微差别。
 
-* 类加载器子系统
-* 运行时数据区
-* 执行引擎
-
-不同jdk版本JVM体系结构也有略微差别：
-
-* jdk7 之前版本
+在**jdk7**版本之前：
 
 <div align="center"> <img src="..\..\images\jvm\JVM体系结构-jdk7.png" width="800px"> </div>
 
-* jdk8 之后版本
+而在**jdk8** 之后版本之后：
 
 <div align="center"> <img src="..\..\images\jvm\JVM体系结构-jdk8.png" width="800px"> </div>
 
-> [The Structure of the Java Virtual Machine](https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-2.html))
+> 详细可参考官方文档：[The Structure of the Java Virtual Machine](https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-2.html)
 
 ## 2.3 JVM指令架构模型
 
