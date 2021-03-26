@@ -1,3 +1,20 @@
+- [一、Java生态圈](#一java生态圈)
+- [二、Java虚拟机](#二java虚拟机)
+  - [2.1 虚拟机与Java虚拟机](#21-虚拟机与java虚拟机)
+  - [2.2 JVM体系结构](#22-jvm体系结构)
+  - [2.3 JVM指令架构模型](#23-jvm指令架构模型)
+  - [2.4 JVM生命周期](#24-jvm生命周期)
+- [三、JVM虚拟机分类](#三jvm虚拟机分类)
+  - [3.1 HotSpot VM](#31-hotspot-vm)
+  - [3.2 JRockit](#32-jrockit)
+  - [3.3 IBM的J9](#33-ibm的j9)
+  - [3.4 Azul VM](#34-azul-vm)
+  - [3.5 KVM和CDC / CLDC  Hotspot](#35-kvm和cdc--cldc--hotspot)
+  - [3.6 Sun Classic VM](#36-sun-classic-vm)
+  - [3.7 Apache Marmony](#37-apache-marmony)
+  - [3.8 Taobao VM](#38-taobao-vm)
+  - [3.9 Dalvik VM](#39-dalvik-vm)
+  - [3.10 Graal VM](#310-graal-vm)
 # 一、Java生态圈
 
 Java 是一种**面向对象、静态类型、编译执行， 有 VM/GC 和运行时、跨平台**的高级语言。

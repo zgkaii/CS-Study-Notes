@@ -1,3 +1,20 @@
+- [前言](#前言)
+- [1. BIO (Blocking I/O)](#1-bio-blocking-io)
+  - [1.1 传统 BIO](#11-传统-bio)
+  - [1.2 伪异步 IO](#12-伪异步-io)
+  - [1.3 代码示例](#13-代码示例)
+  - [1.4 总结](#14-总结)
+- [2. NIO (New I/O)](#2-nio-new-io)
+  - [2.1 NIO 简介](#21-nio-简介)
+  - [2.2 NIO与BIO的区别](#22-nio与bio的区别)
+    - [2.2.1 Non-blocking IO（非阻塞IO）](#221-non-blocking-io非阻塞io)
+    - [2.2.2 Buffer（缓冲区）](#222-buffer缓冲区)
+    - [2.2.3 Channel (通道)](#223-channel-通道)
+    - [2.2.4 Selector (选择器)](#224-selector-选择器)
+  - [2.3 代码示例](#23-代码示例)
+- [3. AIO (Asynchronous I/O)](#3-aio-asynchronous-io)
+- [4. BIO、NIO、AIO适用场景](#4-bionioaio适用场景)
+- [学习资料](#学习资料)
 ## 前言
 
 Java 中的 BIO、NIO和 AIO 理解为是 Java 语言对操作系统的各种 IO 模型的封装。程序员在使用这些 API 的时候，不需要关心操作系统层面的知识，也不需要根据不同操作系统编写不同的代码，只需要使用Java的API即可。

@@ -1,7 +1,27 @@
-大家好，我是 Guide 哥，前段答应读者的 **Spring 事务**分析总结终于来了。这部分内容比较重要，不论是对于工作还是面试，但是网上比较好的参考资料比较少。
-
-如果本文有任何不对或者需要完善的地方，请帮忙指出！Guide 哥感激不尽！
-
+- [1. 什么是事务？](#1-什么是事务)
+- [2. 事物的特性（ACID）了解么?](#2-事物的特性acid了解么)
+- [3. 详谈 Spring 对事务的支持](#3-详谈-spring-对事务的支持)
+  - [3.1. Spring 支持两种方式的事务管理](#31-spring-支持两种方式的事务管理)
+    - [1).编程式事务管理](#1编程式事务管理)
+    - [2)声明式事务管理](#2声明式事务管理)
+  - [3.2. Spring 事务管理接口介绍](#32-spring-事务管理接口介绍)
+    - [3.2.1. PlatformTransactionManager:事务管理接口](#321-platformtransactionmanager事务管理接口)
+    - [3.2.2. TransactionDefinition:事务属性](#322-transactiondefinition事务属性)
+    - [3.2.3. TransactionStatus:事务状态](#323-transactionstatus事务状态)
+  - [3.3. 事务属性详解](#33-事务属性详解)
+    - [3.3.1. 事务传播行为](#331-事务传播行为)
+    - [3.3.2 事务隔离级别](#332-事务隔离级别)
+    - [3.3.3. 事务超时属性](#333-事务超时属性)
+    - [3.3.3. 事务只读属性](#333-事务只读属性)
+    - [3.3.4. 事务回滚规则](#334-事务回滚规则)
+  - [3.4. @Transactional 注解使用详解](#34-transactional-注解使用详解)
+    - [1) `@Transactional` 的作用范围](#1-transactional-的作用范围)
+    - [2) `@Transactional` 的常用配置参数](#2-transactional-的常用配置参数)
+    - [3)`@Transactional` 事务注解原理](#3transactional-事务注解原理)
+    - [4)Spring AOP 自调用问题](#4spring-aop-自调用问题)
+    - [5) `@Transactional` 的使用注意事项总结](#5-transactional-的使用注意事项总结)
+- [4. Reference](#4-reference)
+> 文字来源：JavaGuide
 ## 1. 什么是事务？
 
 **事务是逻辑上的一组操作，要么都执行，要么都不执行。**

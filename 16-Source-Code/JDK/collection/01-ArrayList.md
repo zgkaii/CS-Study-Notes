@@ -1,3 +1,16 @@
+- [1. ArrayList简介](#1-arraylist简介)
+- [2. ArrayList源码简析（JDK 1.8）](#2-arraylist源码简析jdk-18)
+  - [2.1 成员属性](#21-成员属性)
+  - [2.2 构造方法](#22-构造方法)
+  - [2.3 添加元素](#23-添加元素)
+  - [2.4 删除元素](#24-删除元素)
+  - [2.5 ArrayList扩容机制](#25-arraylist扩容机制)
+    - [2.5.1 `ensureCapacityInternal()` 和 `ensureExplicitCapacity()`](#251-ensurecapacityinternal-和-ensureexplicitcapacity)
+    - [2.5.2 `grow()`](#252-grow)
+  - [2.6 `ensureCapacity`](#26-ensurecapacity)
+- [3 遍历](#3-遍历)
+- [4 fail-fast机制](#4-fail-fast机制)
+- [参考](#参考)
 ## 1. ArrayList简介
 
 `java.util.ArrayList` 是一个**数组队列**，相当于 **动态数组**。与J数组相比，它具有**容量能动态增长、元素增删慢、查找快**的特点。
