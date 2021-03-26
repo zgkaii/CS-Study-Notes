@@ -1,3 +1,19 @@
+- [1 问题引出](#1-问题引出)
+- [2 ConcurrentHashMap结构](#2-concurrenthashmap结构)
+  - [2.1 JDK1.7](#21-jdk17)
+  - [2.2 JDK1.8](#22-jdk18)
+- [3 源码分析](#3-源码分析)
+  - [3.1 ConcurrentHashMap(JDK1.7)](#31-concurrenthashmapjdk17)
+    - [3.1.1 初始化](#311-初始化)
+    - [3.1.2 put](#312-put)
+    - [3.1.3 扩容 rehash](#313-扩容-rehash)
+    - [3.1.4 get](#314-get)
+  - [3.2 ConcurrentHashMap(JDK1.8)](#32-concurrenthashmapjdk18)
+    - [3.2.1 初始化 initTable](#321-初始化-inittable)
+    - [3.2.2 put](#322-put)
+    - [3.2.3 get](#323-get)
+  - [4 总结](#4-总结)
+- [参考](#参考)
 ## 1 问题引出
 
 HashMap不是线程安全的，在并发情况下可能会造成Race Condition，形成环形链表从而导致死循环（可参考[JAVA HASHMAP的死循环](https://coolshell.cn/articles/9606.html)一文）。在并发场景下要保证线程安全可以使用 `Collections.synchronizedMap()` 方法来包装HashMap。

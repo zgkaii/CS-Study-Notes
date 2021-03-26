@@ -1,3 +1,13 @@
+- [1 LinkedList简介](#1-linkedlist简介)
+- [2 成员属性](#2-成员属性)
+- [3 构造方法](#3-构造方法)
+- [4 常用方法](#4-常用方法)
+  - [4.1 添加元素](#41-添加元素)
+  - [4.2 查找元素](#42-查找元素)
+  - [4.3 删除元素](#43-删除元素)
+  - [4.4 修改元素](#44-修改元素)
+- [5 ArrayList与LinkedList异同](#5-arraylist与linkedlist异同)
+- [参考](#参考)
 ## 1 LinkedList简介
 
 `LinkedList`是一个实现了<font color="red">List接口</font>和<font color="red">Deque接口</font>的<font color="red">双端链表</font>。

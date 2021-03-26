@@ -1,3 +1,8 @@
+- [1、下载解压](#1下载解压)
+- [2、配置环境变量](#2配置环境变量)
+- [3、验证](#3验证)
+- [4、配置settings文件找到conf文件夹中的settings.xml文件](#4配置settings文件找到conf文件夹中的settingsxml文件)
+- [5、IDEA中Maven的设置](#5idea中maven的设置)
 ##### 1、下载解压
 点击[下载地址](https://maven.apache.org/download.cgi)， 下载 apache-maven-3.6.3-bin.zip 并解压。
 

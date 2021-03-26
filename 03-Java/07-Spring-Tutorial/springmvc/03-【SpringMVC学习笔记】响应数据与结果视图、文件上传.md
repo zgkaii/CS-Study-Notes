@@ -1,4 +1,24 @@
 
+- [响应数据与结果视图](#响应数据与结果视图)
+    - [一、返回值分类](#一返回值分类)
+        - [1.字符串](#1字符串)
+        - [2.void](#2void)
+        - [3.ModelAndView](#3modelandview)
+    - [二、转发和重定向](#二转发和重定向)
+        - [1.请求转发转发](#1请求转发转发)
+        - [2.重定向](#2重定向)
+    - [三、json数据交互](#三json数据交互)
+      - [1.JSON概述](#1json概述)
+      - [2.@ResponseBody响应json数据](#2responsebody响应json数据)
+        - [mvc:resources标签配置不过滤](#mvcresources标签配置不过滤)
+        - [使用@RequestBody获取请求体数据](#使用requestbody获取请求体数据)
+        - [使用@RequestBody注解把json的字符串转换成JavaBean的对象](#使用requestbody注解把json的字符串转换成javabean的对象)
+        - [使用@ResponseBody注解把JavaBean对象转换成json字符串](#使用responsebody注解把javabean对象转换成json字符串)
+    - [四、文件上传](#四文件上传)
+        - [1.传统文件上传](#1传统文件上传)
+        - [2. SpringMVC文件上传](#2-springmvc文件上传)
+        - [3. SpringMVC跨服务器方式文件上传](#3-springmvc跨服务器方式文件上传)
+    - [参考资料](#参考资料)
 # 响应数据与结果视图
 
 ### 一、返回值分类

@@ -1,3 +1,11 @@
+- [1 相关概念](#1-相关概念)
+- [2 REST 接口规范](#2-rest-接口规范)
+  - [2.1 动作](#21-动作)
+  - [2.2 路径（接口命名）](#22-路径接口命名)
+  - [2.3 过滤信息（Filtering）](#23-过滤信息filtering)
+  - [2.4 状态码（Status Codes）](#24-状态码status-codes)
+- [3 HATEOAS](#3-hateoas)
+- [文章推荐](#文章推荐)
 # 1 相关概念
 
 REST，即 **Representational State Transfer** 的缩写，意为"表现层状态转化"，它是由Roy Fielding于2000年在[论文](https://www.ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm)中首次提出。实际上REST的全称是 **Resource Representational State Transfe** ，也就是 **“资源”在网络传输中以某种“表现形式”进行“状态转移”** 。这样的解释理解起来仍然比较晦涩，这三个关键词的含义到底是指什么呢？

@@ -1,3 +1,22 @@
+- [1 HashMap简介](#1-hashmap简介)
+- [2 底层数据结构](#2-底层数据结构)
+  - [2.1 JDK1.7](#21-jdk17)
+  - [2.2 JDK1.8](#22-jdk18)
+- [3 HashMap源码分析（JDK 1.8）](#3-hashmap源码分析jdk-18)
+  - [3.1 静态属性](#31-静态属性)
+  - [3.2 成员属性](#32-成员属性)
+  - [3.3 构造方法](#33-构造方法)
+  - [3.4 tableSizeFor(int cap)方法](#34-tablesizeforint-cap方法)
+  - [3.4 确定数组索引位置](#34-确定数组索引位置)
+    - [3.4.1 hash(Object)](#341-hashobject)
+    - [3.4.2 桶下标计算公式](#342-桶下标计算公式)
+  - [3.5 put(K,V)](#35-putkv)
+  - [3.6 resize()](#36-resize)
+  - [3.7 get(Object)](#37-getobject)
+  - [3.8 treeifyBin(Node<K,V>[] tab, int hash)](#38-treeifybinnodekv-tab-int-hash)
+  - [3.9 treeify(Node<K,V>[])](#39-treeifynodekv)
+- [4 遍历方式](#4-遍历方式)
+- [参考](#参考)
 ## 1 HashMap简介
 HashMap 是一个散列表，它存储的内容是键值对(key-value)映射。它继承了AbstractMap，实现了Map、Cloneable、`java.io.Serializable`接口。
 

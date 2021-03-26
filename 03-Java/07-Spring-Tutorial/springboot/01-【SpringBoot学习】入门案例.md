@@ -1,3 +1,18 @@
+- [一、Spring Boot 简介](#一spring-boot-简介)
+- [二、入门案例：HelloWorld](#二入门案例helloworld)
+  - [2.1 创建maven工程](#21-创建maven工程)
+  - [2.2 引入starter](#22-引入starter)
+  - [2.3 编写主程序](#23-编写主程序)
+  - [2.4 编写Controller](#24-编写controller)
+  - [2.5 运行主程序](#25-运行主程序)
+  - [2.6 简化部署](#26-简化部署)
+- [三、Hello World案例分析](#三hello-world案例分析)
+  - [3.1 POM文件](#31-pom文件)
+    - [（1）父项目](#1父项目)
+    - [（2）场景启动器](#2场景启动器)
+  - [3.2 主程序类](#32-主程序类)
+    - [(1) @SpringBootConfiguration](#1-springbootconfiguration)
+    - [(2) @EnableAutoConfiguration](#2-enableautoconfiguration)
 ## 一、Spring Boot 简介
 
 J2EE的开发略显笨重，配置繁多、 部署流程复杂、第三方技术集成难度大，都很大程度上降低了开发效率。SpringBoot应运而生，SpringBoot简化了Spring应用开发，整合了Spring技术栈， 去繁从简，just run就能创建一个独立的、产品级别的应用，为J2EE开发提供了一站式解决方案。
