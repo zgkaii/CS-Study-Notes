@@ -101,7 +101,7 @@ JRE = JVM + libraries
 
 <div align="center"> <img src="..\..\images\jvm\jvm.image" width="600px"> </div>
 
-> 注意：jdk 9版本后就不存在jre了。
+> 注意：jdk 9版本后就不存在jre文件夹了。
 
 JVM主要被分为三个子系统：**类加载器子系统、运行时数据区与执行引擎**。
 
