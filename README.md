@@ -59,7 +59,6 @@ CS-Notes-Kz
 |    └── 其他
 ├── Python
 ├── Golang
-├── C
 ├── 前端
 |    ├── 前端基础
 |    |    ├── HTML
