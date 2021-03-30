@@ -178,7 +178,7 @@ Java 8及之后堆内存逻辑上分为三部分：新生代+养老区+**元空�
 | Young Generation Space                    | Tenure generation space | Meta Space |
 | Young/New（又被划分为Eden区和Survivor区） | Old/Tenure              | Meta       |
 
-> 疑问，元空间逻辑上属于堆吗？？
+> 疑问，元空间逻辑上属于堆吗？？不属于
 
 ## 3.5 方法区
 
