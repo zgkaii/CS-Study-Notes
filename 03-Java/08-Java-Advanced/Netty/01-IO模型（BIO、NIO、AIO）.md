@@ -1,8 +1,10 @@
 # 一、IO模型分类
 
-首先明确两个概念：**用户空间和内核空间**
+首先明确两个概念：**用户空间和内核空间**。
 
-操作系统的核心是内核，它独立于普通的应用程序，可以访问受保护的内核空间，也有访问底层硬件设备的所有权限。为了保护内核的安全，现在操作系统一般都强制用户进程不能直接操作内核，所以操作系统把内存空间划分成了两个部分：内核空间和用户空间。
+操作系统的核心是内核(kernel)，它独立于普通的应用程序，可以访问受保护的内存空间，也有访问底层硬件设备的所有权限。为了保证内核的安全，现在的操作系统一般都强制用户进程不能直接操作内核。具体的实现方式基本都是由操作系统将虚拟地址空间划分为两部分，一部分为内核空间，另一部分为用户空间。
+
+其实所有的系统资源管理都是在内核空间中完成的。比如读写磁盘文件，分配回收内存，从网络接口读写数据等等。我们的应用程序是无法直接进行这样的操作的。但是我们可以通过内核提供的接口来完成这样的任务。
 
 所以，当我们使用 TCP 发送数据的时候，需要先将数据从用户空间拷贝到内核空间，再由内核操作将数据从内核空间发送出去；当我们使用 TCP 读取数据的时候，数据先在内核空间准备好，再从内核空间拷贝到用户空间供用户进程使用。
 
@@ -14,10 +16,10 @@
 
 所以，一次 IO 的读取操作分为两个阶段（写入操作类似）：
 
-- 等待内核空间数据准备
+- 等待内核空间准备数据
 - 数据从内核空间拷贝到用户空间
 
-为此，Unix 根据这两个阶段又把 IO 分成了以下五种 IO 模型：
+在这基础之上，Unix 把 IO 分成了以下五种 IO 模型：
 
 - 阻塞型 IO
 - 非阻塞型 IO
@@ -27,27 +29,27 @@
 
 ## 1.1 阻塞型 IO
 
-阻塞型 IO，即当用户进程发起请求时，一直阻塞直到数据拷贝到用户空间为止才返回（两个阶段都）。
+阻塞型 IO，即当用户进程发起请求时，一直阻塞直到数据拷贝到用户空间为止才返回（两个阶段都阻塞）。
 
-应该注意到，在阻塞的过程中，其它应用进程还可以执行，因此阻塞不意味着整个操作系统都被阻塞。因为其它应用进程还可以执行，所以不消耗 CPU 时间，这种模型的 CPU 利用率会比较高。
+在阻塞的过程中，其它应用进程还可以执行，因此阻塞不意味着整个操作系统都被阻塞。因为其它应用进程还可以执行，所以不消耗 CPU 时间，这种模型的 CPU 利用率会比较高。
 
  <div align="center"> <img src="..\..\..\images\nio\阻塞式IO.png" width="1000px"></div>
 
 ## 1.2 非阻塞型 IO
 
-和阻塞 IO 类比，内核会立即返回，返回后 获得足够的 CPU 时间继续做其它的事情。 用户进程第一个阶段不是阻塞的,需要不断的主动询问 kernel 数据好了没有（轮询`polling`）；第二个阶段依然总是阻塞的。
+和阻塞 IO 类比，无论内核空间数据是否准备好，非阻塞型 IO内核都会立即返回，返回后获得足够的 CPU 时间继续做其它的事情。 用户进程第一个阶段不是阻塞的，需要不断的主动询问 kernel 数据好了没有（轮询`polling`）；第二个阶段依然总是阻塞的。
 
 由于 CPU 要处理更多的系统调用，因此这种模型的 CPU 利用率比较低。
 
  <div align="center"> <img src="..\..\..\images\nio\非阻塞式IO.png" width="1000px"></div>
 
-## 1.3 I/O 复用
+## 1.3 I/O 多路复用
+
+IO 多路复用(IO multiplexing)，也称事件驱动 IO(event-driven IO)，就是在单个线程里同时监控多个套接字，通过 select 或 poll 轮询所负责的所有 socket，当某个 socket 有数据到达了，就通知用户进程。
 
  <div align="center"> <img src="..\..\..\images\nio\复用IO.png" width="1000px"></div>
 
-IO 多路复用(IO multiplexing)，也称事件驱动 IO(event-driven IO)，就是在单个线	程里同时监控多个套接字，通过 select 或 poll 轮询所负责的所有 socket，当某个 socket 有数据到达了，就通知用户进程。
-
-IO 复用同非阻塞 IO 本质一样，不过利用 了新的 select 系统调用，由内核来负责本 来是请求进程该做的轮询操作。看似比非 阻塞 IO 还多了一个系统调用开销，不过 因为可以支持多路 IO，才算提高了效率。
+IO 复用同非阻塞 IO 本质一样，不过利用 了新的 select 系统调用，由内核来负责本 来是请求进程该做的轮询操作。看似比非阻塞 IO 还多了一个系统调用开销，不过因为可以支持多路 IO，才算提高了效率。
 
 进程先是阻塞在 select/poll 上，再是阻塞在读操作的第二个阶段上。
 
@@ -55,23 +57,25 @@ IO 复用同非阻塞 IO 本质一样，不过利用 了新的 select 系统调�
 
 select/poll 的几大缺点：
 
-（1）每次调用 select，都需要把 fd 集合从用户态拷贝到 内核态，这个开销在 fd 很多时会很大 
+（1）每次调用 select，都需要把 `fd` 集合从用户态拷贝到 内核态，这个开销在 `fd` 很多时会很大 。
 
-（2）同时每次调用 select 都需要在内核遍历传递进来的 所有 fd，这个开销在 fd 很多时也很大 
+（2）同时每次调用 select 都需要在内核遍历传递进来的 所有 `fd`，这个开销在 `fd` 很多时也很大 。
 
-（3）select 支持的文件描述符数量太小了，默认是1024 
+（3）select 支持的文件描述符数量太小了，默认是1024 。
 
 > epoll（Linux 2.5.44内核中引入，2.6内核正式引入，可被用 于代替 POSIX select 和 poll 系统调用）： 
 >
-> （1）内核与用户空间共享一块内存 
+> （1）内核与用户空间共享一块内存。 
 >
-> （2）通过回调解决遍历问题 
+> （2）通过回调解决遍历问题 。
 >
-> （3）fd 没有限制，可以支撑10万连接
+> （3）`fd` 没有限制，可以支撑10万连接。
 
 ## 1.4 信号驱动 I/O
 
-信号驱动 IO 与 BIO 和 NIO 最大的区别就在 于，在 IO 执行的数据准备阶段，不需要轮询。 如图所示：当用户进程需要等待数据的时候 ，会向内核发送一个信号，告诉内核我要什么数据，然后用户进程就继续做别的事情去 了，而当内核中的数据准备好之后，内核立 马发给用户进程一个信号，说”数据准备好 了，快来查收“，用户进程收到信号之后， 立马调用 recvfrom，去查收数据。
+信号驱动 IO 与 BIO 和 NIO 最大的区别就在 于，在 IO 执行的数据准备阶段，不需要轮询。 
+
+当用户进程需要等待数据的时候 ，会向内核发送一个信号，告诉内核我要什么数据，然后用户进程就继续做别的事情去 了，而当内核中的数据准备好之后，内核立马发给用户进程一个信号，说”数据准备好 了，快来查收“，用户进程收到信号之后， 立马调用 recvfrom，去查收数据。
 
 相比于非阻塞式I/O的轮询方式，信号驱动 I/O 的CPU利用率更高。
 
@@ -79,7 +83,7 @@ select/poll 的几大缺点：
 
 ## 1.5 异步 I/O
 
-异步 IO 真正实现了 IO 全流程的非阻塞。 用户进程发出系统调用后立即返回，内核 等待数据准备完成，然后将数据拷贝到用 户进程缓冲区，然后发送信号告诉用户进 程 IO 操作执行完毕（与 SIGIO 相比，一 个是发送信号告诉用户进程数据准备完毕， 一个是 IO执行完毕）。
+异步 IO 真正实现了 IO 全流程的非阻塞。 用户进程发出系统调用后立即返回，内核等待数据准备完成，然后将数据拷贝到用 户进程缓冲区，然后发送信号告诉用户进 程 IO 操作执行完毕（与 SIGIO 相比，一 个是发送信号告诉用户进程数据准备完毕， 一个是 IO执行完毕）。
 
  <div align="center"> <img src="..\..\..\images\nio\异步IO.png" width="600px"></div>
 
@@ -148,9 +152,9 @@ BIO通信（一请求一应答）模型图如下：
 
 伪异步IO模型图：
 
-![伪异步IO模型图](https://my-blog-to-use.oss-cn-beijing.aliyuncs.com/3.png)
+<img src="https://my-blog-to-use.oss-cn-beijing.aliyuncs.com/3.png" alt="伪异步IO模型图" style="zoom:80%;" />
 
-采用线程池和任务队列可以实现一种叫做伪异步的 I/O 通信框架，它的模型图如上图所示。当有新的客户端接入时，将客户端的 Socket 封装成一个Task（该任务实现java.lang.Runnable接口）投递到后端的线程池中进行处理，JDK 的线程池维护一个消息队列和 N 个活跃线程，对消息队列中的任务进行处理。由于线程池可以设置消息队列的大小和最大线程数，因此，它的资源占用是可控的，无论多少个客户端并发访问，都不会导致资源的耗尽和宕机。
+采用线程池和任务队列可以实现一种叫做伪异步的 I/O 通信框架，它的模型图如上图所示。当有新的客户端接入时，将客户端的 Socket 封装成一个Task（该任务实现`java.lang.Runnable`接口）投递到后端的线程池中进行处理，JDK 的线程池维护一个消息队列和 N 个活跃线程，对消息队列中的任务进行处理。由于线程池可以设置消息队列的大小和最大线程数，因此，它的资源占用是可控的，无论多少个客户端并发访问，都不会导致资源的耗尽和宕机。
 
 伪异步I/O通信框架采用了线程池实现，因此避免了为每个请求都创建一个独立线程造成的线程资源耗尽问题。不过因为它的底层仍然是同步阻塞的BIO模型，因此无法从根本上解决问题。
 
@@ -219,7 +223,7 @@ public class IOServer {
 }
 ```
 
-### 1.4 总结
+**小结**
 
 在活动连接数不是特别高（小于单机1000）的情况下，这种模型是比较不错的，可以让每一个连接专注于自己的 I/O 并且编程模型简单，也不用过多考虑系统的过载、限流等问题。线程池本身就是一个天然的漏斗，可以缓冲一些系统处理不了的连接或请求。但是，当面对十万甚至百万级连接的时候，传统的 BIO 模型是无能为力的。因此，我们需要一种更高效的 I/O 处理模型来应对更高的并发量。
 
@@ -227,11 +231,11 @@ public class IOServer {
 
 ### 2.2.1 NIO 简介
 
-NIO是一种**同步非阻塞**的I/O模型，在Java 1.4 中引入了 NIO 框架，对应 java.nio 包，**主要有 Channel（通道） , Selector（选择器），Buffer（缓冲区）三大核心组件**（整个NIO体系包含的类远远不止这三个，只能说这三个是NIO体系的“核心API”）。
+NIO是一种**同步非阻塞**的多路复用 IO模型，在Java 1.4 中引入了 NIO 框架，对应 `java.nio` 包，**主要有 Channel（通道） , Selector（选择器），Buffer（缓冲区）三大核心组件**（整个NIO体系包含的类远远不止这三个，只能说这三个是NIO体系的“核心API”）。
 
 NIO中的N可以理解为**Non-blocking**，不单纯是New。它支持面向缓冲的，基于通道的I/O操作方法。 NIO提供了与传统BIO模型中的 `Socket` 和 `ServerSocket` 相对应的 `SocketChannel` 和 `ServerSocketChannel` 两种不同的套接字通道实现，两种通道都支持阻塞和非阻塞两种模式。阻塞模式使用就像传统中的支持一样，比较简单，但是性能和可靠性都不好；非阻塞模式正好与之相反。对于低负载、低并发的应用程序，可以使用同步阻塞I/O来提升开发速率和更好的维护性；对于高负载、高并发的（网络）应用，应使用 NIO 的非阻塞模式来开发。
 
-![](https://img-blog.csdnimg.cn/20210109215128592.png)
+<img src="https://img-blog.csdnimg.cn/20210109215128592.png" style="zoom:80%;" />
 
 通常来说，NIO中的所有读数据或写数据都是从 Channel（通道） 开始的。
 
@@ -240,13 +244,13 @@ NIO中的N可以理解为**Non-blocking**，不单纯是New。它支持面向缓
 
 数据读取和写入操作图示：
 
-![](https://img-blog.csdnimg.cn/2021010921561582.png)
+<img src="https://img-blog.csdnimg.cn/2021010921561582.png" style="zoom:80%;" />
 
 ### 2.2.2 NIO与BIO的区别
 
-如果是在面试中回答这个问题，我觉得首先肯定要从 NIO 流是非阻塞 IO 而 IO 流是阻塞 IO 说起。然后，可以从 NIO 的3个核心组件/特性为 NIO 带来的一些改进来分析。
+如果是在面试中回答这个问题，我觉得首先肯定要从 NIO 流是非阻塞 IO 而 BIO是阻塞 IO 说起。然后，可以从 NIO 的3个核心组件/特性为 NIO 带来的一些改进来分析。
 
-#### （1）Non-blocking IO（非阻塞IO）
+#### （1）Non-blocking（非阻塞）
 
 **BIO流是阻塞的，NIO流是不阻塞的。**
 
@@ -274,7 +278,7 @@ Buffer 中有几个重要的成员属性：
 
 值得注意的是，在不同模式下，limit和position属性的值是不同的：
 
-![](https://img-blog.csdnimg.cn/20210109223454134.png)
+<img src="https://img-blog.csdnimg.cn/20210109223454134.png" style="zoom: 67%;" />
 
 写模式下，**所谓写模式就是将缓存区中的内容写入通道**。position 代表下一个字节应该被写出去的字节在缓存区中的位置，limit 表示最后一个待写字节在缓存区的位置。
 
@@ -317,95 +321,74 @@ Selector 是 Java NIO 的一个组件，Selector 是一个多路复用器。它�
 
 ### 2.2.3 代码示例
 
-客户端 IOClient.java 的代码不变，我们对服务端使用 NIO 进行改造。
+客户端 `IOClient.java`的代码不变，我们对服务端使用 NIO 进行改造。
 
 ```java
-public class NIOServer {
+public class NIOEchoServer {
     public static void main(String[] args) throws IOException {
-        // 1. serverSelector负责轮询是否有新的连接，服务端监测到新的连接之后，不再创建一个新的线程，
-        // 而是直接将新连接绑定到clientSelector上，这样就不用 IO 模型中 1w 个 while 循环在死等
-        Selector serverSelector = Selector.open();
-        // 2. clientSelector负责轮询连接是否有数据可读
-        Selector clientSelector = Selector.open();
+        // 创建一个Selector
+        Selector selector = Selector.open();
+        // 创建ServerSocketChannel
+        ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
+        // 绑定6666端口
+        serverSocketChannel.bind(new InetSocketAddress(6666));
+        // 设置为非阻塞模式
+        serverSocketChannel.configureBlocking(false);
+        // 将Channel注册到selector上，并注册Accept事件
+        serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
+        System.out.println("server start");
 
-        new Thread(() -> {
-            try {
-                // 对应IO编程中服务端启动
-                ServerSocketChannel listenerChannel = ServerSocketChannel.open();
-                listenerChannel.socket().bind(new InetSocketAddress(6666));
-                // 调整通道为非阻塞模式
-                listenerChannel.configureBlocking(false);
-                //向选择器注册一个通道
-                // int OP_READ = 1 << 0;
-                // int OP_WRITE = 1 << 2;
-                // int OP_CONNECT = 1 << 3;
-                // int OP_ACCEPT = 1 << 4;
-                listenerChannel.register(serverSelector, SelectionKey.OP_ACCEPT);
+        while (true) {
+            // 阻塞在select上（第一阶段阻塞）
+            selector.select();
+            // 如果使用的是select(timeout)或selectNow()需要判断返回值是否大于0
 
-                while (true) {
-                    // 监测是否有新的连接，这里的1指的是阻塞的时间为 1ms
-                    if (serverSelector.select(1) > 0) {
-                        Set<SelectionKey> set = serverSelector.selectedKeys();
-                        Iterator<SelectionKey> keyIterator = set.iterator();
+            // 有就绪的Channel
+            Set<SelectionKey> selectionKeys = selector.selectedKeys();
+            // 遍历selectKeys
+            Iterator<SelectionKey> iterator = selectionKeys.iterator();
+            while (iterator.hasNext()) {
+                SelectionKey selectionKey = iterator.next();
+                // 如果是accept事件
+                if (selectionKey.isAcceptable()) {
+                    // 强制转换为ServerSocketChannel
+                    ServerSocketChannel ssc = (ServerSocketChannel) selectionKey.channel();
+                    SocketChannel socketChannel = ssc.accept();
+                    System.out.println("accept new conn: " + socketChannel.getRemoteAddress());
+                    socketChannel.configureBlocking(false);
+                    // 将SocketChannel注册到Selector上，并注册读事件
+                    socketChannel.register(selector, SelectionKey.OP_READ);
+                } else if (selectionKey.isReadable()) {
+                    // 如果是读取事件
+                    // 强制转换为SocketChannel
+                    SocketChannel socketChannel = (SocketChannel) selectionKey.channel();
+                    // 创建Buffer用于读取数据
+                    ByteBuffer buffer = ByteBuffer.allocate(1024);
+                    // 将数据读入到buffer中（第二阶段阻塞）
+                    int length = socketChannel.read(buffer);
+                    if (length > 0) {
+                        buffer.flip();
+                        byte[] bytes = new byte[buffer.remaining()];
+                        // 将数据读入到byte数组中
+                        buffer.get(bytes);
 
-                        while (keyIterator.hasNext()) {
-                            SelectionKey key = keyIterator.next();
-
-                            if (key.isAcceptable()) {
-                                try {
-                                    // (1) 每来一个新连接，不需要创建一个线程，而是直接注册到clientSelector
-                                    SocketChannel clientChannel = ((ServerSocketChannel) key.channel()).accept();
-                                    clientChannel.configureBlocking(false);
-                                    clientChannel.register(clientSelector, SelectionKey.OP_READ);
-                                } finally {
-                                    keyIterator.remove();
-                                }
-                            }
-                        }
+                        // 换行符会跟着消息一起传过来
+                        String content = new String(bytes, "UTF-8").replace("\r\n", "");
+                        System.out.println("receive msg: " + content);
                     }
                 }
-            } catch (IOException ignored) {
+                iterator.remove();
             }
-        }).start();
-
-        new Thread(() -> {
-            try {
-                while (true) {
-                    // (2) 批量轮询是否有哪些连接有数据可读，这里的1指的是阻塞的时间为 1ms
-                    if (clientSelector.select(1) > 0) {
-                        Set<SelectionKey> set = clientSelector.selectedKeys();
-                        Iterator<SelectionKey> keyIterator = set.iterator();
-
-                        while (keyIterator.hasNext()) {
-                            SelectionKey key = keyIterator.next();
-
-                            if (key.isReadable()) {
-                                try {
-                                    SocketChannel clientChannel = (SocketChannel) key.channel();
-                                    ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
-                                    // (3) 面向 Buffer
-                                    clientChannel.read(byteBuffer);
-                                    byteBuffer.flip();
-                                    System.out.println(
-                                            Charset.defaultCharset().newDecoder().decode(byteBuffer).toString());
-                                } finally {
-                                    keyIterator.remove();
-                                    key.interestOps(SelectionKey.OP_READ);
-                                }
-                            }
-                        }
-                    }
-                }
-            } catch (IOException ignored) {
-            }
-        }).start();
+        }
     }
 }
 ```
 
-为什么大家都不愿意用 JDK 原生 NIO 进行开发呢？从上面的代码中大家都可以看出来，是真的难用！除了编程复杂、编程模型难之外，它还有以下让人诟病的问题：
+首先，我们创建了一个 Selector，充当 IO 多路复用中的选择器；其次，我们启动了一个 ServerSocketChannel，并设置其为非阻塞模式，与 BIO 中的 ServerSocket 类似，是服务端进程。再次，我们把 ServerSocketChannel 注册到 Selector 上；然后通过`while(true)`让Selector 轮询下去，每次轮询结束完会拿到一系列 Key，这些 Key 叫作 SelectionKey，每个 SelectionKey 里面都绑定了一个数据准备好了的 Channel，通过这个 Channel 我们就可以去取数据了。最后，遍历这些 SelectionKey，取出其中的 Channel，再根据不同的事件类型用 Channel 去读取数据并打印出来。
 
-- JDK 的 NIO 底层由 epoll 实现，该实现饱受诟病的空轮询 bug 会导致 cpu 飙升 100%
+为什么大家都不愿意用 JDK 原生 NIO 进行开发呢？从上面的代码中大家都可以看出来，除了编程复杂、编程模型难之外，它还有以下让人诟病的问题：
+
+- JDK 的 NIO 底层由 epoll 实现，该实现饱受诟病的空轮询 bug 会导致 cpu 飙升 100%。
 - 项目庞大之后，自行实现的 NIO 很容易出现各类 bug，维护成本较高。
 
 **Netty** 的出现很大程度上改善了 JDK 原生 NIO 所存在的一些让人难以忍受的问题。
@@ -416,7 +399,66 @@ AIO 也就是 NIO 2。在 Java 7 中引入了 NIO 的改进版 NIO 2,它是异�
 
 AIO 是异步IO的缩写，虽然 NIO 在网络操作中，提供了非阻塞的方法，但是 NIO 的 IO 行为还是同步的。对于 NIO 来说，我们的业务线程是在 IO 操作准备好时，得到通知，接着就由这个线程自行进行 IO 操作，IO操作本身是同步的。（除了 AIO 其他的 IO 类型都是同步的，这一点可以从底层IO线程模型解释，推荐一篇文章：[《漫话：如何给女朋友解释什么是Linux的五种IO模型？》](https://mp.weixin.qq.com/s?__biz=Mzg3MjA4MTExMw==&mid=2247484746&amp;idx=1&amp;sn=c0a7f9129d780786cabfcac0a8aa6bb7&source=41#wechat_redirect) ）
 
-查阅网上相关资料，我发现就目前来说 AIO 的应用还不是很广泛，Netty 之前也尝试使用过 AIO，不过又放弃了。
+还是以上面代码为例，客户端 `IOClient.java`的代码不变，我们对服务端使用 AIO 进行改造。
+
+```java
+public class AIOEchoServer {
+    public static void main(String[] args) throws IOException {
+        // 启动服务端
+        AsynchronousServerSocketChannel serverSocketChannel = AsynchronousServerSocketChannel.open();
+        serverSocketChannel.bind(new InetSocketAddress(6666));
+
+        System.out.println("server start");
+
+        // 监听accept事件，完全异步，不会阻塞
+        serverSocketChannel.accept(null, new CompletionHandler<AsynchronousSocketChannel, Object>() {
+            @Override
+            public void completed(AsynchronousSocketChannel socketChannel, Object attachment) {
+                try {
+                    System.out.println("accept new conn: " + socketChannel.getRemoteAddress());
+                    // 再次监听accept事件
+                    serverSocketChannel.accept(null, this);
+
+                    // 消息的处理
+                    while (true) {
+                        ByteBuffer buffer = ByteBuffer.allocate(1024);
+                        // 将数据读入到buffer中
+                        Future<Integer> future = socketChannel.read(buffer);
+                        if (future.get() > 0) {
+                            buffer.flip();
+                            byte[] bytes = new byte[buffer.remaining()];
+                            // 将数据读入到byte数组中
+                            buffer.get(bytes);
+
+                            String content = new String(bytes, "UTF-8");
+                            // 换行符会当成另一条消息传过来
+                            if (content.equals("\r\n")) {
+                                continue;
+                            }
+                            System.out.println("receive msg: " + content);
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void failed(Throwable exc, Object attachment) {
+                System.out.println("failed");
+            }
+        });
+        // 阻塞住主线程
+        System.in.read();
+    }
+}
+```
+
+首先，我们启动了一个 AsynchronousServerSocketChannel，它与 BIO 中的 ServerSocket 和 NIO 中的 ServerSocketChannel 类似，是一个服务端进程；然后，我们通过 accept () 方法监听客户端连接，用法跟 BIO 和 NIO 都一样，但是，这个 accept () 执行方式完全不一样了，BIO 中的 accept () 是完全阻塞当前线程的，NIO 中的 accept () 是通过 Accept 事件来实现的，而 AIO 中的 accept () 是完全异步的，执行了这个方法之后会立即执行后续的代码，不会停留在 accept () 这一行，所以，在 main () 方法的最后需要加一行阻塞代码，否则 main () 方法执行完毕，进程就结束了。
+
+最后，在 accept () 方法的回调方法 complete () 中处理数据，这里的数据已经经历过数据准备和从内核空间拷贝到用户空间两个阶段了，到达用户空间是真正可用的数据，而不像 BIO 和 NIO 那样还要自己去阻塞着把数据从内核空间拷贝到用户空间再使用。
+
+从效率上来看，AIO 无疑是最高的，然而，遗憾地是，目前作为广大服务器使用的系统 linux 对 AIO 的支持还不完善，导致 AIO 的应用还不是很广泛，Netty 之前也尝试使用过 AIO，不过又放弃了。
 
 ## 2.4. BIO、NIO、AIO适用场景
 
@@ -427,11 +469,11 @@ AIO 是异步IO的缩写，虽然 NIO 在网络操作中，提供了非阻塞的
 | 可靠性   | 差       | 好                     | 好         |
 | 吞吐量   | 低       | 高                     | 高         |
 
-* BIO方式适用于**连接数目比较小且固定**的架构，这种方式对服务器资源要求比较高，并发局限于应用中，JDK1.4以前的唯一选择，但程序简单易理解。
+* BIO方式适用于**连接数目比较小且固定**的架构，这种方式对服务器资源要求比较高，并发局限于应用中，JDK 1.4以前的唯一选择，但程序简单易理解。
 
-* NIO方式适用于**连接数目多且连接比较短**（轻操作）的架构，比如聊天服务器，弹幕系统，服务器间通讯等。编程比较复杂，JDK1.4开始支持。
+* NIO方式适用于**连接数目多且连接比较短**（轻操作）的架构，比如聊天服务器，弹幕系统，服务器间通讯等。编程比较复杂，JDK 1.4开始支持。
 
-* AIO方式使用于**连接数目多且连接比较长**（重操作）的架构，比如相册服务器，充分调用OS参与并发操作，编程比较复杂，JDK7开始支持。
+* AIO方式使用于**连接数目多且连接比较长**（重操作）的架构，比如相册服务器，充分调用OS参与并发操作，编程比较复杂，JDK 1.7开始支持。
 
 # 参考
 
