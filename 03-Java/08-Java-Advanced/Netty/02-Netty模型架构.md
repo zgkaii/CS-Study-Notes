@@ -406,8 +406,9 @@ Reactor模型中有2个关键组成：
   EventLoopGroup eventGroup = new NioEventLoopGroup(1);// 注意是单线程是1
   // 2.创建服务端启动引导/辅助类：ServerBootstrap
   ServerBootstrap b = new ServerBootstrap();
-            boobtstrap.group(eventGroup, eventGroup)
-            //......
+	try {
+        boobtstrap.group(eventGroup, eventGroup)
+        //......
 ```
 
 > 使用 `NioEventLoopGroup` 类的无参构造函数设置线程数量的默认值就是 **CPU 核心数 \*2** 。
