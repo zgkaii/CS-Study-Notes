@@ -205,17 +205,17 @@ int num = 0;
 boolean ready = false; 
 // 线程1 执行此方法
 public void actor1(I_Result r) {
- if(ready) {
- 	r.r1 = num + num;
- } 
- else {
- 	r.r1 = 1;
- }
+	if(ready) {
+		r.r1 = num + num;
+     } 
+ 	else {
+        r.r1 = 1;
+	}
 }
 // 线程2 执行此方法
 public void actor2(I_Result r) {
- num = 2;
- ready = true;
+	num = 2;
+	ready = true;
 }
 ```
 
@@ -254,7 +254,7 @@ JVM到底如何禁止重排序的呢？由此引出Java中的happen-before规则
 
 ### 2.1 happens-before
 
-JMM可以通过happens-before关系**JMM可以通过happens-before关系向程序员提供跨线程的内存可见性保证**。
+JMM可以通过happens-before关系**JMM可以通过happens-before（先行发生）关系向程序员提供跨线程的内存可见性保证**。
 
 《JSR-133:Java Memory Model and Thread Specif ication》对happens-before关系的定义如下。
 
@@ -264,7 +264,7 @@ JMM可以通过happens-before关系**JMM可以通过happens-before关系向程�
 
 **happens-before具体规则**：
 
-（1）程序顺序规则：一个线程内，按照代码顺序，书写在前面的操作，happens-before 于书写在后面的操作。
+（1）程序次序规则：一个线程内，按照代码顺序，书写在前面的操作，happens-before 于书写在后面的操作。
 
 （2）监视器锁规则：对一个锁的解锁，happens-before于随后对这个锁的加锁。
 
@@ -298,7 +298,7 @@ JMM可以通过happens-before关系**JMM可以通过happens-before关系向程�
     }
 ```
 
-（4）传递性：如果A happens-before B，且B happens-before C，那么A happens-before C。
+（4）传递规则：如果A happens-before B，且B happens-before C，那么A happens-before C。
 
 ```java
 	// 具有传递性，如果 x hb-> y 并且 y hb-> z 那么有 x hb-> z ，配合 volatile 的防指令重排
