@@ -15,9 +15,9 @@
     - [3.2.2 写锁释放](#322-写锁释放)
   - [3.3 小结](#33-小结)
 - [参考](#参考)
-## 1 Lock接口
+# 1 Lock接口
 
-### 1.1 Lock与synchronized
+## 1.1 Lock与synchronized
 
 在Lock接口出现之前，Java程序是靠**synchronized**关键字用来实现锁功能，使用时**隐式地获取和释放锁**，但是它将锁的获取和释放固化了。
 
@@ -34,32 +34,34 @@
 使用**synchronized的局限性**还有：
 
 * 当多个线程读写文件时，读操作与读操作之间不会发生冲突。但采用synchronized关键字实现同步时，还是只能一个线程进行读操作，其他读线程只能等待锁的释放而无法进行读操作。因此，需要一种机制来保证多线程都只是进行读操作时，线程之间不会发生冲突(解决方案：ReentrantReadWriteLock) 。
-
-* synchronized无法得知线程是否成功获取到锁 (解决方案：ReentrantLock)。
-
-* ... ...
+* synchronized同步块无法异步处理锁（即不能立即知道是否可以拿到锁） (解决方案：ReentrantLock)。
+* 同步块无法根据条件灵活的加锁解锁（即只能跟同步块范围一致）。
+* 同步块的阻塞无法中断（不能 Interruptibly）。
+* 同步块的阻塞无法控制超时（无法自动解锁）。
 
 为弥补synchronized使用的局限性，Java SE 5之后，并发包中新增了Lock、ReadWriteLock等接口（以及相关实现）。虽然它们缺少了隐式获取释放锁的便捷性，但是却拥有了**锁获取与释放的可操作性、可中断的获取锁以及超时获取锁**等多种synchronized关键字所不具备的同步特性。
 
-### 1.2 Lock接口方法
+## 1.2 Lock接口方法
+
+Lock 锁使用方式方式灵活可控，性能开销小，其锁工具包位于`java.util.concurrent.locks`下。
 
 Lock接口有6个方法：
 
 ```java
-// 获取锁  
+// 获取锁; 类比 synchronized (lock)
 void lock()   
 
 // 如果当前线程未被中断，则获取锁，可以响应中断  
-void lockInterruptibly()   
+void lockInterruptibly() throws InterruptedException;  
 
 // 返回绑定到此 Lock 实例的新 Condition 实例  
 Condition newCondition()   
 
-// 仅在调用时锁为空闲状态才获取该锁，可以响应中断  
+// 支持非阻塞获取锁的API，可以响应中断，成功则返回 true 
 boolean tryLock()   
 
 // 如果锁在给定的等待时间内空闲，并且当前线程未被中断，则获取锁  
-boolean tryLock(long time, TimeUnit unit)   
+boolean tryLock(long time, TimeUnit unit) throws InterruptedException;
 
 // 释放锁  
 void unlock()
@@ -128,7 +130,7 @@ Lock接口的实现类有：
 
 ![](https://img-blog.csdnimg.cn/20201103124416911.png)
 
-## 2 ReentrantLock
+# 2 ReentrantLock
 
 ReentrantLock是Lock接口的主要实现类，ReentrantLock是**可重入锁**，顾名思义，就是支持重进入的锁，它表示该锁**能够支持一个线程对资源的重复加锁**。
 
@@ -148,7 +150,7 @@ ReentrantLock是Lock接口的主要实现类，ReentrantLock是**可重入锁**�
 
 也就是说，调用ReentrantLock时，不传参数或者传入参数`true`，即是公平锁；传入参数`false`，就是非公平锁。（**ReentrantLock默认采用非公平的策略**）
 
-### 2.1 可重入
+## 2.1 可重入
 
 **可重入锁**又名递归锁。可重入指的是**任意线程在获取到锁之后能够再次获取该锁而不会被锁所阻塞**（前提锁对象得是同一个对象或者class）。Java中**ReentrantLock和synchronized都是可重入锁**，可重入锁的一个优点是可一定程度避免死锁。
 
@@ -251,7 +253,7 @@ ReentrantLock继承父类AQS，重写了父类tryAcquire方法。其父类AQS中
 ```
 释放锁时，可重入锁同样先获取当前status的值，在当前线程是持有锁的线程的前提下。如果status-1 == 0，则表示当前线程所有重复获取锁的操作都已经执行完毕，然后该线程才会真正释放锁。如果该锁被获取了n次，那么前(n-1)次tryRelease(int releases)方法必然返回false，而只有同步状态完全释放了，才能返回true。
 
-### 2.2 公平/非公平
+## 2.2 公平/非公平
 
 **公平锁**是指多个线程**按照申请锁的顺序来获取锁**，线程直接进入队列中排队，队列中的第一个线程才能获得锁（不可插队，等待时间越长，请求锁时会被优先满足）。**公平锁的优点是等待锁的线程不会饥饿**。缺点是整体吞吐效率相对非公平锁要低，等待队列中除第一个线程以外的所有线程都会阻塞，CPU唤醒阻塞线程的开销比非公平锁大。
 
@@ -329,7 +331,7 @@ ReentrantLock继承父类AQS，重写了父类tryAcquire方法。其父类AQS中
     }
 
     public final boolean release(int arg) {
-        //子类重写的tryRelease方法，需要等锁的state=0，即tryRelease返回true的时候，才会去唤醒其它线程进行尝试获取锁。
+        // 子类重写的tryRelease方法，需要等锁的state=0，即tryRelease返回true的时候，才会去唤醒其它线程进行尝试获取锁。
         if (tryRelease(arg)) {
             Node h = head;
             if (h != null && h.waitStatus != 0)
@@ -374,13 +376,13 @@ ReentrantLock继承父类AQS，重写了父类tryAcquire方法。其父类AQS中
 
 由此可见，**公平锁就是通过同步队列来实现多个线程按照申请锁的顺序来获取锁，从而实现公平的特性。非公平锁加锁时不考虑排队等待问题，直接尝试获取锁，所以才会存在线程后申请却先获得锁的情况**。
 
-### 2.3 小结
+## 2.3 小结
 
 ReentrantLock重入锁执行流程：
 
 ![](https://img-blog.csdnimg.cn/2020110323501584.png)
 
-### 2.4 中断与超时等待
+## 2.4 中断与超时等待
 
 **（1）lockInterruptibly可中断方式获取锁**
 
@@ -474,7 +476,7 @@ private boolean doAcquireNanos(int arg, long nanosTimeout)
 }
 ```
 
-## 3 ReadWriteLock
+# 3 ReadWriteLock
 
 之前提到锁（如Mutex和ReentrantLock）基本都是**排他锁**，这些锁在同一时刻只允许一个线程进行访问。而**读写锁（ReadWriteLock）**在**同一时刻可以允许多个读线程访问，但是在写线程访问时，所有的读线程和其他写线程均被阻塞**。
 
@@ -567,9 +569,9 @@ writerShouldBlock()方法的作用是判断当前线程是否应该阻塞，对�
 * 对于非公平写锁而言，直接返回false，因为非公平锁获取锁之前不需要去判断是否排队。
 * 对于公平锁写锁而言，它会判断同步队列中是否有人在排队，有人排队，就返回true，表示当前线程需要阻塞。无人排队就返回false。
 
-### 3.1 读锁
+## 3.1 读锁
 
-#### 3.1.1 读锁加锁
+### 3.1.1 读锁加锁
 
 获取读锁时，首先调用ReadLock类中的lock方法：
 
@@ -700,7 +702,7 @@ Sync实现了tryAcquireShared方法，如下：
 
 从上面可以看到多次调用了readerShouldBlock方法，对于公平锁，只要队列中有线程在等待，那么将会返回true，也就意味着读线程需要阻塞；对于非公平锁，如果当前有线程获取了写锁，则返回true。一旦不阻塞，那么读线程将会有机会获得读锁。
 
-#### 3.1.2 读锁释放
+### 3.1.2 读锁释放
 
 当调用readLock.unlock()方法时，会先调用到AQS的releaseShared()方法，在releaseShared()方法中会先调用子类的tryReleaseShared()方法。在这里会调用的是ReentrantReadWriteLock的内部类Sync的`tryReleaseShared()`方法。该方法的源码如下。
 
@@ -738,9 +740,9 @@ protected final boolean tryReleaseShared(int unused) {
 }
 ```
 
-### 3.2 写锁
+## 3.2 写锁
 
-#### 3.2.1 写锁加锁
+### 3.2.1 写锁加锁
 
 首先调用WriteLock类中的lock方法：
 
@@ -803,7 +805,7 @@ protected final boolean tryAcquire(int acquires) {
 
 从上面可以看到调用了writerShouldBlock方法，FairSync的实现是如果等待队列中有等待线程，则返回false，说明公平模式下，只要队列中有线程在等待，那么后来的这个线程也是需要记入队列等待的；NonfairSync中的直接返回的直接是false，说明不需要阻塞。从上面的代码可以得出，当没有锁时，如果使用的非公平模式下的写锁的话，那么返回false，直接通过CAS就可以获得写锁。
 
-#### 3.2.2 写锁释放
+### 3.2.2 写锁释放
 
 写锁的释放与排他锁的释放逻辑也几乎一样。当调用writeLock.unlock()时，先调用到AQS的release()方法，在release()方法中会先调用子类的tryRelease()方法。在这里调用的是ReentrantReadWriteLock的内部类Sync的tryRelease()方法。写锁的释放逻辑比较简单，可以参考下面源码中的注释。方法的源码和注释如下。
 
@@ -824,7 +826,7 @@ protected final boolean tryRelease(int releases) {
 }
 ```
 
-### 3.3 小结
+## 3.3 小结
 
 ReadWriteLock读写锁执行流程：![](https://img-blog.csdnimg.cn/20201104111903784.png)
 
@@ -866,7 +868,7 @@ public class WriteReadLockTest {
 }
 ```
 
-## 参考
+# 参考
 
 [JAVA并发编程的艺术](https://weread.qq.com/web/reader/247324e05a66a124750d9e9kc9f326d018c9f0f895fb5e4)
 

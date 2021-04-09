@@ -324,6 +324,12 @@ true
 
 原子类型累加器的用法及原理可以参考[Java多线程进阶（十七）—— J.U.C之atomic框架：LongAdder](https://segmentfault.com/a/1190000015865714)一文。
 
+原子累加器通过**分段思想**改进原子类，其改进思路：
+
+1. AtomicInteger 和 AtomicLong 里的 value 是所有 线程竞争读写的热点数据；
+2. 将单个 value 拆分成跟线程一样多的数组 Cell[]；
+3. 每个线程写自己的 Cell[i]++，最后对数组求和。
+
 ## 2 原子操作实现原理
 
 在Java中可以通过**锁**和**循环CAS**的方式来实现原子操作。
