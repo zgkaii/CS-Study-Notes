@@ -20,7 +20,7 @@
     - [1.Spring通知类型](#1spring通知类型)
     - [2.切入点表达式](#2切入点表达式)
     - [3. Annotation 注解](#3-annotation-注解)
-- [参考资料：](#参考资料)
+- [参考](#参考)
 ### 一、何为AOP？
 
 AOP(Aspect-Oriented Programming，面向切面编程)是对传统传统 OOP(Object-Oriented Programming，面向对象编程）的补充，属于一种横向扩展。其将与核心业务无关的代码，如**日志记录、性能监控、事务处理**等从业务逻辑代码中抽离出来，进行横向排列，从而实现低耦合，提高开发效率。
@@ -53,12 +53,12 @@ AOP(Aspect-Oriented Programming，面向切面编程)是对传统传统 OOP(Obje
 |性能|基于代理的框架，运行时会有目标类的代理对象生成。|在应用执行前织入切面到代码中，没有额外的运行时开销。|
 
 ### 四、动态代理
-**基于接口的动态代理**  
-提供者：JDK官方的ava.lang.reflect.Proxy 类。  
+**基于接口的动态代理** 
+提供者：JDK官方的ava.lang.reflect.Proxy 类。 
 要求： 被代理类至少实现一个接口。  
 
-**基于子类的动态代理**  
-提供者：第三方的CGLib， CGLIB 要依赖于 ASM 的包。  
+**基于子类的动态代理** 
+提供者：第三方的CGLib， CGLIB 要依赖于 ASM 的包。 
 要求：被代理类不能用final修饰的类（最终类）。  
 
 下面以一个例子来了解两者的差别：   
@@ -417,8 +417,9 @@ public class AnnotationAspect {
 最终通知
 环绕结束
 ```
-测试异常通知：  
+测试异常通知： 
 在UserDaoImpl中add()添加 `int i= 1/0 ;`
+
 ```shell script
 环绕开始
 前置通知，目标：com.aop.aspectj.dao.impl.UserDaoImpl@1ded7b14 方法名称:delete
@@ -470,10 +471,10 @@ execution([权限修饰符] [返回值类型] [简单类名/全类名] [方法�
 |@DeclareParents |	用于定义引介通知，相当于IntroductionInterceptor（不要求掌握）。|
 
 
-### 参考资料：
-[Spring AOP概念理解 ](https://blog.csdn.net/qukaiwei/article/details/50367761)    
-[比较Spring AOP与AspectJ](https://juejin.im/post/6844903555531276296)  
-[AOP（面向切面编程）](http://c.biancheng.net/view/4268.html)  
-[Spring-aop 全面解析（从应用到原理）](https://juejin.im/post/6844903478582575111)  
-[JDK动态代理实现原理](https://blog.csdn.net/yhl_jxy/article/details/80586785)  
-[CGLIB动态代理实现原理](https://blog.csdn.net/yhl_jxy/article/details/80633194)  
+### 参考
+*  [Spring AOP概念理解 ](https://blog.csdn.net/qukaiwei/article/details/50367761) 
+* [比较Spring AOP与AspectJ](https://juejin.im/post/6844903555531276296) 
+* [AOP（面向切面编程）](http://c.biancheng.net/view/4268.html) 
+* [Spring-aop 全面解析（从应用到原理）](https://juejin.im/post/6844903478582575111) 
+* [JDK动态代理实现原理](https://blog.csdn.net/yhl_jxy/article/details/80586785) 
+* [CGLIB动态代理实现原理](https://blog.csdn.net/yhl_jxy/article/details/80633194)  
