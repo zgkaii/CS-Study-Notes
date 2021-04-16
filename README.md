@@ -35,7 +35,7 @@ John Washam的抽认卡：
 ## 项目结构
 
 ```java
-CS-Notes-Kz
+CS-Study-Notes
 ├── 计算机基础
 |    ├── 计算机网络
 |    ├── 操作系统
