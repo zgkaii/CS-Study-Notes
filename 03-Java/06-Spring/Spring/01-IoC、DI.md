@@ -20,15 +20,15 @@
 - [八、Spring管理Bean方式比较](#八spring管理bean方式比较)
 - [九、Spring新注解](#九spring新注解)
 - [十、Spring 整合 Junit](#十spring-整合-junit)
-- [参考资料：](#参考资料)
+- [参考](#参考)
 ### 一、SpringBean到底是什么？
 Bean是Spring中一个重要的概念。Spring官方文档对bean的解释是：  
-```
+```html
 In Spring, the objects that form the backbone of your application and that are managed by the Spring IoC container are called beans. 
 A bean is an object that is instantiated, assembled, and managed by a Spring IoC container.Otherwise, a bean is simply one of many objects in your application. Beans, and the dependencies among them, are reflected in the configuration metadata used by a container.
 ```
 也就是说：
-```
+```html
 在Spring中，构成应用程序的主体并由Spring IoC容器管理的对象统称为beans。 bean是一个由Spring IoC容器实例化、组装和管理的对象。
 此外，bean只是应用程序中许多对象中的一个。Beans以及他们之间的依赖关系是通过容器配置元数据反映出来。
 ```
@@ -60,7 +60,7 @@ Spring 提供了以下两种不同类型的容器：
 
 ![](https://img-blog.csdnimg.cn/20200910173222719.png)  
 
-##### 3.ApplicationContext接口常用实现类：
+##### 3.ApplicationContext接口常用实现类
 * ClassPathXmlApplicationContext: 
 	从类的根路径下加载配置文件。（推荐使用）
 * FileSystemXmlApplicationContext: 
@@ -278,9 +278,9 @@ saveAccount()执行
 ```
 
 ##### 2.静态工厂方式实例化
-使用StaticFactory类中的静态方法createAccountService创建对象，并存入spring容器  
-id属性：指定bean的id，用于从容器中获取  
-class属性：指定静态工厂的全限定类名  
+使用StaticFactory类中的静态方法createAccountService创建对象，并存入spring容器 
+id属性：指定bean的id，用于从容器中获取 
+class属性：指定静态工厂的全限定类名 
 factory-method属性：指定生产对象的静态方法
 
 ```java
@@ -303,8 +303,8 @@ public class StaticFactory {
 
 ##### 3.实例工厂方式实例化
 
-先把工厂的创建交给spring来管理。然后在使用工厂的bean来调用里面的方法。  
-factory-bean属性：用于指定实例工厂bean的id。  
+先把工厂的创建交给spring来管理。然后在使用工厂的bean来调用里面的方法。 
+factory-bean属性：用于指定实例工厂bean的id。 
 factory-method属性：用于指定实例工厂中创建对象的方法。
 
 ```java
@@ -680,8 +680,8 @@ public DataSource getDataSource() throws PropertyVetoException {
 当我们使用spring 5.x版本的时候，要求junit的jar必须是4.12及以上
 
 
-### 参考资料：
-[spring bean是什么](https://www.awaimai.com/2596.html)
-[Spring Bean的生命周期](http://c.biancheng.net/view/4261.html)
-[Spring IoC 详解](https://www.cnblogs.com/wmyskxz/p/8824597.html)
-[Spring思维导图](https://segmentfault.com/a/1190000017348726)
+### 参考
+* [spring bean是什么](https://www.awaimai.com/2596.html)
+* [Spring Bean的生命周期](http://c.biancheng.net/view/4261.html)
+* [Spring IoC 详解](https://www.cnblogs.com/wmyskxz/p/8824597.html)
+* [Spring思维导图](https://segmentfault.com/a/1190000017348726)

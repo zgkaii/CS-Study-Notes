@@ -74,8 +74,6 @@ public class ForEachTest {
 
 **Stream的更优写法**
 
-下面来看一下借助Java 8的Stream API，什么才叫优雅：
-
 ```java
 public class ForEachTest {
     public static void main(String[] args) {
@@ -108,10 +106,13 @@ public class ForEachTest {
 
 > Tips：“Stream流”其实是一个集合元素的函数模型，它并不是集合，也不是数据结构，其本身并不存储任何元素或其地址。
 
+可以这把Stream流理解为一个来自数据源的元素队列并支持聚合操作。
+
 Stream（流）是一个来自数据源的元素队列：
 
-* 元素是特定类型的对象，形成一个队列。 Java中的Stream并不会存储元素，而是按需计算。
-* 数据源 流的来源。 可以是集合，数组 等。
+* **元素**：是特定类型的对象，形成一个队列。 Java中的Stream并不会存储元素，而是按需计算。
+* **数据源**：流的来源。 可以是集合，数组，I/O channel，产生器 generator 等。
+* **聚合操作**：类似 SQL 语句一样的操作，比如 filter, map, reduce, find, match, sorted 等。
 
 和Collection操作不同， Stream操作还有两个基础的特征：
 
@@ -421,24 +422,24 @@ public class StreamTest {
 
 **中间操作和终端操作**
 
-| **操作**    | **类型**            | **返回类型**  | **使用的类型/函数式接口** | **函数描述符**   |
-| ----------- | ------------------- | ------------- | ------------------------- | ---------------- |
-| *filter*    | *中间*              | *Stream<T>*   | *Predicate<T>*            | *T -> boolean*   |
-| *distinct*  | *中间(有状态-无界)* | *Stream<T>*   |                           |                  |
-| *skip*      | *中间(有状态-有界)* | *Stream<T>*   | *long*                    |                  |
-| *limit*     | *中间*              | *Strem<T>*    | *long*                    |                  |
-| *map*       | *中间*              | *Stream<R>*   | *Function<T,R>*           | *T -> R*         |
-| *flatMap*   | *中间(有状态-无界)* | *Stream<R>*   | *Function<T,Stream<R>>*   | *T -> Stream<R>* |
-| *sorted*    | *终端*              | *Stream<T>*   | *Comparator<T>*           | *(T, T) -> int*  |
-| *anyMatch*  | *终端*              | *boolean*     | *Predicate<T>*            | *T -> boolean*   |
-| *noneMatch* | *终端*              | *boolean*     | *Predicate<T>*            | *T -> boolean*   |
-| *allMatch*  | *终端*              | *boolean*     | *Predicate<T>*            | *T -> boolean*   |
-| *findAny*   | *终端*              | *Optional<T>* |                           |                  |
-| *findFirst* | *终端*              | *Optional<T>* |                           |                  |
-| *forEach*   | *终端*              | *void*        | *Consumer<T>*             | *T -> void*      |
-| *collect*   | *终端*              | *R*           | *Collector<T,A,R>*        |                  |
-| *reduce*    | *终端(有状态-有界)* | *Optional<T>* | *BinaryOperator<T>*       | *(T, T) -> T*    |
-| *count*     | *终端*              | *long*        |                           |                  |
+| **操作**    | **类型**          | **返回类型**  | **使用的类型/函数式接口** | **函数描述符**   |
+| ----------- | ----------------- | ------------- | ------------------------- | ---------------- |
+| *filter*    | 中间              | *Stream<T>*   | *Predicate<T>*            | *T -> boolean*   |
+| *distinct*  | 中间(有状态-无界) | *Stream<T>*   |                           |                  |
+| *skip*      | 中间(有状态-有界) | *Stream<T>*   | *long*                    |                  |
+| *limit*     | *中间*            | *Strem<T>*    | *long*                    |                  |
+| *map*       | 中间              | *Stream<R>*   | *Function<T,R>*           | *T -> R*         |
+| *flatMap*   | 中间(有状态-无界) | *Stream<R>*   | *Function<T,Stream<R>>*   | *T -> Stream<R>* |
+| *sorted*    | 终端              | *Stream<T>*   | *Comparator<T>*           | *(T, T) -> int*  |
+| *anyMatch*  | 终端              | *boolean*     | *Predicate<T>*            | *T -> boolean*   |
+| *noneMatch* | 终端              | *boolean*     | *Predicate<T>*            | *T -> boolean*   |
+| *allMatch*  | 终端              | *boolean*     | *Predicate<T>*            | *T -> boolean*   |
+| *findAny*   | 终端              | *Optional<T>* |                           |                  |
+| *findFirst* | 终端              | *Optional<T>* |                           |                  |
+| *forEach*   | 终端              | *void*        | *Consumer<T>*             | *T -> void*      |
+| *collect*   | 终端              | *R*           | *Collector<T,A,R>*        |                  |
+| *reduce*    | 终端(有状态-有界) | *Optional<T>* | *BinaryOperator<T>*       | *(T, T) -> T*    |
+| *count*     | 终端              | *long*        |                           |                  |
 
 ## 参考资料
 

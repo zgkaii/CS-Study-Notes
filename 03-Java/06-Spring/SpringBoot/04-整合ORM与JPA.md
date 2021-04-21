@@ -882,6 +882,8 @@ public class HelloServiceAutoConfiguration {
 }
 ```
 
+> 待深究：可参考https://juejin.cn/post/6844903956825505800
+
 # 参考
 
 [视频教程](https://www.bilibili.com/video/BV1gW411W76m?p=28)

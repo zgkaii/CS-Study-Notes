@@ -1,5 +1,3 @@
-<!-- MarkdownTOC -->
-
 - [前言](#前言)
 - [一  bean的作用域](#一-bean的作用域)
   - [1. singleton——唯一 bean 实例](#1-singleton——唯一-bean-实例)
@@ -16,8 +14,6 @@
   - [非单例管理的对象](#非单例管理的对象)
 - [三 说明](#三-说明)
 
-<!-- /MarkdownTOC -->
-
 # 前言 
 在 Spring 中，那些组成应用程序的主体及由 Spring IOC 容器所管理的对象，被称之为 bean。简单地讲，bean 就是由 IOC 容器初始化、装配及管理的对象，除此之外，bean 就与应用程序中的其他对象没有什么区别了。而 bean 的定义以及 bean 相互间的依赖关系将通过配置元数据来描述。
 
@@ -33,8 +29,6 @@
 ![](http://my-blog-to-use.oss-cn-beijing.aliyuncs.com/18-9-17/1188352.jpg)
 
 五种作用域中，**request、session** 和 **global session** 三种作用域仅在基于web的应用中使用（不必关心你所采用的是什么web应用框架），只能用在基于 web 的 Spring ApplicationContext 环境。
-
-
 
 ### 1. singleton——唯一 bean 实例
 
