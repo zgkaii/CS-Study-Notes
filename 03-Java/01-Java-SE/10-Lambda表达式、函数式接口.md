@@ -45,6 +45,8 @@ int f4(int x) {
 
 当提到 Java 8 的时候，Lambda 表达式总是第一个提到的新特性。Lambda 表达式把函数式编程风格引入到了 Java 平台上，可以极大的提高 Java 开发人员的效率。
 
+Lambda 表达式（lambda expression）是一个匿名函数，Lambda 表达式基于数学中的 λ 演算 得名，直接对应于其中的 lambda 抽象（lambda abstraction），是一个匿名函数，即没有函数名的函数。由于Java中函数不是"第一公民"，需要封装进接口中；而Lambda表达式 就是主要简写内部匿名类。
+
 在兼顾面向对象特性的基础上，Java语言通过Lambda表达式与方法引用等，为开发者打开了函数式编程的大门。
 
 ### 1.2 体验Lambda表达式
@@ -105,7 +107,7 @@ Lambda表达式省去面向对象中的条条框框，由**3个部分**组成：
 
 Lambda表达式的**标准格式**为：
 
-```
+```java
 (参数类型 参数名称) -> { 代码语句 }
 ```
 
@@ -485,8 +487,7 @@ JDK在`ava.util.function`包提供了大量常用的函数式接口以丰富Lamb
 
 ### 2.1 Supplier接口
 
-`java.util.function.Supplier<T>`接口仅包含一个无参的方法：`T get()`，用来获取一个泛型参数指定类型的对
-象数据。
+`java.util.function.Supplier<T>`接口仅包含一个无参的方法：`T get()`，用来获取一个泛型参数指定类型的对象数据。
 
 为实现 `Supplier` 接口，需要提供一个不传入参数且返回泛型类型（generic type）的方法。根据 Javadoc 的描述，调用 `Supplier` 时**，不要求每次都返回一个新的或不同的结果**。
 
@@ -536,8 +537,7 @@ public class SupplierTest {
 
 ### 2.2 Consumer接口
 
-`java.util.function.Consumer<T>`接口则正好与Supplier接口相反，它不是生产一个数据，而是消费一个数据，
-其数据类型由泛型决定。
+`java.util.function.Consumer<T>`接口则正好与Supplier接口相反，它不是生产一个数据，而是消费一个数据，其数据类型由泛型决定。
 
 **抽象方法：accept**
 
