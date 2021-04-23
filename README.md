@@ -38,6 +38,8 @@ John Washam的抽认卡：
 CS-Study-Notes
 ├── 计算机基础
 |    ├── 计算机网络
+|    |    ├── 趣谈网络协议
+|    |    └── 透视HTTP协议
 |    ├── 操作系统
 |    ├── 编译原理
 |    └── 其他
@@ -62,6 +64,7 @@ CS-Study-Notes
 ├── Python
 ├── Golang
 ├── C/C++
+|    └── 网络编程实战
 ├── 前端
 |    ├── 前端基础
 |    |    ├── HTML
@@ -83,6 +86,8 @@ CS-Study-Notes
 |    |    ├── Mysql
 |    |    └── Oracle
 |    └── NoSQL数据库
+|	      ├── Elasticsearch
+| 		  └── Redis
 ├── 分布式系统
 |    ├── 分布式理论
 |    ├── 分布式事务
