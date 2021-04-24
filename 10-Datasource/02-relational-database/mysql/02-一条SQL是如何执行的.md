@@ -19,7 +19,7 @@
 
 下图是 MySQL  的一个简要架构图，从下图你可以很清晰的看到用户的 SQL 语句在 MySQL 内部是如何执行的。
 
-![](https://img-blog.csdnimg.cn/20201121144126404.png)
+<img src="https://img-blog.csdnimg.cn/20210423233024452.png" style="zoom:80%;" />
 
  MySQL 主要分为 Server 层和存储引擎层：
 
@@ -153,7 +153,7 @@ update tb_student T set T.name='李四' where T.age='22';
 
 具体来说，当有一条记录需要更新的时候，InnoDB引擎就会先把记录写到redo log（粉板）里面，并更新内存，这个时候更新就算完成了。同时，InnoDB引擎会在适当的时候，将这个操作记录更新到磁盘里面，而这个更新往往是在系统比较空闲的时候做，这就像打烊以后掌柜做的事。
 
-<img src="https://img-blog.csdnimg.cn/20201121162521315.png" style="zoom:67%;" />
+<img src="https://img-blog.csdnimg.cn/20210423233319735.png" style="zoom:80%;" />
 
 write pos是当前记录的位置，一边写一边后移，写到第3号文件末尾后就回到0号文件开头。checkpoint是当前要擦除的位置，也是往后推移并且循环的，擦除记录前要把记录更新到数据文件。
 
