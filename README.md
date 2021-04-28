@@ -88,7 +88,7 @@ CS-Study-Notes
 |    |    ├── Mysql
 |    |    └── Oracle
 |    └── NoSQL数据库
-|	      ├── Elasticsearch
+|         ├── Elasticsearch
 |    	  └── Redis
 ├── 分布式系统
 |    ├── 分布式理论
