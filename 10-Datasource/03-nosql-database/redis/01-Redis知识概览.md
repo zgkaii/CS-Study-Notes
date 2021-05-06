@@ -124,17 +124,7 @@ SimpleKV 包含了一个键值数据库的基本组件，对这些组件有了�
 * Redis 的持久化模块能支持两种方式：日志（AOF）和快照（RDB），这两种持久化方式具有不同的优劣势，影响到 Redis 的访问性能和可靠性。
 * SimpleKV 是个简单的单机键值数据库，但是，Redis 支持高可靠集群和高可扩展集群，因此，Redis 中包含了相应的集群功能支撑模块。
 
-对比Redis，SimpleKV主要缺少的功能组件或模块如下：
+SimpleKV 和 Redis 做了对比如下：
 
-* **数据结构**，SimpleKV缺乏广泛的数据结构支持，例如支持范围查询的SkipList，和Stream等数据结构。
-* **高可用**，SimpleKV缺乏哨兵或者master-slaver模式的高可用设计。
-* **横向扩展**，SimpleKV缺乏集群和分片功能。
-* **内存安全性**，SimpleKV缺乏内存过载时候的key淘汰算法的支持。
-* **内存利用率**，SimpleKV没有充分对数据结构优化提高内存利用率，例如使用压缩性的数据结构。
-* **事务**，SimpleKV不具备事务性，无法保证多个操作的原子性。
-* **功能扩展**，SimpleKV还需要具备后续功能的拓展。
-* **内存分配器**，SimpleKV就是glibc，Redis的分配器选择更多。
-* ... ...
-
-
+<img src="https://img-blog.csdnimg.cn/img_convert/96ec6394498e713e5d786494940b67b6.png" style="zoom:80%;" />
 

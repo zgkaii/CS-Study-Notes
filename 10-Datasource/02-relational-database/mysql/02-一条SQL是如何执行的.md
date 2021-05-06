@@ -12,6 +12,7 @@
     - [2.2.1 redo log](#221-redo-log)
     - [2.2.2 binlog](#222-binlog)
     - [2.2.3 两阶段提交](#223-两阶段提交)
+- [3 MySQL详细执行流程](#3-MySQL详细执行流程)
 - [参考](#参考)
 # 1 MySQL 基础架构分析
 
@@ -19,7 +20,9 @@
 
 下图是 MySQL  的一个简要架构图，从下图你可以很清晰的看到用户的 SQL 语句在 MySQL 内部是如何执行的。
 
-![](https://img-blog.csdnimg.cn/20201121144126404.png)
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20210423233024452.png" width="450px"/>
+</div>
 
  MySQL 主要分为 Server 层和存储引擎层：
 
@@ -153,7 +156,9 @@ update tb_student T set T.name='李四' where T.age='22';
 
 具体来说，当有一条记录需要更新的时候，InnoDB引擎就会先把记录写到redo log（粉板）里面，并更新内存，这个时候更新就算完成了。同时，InnoDB引擎会在适当的时候，将这个操作记录更新到磁盘里面，而这个更新往往是在系统比较空闲的时候做，这就像打烊以后掌柜做的事。
 
-<img src="https://img-blog.csdnimg.cn/20201121162521315.png" style="zoom:67%;" />
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20210423233319735.png" width="450px"/>
+</div>
 
 write pos是当前记录的位置，一边写一边后移，写到第3号文件末尾后就回到0号文件开头。checkpoint是当前要擦除的位置，也是往后推移并且循环的，擦除记录前要把记录更新到数据文件。
 
@@ -201,6 +206,14 @@ write pos和checkpoint之间的是“粉板”上还空着的部分，可以用�
 * 如果 redo log 只是预提交但不是 commit 状态，这个时候就会去判断 binlog 是否完整，如果完整就提交 redo log, 不完整就回滚事务。
 
 这样就解决了数据一致性的问题。
+
+# 3 MySQL详细执行流程
+
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20210426232151138.png" width="800px"/>
+</div>
+
+> 待更新... ...
 
 # 参考
 
