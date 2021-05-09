@@ -89,7 +89,7 @@ CS-Study-Notes
 |    |    └── Oracle
 |    └── NoSQL数据库
 |         ├── Elasticsearch
-|    	  └── Redis
+|         └── Redis
 ├── 分布式系统
 |    ├── 分布式理论
 |    ├── 分布式事务
