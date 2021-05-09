@@ -1,4 +1,4 @@
-- [一、SpringBoot对静态资源的映射规则](#一springboot对静态资源的映射规则)
+- [一、Spring Boot对静态资源的映射规则](#一springboot对静态资源的映射规则)
 - [三、模板引擎](#三模板引擎)
   - [1、引入Thymeleaf](#1引入thymeleaf)
   - [2、Thymeleaf使用](#2thymeleaf使用)
@@ -7,7 +7,7 @@
   - [1、Spring MVC auto-configuration](#1spring-mvc-auto-configuration)
   - [2、扩展SpringMVC](#2扩展springmvc)
   - [3、全面接管SpringMVC](#3全面接管springmvc)
-- [五、如何修改SpringBoot的默认配置](#五如何修改springboot的默认配置)
+- [五、如何修改Spring Boot的默认配置](#五如何修改springboot的默认配置)
 - [六、RestfulCRUD](#六restfulcrud)
   - [1、默认访问首页](#1默认访问首页)
   - [2、国际化](#2国际化)
@@ -18,7 +18,7 @@
   - [7、CRUD-员工修改](#7crud-员工修改)
   - [8、CRUD-员工删除](#8crud-员工删除)
 - [七、错误处理机制](#七错误处理机制)
-  - [1、SpringBoot默认的错误处理机制](#1springboot默认的错误处理机制)
+  - [1、Spring Boot默认的错误处理机制](#1springboot默认的错误处理机制)
   - [2、定制错误响应](#2定制错误响应)
     - [**2.1 定制错误的页面**](#21-定制错误的页面)
     - [2.2 定制错误的json数据](#22-定制错误的json数据)
@@ -33,11 +33,11 @@
   - [步骤](#步骤)
   - [原理](#原理)
 - [参考](#参考)
-## 一、SpringBoot对静态资源的映射规则
+## 一、Spring Boot对静态资源的映射规则
 
 静态资源的映射规则都在WebMvcAutoConfiguration中。
 
- （1）webjars：以jar包的方式引入静态资源
+ （1）[webjars](https://www.webjars.org/)：以jar包的方式引入静态资源
 
 所有` /webjars/**` ，都在 `classpath:/META-INF/resources/webjars/ `查找资源。
 
@@ -62,7 +62,7 @@ webjars：以jar包的方式引入静态资源
 
 （2）`/**`访问当前项目的任何资源，都去（静态资源的文件夹）找映射。
 
-静态资源文件，比如一些JS、CSS、jQuery文件，SpringBoot默认是从以下这些路径中读取的：
+静态资源文件，比如一些JS、CSS、jQuery文件，Spring Boot默认是从以下这些路径中读取的：
 
 ```java
 -- "classpath:/META-INF/resources/", 
@@ -99,7 +99,7 @@ webjars：以jar包的方式引入静态资源
 spring.resources.static-locations=classpath:/test1/,classpath:/test2/
 ```
 
-特别要注意：**自定义静态资源访问路径后，SpringBoot默认的静态资源路径将不再起作用**。
+特别要注意：**自定义静态资源访问路径后，Spring Boot默认的静态资源路径将不再起作用**。
 
 ## 三、模板引擎
 
@@ -109,7 +109,7 @@ JSP、Velocity、Freemarker、Thymeleaf......
 
 
 
-SpringBoot推荐的Thymeleaf：语法更简单，功能更强大。
+Spring Boot推荐的Thymeleaf：语法更简单，功能更强大。
 
 ### 1、引入Thymeleaf
 
@@ -307,7 +307,7 @@ Special tokens:
 
 ### 1、Spring MVC auto-configuration
 
-SpringBoot对SpringMVC的默认配置:**（WebMvcAutoConfiguration）**
+Spring Boot对SpringMVC的默认配置:**（WebMvcAutoConfiguration）**
 
 - Inclusion of `ContentNegotiatingViewResolver` and `BeanNameViewResolver` beans.
   - 自动配置了ViewResolver（视图解析器：根据方法的返回值得到视图对象（View），视图对象决定如何渲染（转发/重定向））
@@ -421,7 +421,7 @@ public class MyMvcConfig extends WebMvcConfigurerAdapter {
 
 ### 3、全面接管SpringMVC
 
-SpringBoot对SpringMVC的自动配置不需要了，所有都是我们自己配置，所有的SpringMVC的自动配置都失效了。
+Spring Boot对SpringMVC的自动配置不需要了，所有都是我们自己配置，所有的SpringMVC的自动配置都失效了。
 
 **在配置类中添加@EnableWebMvc即可**
 
@@ -477,15 +477,15 @@ public class WebMvcAutoConfiguration {
 
 
 
-## 五、如何修改SpringBoot的默认配置
+## 五、如何修改Spring Boot的默认配置
 
 小结：
 
-​	1. SpringBoot在自动配置很多组件的时候，先看容器中有没有用户自己配置的（@Bean、@Component）如果有就用用户配置的，如果没有，才自动配置；如果有些组件可以有多个（ViewResolver）将用户配置的和自己默认的组合起来。
+​	1. Spring Boot在自动配置很多组件的时候，先看容器中有没有用户自己配置的（@Bean、@Component）如果有就用用户配置的，如果没有，才自动配置；如果有些组件可以有多个（ViewResolver）将用户配置的和自己默认的组合起来。
 
-​	2. 在SpringBoot中会有非常多的xxxConfigurer帮助我们进行扩展配置。
+​	2. 在Spring Boot中会有非常多的xxxConfigurer帮助我们进行扩展配置。
 
-​	3. 在SpringBoot中会有很多的xxxCustomizer帮助我们进行定制配置。
+​	3. 在Spring Boot中会有很多的xxxCustomizer帮助我们进行定制配置。
 
 ## 六、RestfulCRUD
 
@@ -535,7 +535,7 @@ public class MyMvcConfig extends WebMvcConfigurerAdapter {
 
 
 
-（2）SpringBoot自动配置好了管理国际化资源文件的组件；
+（2）Spring Boot自动配置好了管理国际化资源文件的组件；
 
 ```java
 @ConfigurationProperties(prefix = "spring.messages")
@@ -742,7 +742,7 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
             public void addInterceptors(InterceptorRegistry registry) {
                 //super.addInterceptors(registry);
                 //静态资源；  *.css , *.js
-                //SpringBoot已经做好了静态资源映射
+                //Spring Boot已经做好了静态资源映射
                 registry.addInterceptor(new LoginHandlerInterceptor()).addPathPatterns("/**")
                         .excludePathPatterns("/index.html","/","/user/login");
             }
@@ -918,7 +918,7 @@ insert的公共片段在div标签中
 <form th:action="@{/emp}" method="post">
     <!--发送put请求修改员工数据-->
     <!--
-1、SpringMVC中配置HiddenHttpMethodFilter;（SpringBoot自动配置好的）
+1、SpringMVC中配置HiddenHttpMethodFilter;（Spring Boot自动配置好的）
 2、页面创建一个post表单
 3、创建一个input项，name="_method";值就是我们指定的请求方式
 -->
@@ -986,7 +986,7 @@ insert的公共片段在div标签中
 
 ## 七、错误处理机制
 
-### 1、SpringBoot默认的错误处理机制
+### 1、Spring Boot默认的错误处理机制
 
 默认效果：
 
@@ -1079,7 +1079,7 @@ public class BasicErrorController extends AbstractErrorController {
 	}
 
 	private ModelAndView resolve(String viewName, Map<String, Object> model) {
-        //默认SpringBoot可以去找到一个页面？  error/404
+        //默认Spring Boot可以去找到一个页面？  error/404
 		String errorViewName = "error/" + viewName;
         
         //模板引擎可以解析这个页面地址就用模板引擎解析
@@ -1138,7 +1138,7 @@ protected ModelAndView resolveErrorView(HttpServletRequest request,
 
 ​			（2）没有模板引擎（模板引擎找不到这个错误页面），静态资源文件夹下找；
 
-​			（3）以上都没有错误页面，就是默认来到SpringBoot默认的错误提示页面；
+​			（3）以上都没有错误页面，就是默认来到Spring Boot默认的错误提示页面；
 
 #### 	2.2 定制错误的json数据
 
@@ -1209,7 +1209,7 @@ public class MyErrorAttributes extends DefaultErrorAttributes {
 
 ## 八、配置嵌入式Servlet容器
 
-SpringBoot默认使用Tomcat作为嵌入式的Servlet容器。
+Spring Boot默认使用Tomcat作为嵌入式的Servlet容器。
 
 ![](https://img-blog.csdnimg.cn/20200924082246214.png)
 
@@ -1249,7 +1249,7 @@ public EmbeddedServletContainerCustomizer embeddedServletContainerCustomizer(){
 
 ### 2、注册Servlet三大组件【Servlet、Filter、Listener】
 
-由于SpringBoot默认是以jar包的方式启动嵌入式的Servlet容器来启动SpringBoot的web应用，没有web.xml文件。
+由于Spring Boot默认是以jar包的方式启动嵌入式的Servlet容器来启动Spring Boot的web应用，没有web.xml文件。
 
 注册三大组件用以ServletRegistrationBean方式
 
@@ -1284,7 +1284,7 @@ public ServletListenerRegistrationBean myListener(){
 }
 ```
 
-SpringBoot帮我们自动SpringMVC的时候，自动的注册SpringMVC的前端控制器：DIspatcherServlet。
+Spring Boot帮我们自动SpringMVC的时候，自动的注册SpringMVC的前端控制器：DIspatcherServlet。
 
 DispatcherServletAutoConfiguration中：
 
@@ -1530,7 +1530,7 @@ ServerProperties也是定制器
 
 步骤：
 
-* SpringBoot根据导入的依赖情况，给容器中添加相应的EmbeddedServletContainerFactory【TomcatEmbeddedServletContainerFactory】
+* Spring Boot根据导入的依赖情况，给容器中添加相应的EmbeddedServletContainerFactory【TomcatEmbeddedServletContainerFactory】
 
 * 容器中某个组件要创建对象就会惊动后置处理器；EmbeddedServletContainerCustomizerBeanPostProcessor；
 
@@ -1538,17 +1538,15 @@ ServerProperties也是定制器
 
 * 后置处理器，从容器中获取所有的**EmbeddedServletContainerCustomizer**，调用定制器的定制方法
 
-
-
 ### 5、嵌入式Servlet容器启动原理
 
 什么时候创建嵌入式的Servlet容器工厂？什么时候获取嵌入式的Servlet容器并启动Tomcat?
 
 获取嵌入式的Servlet容器工厂：
 
-1）SpringBoot应用启动运行run方法。
+1）Spring Boot应用启动运行run方法。
 
-2）refreshContext(context)，SpringBoot刷新IOC容器【创建IOC容器对象，并初始化容器，创建容器中的每一个组件】，如果是web应用创建**AnnotationConfigEmbeddedWebApplicationContext**，否则：**AnnotationConfigApplicationContext**
+2）refreshContext(context)，Spring Boot刷新IOC容器【创建IOC容器对象，并初始化容器，创建容器中的每一个组件】，如果是web应用创建**AnnotationConfigEmbeddedWebApplicationContext**，否则：**AnnotationConfigApplicationContext**
 
 3）refresh(context);**刷新刚才创建好的ioc容器**
 
@@ -1660,15 +1658,15 @@ EmbeddedServletContainerFactory containerFactory = getEmbeddedServletContainerFa
 </dependency>
 ```
 
-3）必须编写一个**SpringBootServletInitializer**的子类，并调用configure方法
+3）必须编写一个**Spring BootServletInitializer**的子类，并调用configure方法
 
 ```java
-public class ServletInitializer extends SpringBootServletInitializer {
+public class ServletInitializer extends Spring BootServletInitializer {
 
    @Override
    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-       //传入SpringBoot应用的主程序
-      return application.sources(SpringBoot04WebJspApplication.class);
+       //传入Spring Boot应用的主程序
+      return application.sources(Spring Boot04WebJspApplication.class);
    }
 
 }
@@ -1678,9 +1676,9 @@ public class ServletInitializer extends SpringBootServletInitializer {
 
 ### 原理
 
-jar包：执行SpringBoot主类的main方法，启动ioc容器，创建嵌入式的Servlet容器；
+jar包：执行Spring Boot主类的main方法，启动ioc容器，创建嵌入式的Servlet容器；
 
-war包：启动服务器，**服务器启动SpringBoot应用**【SpringBootServletInitializer】，启动ioc容器；
+war包：启动服务器，**服务器启动Spring Boot应用**【Spring BootServletInitializer】，启动ioc容器；
 
 
 
@@ -1710,9 +1708,9 @@ Spring的web模块里面有这个文件：**org.springframework.web.SpringServle
 
 ![](https://img-blog.csdnimg.cn/20200924091440982.png)
 
-5）相当于我们的SpringBootServletInitializer的类会被创建对象，并执行onStartup方法
+5）相当于我们的Spring BootServletInitializer的类会被创建对象，并执行onStartup方法
 
-6）SpringBootServletInitializer实例执行onStartup的时候会createRootApplicationContext；创建容器
+6）Spring BootServletInitializer实例执行onStartup的时候会createRootApplicationContext；创建容器
 
 ```java
 protected WebApplicationContext createRootApplicationContext(
@@ -1734,7 +1732,7 @@ protected WebApplicationContext createRootApplicationContext(
          new ServletContextApplicationContextInitializer(servletContext));
    builder.contextClass(AnnotationConfigEmbeddedWebApplicationContext.class);
     
-    //调用configure方法，子类重写了这个方法，将SpringBoot的主程序类传入了进来
+    //调用configure方法，子类重写了这个方法，将Spring Boot的主程序类传入了进来
    builder = configure(builder);
     
     //使用builder创建一个Spring应用
@@ -1795,14 +1793,12 @@ public ConfigurableApplicationContext run(String... args) {
 }
 ```
 
-**==启动Servlet容器，再启动SpringBoot应用==**。
+**==启动Servlet容器，再启动Spring Boot应用==**。
 
 ## 参考
 
-[视频教程](https://www.bilibili.com/video/BV1gW411W76m?p=28)
+* [webjars官网](https://www.webjars.org/)
 
-[webjars官网](https://www.webjars.org/)
+* [Thymeleaf官方文档](https://www.thymeleaf.org/documentation.html) 
 
-[Thymeleaf官方文档](https://www.thymeleaf.org/documentation.html) 
-
-[Spring Web MVC Framework](https://docs.spring.io/spring-boot/docs/2.4.0-SNAPSHOT/reference/html/spring-boot-features.html#boot-features-spring-mvc)
+* [Spring Web MVC Framework](https://docs.spring.io/spring-boot/docs/2.4.0-SNAPSHOT/reference/html/spring-boot-features.html#boot-features-spring-mvc)
