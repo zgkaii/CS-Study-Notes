@@ -38,6 +38,7 @@ John Washam的抽认卡：
 CS-Study-Notes
 ├── 计算机基础
 |    ├── 计算机网络
+|    |    ├── 计算机网络基础
 |    |    ├── 趣谈网络协议
 |    |    └── 透视HTTP协议
 |    ├── 操作系统
@@ -78,7 +79,8 @@ CS-Study-Notes
 |    	  └── React
 ├── 软件设计
 |    ├── 编程范式
-|    └── 设计原则
+|    ├── 设计原则
+|    └── 设计模式
 ├── Linux
 ├── 数据库
 |    ├── 数据库基础
@@ -86,8 +88,8 @@ CS-Study-Notes
 |    |    ├── Mysql
 |    |    └── Oracle
 |    └── NoSQL数据库
-|	      ├── Elasticsearch
-| 		  └── Redis
+|         ├── Elasticsearch
+|         └── Redis
 ├── 分布式系统
 |    ├── 分布式理论
 |    ├── 分布式事务

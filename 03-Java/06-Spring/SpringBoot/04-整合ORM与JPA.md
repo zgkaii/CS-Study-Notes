@@ -8,7 +8,7 @@
     - [1）镜像操作](#1镜像操作)
     - [2）容器操作](#2容器操作)
     - [3）安装MySQL示例](#3安装mysql示例)
-- [二、SpringBoot与数据访问](#二springboot与数据访问)
+- [二、Spring Boot与数据访问](#二Spring Boot与数据访问)
   - [1、JDBC](#1jdbc)
   - [2、整合Druid数据源](#2整合druid数据源)
   - [3、整合MyBatis](#3整合mybatis)
@@ -121,8 +121,6 @@ systemctl stop docker
 | 列表 | `docker images`                                   | 查看所有本地镜像                                             |
 | 删除 | `docker rmi image-id`                             | 删除指定的本地镜像                                           |
 
-
-
 ### 2）容器操作
 
 | 操作     | 命令                                                         | 说明                                                         |
@@ -134,8 +132,6 @@ systemctl stop docker
 | 删除     | docker rm container-id                                       | 删除指定容器                                                 |
 | 端口映射 | -p 6379:6379 <br>eg:docker run -d -p 6379:6379 --name myredis docker.io/redis | -p: 主机端口(映射到)容器内部的端口                           |
 | 容器日志 | docker logs container-name/container-id                      | 查看容器的日志                                               |
-
-
 
 实例操作：软件镜像（.exe安装程序）----运行镜像----产生一个容器（正在运行的软件，运行程序）
 
@@ -235,9 +231,7 @@ docker run --name some-mysql -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql:tag --
 指定mysql的一些配置参数
 ```
 
-
-
-# 二、SpringBoot与数据访问
+# 二、Spring Boot与数据访问
 
 ## 1、JDBC
 
@@ -262,17 +256,13 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
 ```
 
-效果：
+效果：默认是用`org.apache.tomcat.jdbc.pool.DataSource`作为数据源，数据源的相关配置都在DataSourceProperties里面；
 
-​	默认是用org.apache.tomcat.jdbc.pool.DataSource作为数据源，数据源的相关配置都在DataSourceProperties里面；
-
-自动配置原理：
-
-org.springframework.boot.autoconfigure.jdbc：
+自动配置原理——org.springframework.boot.autoconfigure.jdbc：
 
 1、参考DataSourceConfiguration，根据配置创建数据源，默认使用Tomcat连接池，可以使用spring.datasource.type指定自定义的数据源类型；
 
-2、SpringBoot默认可以支持
+2、Spring Boot默认可以支持
 
 ```java
 org.apache.tomcat.jdbc.pool.DataSource、HikariDataSource、BasicDataSource...
@@ -299,11 +289,7 @@ static class Generic {
 
 4、**DataSourceInitializer：ApplicationListener**；
 
-​	作用：
-
-​		1）runSchemaScripts();运行建表语句
-
-​		2）runDataScripts();运行插入数据的sql语句
+作用：（1）runSchemaScripts();运行建表语句（2）runDataScripts();运行插入数据的sql语句
 
 默认只需要将文件命名为
 
@@ -321,7 +307,7 @@ schema-*.sql、data-*.sql
 ## 2、整合Druid数据源
 
 ```java
-导入druid数据源
+// 导入druid数据源
 @Configuration
 public class DruidConfig {
 
@@ -364,7 +350,6 @@ public class DruidConfig {
         return  bean;
     }
 }
-
 ```
 
 ## 3、整合MyBatis
@@ -409,8 +394,6 @@ public interface DepartmentMapper {
 }
 ```
 
-问题：
-
 自定义MyBatis的配置规则，给容器中添加一个ConfigurationCustomizer：
 
 ```java
@@ -432,12 +415,12 @@ public class MyBatisConfig {
 
 ```java
 // 使用MapperScan批量扫描所有的Mapper接口
-@MapperScan(value = "com.kai.springboot.mapper")
-@SpringBootApplication
-public class SpringBoot06DataMybatisApplication {
+@MapperScan(value = "com.kai.Spring Boot.mapper")
+@Spring BootApplication
+public class Spring Boot06DataMybatisApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SpringBoot06DataMybatisApplication.class, args);
+		SpringApplication.run(Spring Boot06DataMybatisApplication.class, args);
 	}
 }
 ```
@@ -450,11 +433,7 @@ mybatis:
   mapper-locations: classpath:mybatis/mapper/*.xml  指定sql映射文件的位置
 ```
 
-更多使用参照
-
-http://www.mybatis.org/spring-boot-starter/mybatis-spring-boot-autoconfigure/
-
-
+更多使用参照：http://www.mybatis.org/spring-boot-starter/mybatis-spring-boot-autoconfigure/
 
 ## 4、整合SpringData JPA
 
@@ -490,7 +469,6 @@ public class User {
 //继承JpaRepository来完成对数据库的操作
 public interface UserRepository extends JpaRepository<User,Integer> {
 }
-
 ```
 
 3）基本的配置JpaProperties
@@ -600,7 +578,7 @@ public ConfigurableApplicationContext run(String... args) {
          new StartupInfoLogger(this.mainApplicationClass)
                .logStarted(getApplicationLog(), stopWatch);
       }
-       //整个SpringBoot应用启动完成以后返回启动的ioc容器；
+       //整个Spring Boot应用启动完成以后返回启动的ioc容器；
       return context;
    }
    catch (Throwable ex) {
@@ -669,10 +647,10 @@ public class HelloSpringApplicationRunListener implements SpringApplicationRunLi
 
 ```properties
 org.springframework.context.ApplicationContextInitializer=\
-com.kai.springboot.listener.HelloApplicationContextInitializer
+com.kai.Spring Boot.listener.HelloApplicationContextInitializer
 
 org.springframework.boot.SpringApplicationRunListener=\
-com.kai.springboot.listener.HelloSpringApplicationRunListener
+com.kai.Spring Boot.listener.HelloSpringApplicationRunListener
 ```
 
 
@@ -886,9 +864,7 @@ public class HelloServiceAutoConfiguration {
 
 # 参考
 
-[视频教程](https://www.bilibili.com/video/BV1gW411W76m?p=28)
-
-[MyBatis-Spring-Boot-Starter](http://mybatis.org/spring-boot-starter/mybatis-spring-boot-autoconfigure/)
+* [MyBatis-Spring-Boot-Starter](http://mybatis.org/spring-boot-starter/mybatis-spring-boot-autoconfigure/)
 
 
 
