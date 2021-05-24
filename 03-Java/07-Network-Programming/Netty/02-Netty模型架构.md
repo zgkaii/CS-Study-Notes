@@ -1,5 +1,3 @@
-
-
 Netty 是由 JBOSS 提供的一个 Java 开源框架， 现为 Github 上的独立项目，它**是一个异步的、 基于事件驱动的网络应用框架， 用以快速开发高性能、 高可靠性的网络 IO 程序**。Netty 主要针对在 TCP 协议下， 面向 Clients 端的高并发应用， 或者 Peer-to-Peer 场景下的大量数据持续传输的应用。Netty 本质是一个 NIO 框架， 适用于服务器通讯相关的多种应用场景。
 
 | 分类     | Netty特性                                                    |
@@ -305,6 +303,26 @@ Netty的IO线程NioEventLoop由于聚合了多路复用器Selector，可以同�
 
 由于读写操作都是非阻塞的，这就可以充分提升IO线程的运行效率，避免由于频繁I/O阻塞导致的线程挂起，一个I/O线程可以并发处理N个客户端连接和读写操作，这从根本上解决了传统同步阻塞I/O一连接一线程模型，架构的性能、弹性伸缩能力和可靠性都得到了极大的提升。
 
+Netty在不同平台下有不同的NIO实现：
+
+| COMMON                 | Linux                    | macOS/BSD                 |
+| ---------------------- | ------------------------ | ------------------------- |
+| NioEventLoopGroup      | EpollEventLoopGroup      | KQueueEventLoopGroup      |
+| NioEventLoop           | EpollEventLoop           | KQueueEventLoop           |
+| NioServerSocketChannel | EpollServerSocketChannel | KQueueServerSocketChannel |
+| NioSocketChannel       | EpollSocketChannel       | KQueueSocketChannel       |
+
+通用的 NIO 实现（Common）在 Linux 下也是使用 epoll，为什么自己还要单独实现？
+
+源自自信，实现的更好！！！主要有下面两点优势：
+
+* Netty 暴露了更多的可控参数，例如：
+
+  * JDK 的 NIO 默认实现是水平触发。
+  * Netty 是边缘触发（默认）和水平触发可切换。
+
+* Netty 实现的垃圾回收更少、性能更好。
+
 ## 2.2 线程模型
 
 ### 2.2.1 事件驱动模型
@@ -316,8 +334,8 @@ Netty的IO线程NioEventLoop由于聚合了多路复用器Selector，可以同�
 
 以GUI的逻辑处理为例，说明两种逻辑的不同：
 
-- 轮询方式 线程不断轮询是否发生按钮点击事件，如果发生，调用处理逻辑
-- 事件驱动方式 发生点击事件把事件放入事件队列，在另外线程消费的事件列表中的事件，根据事件类型调用相关事件处理逻辑
+- 轮询方式 线程不断轮询是否发生按钮点击事件，如果发生，调用处理逻辑。
+- 事件驱动方式 发生点击事件把事件放入事件队列，在另外线程消费的事件列表中的事件，根据事件类型调用相关事件处理逻辑。
 
  <div align="center"> <img src="..\..\..\images\nio\事件驱动模型.png" width="700px"></div>
 
@@ -376,7 +394,7 @@ Reactor模型中有2个关键组成：
 
 为了解决这些问题，演进出了主从多线程Reactor模型。
 
-#### （3）Reacto主从线程
+#### （3）Reacto主从多线程
 
 一组NIO线程负责接受请求，一组NIO线程处理IO操作。
 
@@ -392,44 +410,16 @@ Reactor模型中有2个关键组成：
 
 在 Netty 主要靠 `NioEventLoopGroup` 线程池来实现具体的线程模型的 。
 
+| 线程模式                  | 实现                                                         |
+| ------------------------- | ------------------------------------------------------------ |
+| Reacto单线程              | EventLoopGroup eventGroup = new NioEventLoopGroup(**1**); <br/><br/>ServerBootstrap serverBootstrap = new ServerBootstrap(); <br/>serverBootstrap.group(eventGroup); |
+| 非主从 Reactor 多线程模式 | EventLoopGroup eventGroup = new NioEventLoopGroup(); <br/><br/>ServerBootstrap serverBootstrap = new ServerBootstrap(); <br/>serverBootstrap.group(eventGroup); |
+| 主从 Reactor 多线程模式   | EventLoopGroup bossGroup = new NioEventLoopGroup(); <br/>EventLoopGroup workerGroup = new NioEventLoopGroup(); <br/><br/>ServerBootstrap serverBootstrap = new ServerBootstrap(); <br/>serverBootstrap.group(bossGroup, workerGroup); |
+
 我们实现服务端的时候，一般会初始化两个线程组：
 
 1. **`bossGroup`** ：接收连接。
 2. **`workerGroup`** ：负责具体的处理，交由对应的 Handler 处理。
-
-**单线程模型**
-
-一个线程需要执行处理所有的 `accept`、`read`、`decode`、`process`、`encode`、`send` 事件。对于高负载、高并发，并且对性能要求比较高的场景不适用。
-
-```java
-  // 1.eventGroup既用于处理客户端连接，又负责具体的处理。
-  EventLoopGroup eventGroup = new NioEventLoopGroup(1);// 注意是单线程是1
-  // 2.创建服务端启动引导/辅助类：ServerBootstrap
-  ServerBootstrap b = new ServerBootstrap();
-	try {
-        boobtstrap.group(eventGroup, eventGroup)
-        //......
-```
-
-> 使用 `NioEventLoopGroup` 类的无参构造函数设置线程数量的默认值就是 **CPU 核心数 \*2** 。
-
-**多线程模型**
-
-一个 Acceptor 线程只负责监听客户端的连接，一个 NIO 线程池负责具体处理： `accept`、`read`、`decode`、`process`、`encode`、`send` 事件。满足绝大部分应用场景，并发连接量不大的时候没啥问题，但是遇到并发连接大的时候就可能会出现问题，成为性能瓶颈。
-
-对应到 Netty 代码是下面这样的：
-
-```java
-// 1.bossGroup 用于接收连接，workerGroup 用于具体的处理
-EventLoopGroup bossGroup = new NioEventLoopGroup(1);
-EventLoopGroup workerGroup = new NioEventLoopGroup();
-try {
-  // 2.创建服务端启动引导/辅助类：ServerBootstrap
-  ServerBootstrap b = new ServerBootstrap();
-  // 3.给引导类配置两大线程组,确定了线程模型
-  b.group(bossGroup, workerGroup)
-    //......
-```
 
 **主从多线程模型**
 
