@@ -483,7 +483,7 @@ show.addActionListener((e) -> {
 
 ## 二、常用函数式接口
 
-JDK在`ava.util.function`包提供了大量常用的函数式接口以丰富Lambda的典型使用场景，主要嘘唏是Consumer（消费型）、supplier（供给型）、predicate（谓词型）、function（功能性）接口。
+JDK在`ava.util.function`包提供了大量常用的函数式接口以丰富Lambda的典型使用场景，主要使用的是Consumer（消费型）、supplier（供给型）、predicate（谓词型）、function（功能性）接口。
 
 ### 2.1 Supplier接口
 
@@ -508,7 +508,7 @@ JDK在`ava.util.function`包提供了大量常用的函数式接口以丰富Lamb
     //传入单个String        
     public void info(Supplier<String> msgSupplier) {
             log(Level.INFO, msgSupplier);
-        }
+    }
 	//传入 Supplier<String>
     public void log(Level level, Supplier<String> msgSupplier) {
         if (!isLoggable(level)) {// 如果不显示消息则返回
@@ -765,10 +765,10 @@ public class FunctionTest {
 
 ## 参考资料
 
-[理解函数式编程](https://wudaijun.com/2018/05/understand-functional-programing/)
+* [理解函数式编程](https://wudaijun.com/2018/05/understand-functional-programing/)
 
-[Lambda表达式详解](https://www.cnblogs.com/haixiang/p/11029639.html)
+* [Lambda表达式详解](https://www.cnblogs.com/haixiang/p/11029639.html)
 
-[Java8-方法引用详解](https://segmentfault.com/a/1190000012269548)
+* [Java8-方法引用详解](https://segmentfault.com/a/1190000012269548)
 
-[函数式接口](https://geek-docs.com/java/java-examples/java-consumer-interface.html)
+* [函数式接口](https://geek-docs.com/java/java-examples/java-consumer-interface.html)

@@ -89,8 +89,6 @@ public class ListTest {
 `LinkedList `实现了了`Cloneable`接口，即覆盖了函数clone()，能够克隆。
 `LinkedList `实现了`java.io.Serializable`接口，这意味着`LinkedList `支持序列化，能通过序列化传输数据。
 
-
-
 实际开发中对一个集合元素的添加与删除经常涉及到首尾操作，而`LinkedList`提供了大量首尾操作的方法：
 
 * `public void addFirst(E e)`:将指定元素插入此列表的开头。
@@ -374,9 +372,7 @@ public class CollectionsTest {
 
 ### 5.2 Comparator比较器
 
-我们还是先研究照默认规则排序：`public static <T> void sort(List<T> list)`
-
-不过这次存储的是字符串类型。
+我们还是先研究照默认规则排序：`public static <T> void sort(List<T> list)`。不过这次存储的是字符串类型。
 
 ```java
 public class CollectionsTest2 {
@@ -458,6 +454,8 @@ public class CollectionsTest3 {
 
 ## 六、Arrays工具类
 
+### 6.1 基础使用
+
 Arrays类是**数组**的操作类，定义在java.util包中，主要功能是实现数组元素的查找、数组内容的充填和排序等功能。 Arrays 类里均为 **static 修饰的方法**（static 修饰的方法可以直接通过类名调用），可以直接通过 **Arrays.xxx(xxx)** 的形式调用方法。下面了看几个常用方法。
 
 **1．使用sort()方法排序**
@@ -538,10 +536,138 @@ public class ArraysTest {
 当前数组容器：[5, 1, 9, 9, 9, 8, -1, 0]
 ```
 
+### 6.2 Arrays.asList()避坑指南
+
+`Arrays.asList()`在平时开发中还是比较常见的，我们可以使用它将一个数组转换为一个 List 集合。
+
+```java
+String[] myArray = { "Apple", "Banana", "Orange" };
+List<String> myList = Arrays.asList(myArray);
+//上面两个语句等价于下面一条语句
+List<String> myList = Arrays.asList("Apple","Banana", "Orange");
+```
+
+JDK 源码对于这个方法的说明：
+
+```java
+/**
+ * 返回由指定数组支持的固定大小的列表。此方法作为基于数组和基于集合的API之间的桥梁，
+ * 与Collection.toArray()结合使用。返回的List是可序列化并实现RandomAccess接口。
+ */
+public static <T> List<T> asList(T... a) {
+    return new ArrayList<>(a);
+}
+```
+
+**《阿里巴巴 Java 开发手册》对其的描述**：【强制】使用工具类`Arrays.asList()`把数组转换成集合时，不能使用其修改集合相关的方法，它的 `add/remove/clear` 方法会抛出 `UnsupportedOperationException` 异常。 
+
+* 说明：asList 的返回对象是一个 Arrays 内部类，并没有实现集合的修改方法。`Arrays.asList` 体现的是适配器模式，只是转换接口，后台的数据仍是数组。
+
+```java
+String[] str = new String[] { "you", "wu" }; 
+List list = Arrays.asList(str); 
+```
+
+* 第一种情况：`list.add("yangguanbao"); `运行时异常。 
+* 第二种情况：`str[0] = "gujin"; 那么 list.get(0)`也会随之修改
+
+**使用时的注意事项总结**：
+
+（1）**传递的数组必须是对象数组，而不是基本类型。**
+
+`Arrays.asList()`是泛型方法，传入的对象必须是对象数组。
+
+```java
+int[] myArray = { 1, 2, 3 };
+List myList = Arrays.asList(myArray);
+System.out.println(myList.size());//1
+System.out.println(myList.get(0));//数组地址值
+System.out.println(myList.get(1));//报错：ArrayIndexOutOfBoundsException
+int [] array=(int[]) myList.get(0);
+System.out.println(array[0]);//1
+```
+
+当传入一个原生数据类型数组时，`Arrays.asList()` 的真正得到的参数就不是数组中的元素，而是数组对象本身！此时 List 的唯一元素就是这个数组，这也就解释了上面的代码。
+
+我们使用包装类型数组就可以解决这个问题。
+
+```java
+Integer[] myArray = { 1, 2, 3 };
+```
+
+**使用集合的修改方法:`add()`、`remove()`、`clear()`会抛出异常。**
+
+```java
+List myList = Arrays.asList(1, 2, 3);
+myList.add(4); // 运行时报错：UnsupportedOperationException
+myList.remove(1); // 运行时报错：UnsupportedOperationException
+myList.clear(); // 运行时报错：UnsupportedOperationException
+```
+
+`Arrays.asList()` 方法返回的并不是 `java.util.ArrayList` ，而是 `java.util.Arrays` 的一个内部类，这个内部类并没有实现集合的修改方法或者说并没有重写这些方法。
+
+```java
+List myList = Arrays.asList(1, 2, 3);
+System.out.println(myList.getClass()); // class java.util.Arrays$ArrayList
+```
+
+下图是`java.util.Arrays$ArrayList`的简易源码，我们可以看到这个类重写的方法有哪些。
+
+```java
+  private static class ArrayList<E> extends AbstractList<E>
+        implements RandomAccess, java.io.Serializable
+    {
+        ...
+
+        @Override
+        public E get(int index) {
+          ...
+        }
+
+        @Override
+        public E set(int index, E element) {
+          ...
+        }
+
+        @Override
+        public int indexOf(Object o) {
+          ...
+        }
+
+        @Override
+        public boolean contains(Object o) {
+           ...
+        }
+
+        @Override
+        public void forEach(Consumer<? super E> action) {
+          ...
+        }
+
+        @Override
+        public void replaceAll(UnaryOperator<E> operator) {
+          ...
+        }
+
+        @Override
+        public void sort(Comparator<? super E> c) {
+          ...
+        }
+    }
+```
+
+我们再看一下`java.util.AbstractList`的`remove()`方法，这样我们就明白为啥会抛出`UnsupportedOperationException`。
+
+```java
+public E remove(int index) {
+    throw new UnsupportedOperationException();
+}
+```
+
 ## 参考资料
 
-[Java 集合系列之 Collection架构](https://www.cnblogs.com/skywang12345/p/3308513.html)
+* [Java 集合系列之 Collection架构](https://www.cnblogs.com/skywang12345/p/3308513.html)
 
-[LinkedHashSet 的实现原理](https://wiki.jikexueyuan.com/project/java-collection/linkedhashset.html)
+* [LinkedHashSet 的实现原理](https://wiki.jikexueyuan.com/project/java-collection/linkedhashset.html)
 
-[JavaSE基础:Arrays工具类](https://juejin.im/post/6844903556131061767)
+* [JavaSE基础:Arrays工具类](https://juejin.im/post/6844903556131061767)

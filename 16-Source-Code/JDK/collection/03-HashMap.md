@@ -825,19 +825,12 @@ TreeNode相关操作的其他方法分析可以参考[死磕 java集合之HashMa
 
 ## 参考
 
-[HashMap源码分析](https://juejin.im/post/6844904048185851911)
-
-[HashMap(JDK1.8)源码+底层数据结构分析](https://github.com/Snailclimb/JavaGuide/blob/master/docs/java/collection/HashMap(JDK1.8)%E6%BA%90%E7%A0%81%2B%E5%BA%95%E5%B1%82%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90.md)
-
-[深入理解HashMap（jdk7）](https://juejin.im/post/6844903903595593741)
-
-[全网把Map中的hash()分析的最透彻的文章，别无二家](https://www.hollischuang.com/archives/2091)
-
-[JDK 源码中 HashMap 的 hash 方法原理是什么？](https://www.zhihu.com/question/20733617)
-
-[死磕 java集合之HashMap源码分析](https://juejin.im/post/6844903817855631373)
-
-[深入理解HashMap(四): 关键源码逐行分析之resize扩容](https://segmentfault.com/a/1190000015812438)
-
-[HashMap 的 7 种遍历方式与性能分析！](https://juejin.im/post/6844904144331866119)
+* [HashMap源码分析](https://juejin.im/post/6844904048185851911)
+* [HashMap(JDK1.8)源码+底层数据结构分析](https://github.com/Snailclimb/JavaGuide/blob/master/docs/java/collection/HashMap(JDK1.8)%E6%BA%90%E7%A0%81%2B%E5%BA%95%E5%B1%82%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90.md)
+* [深入理解HashMap（jdk7）](https://juejin.im/post/6844903903595593741)
+* [全网把Map中的hash()分析的最透彻的文章，别无二家](https://www.hollischuang.com/archives/2091)
+* [JDK 源码中 HashMap 的 hash 方法原理是什么？](https://www.zhihu.com/question/20733617)
+* [死磕 java集合之HashMap源码分析](https://juejin.im/post/6844903817855631373)
+* [深入理解HashMap(四): 关键源码逐行分析之resize扩容](https://segmentfault.com/a/1190000015812438)
+* [HashMap 的 7 种遍历方式与性能分析！](https://juejin.im/post/6844904144331866119)
 

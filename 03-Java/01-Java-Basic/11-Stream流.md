@@ -443,12 +443,8 @@ public class StreamTest {
 
 ## 参考资料
 
-[简洁方便的集合处理 Java 8 stream流](https://www.infoq.cn/article/vKZp6uczINXh3u9zOtDl)
-
-[Java8 Stream流学习笔记](https://www.jianshu.com/p/dda6ae5cf34e)
-
-[Java 函数式编程（三）流（Stream）](https://juejin.im/post/6844903662133706760)
-
-[Java 8 新特性 Stream类的collect方法](https://www.cnblogs.com/Deters/p/11137532.html)
-
-[Stream流](https://www.cnblogs.com/yulinfeng/p/12561664.html)
+* [简洁方便的集合处理 Java 8 stream流](https://www.infoq.cn/article/vKZp6uczINXh3u9zOtDl)
+* [Java8 Stream流学习笔记](https://www.jianshu.com/p/dda6ae5cf34e)
+* [Java 函数式编程（三）流（Stream）](https://juejin.im/post/6844903662133706760)
+* [Java 8 新特性 Stream类的collect方法](https://www.cnblogs.com/Deters/p/11137532.html)
+* [Stream流](https://www.cnblogs.com/yulinfeng/p/12561664.html)

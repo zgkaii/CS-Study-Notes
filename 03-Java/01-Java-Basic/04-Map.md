@@ -26,7 +26,6 @@
 * EnumMap几乎和HashMap是一样的，区别在于EnumMap的key是一个Enum。
 
 > Tips：Map接口中的集合都有两个泛型变量<K,V>，在使用时，要为两个泛型变量赋予数据类型。两个泛型变量<K,V>的数据类型可以相同，也可以不同。
->
 
 ### 1.3  常用方法
 
@@ -169,7 +168,6 @@ public class MapTest {
 ~~~
 
 > Tips：**Map集合不能直接使用迭代器或者foreach进行遍历**，但是转成Set之后就可以使用了。
->
 
 ## 二、HashMap
 
@@ -222,18 +220,18 @@ Node是HashMap的一个内部类，实现了Map.Entry接口，本质是就是一
 
 HashMap中常用的方法有：
 
-* **void clear（）**：从指定的Map中删除所有键和值对。
-* **Object clone（）**：它返回一个映射的所有映射的副本，并用于将它们克隆到另一个映射中。
-* **boolean containsKey（Object key）**：这是一个布尔函数，根据在Map中是否找到指定的键来返回true或false。
-* **boolean containsValue（Object Value）**：类似于containsKey（）方法，但是它将查找指定的值而不是键。
+* **void clear()**：从指定的Map中删除所有键和值对。
+* **Object clone()**：它返回一个映射的所有映射的副本，并用于将它们克隆到另一个映射中。
+* **boolean containsKey(Object key)**：这是一个布尔函数，根据在Map中是否找到指定的键来返回true或false。
+* **boolean containsValue(Object Value)**：类似于containsKey（）方法，但是它将查找指定的值而不是键。
 * **Value get(Object key)**）：它返回指定键的值。
-* **boolean isEmpty（）**：检查映射是否为空。如果映射中不存在键值映射，则此函数返回true，否则返回false。
-* **Set keySet（）**：它返回从Map获取的键的Set。
-* **value put（Key k，Value v）**：将键值映射插入到映射中。
-* **int size（）**：返回映射的大小–键值映射的数量。
-* **Collection values（）**：它返回Map的值的集合。
+* **boolean isEmpty()**：检查映射是否为空。如果映射中不存在键值映射，则此函数返回true，否则返回false。
+* **Set keySet()**：它返回从Map获取的键的Set。
+* **value put(Key k，Value v)**：将键值映射插入到映射中。
+* **int size()**：返回映射的大小–键值映射的数量。
+* **Collection values()**：它返回Map的值的集合。
 * **Value remove(Object key)**：删除指定键的键值对。
-* **void putAll（Map m）**：将Map的所有元素复制到另一个指定的Map。
+* **void putAll(Map m)**：将Map的所有元素复制到另一个指定的Map。
 
 ### 2.4 遍历方式
 
@@ -486,7 +484,6 @@ synchronized Collection<V>       values()
 4. 查看三人各自手中的牌（按照牌的大小排序）、底牌
 
 > 规则：手中扑克牌从大到小的摆放顺序：大王,小王,2,A,K,Q,J,10,9,8,7,6,5,4,3
->
 
 ### 5.2 案例需求分析
 
@@ -628,13 +625,13 @@ public class Poker {
 
 ## 参考资料
 
-[Java 集合系列之 Map架构](https://www.cnblogs.com/skywang12345/p/3308931.html)
+* [Java 集合系列之 Map架构](https://www.cnblogs.com/skywang12345/p/3308931.html)
 
-[Java 8系列之重新认识HashMap](https://tech.meituan.com/2016/06/24/java-hashmap.html)
+* [Java 8系列之重新认识HashMap](https://tech.meituan.com/2016/06/24/java-hashmap.html)
 
-[Java HashMap工作原理及实现](https://yikun.github.io/2015/04/01/Java-HashMap%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86%E5%8F%8A%E5%AE%9E%E7%8E%B0/)
+* [Java HashMap工作原理及实现](https://yikun.github.io/2015/04/01/Java-HashMap%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86%E5%8F%8A%E5%AE%9E%E7%8E%B0/)
 
- [图解LinkedHashMap原理](https://www.jianshu.com/p/8f4f58b4b8ab)
+* [图解LinkedHashMap原理](https://www.jianshu.com/p/8f4f58b4b8ab)
 
  
 
