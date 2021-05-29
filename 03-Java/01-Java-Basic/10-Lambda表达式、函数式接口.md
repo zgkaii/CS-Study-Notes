@@ -51,7 +51,7 @@ Lambda 表达式（lambda expression）是一个匿名函数，Lambda 表达式�
 
 ### 1.2 体验Lambda表达式
 
-#### （1）匿名内部类方式启动线程
+#### 1.2.1 匿名内部类方式启动线程
 
 当需要启动一个线程去完成任务时，通常会通过`java.lang.Runnable`接口来定义任务内容，并使用`java.lang.Thread`类来启动该线程。代码如下：
 
@@ -79,7 +79,7 @@ public class RunnableTest {
 - 必须覆盖重写抽象`run`方法，所以方法名称、方法参数、方法返回值**不得不**再写一遍，且不能写错；
 - 而实际上，**只有方法体才是关键所在**。
 
-#### （2）Lambda表达式启动线程
+#### 1.2.2 Lambda表达式启动线程
 
 借助Java 8的全新语法，上述`Runnable`接口的匿名内部类写法可以这样书写：
 
@@ -97,7 +97,7 @@ public class LambdaTest {
 
 ### 1.3 格式及使用
 
-#### （1）Lambda表达式格式
+#### 1.3.1 Lambda表达式格式
 
 Lambda表达式省去面向对象中的条条框框，由**3个部分**组成：
 
@@ -131,7 +131,7 @@ Lambda表达式的**标准格式**为：
 () -> { return 3.1415 };
 ```
 
-#### （2）Lambda的使用前提
+#### 1.3.2 Lambda的使用前提
 
 虽然使用 Lambda 表达式可以对某些接口进行简单的实现，语法非常简洁，完全没有面向对象编程复杂的束缚。但是使用时有几个问题需要特别注意：
 
@@ -146,9 +146,9 @@ Lambda表达式的**标准格式**为：
 
 可以使用`@FunctionalInterface`来修饰函数式接口，要求接口中的抽象方法只有一个。 
 
-#### （3）函数式接口
+#### 1.3.3 函数式接口
 
-**函数式接口**就是：有且仅有一个抽象方法的接口。
+**函数式接口**就是：**有且仅有一个抽象方法的接口（但是可以有多个非抽象方法的接口)**。
 
 - `FunctionalInterface`注解标注一个函数式接口，不能标注`类`，`方法`，`枚举`，`属性`。
 - 如果接口被标注了`@FunctionalInterface`，这个类就必须符合函数式接口的规范。
@@ -191,7 +191,7 @@ public interface MyFunctionalInterface {
 
 一旦使用该注解来定义接口，编译器将会强制检查该接口是否确实有且仅有一个抽象方法，否则将会报错。需要注 意的是，即使不使用该注解，只要满足函数式接口的定义，这仍然是一个函数式接口，使用起来都一样。
 
-#### （4）Lambda基本使用
+#### 1.3.4 Lambda基本使用
 
 我们这里给出六个接口。
 
@@ -319,7 +319,7 @@ public class LambdaTest2 {
 }
 ```
 
-#### （5）方法引用
+#### 1.3.5 方法引用
 
 双冒号（`::`）操作符是 Java 中的**方法引用**。 当们使用一个方法的引用时，目标引用放在 `::` 之前，目标引用提供的方法名称放在 `::` 之后，即 `目标引用::方法`。
 
@@ -351,7 +351,7 @@ public class LambdaTest3 {
 
 - **构造方法的引用**
 
-一般我们需要声明接口，该接口作为对象的生成器，通过 类名::new 的方式来实例化对象，然后调用方法返回对象。
+一般我们需要声明接口，该接口作为对象的生成器，通过 类名`::new` 的方式来实例化对象，然后调用方法返回对象。
 
 ```java
 public interface ItemCreatorBlankConstruct {
@@ -417,34 +417,34 @@ public class LambdaTest4 {
 
 ### 1.4 常见使用场景
 
-#### （1）线程初始化
+**（1）线程初始化**
 
 ```java
-new Thread(
-    () -> System.out.println("Hello world")
-).start();
+        new Thread(
+            () -> System.out.println("Hello world")
+        ).start();
 ```
 
-#### （2）遍例集合
+**（2）遍例集合**
 
 ```java
-// old way
-List<Integer> list = Arrays.asList(1, 2, 3, 4, 5, 6, 7);
-for (Integer n : list) {
-    System.out.println(n);
-}
+        // old way
+        List<Integer> list = Arrays.asList(1, 2, 3, 4, 5, 6, 7);
+        for (Integer n : list) {
+            System.out.println(n);
+        }
 
-// 使用 -> 的 Lambda 表达式
-list.forEach(n -> System.out.println(n));
+        // 使用 -> 的 Lambda 表达式
+        list.forEach(n -> System.out.println(n));
 
-// 使用 :: 的 Lambda 表达式（方法引用）
-list.forEach(System.out::println);
+        // 使用 :: 的 Lambda 表达式（方法引用）
+        list.forEach(System.out::println);
 ```
 
-#### （3）元素排序
+**（3）元素排序**
 
 ```java
- ArrayList<Item> list = new ArrayList<>();
+ 		ArrayList<Item> list = new ArrayList<>();
         list.add(new Item(13, "背心", 7.80));
         list.add(new Item(11, "半袖", 37.80));
         list.add(new Item(14, "风衣", 139.80));
@@ -463,22 +463,22 @@ list.forEach(System.out::println);
         System.out.println(list);
 ```
 
-#### （4）事件处理
+**（4）事件处理**
 
 ```java
-// old way
-JButton show =  new JButton("Show");
-show.addActionListener(new ActionListener() {
-    @Override
-    public void actionPerformed(ActionEvent e) {
-    System.out.println("old way");
-    }
-}); 
+        // old way
+        JButton show =  new JButton("Show");
+        show.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            System.out.println("old way");
+            }
+        }); 
 
-// 使用 -> 的 Lambda 表达式
-show.addActionListener((e) -> {
-    System.out.println("使用 -> 的 Lambda 表达式");
-});
+        // 使用 -> 的 Lambda 表达式
+        show.addActionListener((e) -> {
+            System.out.println("使用 -> 的 Lambda 表达式");
+        });
 ```
 
 ## 二、常用函数式接口
@@ -621,7 +621,41 @@ public class ConsumerTest {
 
 ### 2.3 Predicate接口
 
-有时候我们需要对某种类型的数据进行判断，从而得到一个boolean值结果。这时可以使用`java.util.function.Predicate<T>`接口。
+Predicate 接口是只有一个参数的返回布尔类型值的 **断言型** 接口。该接口包含多种默认方法来将 Predicate 组合成其他复杂的逻辑（比如：与，或，非）：
+
+**译者注：** Predicate 接口源码如下
+
+```java
+package java.util.function;
+import java.util.Objects;
+
+@FunctionalInterface
+public interface Predicate<T> {
+    
+    // 该方法是接受一个传入类型,返回一个布尔值.此方法应用于判断.
+    boolean test(T t);
+
+    //and方法与关系型运算符"&&"相似，两边都成立才返回true
+    default Predicate<T> and(Predicate<? super T> other) {
+        Objects.requireNonNull(other);
+        return (t) -> test(t) && other.test(t);
+    }
+    // 与关系运算符"!"相似，对判断进行取反
+    default Predicate<T> negate() {
+        return (t) -> !test(t);
+    }
+    //or方法与关系型运算符"||"相似，两边只要有一个成立就返回true
+    default Predicate<T> or(Predicate<? super T> other) {
+        Objects.requireNonNull(other);
+        return (t) -> test(t) || other.test(t);
+    }
+   // 该方法接收一个Object对象,返回一个Predicate类型.此方法用于判断第一个test的方法与第二个test方法相同(equal).
+    static <T> Predicate<T> isEqual(Object targetRef) {
+        return (null == targetRef)
+                ? Objects::isNull
+                : object -> targetRef.equals(object);
+    }
+```
 
 **抽象方法：test**
 
@@ -713,6 +747,33 @@ public class PredicateTest {
 ### 2.4 Function接口
 
 `java.util.function.Function<T,R>`接口用来根据一个类型的数据得到另一个类型的数据，前者称为前置条件，后者称为后置条件。
+
+```java
+package java.util.function;
+ 
+import java.util.Objects;
+ 
+@FunctionalInterface
+public interface Function<T, R> {
+    
+    //将Function对象应用到输入的参数上，然后返回计算结果。
+    R apply(T t);
+    //将两个Function整合，并返回一个能够执行两个Function对象功能的Function对象。
+    default <V> Function<V, R> compose(Function<? super V, ? extends T> before) {
+        Objects.requireNonNull(before);
+        return (V v) -> apply(before.apply(v));
+    }
+    // 
+    default <V> Function<T, V> andThen(Function<? super R, ? extends V> after) {
+        Objects.requireNonNull(after);
+        return (T t) -> after.apply(apply(t));
+    }
+ 
+    static <T> Function<T, T> identity() {
+        return t -> t;
+    }
+}
+```
 
 **抽象方法：apply**
 
