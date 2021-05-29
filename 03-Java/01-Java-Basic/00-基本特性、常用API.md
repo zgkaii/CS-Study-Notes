@@ -77,7 +77,7 @@ Picked up JAVA_TOOL_OPTIONS: -Dfile.encoding=gb2312
 
 2）局部变量：
 
-- 局部变量只定义在局  部范围内，如：函数内，语句内等，只在所属的区域有效。
+- 局部变量只定义在局部范围内，如：函数内，语句内等，只在所属的区域有效。
 - 局部变量存在于栈内存中，作用的范围结束，变量空间会自动释放。
 - 局部变量没有默认初始化值
 
@@ -336,8 +336,6 @@ public class DateTest {
 * **格式化**：按照指定的格式，从Date对象转换为String对象。
 * **解析**：按照指定的格式，从String对象转换为Date对象。
 
-
-
 1）构造方法
 
 DateFormat为抽象类，不能直接使用，所以需要常用的子类`java.text.SimpleDateFormat`。这个类需要一个模式（格式）来指定格式化或解析的标准。构造方法为：
@@ -414,8 +412,6 @@ public class CalendarTest {
     }
 }
 ```
-
-
 
 **1）常用方法：**
 
@@ -738,8 +734,87 @@ str.split(String sign,int limit)
 ### 6.3 String、StringBuffer和StringBuilder
 
 ![](https://img-blog.csdnimg.cn/20200806103642453.png)
-StringBuilder与StringBuffer是可变字符串类。一般情况下，速度从快到慢为 StringBuilder > StringBuffer > String。
-操作少量的数据使用 String；单线程操作大量数据使用 StringBuilder；多线程操作大量数据使用 StringBuffer。
+StringBuilder与StringBuffer是可变字符串类。一般情况下，**速度从快到慢为 StringBuilder > StringBuffer > String，此外StringBuilder是线程不安全的，而StringBuffer是线程安全的**。操作少量的数据使用 String；单线程操作大量数据使用 StringBuilder；多线程操作大量数据使用 StringBuffer。
+
+------
+
+**问题**：StringBuilder为什么是线程不安全的呢？
+
+这里写了一个测试用例，发现StringBuilder的确会出现线程安全问题，多次测试结果都不等于1000。
+
+```java
+public class StringBuilderAndBuffer {
+    public static void main(String[] args) throws InterruptedException {
+        StringBuilder stringBuilder = new StringBuilder();
+        StringBuffer stringBuffer = new StringBuffer();
+
+        for (int i = 0; i < 10; i++) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    for (int j = 0; j < 1000; j++) {
+                        stringBuilder.append("a");
+                        stringBuffer.append("b");
+                    }
+                }
+            }).start();
+        }
+
+        Thread.sleep(1000);
+        System.out.println(stringBuilder.length());// 9996
+        System.out.println(stringBuffer.length());// 1000
+    }
+}
+```
+
+查看源码得知道，`StringBuilder`和`StringBuffer`都继承了`AbstractStringBuilder`，最主要的成员变量：
+
+```java
+    /**
+     * 存储字符串具体内容
+     */
+    char[] value;
+
+    /**
+     * 已使用字符串数量
+     */
+    int count;
+```
+
+`StringBuilder`的`append`方法重写了父类的`append`方法，`AbstractStringBuilder`中`append`方法：
+
+```java
+    // StringBuilder.java
+	@Override
+    public StringBuilder append(String str) {
+        super.append(str);
+        return this;
+    }
+
+	// AbstractStringBuilder.java
+	public AbstractStringBuilder append(String str) {
+        if (str == null)
+            return appendNull();
+        int len = str.length();
+        ensureCapacityInternal(count + len);
+        str.getChars(0, len, value, count);
+        count += len;
+        return this;
+    }
+```
+
+问题就出在第7行代码，由于` count += len;`并不是原子操作。例如两个线程都获取到count=10，len的值为1，两个线程同时执行到了第七行，拿到的值都是`10`，执行完加法运算后将结果赋值给`count`，所以两个线程最终得到的结果都是`11`，而不是`12`。
+
+那StringBuffer为什么是线程安全的呢？看其源码明白了——其添加了`synchronized`锁。
+
+```java
+    @Override
+    public synchronized StringBuffer append(String str) {
+        toStringCache = null;
+        super.append(str);
+        return this;
+    }
+```
 
 ## 七、内置包装类
 
@@ -762,20 +837,18 @@ StringBuilder与StringBuffer是可变字符串类。一般情况下，速度从�
 
 * **拆箱**：从包装类对象转换为对应的基本类型。
 
-  
-
 用Integer与 int为例：
 
 基本数值---->包装对象
 
-~~~shell script
-Integer i = new Integer(4);//使用构造函数函数
-Integer iii = Integer.valueOf(4);//使用包装类中的valueOf方法
+~~~java
+Integer i = new Integer(4);// 使用构造函数函数
+Integer iii = Integer.valueOf(4);// 使用包装类中的valueOf方法
 ~~~
 
 包装对象---->基本数值
 
-~~~shell script
+~~~java
 int num = i.intValue();
 ~~~
 
@@ -783,21 +856,19 @@ int num = i.intValue();
 
 从Java 5（JDK 1.5）开始，基本类型与包装类的装箱、拆箱动作可以自动完成。例如：
 
-```shell script
-Integer i = 4;//1.自动装箱------>Integer i = Integer.valueOf(4);
-i = i + 5;    //2.自动拆箱:等号右边将i对象转成基本数值------> i.intValue() + 5;
-		      //3.自动装箱:加法运算完成后，再次装箱，把基本数值转成对象。
+```java
+Integer i = 4;// 1.自动装箱------>Integer i = Integer.valueOf(4);
+i = i + 5;    // 2.自动拆箱:等号右边将i对象转成基本数值------> i.intValue() + 5;
+		      // 3.自动装箱:加法运算完成后，再次装箱，把基本数值转成对象。
 ```
 
 ### 7.3 基本类型与字符串之间的转换
 
 **基本类型转换String**总共有三种方式，这里只讲最简单的一种方式： 
 
-~~~
+~~~shell
 基本类型直接与""相连接即可；如：34+""
 ~~~
-
-String转换成对应的基本类型 
 
 除了Character类之外，其他所有包装类都具有parseXxx静态方法可以将字符串参数转换为对应的基本类型：
 
@@ -823,24 +894,26 @@ public class Demo18WrapperParse {
 
 ### 7.4 疑问解答
 
-==1）为什么存在基本类型与包装类型这两种类型呢？==
+==（1）为什么存在基本类型与包装类型这两种类型呢？==
+
 在Java语言中，new一个对象存储在堆里，我们通过栈中的引用来使用这些对象；但是对于经常用到的一系列类型如int，如果我们用new将其存储在堆里就不是很有效——特别是简单的小的变量。所以就出现了基本类型，同C++一样，Java采用了相似的做法，对于这些类型不是用new关键字来创建，而是直接将变量的值存储在栈中，因此更加高效。
 
-==2）有了基本类型为什么还要有包装类型呢？==
+==（2）有了基本类型为什么还要有包装类型呢？==
+
 Java是一个面相对象的编程语言，基本类型并不具有对象的性质，为了让基本类型也具有对象的特征，就出现了包装类型（如我们在使用集合类型Collection时就一定要使用包装类型而非基本类型），它相当于将基本类型“包装起来”，使得它具有了对象的性质，并且为其添加了属性和方法，丰富了基本类型的操作。
 
 另外，使用ArrayList，HashMap中时，像int，double等基本类型是放不进去的，因为容器都是装object的，这时就需要这些基本类型的包装类了。
 
-==3）二者的主要区别在哪里呢？==
+==（3）二者的主要区别在哪里呢？==
 
 1. 声明方式不同：
-   基本类型不使用new关键字，而包装类型需要使用new关键字来在堆中分配存储空间
+   基本类型不使用new关键字，而包装类型需要使用new关键字来在堆中分配存储空间。
 
 2. 存储方式及位置不同： 
-   基本类型是直接将变量值存储在栈中，而包装类型是将对象放在堆中，然后通过引用来使用；
+   基本类型是直接将变量值存储在栈中，而包装类型是将对象放在堆中，然后通过引用来使用。
 
 3. 初始值不同：
-   基本类型的初始值如int为0，boolean为false，而包装类型的初始值为null
+   基本类型的初始值如int为0，boolean为false，而包装类型的初始值为null。
 
 4. 使用方式不同：
 
@@ -848,10 +921,7 @@ Java是一个面相对象的编程语言，基本类型并不具有对象的性�
 
 ## 参考资料
 
-[浅析Java程序的执行过程](https://juejin.im/post/6844903775056953352)
-
-[equals与hashCode详解](https://www.cnblogs.com/qian123/p/5703507.html)
-
-[equals()、compareTo() 与==](https://blog.csdn.net/u012369153/article/details/52982022)
-
-[内置包装类](http://c.biancheng.net/java/60/)
+* [浅析Java程序的执行过程](https://juejin.im/post/6844903775056953352)
+* [equals与hashCode详解](https://www.cnblogs.com/qian123/p/5703507.html)
+* [equals()、compareTo() 与==](https://blog.csdn.net/u012369153/article/details/52982022)
+* [内置包装类](http://c.biancheng.net/java/60/)

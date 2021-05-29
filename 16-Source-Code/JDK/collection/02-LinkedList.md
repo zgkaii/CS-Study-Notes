@@ -426,7 +426,7 @@ set(int index, E element)方法：修改指定节点元素
 
 ## 参考
 
-[LinkedList源码分析（一）](https://juejin.im/post/6844903615811813384)
+* [LinkedList源码分析（一）](https://juejin.im/post/6844903615811813384)
 
-[LinkedList源码分析（二）](https://juejin.im/post/6844903617904771085)
+* [LinkedList源码分析（二）](https://juejin.im/post/6844903617904771085)
 
