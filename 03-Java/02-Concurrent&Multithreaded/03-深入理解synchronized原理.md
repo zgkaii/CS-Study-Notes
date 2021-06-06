@@ -1,4 +1,4 @@
-- [1 线程安全问题](#1-线程安全问题)
+- [1 竞态条件](#1-竞态条件)
 - [2 初识synchronized](#2-初识synchronized)
   - [2.1 使用场景](#21-使用场景)
   - [2.2 案例分析](#22-案例分析)
@@ -17,30 +17,20 @@
   - [4.4 偏向锁](#44-偏向锁)
   - [4.5 轻量级锁](#45-轻量级锁)
   - [4.6 锁膨胀/锁升级](#46-锁膨胀锁升级)
-- [5 简析CAS](#5-简析cas)
-- [6 写在最后](#6-写在最后)
+- [5 总结](#5-总结)
 - [参考资料](#参考资料)
-# 1 线程安全问题
+
+# 1 竞态条件
 
 在并发编程中，需要处理两个关键问题：线程之间如何**通信**及线程之间如何**同步**（这里的线程是指并发执行的活动实体）。
 
-**通信**是指线程之间以何种机制来交换信息。**Java中并发采用的是共享内存模型**，在共享内存的并发模型里，线程之间共享程序的公共状态，通过写-读内存中的公共状态进行**隐式通信**。
+**通信**是指线程之间以何种机制来交换信息。**Java中并发采用的是共享内存模型**，在共享内存的并发模型里，线程之间共享程序的公共状态，通过写-读内存中的公共状态进行**隐式通信**；而**同步**是指程序中用于控制不同线程间操作发生相对顺序的机制。在共享内存并发模型里，同步是显式进行的。程序员必须显式指定某个方法或某段代码需要在线程之间**互斥**执行。
 
-而**同步**是指程序中用于控制不同线程间操作发生相对顺序的机制。在共享内存并发模型里，同步是显式进行的。程序员必须显式指定某个方法或某段代码需要在线程之间**互斥**执行。
+互斥即“**同一时刻只有一个线程执行**”，如果我们能够保证对共享变量的修改是互斥的，那么，无论是单核 CPU 还是多核 CPU，就都能保证原子性了。
 
-Java内存模型（Java Memory Model，JMM）描述了Java程序中各种变量（线程共享变量）的访问规则，以及在JVM中将变量存储到内存和从内存中读取出变量这样的底层细节。
-
-![](https://img-blog.csdnimg.cn/20200928202635957.png)
-
-在Java中，所有实例域、静态域和数组元素都存储在堆内存中，堆内存在线程之间共享。由于线程的工作内存是线程私有内存，线程间无法互相访问对方的工作内存。所以线程 0 、线程 1 和线程 2需要读写主内存的`共享变量`时，就都先将该共享变量拷贝（load）到自己的工作内存，然后在自己的工作内存中对该变量进行所有操作，线程工作内存对**变量副本完成操作之后再将结果同步（save）至主内存**。
-
-因此，在[线程上下文切换](https://blog.csdn.net/KAIZ_LEARN/article/details/109225490)期间，**多线程读写共享内存中的全局变量及静态变量容易引发竞态条件**。
-
-下面用代码来说明：
+下面举一个例子：
 
 ```java
-@Slf4j
-public class SafeTest {
     static int count = 0;
 
     public static void main(String[] args) throws InterruptedException {
@@ -60,7 +50,6 @@ public class SafeTest {
         t2.join();
         log.debug("count的值是: {}", count);
     }
-}
 ```
 
 按照常理而言，count最终结果应该为0。多次运行发现，最终count值还可能是正数，也可能为负数。这是为什么呢？
@@ -101,21 +90,29 @@ public class SafeTest {
 
 正常顺序执行：
 
-![](https://img-blog.csdnimg.cn/20201025112256131.png)
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20201025112256131.png" width="550px"/>
+</div>
 
 实际出现负数的情况：
 
-![](https://img-blog.csdnimg.cn/20201025112454585.png)
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20201025112454585.png" width="550px"/>
+</div>
 
 实际出现正数的情况：
 
-![](https://img-blog.csdnimg.cn/20201025112642320.png)
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20201025112642320.png" width="550px"/>
+</div>
 
 像上面`count++` 和 `count--` 的代码所在区域又称**临界区**（**一段代码内如果存在对共享资源的多线程读写操作，那么称这段代码为临界区**）。
 
 跟上面案例一样。如果多个线程临界区代码执行竞争同一资源时，对资源的访问顺序敏感，执行时序的不同导致会出现某种不正常的行为，就称存在**竞态条件（Race Condition）**。
 
-为避免竞态条件的出现，保证java共享内存的原子性、可见性、有序性，很有必要保持线程同步。Java中提供了synchronized、volatile关键字与`Lock`接口。
+实际上，原子性问题的源头就是**线程切换**。在[线程上下文切换](https://blog.csdn.net/KAIZ_LEARN/article/details/109225490)期间，**多线程读写共享内存中的全局变量及静态变量容易引发竞态条件**。
+
+为避免竞态条件的出现，保证java共享内存的原子性，很有必要保持线程同步。Java中主要提供了两种方法：一种是用synchronized关键字，另一种是用Lock显式锁。
 
 # 2 初识synchronized
 
@@ -125,7 +122,9 @@ synchronized采用**互斥同步**（Mutual Exclusion & Synchnronization）的�
 
 在Java代码中使用synchronized可使用在代码块和方法中，根据Synchronized用的位置可以有这些使用场景：
 
-![](https://img-blog.csdnimg.cn/20201025123258136.png)
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20201025123258136.png" width="800px"/>
+</div>
 
 可见，synchronized的使用场景主要有3种：
 
@@ -138,8 +137,6 @@ synchronized采用**互斥同步**（Mutual Exclusion & Synchnronization）的�
 下面，将synchronized应用到上面的案例中：
 
 ```java
-@Slf4j
-public class SafeTest {
     static int count = 0;
     static final Object lock = new Object();
 
@@ -164,12 +161,13 @@ public class SafeTest {
         t2.join();
         log.debug("count的值是: {}", count);
     }
-}
 ```
 
 多次测试发现，结果都为0。这是因为synchronized利用对象锁保证了临界区代码的原子性，临界区内的代码在外界看来是不可分割的，不会被线程切换所打断。
 
-![](https://img-blog.csdnimg.cn/20201025213813109.png)
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20201025213813109.png" width="600px"/>
+</div>
 
 synchronized为什么这么神奇，它到底做了什么呢？下面就进一步探讨一下synchronized的实现原理。
 
@@ -179,27 +177,33 @@ synchronized为什么这么神奇，它到底做了什么呢？下面就进一�
 
 ## 3.1 Java对象头
 
-[对象实例化内存布局与访问定位](https://blog.csdn.net/KAIZ_LEARN/article/details/109281030)中描述了，JVM中对象内存布局主要分为三块区域：对象头区、实例数据区和填充区。
+JVM中对象内存布局主要分为三块区域：对象头区、实例数据区和填充区。
 
-<img src="https://img-blog.csdnimg.cn/202010111456447.jpg" style="zoom: 67%;" />
-
-**Synchronized用到的锁就是存在Java对象头里的**。对象头区又主要分为两部分，分别是 运行时元数据（Mark Word）和 类型指针。
+**Synchronized用到的锁就是存在Java对象头里的**。对象头区又主要分为两部分，分别是运行时元数据（Mark Word）和 类型指针。
 
 如果对象是数组类型，则虚拟机用3个字宽（Word）存储对象头，如果对象是非数组类型，则用2字宽存储对象头。在32位虚拟机中，1字宽等于4字节，即32bit。 Java对象头具体结构描述如下：
 
-![](https://img-blog.csdnimg.cn/20201026155604418.png#pic_center)
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/2021060615134026.png" width="800px"/>
+</div>
 
 **Mark Word用于存储对象自身的运行时数据，如：哈希码（HashCode）、GC分代年龄、锁状态标志、线程持有的锁、偏向线程 ID、偏向时间戳等**。32位JVM的Mark Word的默认存储结构如下：
 
-![](https://img-blog.csdnimg.cn/2020102615580277.png#pic_center)
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20210606151454517.png" width="800px"/>
+</div>
 
 在运行期间，Mark Word里存储的数据会随着锁标志位的变化而变化。Mark Word可能变化为存储以下4种数据：
 
-![](https://img-blog.csdnimg.cn/20201026155859957.png)
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20210606151502543.png" width="800px"/>
+</div>
 
 在64位虚拟机下，Mark Word是64bit大小的，其存储结构如下：
 
-![](https://img-blog.csdnimg.cn/20201026155937989.png#pic_center)
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20210606151509224.png" width="800px"/>
+</div>
 
 ## 3.2 锁记录
 
@@ -207,13 +211,13 @@ synchronized为什么这么神奇，它到底做了什么呢？下面就进一�
 
 **Lock Record是线程私有的数据结构**，每一个线程都有一个可用Lock Record列表，同时还有一个全局的可用列表。**每一个被锁住的对象Mark Word都会和一个Lock Record关联**（对象头的Mark Word中的Lock Word指向Lock Record的起始地址），同时**Lock Record中有一个Owner字段存放拥有该锁的线程的唯一标识**（或者`object mark word`），表示该锁被这个线程占用。
 
-| Lock Record | 描述                                                         |
-| ----------- | ------------------------------------------------------------ |
-| Owner       | 初始时为NULL表示当前没有任何线程拥有该monitor record，当线程成功拥有该锁后保存线程唯一标识，当锁被释放时又设置为NULL。 |
-| EntryQ      | 关联一个系统互斥锁（semaphore），阻塞所有试图锁住monitor record失败的线程。 |
-| RcThis      | 表示blocked或waiting在该monitor record上的所有线程的个数。   |
-| Nest        | 用来实现重入锁的计数。                                       |
-| HashCode    | 保存从对象头拷贝过来的HashCode值（可能还包含GC age）。       |
+| Lock Record | 描述                                                                                                                                                                                                                                                                                                      |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Owner       | 初始时为NULL表示当前没有任何线程拥有该monitor record，当线程成功拥有该锁后保存线程唯一标识，当锁被释放时又设置为NULL。                                                                                                                                                                                    |
+| EntryQ      | 关联一个系统互斥锁（semaphore），阻塞所有试图锁住monitor record失败的线程。                                                                                                                                                                                                                               |
+| RcThis      | 表示blocked或waiting在该monitor record上的所有线程的个数。                                                                                                                                                                                                                                                |
+| Nest        | 用来实现重入锁的计数。                                                                                                                                                                                                                                                                                    |
+| HashCode    | 保存从对象头拷贝过来的HashCode值（可能还包含GC age）。                                                                                                                                                                                                                                                    |
 | Candidate   | 用来避免不必要的阻塞或等待线程唤醒，因为每一次只有一个线程能够成功拥有锁，如果每次前一个释放锁的线程唤醒所有正在阻塞或等待的线程，会引起不必要的上下文切换（从阻塞到就绪然后因为竞争锁失败又被阻塞）从而导致性能严重下降。Candidate只有两种可能的值0表示没有需要唤醒的线程1表示要唤醒一个继任线程来竞争锁 |
 
 ## 3.3 Monitor原理
@@ -259,7 +263,9 @@ synchronized为什么这么神奇，它到底做了什么呢？下面就进一�
 
 ObjectMonitor中有两个队列，**_WaitSet 和 _EntryList**，用来保存ObjectWaiter对象列表（ **每个等待锁的线程都会被封装成ObjectWaiter对象** ），**_owner指向持有ObjectMonitor对象的线程**，当多个线程同时访问一段同步代码：
 
-![](https://img-blog.csdnimg.cn/20201026000053726.png)
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20201026000053726.png" width="450px"/>
+</div>
 
 * 线程需要获取 Object 的锁时，会被放入 EntrySet（入口区） 中进行等待（enter）。
 * 如果该线程获取到了锁（acquire），成为当前锁的 Owner。
@@ -386,11 +392,15 @@ JDK 6为了减少获得锁和释放锁带来的性能消耗，引入了“偏向
 
 四种锁状态对应的的Mark Word内容描述如下：
 
-![](https://img-blog.csdnimg.cn/20201027235703700.png)
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20201027235703700.png" width="600px"/>
+</div>
 
 在64位虚拟机下，Mark Word在不同锁状态存储结构如下：
 
-![](https://img-blog.csdnimg.cn/20201026011946370.png#pic_center)
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20201026011946370.png" width="600px"/>
+</div>
 
 ## 4.2 自旋（Spin）
 
@@ -412,7 +422,7 @@ JDK 6为了减少获得锁和释放锁带来的性能消耗，引入了“偏向
 
 在JDK1.6中自旋锁默认开启。可以使用`-XX:+UseSpinning`开启，`-XX:-UseSpinning`关闭自旋锁优化。
 
-自旋的默认次数为**10次**，可以使用`-XX:preBlockSpin`参数修改默认的自旋次数。
+自旋的默认次数为**10次**，可以使用`-XX:preBlockSpin`参数修改默认的自	旋次数。
 
 ### 4.2.2 适应性自旋锁
 
@@ -471,7 +481,9 @@ public void vectorTest(){
 
 当一个线程访问同步代码块并获取锁时，会在Mark Word里存储锁偏向的线程ID。**在线程进入和退出同步块时不再通过CAS操作来加锁和解锁，而是检测Mark Word里是否存储着指向当前线程的偏向锁**。引入偏向锁是为了在没有多线程竞争的情况下尽量减少不必要的轻量级锁执行路径，**偏向锁只需要在置换ThreadID的时候依赖一次CAS原子指令即可**。
 
-![](https://img-blog.csdnimg.cn/20201029093518296.png#pic_center)
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20201029093518296.png" width="650px"/>
+</div>
 
 偏向锁只有遇到其他线程尝试竞争偏向锁时，持有偏向锁的线程才会释放锁，线程不会主动释放偏向锁。偏向锁的撤销，需要等待**全局安全点**（在这个时间点上没有字节码正在执行），它会首先暂停拥有偏向锁的线程，判断锁对象是否处于被锁定状态。撤销偏向锁后恢复到无锁（标志位为“01”）或轻量级锁（标志位为“00”）的状态。
 
@@ -512,7 +524,9 @@ public class BiasedLockTest {
 
 打印结果如下：
 
-![](https://img-blog.csdnimg.cn/20201029101326547.png)
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20201029101326547.png" width="800px"/>
+</div>
 
    图中的1、2、3、4分别对应 MarkWord、类型指针、实例数据、对齐填充。
 
@@ -525,7 +539,9 @@ public class BiasedLockTest {
 
 再次运行：
 
-![](https://img-blog.csdnimg.cn/20201029101939258.png)
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20201029101939258.png" width="900px"/>
+</div>
 
 ## 4.5 轻量级锁
 
@@ -538,97 +554,37 @@ public class BiasedLockTest {
 1. 在代码块进入同步块时，如果同步对象锁状态为无锁状态（锁标志位01，是否偏向锁0），虚拟机首先将在当前线程的栈帧中建立一个名为锁记录（Lock Record）的空间，用于存储锁对象目前的Mark Word的拷贝，官方称之为Displaced Mark Word。
 2. 拷贝对象头中的Mark Word复制到锁记录中。
 
-![](https://img-blog.csdnimg.cn/20201029202248681.png)
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20201029202248681.png" width="800px"/>
+</div>
 
 3. 拷贝成功后，虚拟机将使用**CAS操作**尝试将对象的Mark Word更新为指向Lock Record的指针，并将Lock Record里的owner指针指向对象的Mark Word。
 
-![](https://img-blog.csdnimg.cn/20201029202504258.png)
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20201029202504258.png" width="800px"/>
+</div>
 
 4. 如果更新动作成功了，那么这个线程就拥有了该对象的锁，此时对象Mark Word锁标志位设置为00，表示此对象处于轻量级锁定状态。
 
-![](https://img-blog.csdnimg.cn/20201029202728319.png)
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20201029202728319.png" width="800px"/>
+</div>
 
 5. 如果更新操作失败了，虚拟机首先会检查对象的Mark Word是否指向当前线程的栈帧，如果是，说明当前线程已经拥有了这个对象的锁，那么可用直接进入同步块继续执行。否则说明有多个线程竞争锁，若当前只有一个等待线程，则线程会通过自旋进行等待；但当自旋超过一定次数或者一个线程持有锁，一个在自旋，又来了第三个线程竞争锁，那么轻量级锁会膨胀升级为重量级锁，锁标志位设置为10。
 
-![](https://img-blog.csdnimg.cn/20201029202816904.png)
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20201029202816904.png" width="800px"/>
+</div>
 
 ## 4.6 锁膨胀/锁升级
 
 锁升级过程：无锁—>偏向锁—>轻量级锁—>重量级锁。具体如下：
 
-![](https://img-blog.csdnimg.cn/20201029210053486.png)
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20201029210053486.png" width="1000px"/>
+</div>
 
-# 5 简析CAS
-
-CAS全称 **Compare And Swap（比较与交换）**，是一种无锁算法。在不使用锁（没有线程被阻塞）的情况下实现多线程之间的**变量同步**。
-
-CAS算法涉及到三个操作数：
-
-- V 内存地址存放的实际值
-- A 比较的旧值 
-- B 更新的新值
-
-当且仅当V的值等于A时（旧值和内存中实际的值相同），表明旧值A已经是目前最新版本的值，自然而然可以将新值 N 赋值给 V。反之则表明V和A变量不同步，直接返回V即可。当多个线程使用CAS操作一个变量时，只有一个线程会更新成功，其余失败的线程会重新尝试。也就是说，“更新”是一个不断重试的操作。
-
-进入原子类AtomicInteger的源码，看一下AtomicInteger的定义：
-
-```java
-public class AtomicInteger extends Number implements java.io.Serializable {
-    private static final long serialVersionUID = 6214790243416807050L;
-
-    // 获取并操作内存的数据。
-    private static final Unsafe unsafe = Unsafe.getUnsafe();
-    // 存储value在AtomicInteger中的偏移量。
-    private static final long valueOffset;
-
-    static {
-        try {
-            valueOffset = unsafe.objectFieldOffset
-                (AtomicInteger.class.getDeclaredField("value"));
-        } catch (Exception ex) { throw new Error(ex); }
-    }
-	
-    // 存储AtomicInteger的int值，该属性需要借助volatile关键字保证其在线程间是可见的。
-    private volatile int value;
-```
-
-接下来，我们查看AtomicInteger的自增函数incrementAndGet()的源码时，发现自增函数底层调用的是unsafe.getAndAddInt()。
-
-```java
-    // AtomicInteger 自增方法
-    public final int incrementAndGet() {
-      return unsafe.getAndAddInt(this, valueOffset, 1) + 1;
-    }    
-
-	// Unsafe.class
-	public final int getAndAddInt(Object var1, long var2, int var4) {
-        int var5;
-        do {
-            var5 = this.getIntVolatile(var1, var2);
-        } while(!this.compareAndSwapInt(var1, var2, var5, var5 + var4));
-
-        return var5;
-    }
-```
-
-`compareAndSwapInt`这个函数，它也是`CAS`缩写的由来。通过OpenJDK 8 来查看Unsafe.cpp的源码：
-
-```java
-// Unsafe.java
-public final int getAndAddInt(Object o, long offset, int delta) {
-   int v;
-   do {
-       v = getIntVolatile(o, offset);
-   } while (!compareAndSwapInt(o, offset, v, v + delta));
-   return v;
-}
-```
-
-根据OpenJDK 8的源码我们可以看出，getAndAddInt()循环获取给定对象o中的偏移量处的值v，然后判断内存值是否等于v。如果相等则将内存值设置为 v + delta，否则返回false，继续循环进行重试，直到设置成功才能退出循环，并且将旧值返回。整个“比较+更新”操作封装在compareAndSwapInt()中，在JNI里是借助于一个CPU指令完成的，属于原子操作，可以保证多个线程都能够看到同一个变量的修改值。
-
-后续JDK通过CPU的**cmpxchg指令**，去比较寄存器中的 A 和 内存中的值 V。如果相等，就把要写入的新值 B 存入内存中。如果不相等，就将内存值 V 赋值给寄存器中的值 A。然后通过Java代码中的while循环再次调用cmpxchg指令进行重试，直到设置成功为止。
-
-# 6 写在最后
+# 5 总结
 
 在并行编程过程中，很容易产生线程安全问题，比如多线程读写共享内存中的全局变量及静态变量时引发的竞态条件。
 
@@ -636,27 +592,25 @@ public final int getAndAddInt(Object o, long offset, int delta) {
 
 JDK 6为了减少获得锁和释放锁带来的性能消耗，引入了“偏向锁”和“轻量级锁”。所以，目前锁一共有4种状态，级别从低到高依次是：无锁状态、偏向锁状态、轻量级锁状态和重量级锁状态，这几个状态会随着竞争情况逐渐升级，性能开销也逐渐增大。这4种锁并不是相互替代的关系，它们只是在不同场景下的不同选择。
 
-| 锁       | 优点                                                         | 缺点                                                | 适用场景                                 |
-| -------- | ------------------------------------------------------------ | --------------------------------------------------- | ---------------------------------------- |
+| 锁       | 优点                                                                     | 缺点                                                | 适用场景                                 |
+| -------- | ------------------------------------------------------------------------ | --------------------------------------------------- | ---------------------------------------- |
 | 偏向锁   | 加锁和解锁不需要额外消耗，<br>和执行非同步方法相比仅仅存在纳秒级的差距。 | 线程间存在锁竞争，<br>会带来额外的锁撤销的消耗。    | 适用于只有一个线程访问同步块场景。       |
-| 轻量级锁 | 竞争的线程不会阻塞，<br>提高了线程的响应速度。               | 如果始终得不到锁竞争的线程，<br>使用自旋会消耗CPU。 | 追求响应速度，<br>同步块执行速度非常快。 |
-| 重量级锁 | 线程竞争不会使用自旋，<br>不会消耗CPU。                      | 线程阻塞，响应时间缓慢。                            | 追求吞吐量，<br>同步块执行时间较长。     |
+| 轻量级锁 | 竞争的线程不会阻塞，<br>提高了线程的响应速度。                           | 如果始终得不到锁竞争的线程，<br>使用自旋会消耗CPU。 | 追求响应速度，<br>同步块执行速度非常快。 |
+| 重量级锁 | 线程竞争不会使用自旋，<br>不会消耗CPU。                                  | 线程阻塞，响应时间缓慢。                            | 追求吞吐量，<br>同步块执行时间较长。     |
 
 # 参考资料
 
-[【JAVA学习笔记】多线程](https://blog.csdn.net/KAIZ_LEARN/article/details/108890366)
+* [《JAVA并发编程的艺术》](https://weread.qq.com/web/reader/247324e05a66a124750d9e9k8f132430178f14e45fce0f7)
 
-[JAVA并发编程的艺术](https://weread.qq.com/web/reader/247324e05a66a124750d9e9k8f132430178f14e45fce0f7)
+* [让你彻底理解Synchronized](https://www.jianshu.com/p/d53bf830fa09)
 
-[让你彻底理解Synchronized](https://www.jianshu.com/p/d53bf830fa09)
+* [Java 中的 Monitor 机制](https://segmentfault.com/a/1190000016417017)
 
-[Java 中的 Monitor 机制](https://segmentfault.com/a/1190000016417017)
+* [深入分析Synchronized原理](https://juejin.im/post/6844903640197513230)
 
-[深入分析Synchronized原理](https://juejin.im/post/6844903640197513230)
+* [不可不说的Java“锁”事](https://tech.meituan.com/2018/11/15/java-lock.html)
 
-[不可不说的Java“锁”事](https://tech.meituan.com/2018/11/15/java-lock.html)
-
-[对象的内存布局（JOL）和锁](https://zhuanlan.zhihu.com/p/137849590)
+* [对象的内存布局（JOL）和锁](https://zhuanlan.zhihu.com/p/137849590)
 
 
 

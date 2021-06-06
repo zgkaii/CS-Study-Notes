@@ -2,13 +2,13 @@
 
 ## 前言
 
-Java提供了种类丰富的锁，每种锁因其特性的不同，在适当的场景下能够展现出非常高的效率。本文旨在对锁相关源码（本文中的源码来自JDK 8和Netty 3.10.6）、使用场景进行举例，为读者介绍主流锁的知识点，以及不同的锁的适用场景。
+Java提供了种类丰富的锁，每种锁因为其特性不同，在适当的场景下能够展现出非常高的效率。本文旨在对锁的相关源码（本文中的源码来自JDK 8和Netty 3.10.6）、使用场景进行举例，为读者介绍主流锁的知识点，以及不同锁的适用场景。
 
-Java中往往是按照是否含有某一特性来定义锁，我们通过特性将锁进行分组归类，再使用对比的方式进行介绍，帮助大家更快捷的理解相关知识。下面给出本文内容的总体分类目录：
+<div align="center">  
+<img src="https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/7f749fc8.png" width="850px"/>
+</div>
 
-![img](https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/7f749fc8.png)
-
-### 1. 乐观锁 VS 悲观锁
+# 1. 乐观锁 VS 悲观锁
 
 乐观锁与悲观锁是一种广义上的概念，体现了看待线程同步的不同角度。在Java和数据库中都有此概念对应的实际应用。
 
@@ -18,7 +18,9 @@ Java中往往是按照是否含有某一特性来定义锁，我们通过特性�
 
 乐观锁在Java中是通过使用无锁编程来实现，最常采用的是CAS算法，Java原子类中的递增操作就通过CAS自旋实现的。
 
-![img](https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/c8703cd9.png)
+<div align="center">  
+<img src="https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/c8703cd9.png" width="1000px"/>
+</div>
 
 根据从上面的概念描述我们可以发现：
 
@@ -60,7 +62,9 @@ CAS算法涉及到三个操作数：
 
 之前提到java.util.concurrent包中的原子类，就是通过CAS来实现了乐观锁，那么我们进入原子类AtomicInteger的源码，看一下AtomicInteger的定义：
 
-![img](https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/feda866e.png)
+<div align="center">  
+<img src="https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/feda866e.png" width="700px"/>
+</div>
 
 根据定义我们可以看出各属性的作用：
 
@@ -117,7 +121,7 @@ CAS虽然很高效，但是它也存在三大问题，这里也简单说一下�
 
    - Java从1.5开始JDK提供了AtomicReference类来保证引用对象之间的原子性，可以把多个变量放在一个对象里来进行CAS操作。
 
-### 2. 自旋锁 VS 适应性自旋锁
+# 2. 自旋锁 VS 适应性自旋锁
 
 在介绍自旋锁前，我们需要介绍一些前提知识来帮助大家明白自旋锁的概念。
 
@@ -127,13 +131,17 @@ CAS虽然很高效，但是它也存在三大问题，这里也简单说一下�
 
 而为了让当前线程“稍等一下”，我们需让当前线程进行自旋，如果在自旋完成后前面锁定同步资源的线程已经释放了锁，那么当前线程就可以不必阻塞而是直接获取同步资源，从而避免切换线程的开销。这就是自旋锁。
 
-![img](https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/452a3363.png)
+<div align="center">  
+<img src="https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/452a3363.png" width="800px"/>
+</div>
 
 自旋锁本身是有缺点的，它不能代替阻塞。自旋等待虽然避免了线程切换的开销，但它要占用处理器时间。如果锁被占用的时间很短，自旋等待的效果就会非常好。反之，如果锁被占用的时间很长，那么自旋的线程只会白浪费处理器资源。所以，自旋等待的时间必须要有一定的限度，如果自旋超过了限定次数（默认是10次，可以使用-XX:PreBlockSpin来更改）没有成功获得锁，就应当挂起线程。
 
 自旋锁的实现原理同样也是CAS，AtomicInteger中调用unsafe进行自增操作的源码中的do-while循环就是一个自旋操作，如果修改数值失败则通过循环来执行自旋，直至修改成功。
 
-![img](https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/83b3f85e.png)
+<div align="center">  
+<img src="https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/83b3f85e.png" width="800px"/>
+</div>
 
 自旋锁在JDK1.4.2中引入，使用-XX:+UseSpinning来开启。JDK 6中变为默认开启，并且引入了自适应的自旋锁（适应性自旋锁）。
 
@@ -141,7 +149,7 @@ CAS虽然很高效，但是它也存在三大问题，这里也简单说一下�
 
 在自旋锁中 另有三种常见的锁形式:TicketLock、CLHlock和MCSlock，本文中仅做名词介绍，不做深入讲解，感兴趣的同学可以自行查阅相关资料。
 
-### 3. 无锁 VS 偏向锁 VS 轻量级锁 VS 重量级锁
+# 3. 无锁 VS 偏向锁 VS 轻量级锁 VS 重量级锁
 
 这四种锁是指锁的状态，专门针对synchronized的。在介绍这四种锁状态之前还需要介绍一些额外的知识。
 
@@ -149,7 +157,7 @@ CAS虽然很高效，但是它也存在三大问题，这里也简单说一下�
 
 在回答这个问题之前我们需要了解两个重要的概念：“Java对象头”、“Monitor”。
 
-#### Java对象头
+## Java对象头
 
 synchronized是悲观锁，在操作同步资源之前需要给同步资源先加锁，这把锁就是存在Java对象头里的，而Java对象头又是什么呢？
 
@@ -159,7 +167,7 @@ synchronized是悲观锁，在操作同步资源之前需要给同步资源先�
 
 **Klass Point**：对象指向它的类元数据的指针，虚拟机通过这个指针来确定这个对象是哪个类的实例。
 
-#### Monitor
+## Monitor
 
 Monitor可以理解为一个同步工具或一种同步机制，通常被描述为一个对象。每一个Java对象就有一把看不见的锁，称为内部锁或者Monitor锁。
 
@@ -218,11 +226,13 @@ Monitor是线程私有的数据结构，每一个线程都有一个可用monitor
 
 整体的锁状态升级流程如下：
 
-![img](https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/8afdf6f2.png)
+<div align="center">  
+<img src="https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/8afdf6f2.png" width="700px"/>
+</div>
 
 综上，偏向锁通过对比Mark Word解决加锁问题，避免执行CAS操作。而轻量级锁是通过用CAS操作和自旋来解决加锁问题，避免线程阻塞和唤醒而影响性能。重量级锁是将除了拥有锁的线程以外的线程都阻塞。
 
-### 4. 公平锁 VS 非公平锁
+# 4. 公平锁 VS 非公平锁
 
 公平锁是指多个线程按照申请锁的顺序来获取锁，线程直接进入队列中排队，队列中的第一个线程才能获得锁。公平锁的优点是等待锁的线程不会饿死。缺点是整体吞吐效率相对非公平锁要低，等待队列中除第一个线程以外的所有线程都会阻塞，CPU唤醒阻塞线程的开销比非公平锁大。
 
@@ -230,33 +240,43 @@ Monitor是线程私有的数据结构，每一个线程都有一个可用monitor
 
 直接用语言描述可能有点抽象，这里作者用从别处看到的一个例子来讲述一下公平锁和非公平锁。
 
-![img](https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/a23d746a.png)
+<div align="center">  
+<img src="https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/a23d746a.png" width="900px"/>
+</div>
 
 如上图所示，假设有一口水井，有管理员看守，管理员有一把锁，只有拿到锁的人才能够打水，打完水要把锁还给管理员。每个过来打水的人都要管理员的允许并拿到锁之后才能去打水，如果前面有人正在打水，那么这个想要打水的人就必须排队。管理员会查看下一个要去打水的人是不是队伍里排最前面的人，如果是的话，才会给你锁让你去打水；如果你不是排第一的人，就必须去队尾排队，这就是公平锁。
 
 但是对于非公平锁，管理员对打水的人没有要求。即使等待队伍里有排队等待的人，但如果在上一个人刚打完水把锁还给管理员而且管理员还没有允许等待队伍里下一个人去打水时，刚好来了一个插队的人，这个插队的人是可以直接从管理员那里拿到锁去打水，不需要排队，原本排队等待的人只能继续等待。如下图所示：
 
-![img](https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/4499559e.png)
+<div align="center">  
+<img src="https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/4499559e.png" width="900px"/>
+</div>
 
 接下来我们通过ReentrantLock的源码来讲解公平锁和非公平锁。
 
-![img](https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/6edea205.png)
+<div align="center">  
+<img src="https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/6edea205.png" width="800px"/>
+</div>
 
 根据代码可知，ReentrantLock里面有一个内部类Sync，Sync继承AQS（AbstractQueuedSynchronizer），添加锁和释放锁的大部分操作实际上都是在Sync中实现的。它有公平锁FairSync和非公平锁NonfairSync两个子类。ReentrantLock默认使用非公平锁，也可以通过构造器来显示的指定使用公平锁。
 
 下面我们来看一下公平锁与非公平锁的加锁方法的源码:
 
-![img](https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/bc6fe583.png)
+<div align="center">  
+<img src="https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/bc6fe583.png" width="900px"/>
+</div>
 
 通过上图中的源代码对比，我们可以明显的看出公平锁与非公平锁的lock()方法唯一的区别就在于公平锁在获取同步状态时多了一个限制条件：hasQueuedPredecessors()。
 
-![img](https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/bd0036bb.png)
+<div align="center">  
+<img src="https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/bd0036bb.png" width="800px"/>
+</div>
 
 再进入hasQueuedPredecessors()，可以看到该方法主要做一件事情：主要是判断当前线程是否位于同步队列中的第一个。如果是则返回true，否则返回false。
 
 综上，公平锁就是通过同步队列来实现多个线程按照申请锁的顺序来获取锁，从而实现公平的特性。非公平锁加锁时不考虑排队等待问题，直接尝试获取锁，所以存在后申请却先获得锁的情况。
 
-### 5. 可重入锁 VS 非可重入锁
+# 5. 可重入锁 VS 非可重入锁
 
 可重入锁又名递归锁，是指在同一个线程在外层方法获取锁的时候，再进入该线程的内层方法会自动获取锁（前提锁对象得是同一个对象或者class），不会因为之前已经获取过还没释放而阻塞。Java中ReentrantLock和synchronized都是可重入锁，可重入锁的一个优点是可一定程度避免死锁。下面用示例代码来进行分析：
 
@@ -281,11 +301,15 @@ public class Widget {
 
 还是打水的例子，有多个人在排队打水，此时管理员允许锁和同一个人的多个水桶绑定。这个人用多个水桶打水时，第一个水桶和锁绑定并打完水之后，第二个水桶也可以直接和锁绑定并开始打水，所有的水桶都打完水之后打水人才会将锁还给管理员。这个人的所有打水流程都能够成功执行，后续等待的人也能够打到水。这就是可重入锁。
 
-![img](https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/58fc5bc9.png)
+<div align="center">  
+<img src="https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/58fc5bc9.png" width="800px"/>
+</div>
 
 但如果是非可重入锁的话，此时管理员只允许锁和同一个人的一个水桶绑定。第一个水桶和锁绑定打完水之后并不会释放锁，导致第二个水桶不能和锁绑定也无法打水。当前线程出现死锁，整个等待队列中的所有线程都无法被唤醒。
 
-![img](https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/ea597a0c.png)
+<div align="center">  
+<img src="https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/ea597a0c.png" width="800px"/>
+</div>
 
 之前我们说过ReentrantLock和synchronized都是重入锁，那么我们通过重入锁ReentrantLock以及非可重入锁NonReentrantLock的源码来对比分析一下为什么非可重入锁在重复调用同步资源时会出现死锁。
 
@@ -295,9 +319,11 @@ public class Widget {
 
 释放锁时，可重入锁同样先获取当前status的值，在当前线程是持有锁的线程的前提下。如果status-1 == 0，则表示当前线程所有重复获取锁的操作都已经执行完毕，然后该线程才会真正释放锁。而非可重入锁则是在确定当前线程是持有锁的线程之后，直接将status置为0，将锁释放。
 
-![img](https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/32536e7a.png)
+<div align="center">  
+<img src="https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/32536e7a.png" width="1000px"/>
+</div>
 
-### 6. 独享锁 VS 共享锁
+# 6. 独享锁 VS 共享锁
 
 独享锁和共享锁同样是一种概念。我们先介绍一下具体的概念，然后通过ReentrantLock和ReentrantReadWriteLock的源码来介绍独享锁和共享锁。
 
@@ -309,7 +335,9 @@ public class Widget {
 
 下图为ReentrantReadWriteLock的部分源码：
 
-![img](https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/762a042b.png)
+<div align="center">  
+<img src="https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/762a042b.png" width="1000px"/>
+</div>
 
 我们看到ReentrantReadWriteLock有两把锁：ReadLock和WriteLock，由词知意，一个读锁一个写锁，合称“读写锁”。再进一步观察可以发现ReadLock和WriteLock是靠内部类Sync实现的锁。Sync是AQS的一个子类，这种结构在CountDownLatch、ReentrantLock、Semaphore里面也都存在。
 
@@ -319,7 +347,9 @@ public class Widget {
 
 在独享锁中这个值通常是0或者1（如果是重入锁的话state值就是重入的次数），在共享锁中state就是持有锁的数量。但是在ReentrantReadWriteLock中有读、写两把锁，所以需要在一个整型变量state上分别描述读锁和写锁的数量（或者也可以叫状态）。于是将state变量“按位切割”切分成了两个部分，高16位表示读锁状态（读锁个数），低16位表示写锁状态（写锁个数）。如下图所示：
 
-![img](https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/8793e00a.png)
+<div align="center">  
+<img src="https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/8793e00a.png" width="1000px"/>
+</div>
 
 了解了概念之后我们再来看代码，先看写锁的加锁源码：
 
@@ -391,29 +421,27 @@ protected final int tryAcquireShared(int unused) {
 
 此时，我们再回头看一下互斥锁ReentrantLock中公平锁和非公平锁的加锁源码：
 
-![img](https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/8b7878ec.png)
+<div align="center">  
+<img src="https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/8b7878ec.png" width="1000px"/>
+</div>
 
 我们发现在ReentrantLock虽然有公平锁和非公平锁两种，但是它们添加的都是独享锁。根据源码所示，当某一个线程调用lock方法获取锁时，如果同步资源没有被其他线程锁住，那么当前线程在使用CAS更新state成功后就会成功抢占该资源。而如果公共资源被占用且不是被当前线程占用，那么就会加锁失败。所以可以确定ReentrantLock无论读操作还是写操作，添加的锁都是都是独享锁。
 
-## 结语
+# 结语
 
 本文Java中常用的锁以及常见的锁的概念进行了基本介绍，并从源码以及实际应用的角度进行了对比分析。限于篇幅以及个人水平，没有在本篇文章中对所有内容进行深层次的讲解。
 
 其实Java本身已经对锁本身进行了良好的封装，降低了研发同学在平时工作中的使用难度。但是研发同学也需要熟悉锁的底层原理，不同场景下选择最适合的锁。而且源码中的思路都是非常好的思路，也是值得大家去学习和借鉴的。
 
-## 参考资料
+# 参考资料
 
-1. 《Java并发编程艺术》
-2. [Java中的锁](https://blog.csdn.net/u013256816/article/details/51204385)
-3. [Java CAS 原理剖析](https://juejin.im/post/5a73cbbff265da4e807783f5)
-4. [Java并发——关键字synchronized解析](https://juejin.im/post/5b42c2546fb9a04f8751eabc)
-5. [Java synchronized原理总结](https://zhuanlan.zhihu.com/p/29866981)
-6. [聊聊并发（二）——Java SE1.6中的Synchronized](http://www.infoq.com/cn/articles/java-se-16-synchronized)
-7. [深入理解读写锁—ReadWriteLock源码分析](https://blog.csdn.net/qq_19431333/article/details/70568478)
-8. [【JUC】JDK1.8源码分析之ReentrantReadWriteLock](https://www.cnblogs.com/twoheads/p/9635309.html)
-9. [Java多线程（十）之ReentrantReadWriteLock深入分析](https://my.oschina.net/adan1/blog/158107)
-10. [Java–读写锁的实现原理](https://mrdear.cn/2018/06/23/java/java--readwritelock)
-
-## 作者简介
-
-- 家琪，美团点评后端工程师。2017 年加入美团点评，负责美团点评境内度假的业务开发。
+* 《Java并发编程艺术》
+* [Java中的锁](https://blog.csdn.net/u013256816/article/details/51204385)
+* [Java CAS 原理剖析](https://juejin.im/post/5a73cbbff265da4e807783f5)
+* [Java并发——关键字synchronized解析](https://juejin.im/post/5b42c2546fb9a04f8751eabc)
+* [Java synchronized原理总结](https://zhuanlan.zhihu.com/p/29866981)
+* [聊聊并发（二）——Java SE1.6中的Synchronized](http://www.infoq.com/cn/articles/java-se-16-synchronized)
+* [深入理解读写锁—ReadWriteLock源码分析](https://blog.csdn.net/qq_19431333/article/details/70568478)
+* [【JUC】JDK1.8源码分析之ReentrantReadWriteLock](https://www.cnblogs.com/twoheads/p/9635309.html)
+* [Java多线程（十）之ReentrantReadWriteLock深入分析](https://my.oschina.net/adan1/blog/158107)
+* [Java–读写锁的实现原理](https://mrdear.cn/2018/06/23/java/java--readwritelock)

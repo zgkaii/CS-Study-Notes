@@ -422,7 +422,8 @@ public class Producer implements Runnable {
         synchronized (queue) {
             while (queue.size() == maxCapacity) {
                 try {
-                    System.out.println("生产者" + Thread.currentThread().getName() + "Queue 已满，WAITING");
+                    System.out.println("生产者" 
+                                       + Thread.currentThread().getName() + "Queue 已满，WAITING");
                     wait();
                     System.out.println("生产者" + Thread.currentThread().getName() + "退出等待");
                 } catch (InterruptedException e) {
@@ -458,7 +459,8 @@ public class Consumer implements Runnable {
         synchronized (queue) {
             while (queue.isEmpty()) {
                 try {
-                    System.out.println("消费者" + Thread.currentThread().getName() + "Queue已空，WAITING");
+                    System.out.println("消费者" 
+                                       + Thread.currentThread().getName() + "Queue已空，WAITING");
                     wait();
                     System.out.println("消费者" + Thread.currentThread().getName() + "退出等待");
                 } catch (InterruptedException e) {
@@ -635,10 +637,7 @@ park和unpark的灵活之处在于，**unpark函数可以先于park调用**。�
 
 ## 参考资料
 
-[JAVA并发编程的艺术](https://weread.qq.com/web/reader/247324e05a66a124750d9e9k8f132430178f14e45fce0f7)
-
-[Java精通并发-透过openjdk源码分析wait与notify方法的本地实现](https://www.cnblogs.com/webor2006/p/11443392.html)
-
-[LockSupport中的park与unpark原理](https://blog.csdn.net/weixin_39687783/article/details/85058686)
-
-[Java的LockSupport.park()实现分析](https://hengyunabc.blog.csdn.net/article/details/28126139?utm_medium=distribute.pc_relevant_t0.none-task-blog-BlogCommendFromMachineLearnPai2-1.channel_param&depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-BlogCommendFromMachineLearnPai2-1.channel_param)
+* [《JAVA并发编程的艺术》](https://weread.qq.com/web/reader/247324e05a66a124750d9e9k8f132430178f14e45fce0f7)
+* [Java精通并发-透过openjdk源码分析wait与notify方法的本地实现](https://www.cnblogs.com/webor2006/p/11443392.html)
+* [LockSupport中的park与unpark原理](https://blog.csdn.net/weixin_39687783/article/details/85058686)
+* [Java的LockSupport.park()实现分析](https://hengyunabc.blog.csdn.net/article/details/28126139?utm_medium=distribute.pc_relevant_t0.none-task-blog-BlogCommendFromMachineLearnPai2-1.channel_param&depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-BlogCommendFromMachineLearnPai2-1.channel_param)

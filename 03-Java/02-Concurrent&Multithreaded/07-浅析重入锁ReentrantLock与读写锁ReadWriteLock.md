@@ -4,8 +4,8 @@
 - [2 ReentrantLock](#2-reentrantlock)
   - [2.1 可重入](#21-可重入)
   - [2.2 公平/非公平](#22-公平非公平)
-  - [2.3 小结](#23-小结)
-  - [2.4 中断与超时等待](#24-中断与超时等待)
+  - [2.3 中断与超时等待](#23-中断与超时等待)
+  - [2.4 小结](#24-小结)
 - [3 ReadWriteLock](#3-readwritelock)
   - [3.1 读锁](#31-读锁)
     - [3.1.1 读锁加锁](#311-读锁加锁)
@@ -15,6 +15,13 @@
     - [3.2.2 写锁释放](#322-写锁释放)
   - [3.3 小结](#33-小结)
 - [参考](#参考)
+
+**写在最前**
+
+在并发编程领域，有两大核心问题：一个是**互斥**，即同一时刻只允许一个线程访问共享资源；另一个是**同步**，即线程之间如何通信、协作。这两大问题，管程都是能够解决的。**Java SDK 并发包通过 Lock 和 Condition 两个接口来实现管程，其中 Lock 用于解决互斥问题，Condition 用于解决同步问题**。
+
+在《深入理解synchronized原理》一文中，我们知道了Java 语言本身提供的 synchronized 也是管程的一种实现，既然 Java 从语言层面已经实现了管程了，那为什么还要在 SDK 里提供另外一种实现呢？
+
 # 1 Lock接口
 
 ## 1.1 Lock与synchronized
@@ -29,7 +36,7 @@
 
 （3）占有锁的线程进入 WAITING 状态从而释放锁，例如调用了wait()方法等。
 
-这会极大影响程序执行效率。因此，需要有一种机制保证等待的线程不是一直处于无期限地等待的状态（解决方案：tryLock(long time, TimeUnit unit))/lockInterruptibly()）。
+这会极大影响程序执行效率。因此，需要有一种机制保证等待的线程不是一直处于无期限地等待的状态（解决方案：`tryLock(long time, TimeUnit unit))/lockInterruptibly() `）。
 
 使用**synchronized的局限性**还有：
 
@@ -128,13 +135,17 @@ public void method() throws InterruptedException {
 
 Lock接口的实现类有：
 
-![](https://img-blog.csdnimg.cn/20201103124416911.png)
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20201103124416911.png" width="800px"/>
+</div>
 
 # 2 ReentrantLock
 
 ReentrantLock是Lock接口的主要实现类，ReentrantLock是**可重入锁**，顾名思义，就是支持重进入的锁，它表示该锁**能够支持一个线程对资源的重复加锁**。
 
-![](https://img-blog.csdnimg.cn/20201103222250189.png)
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20201103222250189.png" width="600px"/>
+</div>
 
 它实现了 Lock 接口，内部类 Sync 是 AQS 的子类；Sync的两个子类 NonfairSync 和 FairSync 分别对应**公平锁和非公平锁两种策略**。（如果在绝对时间上，先对锁进行获取的请求一定先被满足，那么这个锁是公平的；反之，是不公平的。）公平的获取锁，也就是等待时间最长的线程最优先获取锁，也可以说锁获取是顺序的。ReentrantLock提供了一个构造函数，能够控制锁是否是公平的。
 
@@ -376,13 +387,8 @@ ReentrantLock继承父类AQS，重写了父类tryAcquire方法。其父类AQS中
 
 由此可见，**公平锁就是通过同步队列来实现多个线程按照申请锁的顺序来获取锁，从而实现公平的特性。非公平锁加锁时不考虑排队等待问题，直接尝试获取锁，所以才会存在线程后申请却先获得锁的情况**。
 
-## 2.3 小结
 
-ReentrantLock重入锁执行流程：
-
-![](https://img-blog.csdnimg.cn/2020110323501584.png)
-
-## 2.4 中断与超时等待
+## 2.3 中断与超时等待
 
 **（1）lockInterruptibly可中断方式获取锁**
 
@@ -476,6 +482,14 @@ private boolean doAcquireNanos(int arg, long nanosTimeout)
 }
 ```
 
+## 2.4 小结
+
+ReentrantLock重入锁执行流程：
+
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/2020110323501584.png" width="650px"/>
+</div>
+
 # 3 ReadWriteLock
 
 之前提到锁（如Mutex和ReentrantLock）基本都是**排他锁**，这些锁在同一时刻只允许一个线程进行访问。而**读写锁（ReadWriteLock）**在**同一时刻可以允许多个读线程访问，但是在写线程访问时，所有的读线程和其他写线程均被阻塞**。
@@ -486,7 +500,9 @@ ReadWriteLock维护了一组锁，一个是只读的锁，一个是写锁。读�
 
 由于state是int类型的变量，在内存中`占用4个字节，也就是32位`。将其拆分为两部分：高16位和低16位，其中`高16位用来表示读锁状态，低16位用来表示写锁状态`。当设置读锁成功时，就将高16位加1，释放读锁时，将高16位减1；当设置写锁成功时，就将低16位加1，释放写锁时，将第16位减1。
 
-![](https://img-blog.csdnimg.cn/20201104144106893.png)
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20201104144106893.png" width="600px"/>
+</div>
 
 ReadWriteLock 接口只有两个方法：
 
@@ -499,7 +515,9 @@ Lock writeLock()
 
 Java并发库中ReetrantReadWriteLock实现了ReadWriteLock接口并添加了可重入的特性。
 
-![](https://img-blog.csdnimg.cn/20201104131456221.png)
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20201104131456221.png" width="800px"/>
+</div>
 
 ReentrantReadWriteLock有两个构造方法：
 
@@ -531,7 +549,7 @@ abstract boolean readerShouldBlock();
 abstract boolean writerShouldBlock();
 ```
 
-FairSync/NonfairSync实现方法如下：
+FairSync/NonfairSync实现方法如下： 
 
 ```java
     /**
@@ -870,12 +888,8 @@ public class WriteReadLockTest {
 
 # 参考
 
-[JAVA并发编程的艺术](https://weread.qq.com/web/reader/247324e05a66a124750d9e9kc9f326d018c9f0f895fb5e4)
-
-[不可不说的Java“锁”事](https://tech.meituan.com/2018/11/15/java-lock.html)
-
-[深入理解ReentrantLock的实现原理](https://juejin.im/post/6844903805683761165)
-
-[读写锁ReadWriteLock的实现原理](https://juejin.im/post/6844903988169555975)
-
-[深入理解读写锁—ReadWriteLock源码分析](https://blog.csdn.net/qq_19431333/article/details/70568478)
+* [《JAVA并发编程的艺术》](https://weread.qq.com/web/reader/247324e05a66a124750d9e9kc9f326d018c9f0f895fb5e4)
+* [不可不说的Java“锁”事](https://tech.meituan.com/2018/11/15/java-lock.html)
+* [深入理解ReentrantLock的实现原理](https://juejin.im/post/6844903805683761165)
+* [读写锁ReadWriteLock的实现原理](https://juejin.im/post/6844903988169555975)
+* [深入理解读写锁—ReadWriteLock源码分析](https://blog.csdn.net/qq_19431333/article/details/70568478)

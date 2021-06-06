@@ -33,7 +33,7 @@
 
 在阻塞的过程中，其它应用进程还可以执行，因此阻塞不意味着整个操作系统都被阻塞。因为其它应用进程还可以执行，所以不消耗 CPU 时间，这种模型的 CPU 利用率会比较高。
 
- <div align="center"> <img src="..\..\..\images\nio\阻塞式IO.png" width="1000px"></div>
+ <div align="center"> <img src="..\..\images\nio\阻塞式IO.png" width="1000px"></div>
 
 ## 1.2 非阻塞型 IO
 
@@ -41,19 +41,19 @@
 
 由于 CPU 要处理更多的系统调用，因此这种模型的 CPU 利用率比较低。
 
- <div align="center"> <img src="..\..\..\images\nio\非阻塞式IO.png" width="1000px"></div>
+ <div align="center"> <img src="..\..\images\nio\非阻塞式IO.png" width="1000px"></div>
 
 ## 1.3 I/O 多路复用
 
 IO 多路复用(IO multiplexing)，也称事件驱动 IO(event-driven IO)，就是在单个线程里同时监控多个套接字，通过 select 或 poll 轮询所负责的所有 socket，当某个 socket 有数据到达了，就通知用户进程。
 
- <div align="center"> <img src="..\..\..\images\nio\复用IO.png" width="1000px"></div>
+ <div align="center"> <img src="..\..\images\nio\复用IO.png" width="1000px"></div>
 
 IO 复用同非阻塞 IO 本质一样，不过利用 了新的 select 系统调用，由内核来负责本 来是请求进程该做的轮询操作。看似比非阻塞 IO 还多了一个系统调用开销，不过因为可以支持多路 IO，才算提高了效率。
 
 进程先是阻塞在 select/poll 上，再是阻塞在读操作的第二个阶段上。
 
- <div align="center"> <img src="..\..\..\images\nio\复用IO2.png" width="600px"></div>
+ <div align="center"> <img src="..\..\images\nio\复用IO2.png" width="600px"></div>
 
 select/poll 的几大缺点：
 
@@ -79,17 +79,17 @@ select/poll 的几大缺点：
 
 相比于非阻塞式I/O的轮询方式，信号驱动 I/O 的CPU利用率更高。
 
- <div align="center"> <img src="..\..\..\images\nio\信号驱动IO.png" width="600px"></div>
+ <div align="center"> <img src="..\..\images\nio\信号驱动IO.png" width="600px"></div>
 
 ## 1.5 异步 I/O
 
 异步 IO 真正实现了 IO 全流程的非阻塞。 用户进程发出系统调用后立即返回，内核等待数据准备完成，然后将数据拷贝到用 户进程缓冲区，然后发送信号告诉用户进 程 IO 操作执行完毕（与 SIGIO 相比，一 个是发送信号告诉用户进程数据准备完毕， 一个是 IO执行完毕）。
 
- <div align="center"> <img src="..\..\..\images\nio\异步IO.png" width="600px"></div>
+ <div align="center"> <img src="..\..\images\nio\异步IO.png" width="600px"></div>
 
 ## 1.6 五大 I/O 模型比较
 
- <div align="center"> <img src="..\..\..\images\nio\IO模型.png" width="400px"></div>
+ <div align="center"> <img src="..\..\images\nio\IO模型.png" width="400px"></div>
 
 - 同步 I/O：将数据从内核缓冲区复制到应用进程缓冲区的阶段（第二阶段），应用进程会阻塞。
 - 异步 I/O：第二阶段应用进程不会阻塞。

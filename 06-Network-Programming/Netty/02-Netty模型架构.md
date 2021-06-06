@@ -21,7 +21,7 @@ Netty 的分层很清晰：
 - 传输服务层，主要定义一些通信的底层能力，或者说是传输协议的支持，比如 TCP、UDP、HTTP 隧道、虚拟机管道等。
 - 协议支持层，支持 HTTP、Protobuf、二进制、文本、WebSocket等一系列常见协议， 还支持通过实行编码解码逻辑来实现自定义协议。
 
- <div align="center"> <img src="..\..\..\images\nio\netty框架.png" width="500px"></div>
+ <div align="center"> <img src="..\..\images\nio\netty框架.png" width="500px"></div>
 
 ## 1.2 核心组件
 
@@ -29,7 +29,8 @@ Netty 的分层很清晰：
 
 Bootstrap意思是引导，一个Netty应用通常由一个Bootstrap开始，主要作用是配置整个Netty程序，串联各个组件。
 
- <div align="center"> <img src="..\..\..\images\nio\Bootstrap.png" width="400px"></div>
+ <div align="center"> <img src="..\..\images\nio\Bootstrap.png" width="400px"></div>
+
 **`Bootstrap` 是客户端的启动引导类/辅助类**，具体使用方法如下：
 
 ```java
@@ -89,7 +90,7 @@ Bootstrap意思是引导，一个Netty应用通常由一个Bootstrap开始，主
 
 NioEventLoopGroup，主要管理EventLoop的生命周期，可以理解为一个线程池，内部维护了一组线程，每个线程(NioEventLoop)负责处理多个Channel上的事件，而一个Channel只对应于一个线程。
 
- <div align="center"> <img src="..\..\..\images\nio\NioEventLoopGroup.png" width="400px"></div>
+ <div align="center"> <img src="..\..\images\nio\NioEventLoopGroup.png" width="400px"></div>
 
 上面四个接口很熟悉：
 
@@ -121,7 +122,7 @@ NioEventLoop 可以理解为是 NioEventLoopGroup 中的工作线程，类似于
 
 两种任务的执行时间比由变量ioRatio控制，默认为50，则表示允许非IO任务执行的时间与IO任务的执行时间相等。
 
- <div align="center"> <img src="..\..\..\images\nio\NioEventLoop.png" width="700px"></div>
+ <div align="center"> <img src="..\..\images\nio\NioEventLoop.png" width="700px"></div>
 
 可以看到这个继承体系比 EventLoopGroup 还复杂，这里介绍几个关键的接口或类：
 
@@ -141,7 +142,7 @@ NioEventLoop 可以理解为是 NioEventLoopGroup 中的工作线程，类似于
 
 Netty中ByteBuf 声明了两个指针：一个读指针 `readIndex` 用于读取数据，一个写指针 `writeIndex` 用于写数据。
 
- <div align="center"> <img src="..\..\..\images\nio\ByteBuf1.png" width="900px"></div>
+ <div align="center"> <img src="..\..\images\nio\ByteBuf1.png" width="900px"></div>
 
 使用读写指针分离带来的好处是明显的，彻底解决了读写模式与position 指针频繁变换的问题。那么，新的 **ByteBuf 都有哪些特性呢？**
 
@@ -167,7 +168,7 @@ Netty中ByteBuf 声明了两个指针：一个读指针 `readIndex` 用于读取
 
 基于以上三个维度，而且是完全不相干的三个维度，就形成了 `2 * 2 * 2 = 8` 种完全不一样的 ByteBuf，即`PooledHeapByteBuf、PooledUnsafeHeapByteBuf、PooledDirectByteBuf、PooledUnsafeDirectByteBuf、UnpooledHeapByteBuf、UnpooledUnsafeHeapByteBuf、UnpooledDirectByteBuf、UnpooledUnsafeDirectByteBuf`。
 
- <div align="center"> <img src="..\..\..\images\nio\ByteBuf.png" width="900px"></div>
+ <div align="center"> <img src="..\..\images\nio\ByteBuf.png" width="900px"></div>
 
 关于上面八种 ByteBuf，我们并不需要显式地去调用它们的构造方法，而是使用一种叫作 `ByteBufAllocator` 分配器的东西来为我们创建 ByteBuf 对象，而这种分配器又有四种不同的类型：
 
@@ -176,7 +177,8 @@ Netty中ByteBuf 声明了两个指针：一个读指针 `readIndex` 用于读取
 - PreferHeapByteBufAllocator，更偏向于使用堆内存，即除了显式地指明了使用直接内存的方法都使用堆内存。
 - PreferDirectByteBufAllocator，更偏向于使用直接内存，即除了显式地指明了使用堆内存的方法都使用直接内存。
 
- <div align="center"> <img src="..\..\..\images\nio\ByteBufAllocator.png" width="900px"></div>
+ <div align="center"> <img src="..\..\images\nio\ByteBufAllocator.png" width="900px"></div>
+
 八种 ByteBuf和四种 Allocator似乎还是很难选择，这一点Netty也为我们考虑好了，只需要简单地调用如下几行代码，Netty 就可以帮我们创建最适合当前平台的 ByteBuf：
 
 ```java
@@ -218,7 +220,7 @@ Netty 的 Channel 是对 Java 原生 Channel 的进一步封装，不仅封装�
 
 Netty 不仅支持这些协议的 NIO 通用平台实现，还支持特定平台的实现，而且只需要简单地更换前缀就可以达到对不同平台的支持，比如，ServerSocketChannel 的通用实现为 NioServerSocketChannel，在 Linux 下完全可以更换成 EpollServerSocketChannel，代码只需要做很小的修改。
 
- <div align="center"> <img src="..\..\..\images\nio\Channel.png" width="900px"></div>
+ <div align="center"> <img src="..\..\images\nio\Channel.png" width="900px"></div>
 
 比较常用的`Channel`接口实现类是有：
 
@@ -269,7 +271,7 @@ ChannelPipeline 是 ChannelHandler 的集合，它负责处理和拦截入站和
 
 通过以上分析，可以得出，ChannelPipeline、ChannelHandlerContext 都是线程安全的，因为同一个 Channel 的事件都会在一个线程中处理完毕（假设用户不自己启动线程）。但是，ChannelHandler 却不一定，ChannelHandler 类似于 Spring MVC 中的 Service 层，专门处理业务逻辑的地方，一个 ChannelHandler 实例可以供多个 Channel 使用，所以，不建议把有状态的变量放在 ChannelHandler 中，而是放在消息本身或者 ChannelHandlerContext 中。
 
- <div align="center"> <img src="..\..\..\images\nio\ChannelPipeline.png" width="800px"></div>
+ <div align="center"> <img src="..\..\images\nio\ChannelPipeline.png" width="800px"></div>
 
 ### 1.2.9 ChannelOption
 
@@ -297,7 +299,7 @@ Netty作为异步事件驱动的网络，高性能之处主要来自于其I/O模
 
 Netty的非阻塞I/O的实现关键是基于I/O多路复用模型：单个线程里同时监控多个套接字，通过 select 或 poll 轮询所负责的所有 socket，当某个 socket 有数据到达了，就通知用户进程。
 
- <div align="center"> <img src="..\..\..\images\nio\复用IO.png" width="1000px"></div>
+ <div align="center"> <img src="..\..\images\nio\复用IO.png" width="1000px"></div>
 
 Netty的IO线程NioEventLoop由于聚合了多路复用器Selector，可以同时并发处理成百上千个客户端连接。当线程从某客户端Socket通道进行读写数据时，若没有数据可用时，该线程可以进行其他任务。线程通常将非阻塞 IO 的空闲时间用于在其他通道上执行 IO 操作，所以单独的线程可以管理多个输入和输出通道。
 
@@ -337,7 +339,7 @@ Netty在不同平台下有不同的NIO实现：
 - 轮询方式 线程不断轮询是否发生按钮点击事件，如果发生，调用处理逻辑。
 - 事件驱动方式 发生点击事件把事件放入事件队列，在另外线程消费的事件列表中的事件，根据事件类型调用相关事件处理逻辑。
 
- <div align="center"> <img src="..\..\..\images\nio\事件驱动模型.png" width="700px"></div>
+ <div align="center"> <img src="..\..\images\nio\事件驱动模型.png" width="700px"></div>
 
 主要包括4个基本组件：
 
@@ -360,7 +362,7 @@ Reactor模型中有2个关键组成：
 - Reactor Reactor在一个单独的线程中运行，负责监听和分发事件，分发给适当的处理程序来对IO事件做出反应。 它就像公司的电话接线员，它接听来自客户的电话并将线路转移到适当的联系人
 - Handlers 处理程序执行I/O事件要完成的实际事件，类似于客户想要与之交谈的公司中的实际官员。Reactor通过调度适当的处理程序来响应I/O事件，处理程序执行非阻塞操作
 
- <div align="center"> <img src="..\..\..\images\nio\Reactor模型.png" width="600px"></div>
+ <div align="center"> <img src="..\..\images\nio\Reactor模型.png" width="600px"></div>
 
 取决于Reactor的数量和Hanndler线程数量的不同，Reactor模型有3个变种
 
@@ -374,9 +376,9 @@ Reactor模型中有2个关键组成：
 
 所有的IO操作都由同一个NIO线程处理。
 
- <div align="center"> <img src="..\..\..\images\nio\单线程.png" width="600px"></div>
+ <div align="center"> <img src="..\..\images\nio\单线程.png" width="600px"></div>
 
- <div align="center"> <img src="..\..\..\images\nio\单线程1.png" width="600px"></div>
+ <div align="center"> <img src="..\..\images\nio\单线程1.png" width="600px"></div>
 
 **单线程 Reactor 的优点是对系统资源消耗特别小，但是，没办法支撑大量请求的应用场景并且处理请求的时间可能非常慢，毕竟只有一个线程在工作嘛！所以，一般实际项目中不会使用单线程Reactor 。**
 
@@ -386,9 +388,9 @@ Reactor模型中有2个关键组成：
 
 一个线程负责接受请求,一组NIO线程处理IO操作。
 
- <div align="center"> <img src="..\..\..\images\nio\多线程.png" width="600px"></div>
+ <div align="center"> <img src="..\..\images\nio\多线程.png" width="600px"></div>
 
- <div align="center"> <img src="..\..\..\images\nio\多线程1.png" width="600px"></div>
+ <div align="center"> <img src="..\..\images\nio\多线程1.png" width="600px"></div>
 
 **大部分场景下多线程Reactor模型是没有问题的，但是在一些并发连接数比较多（如百万并发）的场景下，一个线程负责接受客户端请求就存在性能问题了。**
 
@@ -398,9 +400,9 @@ Reactor模型中有2个关键组成：
 
 一组NIO线程负责接受请求，一组NIO线程处理IO操作。
 
- <div align="center"> <img src="..\..\..\images\nio\主从模型.png" width="600px"></div>
+ <div align="center"> <img src="..\..\images\nio\主从模型.png" width="600px"></div>
 
- <div align="center"> <img src="..\..\..\images\nio\主从模型1.png" width="600px"></div>
+ <div align="center"> <img src="..\..\images\nio\主从模型1.png" width="600px"></div>
 
 ### 2.2.3 Netty线程模型实现
 
