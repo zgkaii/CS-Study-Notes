@@ -159,9 +159,6 @@ public class ScheduledThreadPoolExecutor
 - **SingleThreadExecutor**
 - **CachedThreadPool**
 
-对应 Executors 工具类中的方法如图所示：
-![通过Executor 框架的工具类Executors来实现](https://my-blog-to-use.oss-cn-beijing.aliyuncs.com/2019-11/format,png.jpeg)
-
 ## 四 (重要)ThreadPoolExecutor 使用示例
 
 我们上面讲解了 `Executor`框架以及 `ThreadPoolExecutor` 类，下面让我们实战一下，来通过写一个 `ThreadPoolExecutor` 的小 Demo 来回顾上面的内容。

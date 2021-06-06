@@ -1,6 +1,6 @@
 ## 浅析Callable/Future/FutureTask
 
-[【Java学习笔记】多线程](https://blog.csdn.net/KAIZ_LEARN/article/details/108890366)一文中，描述了创建线程主要有两种方式，一种是直接继承Thread类，另外一种就是实现Runnable接口。
+[多线程基础](https://blog.csdn.net/KAIZ_LEARN/article/details/108890366)一文中，描述了创建线程主要有两种方式，一种是直接继承Thread类，另外一种就是实现Runnable接口。
 
 这两种方式都有一个缺陷就是：**在执行完任务之后无法获取执行结果**。如果需要获取执行结果，就必须通过共享变量或者使用线程通信的方式来达到效果。
 
@@ -478,10 +478,7 @@ public boolean cancel(boolean mayInterruptIfRunning) {
 
 ### 参考资料
 
-[JAVA并发编程的艺术](https://weread.qq.com/web/reader/247324e05a66a124750d9e9k8f132430178f14e45fce0f7)
-
-[Java Future详解](https://mp.weixin.qq.com/s/RX5rVuGr6Ab0SmKigmZEag)
-
-[Java Future](https://mp.weixin.qq.com/s/RX5rVuGr6Ab0SmKigmZEag)
-
-[Runnable,Callable,Future关系浅析](https://juejin.im/post/6844903577882722312)
+* [《JAVA并发编程的艺术》](https://weread.qq.com/web/reader/247324e05a66a124750d9e9k8f132430178f14e45fce0f7)
+* [Java Future详解](https://mp.weixin.qq.com/s/RX5rVuGr6Ab0SmKigmZEag)
+* [Java Future](https://mp.weixin.qq.com/s/RX5rVuGr6Ab0SmKigmZEag)
+* [Runnable,Callable,Future关系浅析](https://juejin.im/post/6844903577882722312)

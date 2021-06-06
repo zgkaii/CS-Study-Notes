@@ -19,6 +19,8 @@ JDK = JRE + tools => JRE = JVM + libraries
 
 ## 1.2 字节码
 
+
+
 ## 1.3 .class文件执行流程
 
 Java虚拟机与Java语言并没有必然的联系，它只与特定的**二进制文件格式**——`.class文件`格式所关联，class文件中包含了Java虚拟机指令集（或者称为字节码、Bytecodes）和符号表，还有一些其他辅助信息。
@@ -177,8 +179,6 @@ Java 8及之后堆内存逻辑上分为三部分：新生代+养老区+**元空�
 | ----------------------------------------- | ----------------------- | ---------- |
 | Young Generation Space                    | Tenure generation space | Meta Space |
 | Young/New（又被划分为Eden区和Survivor区） | Old/Tenure              | Meta       |
-
-> 疑问，元空间逻辑上属于堆吗？？不属于
 
 ## 3.5 方法区
 
@@ -443,3 +443,4 @@ JDK11与JDK12起，分别开始支持ZGC与Shennandoah GC：
 # 八、GC日志分析
 
 # 九、JVM性能调优
+

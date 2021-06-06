@@ -297,17 +297,17 @@ Server received: Netty rocks!
 
 > NIO模型中即对应NioEventLoopGroup与NioEventLoop。 
 
- <div align="center"> <img src="..\..\..\images\nio\线程模式.png" width="600px"></div>
+ <div align="center"> <img src="..\..\images\nio\线程模式.png" width="600px"></div>
 
 当前实现中， 使用**顺序循环（round-robin）**的方式进行分配以获取一个均衡的分布，并且相同的EventLoop可能会被分配给多个 Channel。 一旦一个 Channel 被分配给一个EventLoop，它将在它的整个生命周期中都使用这个 EventLoop（以及相关联的 Thread）。
 
- <div align="center"> <img src="..\..\..\images\nio\eventloop.png" width="600px"></div>
+ <div align="center"> <img src="..\..\images\nio\eventloop.png" width="600px"></div>
 
 可以这里理解`EventLoop`：如果把Netty应用比作虚拟机的话，那么`EventLoop`就是CPU；如果把Netty比作一个餐厅的话，那么`EventLoop`就是上菜员。
 
- <div align="center"> <img src="..\..\..\images\nio\核心对象.png" width="600px"></div>
+ <div align="center"> <img src="..\..\images\nio\核心对象.png" width="600px"></div>
 
 一个 EventLoopGroup 包含一个或者多个 EventLoop，而一个 EventLoop 在它的生命周期内只和一个 Thread 绑定，所有由 EventLoop 处理的 I/O 事件都将在它专有的 Thread 上被处理； 一个 Channel 在它的生命周期内只注册于一个 EventLoop，而一个 Channel 在它的生命周期内只注册于一个 EventLoop。
 
- <div align="center"> <img src="..\..\..\images\nio\Netty运行原理.png" width="600px"></div>
+ <div align="center"> <img src="..\..\images\nio\Netty运行原理.png" width="600px"></div>
 

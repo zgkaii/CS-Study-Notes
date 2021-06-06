@@ -121,6 +121,10 @@ public class TimeWaitingTest extends Thread {
 
 #### 2.2.2 yield()
 
+`Thread.yield()`，一定是当前线程调用此方法，当前线程放弃获取的 CPU 时间片，但不释放锁资源，由运行状态变为 就绪状态，让 OS 再次选择线程。
+
+作用：让相同优先级的线程轮流执行，但并不保证一定会轮流执行。实际中无法保证 yield() 达到让步目的，因为让步的线程还有可能被线程调度程序再次选中。Thread.yield() 不会导致阻塞。该方法与 sleep() 类似，只是不能由用户指定暂停多长时间。
+
 调用`Thread.yield()`静态原生方法，也能暂停当前线程，其与`sleep()`有何异同呢？
 
 - sleep(long)方法会**使线程转入超时等待(TIMED_WAITING)状态**，时间到了之后才会转入就绪状态。而yield()方法不能指定时间，不会将线程转入TIMED_WAITING状态，而是强制线程进入READY状态，从而让其它具有相同优先级的等待线程获取执行权。
@@ -659,8 +663,6 @@ InterruptedException --- [child] Interrupted
 一般说来，如果一个方法声明抛出InterruptedException，表示该方法是可中断的，比如wait/sleep/join。也就是说可中断方法会对interrupt调用做出响应（例如sleep响应interrupt的操作包括清除中断状态，抛出InterruptedException），异常都是由可中断方法自己抛出来的，并不是直接由interrupt方法直接引起的。
 **正是如此，Object.wait()/Thread.sleep()/Thread.join()方法，才会不断的轮询监听 interrupted 标志位，发现其为true后，会停止阻塞并抛出 InterruptedException异常**。
 
-
-
 **总结**
 
 Thread.interrupt()方法不会真正地中断一个正在运行的线程。它主要用于设置线程的中断标示位，在线程受到阻塞的地方（如Thread.sleep()、Thread.join()、Object.wait()检查到线程为“中断状态”后）抛出一个InterruptedException异常，并且“中断状态”也将被清除，这样线程就得以退出阻塞的状态。如果线程没有被阻塞，这时调用 interrupt() 将不起作用，直到执行到 wait/sleep/join 时，才马上会抛出InterruptedException。
@@ -798,13 +800,6 @@ Task Priority:10 Count:1980892
 
 ## 参考资料
 
-[多线程基础](https://blog.csdn.net/KAIZ_LEARN/article/details/108890366)
+* [Thread的中断机制(interrupt)](https://www.cnblogs.com/onlywujun/p/3565082.html)
 
-[JAVA并发编程的艺术](https://weread.qq.com/web/reader/247324e05a66a124750d9e9k8f132430178f14e45fce0f7)
-
-[Thread的中断机制(interrupt)](https://www.cnblogs.com/onlywujun/p/3565082.html)
-
-[Java Thread的join() 之刨根问底](https://juejin.im/post/6844903624842149895)
-
-
-
+* [Java Thread的join() 之刨根问底](https://juejin.im/post/6844903624842149895)

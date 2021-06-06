@@ -30,7 +30,9 @@ AQS是用来构建锁或者其他同步组件的基础框架，它使用了一�
 
 **AQS 是依赖 CLH 队列锁来完成同步状态的管理**。当前线程获取同步状态失败时，同步器会将当前线程以及等待状态等信息构建为一个**节点(Node)**并将其加入同步队列，同步会阻塞当前线程，当同步状态释放时，会将首节点中的线程唤醒，使其再次尝试获取同步状态。
 
-![](https://img-blog.csdnimg.cn/20210408152145878.png)
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20210605211037575.png" width="600px"/>
+</div>
 
 > CLH(Craig,Landin,and Hagersten)队列是一个虚拟的双向队列（**FIFO双向队列**）（虚拟的双向队列即不存在队列实例，仅存在结点之间的关联关系）。**AQS 是将每条请求共享资源的线程封装成一个 CLH 锁队列的一个结点（Node）来实现锁的分配**。
 
@@ -412,13 +414,17 @@ Semaphore（信号量）用来控制 **同时访问特定资源的线程数量**
 
 以停车场为例。假设一个停车场只有10个车位，这时如果同时来了15辆车，则只允许其中10辆不受阻碍的进入。剩下的5辆车则必须在入口等待，此后来的车也都不得不在入口处等待。这时，如果有5辆车离开停车场，放入5辆；如果又离开2辆，则又可以放入2辆，如此往复。
 
-![](https://img-blog.csdnimg.cn/20210408152244233.png)
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20210408152244233.png" width="400px"/>
+</div>
 
 在这个停车场系统中，车位即是共享资源，每辆车就好比一个线程，信号量就是空车位的数目。
 
 Semaphore中包含了一个实现了AQS的同步器Sync，以及它的两个子类FairSync和NonFairSync。查看Semaphore类结构：
 
-![](https://img-blog.csdnimg.cn/20201105094613463.png)
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20201105094613463.png" width="500px"/>
+</div>
 
 可见Semaphore也是区分公平模式和非公平模式的。
 
@@ -896,16 +902,10 @@ childThread:6 is finish
 
 ## 参考
 
-[JAVA并发编程的艺术](https://weread.qq.com/web/reader/247324e05a66a124750d9e9)
-
-[AQS原理学习笔记](https://juejin.im/post/6844903782636060679#heading-6)
-
-[【JUC】JDK1.8源码分析之AbstractQueuedSynchronizer（二）](https://www.cnblogs.com/leesf456/p/5350186.html)
-
-[死磕 java同步系列之Semaphore源码解析](https://juejin.im/post/6844903866329202701)
-
- [【JUC】JDK1.8源码分析之CountDownLatch（五）](https://www.cnblogs.com/leesf456/p/5406191.html)
-
-[并发编程之 CyclicBarrier 源码分析](https://juejin.im/post/5ae755256fb9a07ac3634067)
-
-[Java并发之CyclicBarrier](https://juejin.im/entry/6844903487482904584)
+* [《JAVA并发编程的艺术》](https://weread.qq.com/web/reader/247324e05a66a124750d9e9)
+* [AQS原理学习笔记](https://juejin.im/post/6844903782636060679#heading-6)
+* [【JUC】JDK1.8源码分析之AbstractQueuedSynchronizer（二）](https://www.cnblogs.com/leesf456/p/5350186.html)
+* [死磕 java同步系列之Semaphore源码解析](https://juejin.im/post/6844903866329202701)
+*  [【JUC】JDK1.8源码分析之CountDownLatch（五）](https://www.cnblogs.com/leesf456/p/5406191.html)
+* [并发编程之 CyclicBarrier 源码分析](https://juejin.im/post/5ae755256fb9a07ac3634067)
+* [Java并发之CyclicBarrier](https://juejin.im/entry/6844903487482904584)
