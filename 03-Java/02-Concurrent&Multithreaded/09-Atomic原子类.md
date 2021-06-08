@@ -18,9 +18,11 @@
 
 即使是在多个线程一起执行的时候，一个操作一旦开始，就不会被其他线程干扰。简而言之，**原子类就是具有原子/原子操作特征的类，它们能无锁地避免原子性问题**。
 
-并发包 `java.util.concurrent` 的原子类都存放在`java.util.concurrent.atomic`下，如下图所示。
+并发包 `java.util.concurrent` 的原子类都存放在`java.util.concurrent.atomic`下。
 
-![](https://img-blog.csdnimg.cn/20201105205300727.png)
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20210606194422177.png" width="800px"/>
+</div>
 
 根据操作的数据类型，可以将JUC包中的原子类分为主要5类：
 

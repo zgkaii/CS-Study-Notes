@@ -18,6 +18,10 @@
 
 并发编程大师Doug Lea开发了非常多的并发容器和框架，这些容器大部分在 `java.util.concurrent` 包中。
 
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20210606192835508.png" width="800px"/>
+</div>
+
 - **ConcurrentHashMap:** ConcurrentHashMap是线程安全且高效的HashMap。
 - **ConcurrentLinkedQueue:** 一个基于链接节点的无界线程安全队列，可以看做一个线程安全的 LinkedList，是一个非阻塞队列。
 - **BlockingQueue:** 一个阻塞队列，适合用于作为数据共享的通道。它是一个接口，JDK 内部通过链表、数组等方式实现了这个接口。

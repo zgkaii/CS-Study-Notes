@@ -1,5 +1,3 @@
-> 原文地址——[【深入AQS原理】我画了35张图就是为了让你深入 AQS](https://juejin.im/post/6844904146127044622)
-
 ### `ThreadLocal`代码演示
 
 我们先看下`ThreadLocal`使用示例：
@@ -8,7 +6,7 @@
 public class ThreadLocalTest {
     private List<String> messages = Lists.newArrayList();
 
-    public static final `ThreadLocal`<ThreadLocalTest> holder = 	ThreadLocal.withInitial(ThreadLocalTest::new);
+    public static final ThreadLocal<ThreadLocalTest> holder = 	ThreadLocal.withInitial(ThreadLocalTest::new);
 
     public static void add(String message) {
         holder.get().messages.add(message);
@@ -42,9 +40,6 @@ size: 0
 ### `ThreadLocal`的数据结构
 
 ![](https://img-blog.csdnimg.cn/20201208171229148.png)
-
-
-
 
 `Thread`类有一个类型为``ThreadLocal`.`ThreadLocalMap``的实例变量`threadLocals`，也就是说每个线程有一个自己的`ThreadLocalMap`。
 
