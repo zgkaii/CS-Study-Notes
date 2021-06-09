@@ -170,7 +170,7 @@ void ObjectMonitor::notifyAll(TRAPS) {
         assert (List->TState == ObjectWaiter::TS_ENTER, "invariant") ;
         assert (List != iterator, "invariant") ;
      }
-	  // 根据不同状态采取不同策略，将从_WaitSet列表中移出来的ObjectWaiter对象加入到_EntryList列表中。	
+	 // 根据不同状态采取不同策略，将从_WaitSet列表中移出来的ObjectWaiter对象加入到_EntryList列表中。	
      if (Policy == 0) {       // prepend to EntryList
          if (List == NULL) {
              iterator->_next = iterator->_prev = NULL ;
@@ -423,9 +423,11 @@ public class Producer implements Runnable {
             while (queue.size() == maxCapacity) {
                 try {
                     System.out.println("生产者" 
-                                       + Thread.currentThread().getName() + "Queue 已满，WAITING");
+                                       + Thread.currentThread().getName() 
+                                       + "Queue 已满，WAITING");
                     wait();
-                    System.out.println("生产者" + Thread.currentThread().getName() + "退出等待");
+                    System.out.println("生产者" + Thread.currentThread().getName() 
+                                       + "退出等待");
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -435,7 +437,8 @@ public class Producer implements Runnable {
             }
             Integer i = new Random().nextInt(50);
             queue.offer(new Product("产品" + i.toString()));
-            System.out.println("生产者" + Thread.currentThread().getName() + "生产了产品" + i.toString());
+            System.out.println("生产者" + Thread.currentThread().getName() 
+                               + "生产了产品" + i.toString());
         }
     }
 }
@@ -460,9 +463,11 @@ public class Consumer implements Runnable {
             while (queue.isEmpty()) {
                 try {
                     System.out.println("消费者" 
-                                       + Thread.currentThread().getName() + "Queue已空，WAITING");
+                                       + Thread.currentThread().getName() 
+                                       + "Queue已空，WAITING");
                     wait();
-                    System.out.println("消费者" + Thread.currentThread().getName() + "退出等待");
+                    System.out.println("消费者" + Thread.currentThread().getName() 
+                                       + "退出等待");
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -472,7 +477,8 @@ public class Consumer implements Runnable {
             }
 
             Product product = queue.poll();
-            System.out.println("消费者" + Thread.currentThread().getName() + "消费了" + product.getName());
+            System.out.println("消费者" + Thread.currentThread().getName() 
+                               + "消费了" + product.getName());
         }
     }
 }
@@ -519,12 +525,17 @@ public class TreadTest {
 
 ## 3 park与unpark
 
-LockSupport类是Java6(JSR166-JUC)引入的一个类，用来**创建锁和其他同步工具类的基本线程阻塞原语**。使用LockSupport类中的park()和unpark()方法也可以实现线程的阻塞与唤醒。Park有停车的意思，假设线程为车辆，那么park方法代表着停车，而unpark方法则是指车辆启动离开。
+LockSupport类是Java6(JSR166-JUC)引入的一个类，用来**创建锁和其他同步工具类的基本线程阻塞原语**。LockSupport 类似于 Thread 类的静态方法，专门处理（执行这个代码的）本线程的。
+
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20210609100241585.png" width="700px"/>
+</div>
+
+使用LockSupport类中的park()和unpark()方法也可以实现线程的阻塞与唤醒。Park有停车的意思，假设线程为车辆，那么park方法代表着停车，而unpark方法则是指车辆启动离开。
 
 ```java
     public static void park() {
         UNSAFE.park(false, 0L);
-    }
 
     public static void park(Object blocker) {
         Thread t = Thread.currentThread();
@@ -634,6 +645,12 @@ park和unpark的灵活之处在于，**unpark函数可以先于park调用**。�
 ```
 
 可见，在第二次调用park后，线程无法再获取许可出现了死锁。
+
+------
+
+问题：为什么 unpark 需要加一个线程作为参数？
+
+解答：因为一个park的线程，无法自己唤醒自己，所以需要其他线程来唤醒。
 
 ## 参考资料
 

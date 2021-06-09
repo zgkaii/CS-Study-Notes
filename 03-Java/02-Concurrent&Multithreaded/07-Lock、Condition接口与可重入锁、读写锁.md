@@ -1,6 +1,7 @@
 - [1 Lock接口](#1-lock接口)
   - [1.1 Lock与synchronized](#11-lock与synchronized)
   - [1.2 Lock接口方法](#12-lock接口方法)
+  - [1.3 Lock如何保证可见性](#13-lock如何保证可见性)
 - [2 ReentrantLock](#2-reentrantlock)
   - [2.1 可重入](#21-可重入)
   - [2.2 公平/非公平](#22-公平非公平)
@@ -13,8 +14,15 @@
   - [3.2 写锁](#32-写锁)
     - [3.2.1 写锁加锁](#321-写锁加锁)
     - [3.2.2 写锁释放](#322-写锁释放)
-  - [3.3 小结](#33-小结)
+  - [3.3 读写锁实现缓存](#33-读写锁实现缓存)
+  - [3.4 读写锁的升级与降级](#34-读写锁的升级与降级)
+  - [3.4 读写锁小结](#34-读写锁小结)
+- [4 Condition接口](#4-condition接口)
+  - [4.1 常用方法](#41-常用方法)
+  - [4.2 Dubbo 源码分析](#42-dubbo-源码分析)
 - [参考](#参考)
+
+------
 
 **写在最前**
 
@@ -38,7 +46,7 @@
 
 这会极大影响程序执行效率。因此，需要有一种机制保证等待的线程不是一直处于无期限地等待的状态（解决方案：`tryLock(long time, TimeUnit unit))/lockInterruptibly() `）。
 
-使用**synchronized的局限性**还有：
+除此之外，使用**synchronized的局限性**还有：
 
 * 当多个线程读写文件时，读操作与读操作之间不会发生冲突。但采用synchronized关键字实现同步时，还是只能一个线程进行读操作，其他读线程只能等待锁的释放而无法进行读操作。因此，需要一种机制来保证多线程都只是进行读操作时，线程之间不会发生冲突(解决方案：ReentrantReadWriteLock) 。
 * synchronized同步块无法异步处理锁（即不能立即知道是否可以拿到锁） (解决方案：ReentrantLock)。
@@ -136,8 +144,37 @@ public void method() throws InterruptedException {
 Lock接口的实现类有：
 
 <div align="center">  
-<img src="https://img-blog.csdnimg.cn/20201103124416911.png" width="800px"/>
+<img src="https://img-blog.csdnimg.cn/20201103124416911.png" width="700px"/>
 </div>
+
+## 1.3 Lock如何保证可见性
+
+我们已经知道Java中的可见性是通过Happen-Before规则来保证的，而synchronized之所以能保证可见性，也是因为synchronized 相关的规则：synchronized 的解锁 Happens-Before 于后续对这个锁的加锁。那么Lock靠什么保证可见性呢？例如在下面的代码中，线程 T1 对 value 进行了 +=1 操作，那后续的线程 T2 能够看到 value 的正确结果吗？
+
+```java
+class X {
+  private final Lock rtl = new ReentrantLock();
+  int value;
+  public void addOne() {
+    // 获取锁
+    rtl.lock();  
+    try {
+      value+=1;
+    } finally {
+      // 保证锁能释放
+      rtl.unlock();
+    }
+  }
+}
+```
+
+答案是肯定的，Java SDK里面锁实现挺复杂，这里不展开细说，但是原理简单介绍一下：**它是利用了volatile相关的volatile相关的Happens-Before规则**。Java SDK 里面的 ReentrantLock，内部持有一个 volatile 的成员变量 state，获取锁的时候，会读写 state 的值；解锁的时候，也会读写 state 的值（简化后的代码如下面所示）。也就是说，在执行 value+=1 之前，程序先读写了一次 volatile 变量 state，在执行 value+=1 之后，又读写了一次 volatile 变量 state。根据相关的 Happens-Before 规则：
+
+1. **顺序性规则**：对于线程 T1，value+=1 Happens-Before 释放锁的操作 unlock()；
+2. **volatile 变量规则**：由于 state = 1 会先读取 state，所以线程 T1 的 unlock() 操作 Happens-Before 线程 T2 的 lock() 操作；
+3. **传递性规则**：线程 T1 的 value+=1 Happens-Before 线程 T2 的 lock() 操作。
+
+所以说，后续线程 T2 能够看到 value 的正确结果。
 
 # 2 ReentrantLock
 
@@ -191,9 +228,11 @@ ReentrantLock是Lock接口的主要实现类，ReentrantLock是**可重入锁**�
         private static final long serialVersionUID = 7316153563782823691L;
 
         final void lock() {
-            // 利用CAS尝试设置AQS的state为1。设置成功，表示获取锁成功；如果设置失败，表示state已经>=1。
+            // 利用CAS尝试设置AQS的state为1。设置成功，表示获取锁成功；
+            // 如果设置失败，表示state已经>=1。
             if (compareAndSetState(0, 1))
-                // 线程获取AQS锁成功，需要设置AQS中的变量exclusiveOwnerThread为当前持有锁的线程，做保存记录
+                // 线程获取AQS锁成功，需要设置AQS中的变量exclusiveOwnerThread
+                // 为当前持有锁的线程，做保存记录
                 setExclusiveOwnerThread(Thread.currentThread());
             else
                 // 调用acquire()，再次尝试或者线程进入等待队列。
@@ -226,12 +265,14 @@ public final void acquire(int arg) {
             final Thread current = Thread.currentThread();
             int c = getState();// 获取锁状态（0未加锁；1已加锁）
             if (c == 0) {
-                if (compareAndSetState(0, acquires)) {// 直接CAS尝试获取锁，直接返回true，当前线程不会进入同步队列。
+                // 直接CAS尝试获取锁，直接返回true，当前线程不会进入同步队列。
+                if (compareAndSetState(0, acquires)) {
                     setExclusiveOwnerThread(current);
                     return true;
                 }
             }
-            else if (current == getExclusiveOwnerThread()) { // 如果当前线程已占用锁，再次获取锁
+            // 如果当前线程已占用锁，再次获取锁
+            else if (current == getExclusiveOwnerThread()) {
                 int nextc = c + acquires;// status+1（可重入性）
                 if (nextc < 0)
                     throw new Error("Maximum lock count exceeded");
@@ -492,11 +533,11 @@ ReentrantLock重入锁执行流程：
 
 # 3 ReadWriteLock
 
-之前提到锁（如Mutex和ReentrantLock）基本都是**排他锁**，这些锁在同一时刻只允许一个线程进行访问。而**读写锁（ReadWriteLock）**在**同一时刻可以允许多个读线程访问，但是在写线程访问时，所有的读线程和其他写线程均被阻塞**。
+之前提到锁（如Mutex和ReentrantLock）基本都是**排他锁**，这些锁在同一时刻只允许一个线程进行访问。而**读写锁（ReadWriteLock）**在**同一时刻可以允许多个读线程访问，只允许一个写线程访问，且在写线程访问时，所有的读线程和其他写线程均被阻塞**。
 
-ReadWriteLock维护了一组锁，一个是只读的锁，一个是写锁。读锁可以在没有写锁的时候被多个线程同时持有，写锁是独占的。
+可以看出，读写锁与互斥锁最大的区别在于：读写锁允许多个读线程同时读共享变量，而互斥锁是不允许的，这是读写锁在读多写少场景下性能优于互斥锁的关键。
 
-如何用一个共享变量来区分锁是写锁还是读锁呢？答案就是`按位拆分`。
+ReadWriteLock维护了一组锁，一个是只读的锁，一个是写锁。读锁可以在没有写锁的时候被多个线程同时持有，写锁是独占的。如何用一个共享变量来区分锁是写锁还是读锁呢？答案就是`按位拆分`。
 
 由于state是int类型的变量，在内存中`占用4个字节，也就是32位`。将其拆分为两部分：高16位和低16位，其中`高16位用来表示读锁状态，低16位用来表示写锁状态`。当设置读锁成功时，就将高16位加1，释放读锁时，将高16位减1；当设置写锁成功时，就将低16位加1，释放写锁时，将第16位减1。
 
@@ -626,7 +667,8 @@ Sync实现了tryAcquireShared方法，如下：
             
             /**
              * 在下面的代码中进行了三个判断：
-             * 1、读锁是否应该排队。没有排队，就进行if后面的判断。排队，就直接调用fullTryAcquireShared()方法。
+             * 1、读锁是否应该排队。没有排队，就进行if后面的判断。
+             *    排队，就直接调用fullTryAcquireShared()方法。
              * 2、读锁数量是否超过最大值。（最大数量为2的16次方-1=65535）
              * 3、是否获取到同步变量的最新状态值
              */          
@@ -695,7 +737,8 @@ Sync实现了tryAcquireShared方法，如下：
                 // 如果读锁达到了最大值，抛出异常
                 if (sharedCount(c) == MAX_COUNT)
                     throw new Error("Maximum lock count exceeded");
-        		// 尝试设置同步变量的值，只要设置成功了，就表示当前线程获取到了锁，然后就设置锁的获取次数等相关信息
+        		// 尝试设置同步变量的值，只要设置成功了，就表示当前线程获取到了锁，
+                // 然后就设置锁的获取次数等相关信息
                 if (compareAndSetState(c, c + SHARED_UNIT)) {
                     if (sharedCount(c) == 0) {
                         firstReader = current;
@@ -793,7 +836,8 @@ protected final boolean tryAcquire(int acquires) {
             int w = exclusiveCount(c);
             // 如果线程占有了写锁或者读锁
             if (c != 0) {
-                // 如果写锁数量为0，线程占有的必是读锁，而且这个线程并不是当前线程（完全不符合重入），返回false
+                // 如果写锁数量为0，线程占有的必是读锁，
+                // 而且这个线程并不是当前线程（完全不符合重入），返回false
                 if (w == 0 || current != getExclusiveOwnerThread())
                     return false;
                 // 如果写锁的数量超过了最大值，抛出异常
@@ -805,8 +849,8 @@ protected final boolean tryAcquire(int acquires) {
             }
     
             /**
-             * 1. 当writerShouldBlock()返回true时，表示当前线程还不能直接获取锁，因此tryAcquire()方法直接返回false。
-             * 2. 当writerShouldBlock()返回false时，表示当前线程可以尝试去获取锁，因此会执行if判断中后面的逻辑
+             * 1. writerShouldBlock()返回true，当前线程不能直接获取锁，tryAcquire()直接返回false。
+             * 2. writerShouldBlock()返回false，当前线程可以尝试去获取锁，因此会执行if判断中后面的逻辑
              * 	  即通过CAS方法尝试去修改同步变量的值。
              * 3. 如果修改同步变量成功，则表示当前线程获取到了锁，最终tryAcquire()方法会返回true。
              *	  如果修改失败，那么tryAcquire()会返回false，表示获取锁失败。
@@ -834,7 +878,8 @@ protected final boolean tryRelease(int releases) {
         throw new IllegalMonitorStateException();
     // 将state的值减去releases
     int nextc = getState() - releases;
-    // 调用exclusiveCount()方法，计算写锁的数量。如果写锁的数量为0，表示写锁被完全释放，此时将AQS的exclusiveOwnerThread属性置为null
+    // 调用exclusiveCount()方法，计算写锁的数量。如果写锁的数量为0，
+    // 表示写锁被完全释放，此时将AQS的exclusiveOwnerThread属性置为null
     // 并返回free标识，表示写锁是否被完全释放
     boolean free = exclusiveCount(nextc) == 0;
     if (free)
@@ -844,47 +889,330 @@ protected final boolean tryRelease(int releases) {
 }
 ```
 
-## 3.3 小结
+## 3.3 读写锁实现缓存
 
-ReadWriteLock读写锁执行流程：![](https://img-blog.csdnimg.cn/20201104111903784.png)
+这里用读写锁实现一个缓存工具类。在下面的代码中，我们声明了一个 Cache<K, V> 类，其中类型参数 K 代表缓存里 key 的类型，V 代表缓存里 value 的类型。缓存的数据保存在 Cache 类内部的 HashMap 里面，HashMap 不是线程安全的，这里我们使用读写锁 ReadWriteLock 来保证其线程安全。ReadWriteLock 是一个接口，它的实现类是 ReentrantReadWriteLock，通过名字你应该就能判断出来，它是支持可重入的。下面我们通过 ReadWriteLock 创建了一把读锁和一把写锁。
 
-**读写锁不支持锁升级，支持锁降级**。锁降级指的是线程获取到了写锁，在没有释放写锁的情况下，又获取读锁。以下面代码为例：
+Cache 这个工具类，我们提供了两个方法，一个是读缓存方法 get()，另一个是写缓存方法 put()。读缓存需要用到读锁，读锁的使用和前面我们介绍的 Lock 的使用是相同的，都是 `try{}finally{}`这个编程范式。写缓存则需要用到写锁，写锁的使用和读锁是类似的。这样看来，读写锁的使用还是非常简单的。
 
 ```java
-public class WriteReadLockTest {
-    Object data;
-    // 是否有效，如果失效，需要重新计算 data
-    volatile boolean cacheValid;
-    final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
-
-    void processCachedData() {
-        rwl.readLock().lock();
-        if (!cacheValid) {
-            // 获取写锁前必须释放读锁
-            rwl.readLock().unlock();
-            rwl.writeLock().lock();
-            try {
-                // 判断是否有其它线程已经获取了写锁、更新了缓存, 避免重复更新
-                if (!cacheValid) {
-                    data = ...
-                    cacheValid = true;
-                }
-                // 降级为读锁, 释放写锁, 这样能够让其它线程读取缓存
-                rwl.readLock().lock();
-            } finally {
-
-                rwl.writeLock().unlock();
-            }
-        }
-        // 自己用完数据, 释放读锁
-        try {
-            use(data);
-        } finally {
-            rwl.readLock().unlock();
-        }
-    }
+class Cache<K,V> {
+  final Map<K, V> m = new HashMap<>();
+  final ReadWriteLock rwl = new ReentrantReadWriteLock();
+  // 读锁
+  final Lock r = rwl.readLock();
+  // 写锁
+  final Lock w = rwl.writeLock();
+  // 读缓存
+  V get(K key) {
+    r.lock();
+    try { return m.get(key); }
+    finally { r.unlock(); }
+  }
+  // 写缓存
+  V put(K key, V value) {
+    w.lock();
+    try { return m.put(key, value); }
+    finally { w.unlock(); }
+  }
 }
 ```
+
+**使用缓存首先要解决缓存数据的初始化问题**。如果源头数据的数据量不大，就可以采用一次性加载的方式；如果源头数据量非常大，那么就需要按需加载了，按需加载也叫懒加载，指的是只有当应用查询缓存，并且数据不在缓存里的时候，才触发加载源头相关数据进缓存的操作。
+
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20210609170830449.png" width="400px"/>
+</div>
+
+下面的这段代码实现了按需加载的功能，这里我们假设缓存的源头是数据库。需要注意的是，如果缓存中没有缓存目标对象，那么就需要从数据库中加载，然后写入缓存，写缓存需要用到写锁，所以在代码中的⑤处，我们调用了 `w.lock()` 来获取写锁。
+
+另外，还需要注意的是，在获取写锁之后，我们并没有直接去查询数据库，而是在代码⑥⑦处，重新验证了一次缓存中是否存在，再次验证如果还是不存在，我们才去查询数据库并更新本地缓存。为什么我们要再次验证呢？
+
+```java
+class Cache<K,V> {
+  final Map<K, V> m = new HashMap<>();
+  final ReadWriteLock rwl = new ReentrantReadWriteLock();
+  final Lock r = rwl.readLock();
+  final Lock w = rwl.writeLock();
+ 
+  V get(K key) {
+    V v = null;
+    // 读缓存
+    r.lock();         // 1
+    try {
+      v = m.get(key); // 2
+    } finally{
+      r.unlock();     // 3
+    }
+    // 缓存中存在，返回
+    if(v != null) {return v;}  // 4
+    // 缓存中不存在，查询数据库
+    w.lock();         // 5
+    try {
+      // 再次验证
+      // 其他线程可能已经查询过数据库
+      v = m.get(key); // 6
+      if(v == null){  // 7
+        // 查询数据库
+        v= 省略代码无数
+        m.put(key, v);
+      }
+    } finally{
+      w.unlock();
+    }
+    return v; 
+  }
+}
+```
+
+原因是在高并发的场景下，有可能会有多线程竞争写锁。假设缓存是空的，没有缓存任何东西，如果此时有三个线程 T1、T2 和 T3 同时调用 get() 方法，并且参数 key 也是相同的。那么它们会同时执行到代码⑤处，但此时只有一个线程能够获得写锁，假设是线程 T1，线程 T1 获取写锁之后查询数据库并更新缓存，最终释放写锁。此时线程 T2 和 T3 会再有一个线程能够获取写锁，假设是 T2，如果不采用再次验证的方式，此时 T2 会再次查询数据库。T2 释放写锁之后，T3 也会再次查询一次数据库。而实际上线程 T1 已经把缓存的值设置好了，T2、T3 完全没有必要再次查询数据库。所以，再次验证的方式，能够避免高并发场景下重复查询数据的问题。
+
+## 3.4 读写锁的升级与降级
+
+上面按需加载的示例代码中，在①处获取读锁，在③处释放读锁，那是否可以在②处的下面增加验证缓存并更新缓存的逻辑呢？详细的代码如下。
+
+```java
+// 读缓存
+r.lock();         // 1
+try {
+  v = m.get(key); // 2
+  if (v == null) {
+    w.lock();
+    try {
+      // 再次验证并更新缓存
+      // 省略详细代码
+    } finally{
+      w.unlock();
+    }
+  }
+} finally{
+  r.unlock();     // 3
+}
+```
+
+这样看上去好像是没有问题的，先是获取读锁，然后再升级为写锁，对此还有个专业的名字，叫**锁的升级**。可惜 ReadWriteLock 并不支持这种升级。在上面的代码示例中，读锁还没有释放，此时获取写锁，会导致写锁永久等待，最终导致相关线程都被阻塞，永远也没有机会被唤醒。锁的升级是不允许的，这个你一定要注意。
+
+不过，虽然锁的升级是不允许的，但是锁的降级却是允许的。以下代码来源自 ReentrantReadWriteLock 的官方示例，略做了改动。你会发现在代码①处，获取读锁的时候线程还是持有写锁的，这种锁的降级是支持的。
+
+```java
+class CachedData {
+  Object data;
+  volatile boolean cacheValid;
+  final ReadWriteLock rwl = new ReentrantReadWriteLock();
+  // 读锁  
+  final Lock r = rwl.readLock();
+  // 写锁
+  final Lock w = rwl.writeLock();
+  
+  void processCachedData() {
+    // 获取读锁
+    r.lock();
+    if (!cacheValid) {
+      // 释放读锁，因为不允许读锁的升级
+      r.unlock();
+      // 获取写锁
+      w.lock();
+      try {
+        // 再次检查状态  
+        if (!cacheValid) {
+          data = ...
+          cacheValid = true;
+        }
+        // 释放写锁前，降级为读锁
+        // 降级是可以的
+        r.lock(); // 1
+      } finally {
+        // 释放写锁
+        w.unlock(); 
+      }
+    }
+    // 此处仍然持有读锁
+    try {use(data);} 
+    finally {r.unlock();}
+  }
+}
+```
+
+## 3.4 读写锁小结
+
+读写锁类似于 ReentrantLock，也支持公平模式和非公平模式。读锁和写锁都实现了 `java.util.concurrent.locks.Lock `接口，所以除了支持 lock() 方法外，tryLock()、lockInterruptibly() 等方法也都是支持的。但是有一点需要注意，那就是只有写锁支持条件变量，读锁是不支持条件变量的，读锁调用 `newCondition()` 会抛出 `UnsupportedOperationException` 异常。
+
+ReadWriteLock读写锁执行流程：
+
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20201104111903784.png" width="800px"/>
+</div>
+
+**读写锁不支持锁升级，支持锁降级**。锁降级指的是线程获取到了写锁，在没有释放写锁的情况下，又获取读锁。
+
+# 4 Condition接口
+
+## 4.1 常用方法
+
+Java SDK 并发包里的 Lock 有别于 synchronized 隐式锁的三个特性：能够响应中断、支持超时和非阻塞地获取锁；而**Condition 实现了管程模型里面的条件变量**。Condition 可以看做是 Lock 对象上的信号，类似于 wait/notify。Conditiion接口下重要方法如下：
+
+| 重要方法                                                                         | 说明                                                  |
+| -------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| **void** await() **throws** InterruptedException;                                | 等待信号; 类比 Object#wait()                          |
+| **void** awaitUninterruptibly();                                                 | 等待信号;                                             |
+| **boolean** await(**long** time, TimeUnit unit) **throws** InterruptedException; | 等待信号; 超时则返回 **false**                        |
+| **boolean** awaitUntil(Date deadline) **throws** InterruptedException;           | 等待信号; 超时则返回 **false**                        |
+| **void** signal();                                                               | 给一个等待线程发送唤醒信号; 类比<br/>Object#notify () |
+| **void** signalAll();                                                            | 给**所有**等待线程发送唤醒信号;类比Object#notifyAll() |
+
+在很多并发场景下，支持多个条件变量能够让我们的并发程序可读性更好，实现起来也更容易。例如，实现一个阻塞队列，就需要两个条件变量。
+
+**那如何利用两个条件变量快速实现阻塞队列呢？**
+
+一个阻塞队列，需要两个条件变量，一个是队列不空（空队列不允许出列），两外一个是队列不满（队列已满不允许出列），代码如下：
+
+```java
+public class BlockedQueue<T>{
+  final Lock lock = new ReentrantLock();
+  // 条件变量：队列不满  
+  final Condition notFull = lock.newCondition();
+  // 条件变量：队列不空  
+  final Condition notEmpty = lock.newCondition();
+ 
+  // 入队
+  void enq(T x) {
+    lock.lock();
+    try {
+      while (队列已满){
+        notFull.await(); // 等待队列不满
+      }  
+      // 省略入队操作...
+      notEmpty.signal(); // 入队后, 通知可出队
+    }finally {
+      lock.unlock();
+    }
+  }
+  // 出队
+  void deq(){
+    lock.lock();
+    try {
+      while (队列已空){
+        notEmpty.await(); // 等待队列不空
+      }  
+      // 省略出队操作...
+      notFull.signal(); // 出队后，通知可入队
+    }finally {
+      lock.unlock();
+    }  
+  }
+}
+```
+
+不过，这里你需要注意，Lock 和 Condition 实现的管程，**线程等待和通知需要调用 await()、signal()、signalAll()**，它们的语义和 wait()、notify()、notifyAll() 是相同的。但是不一样的是，Lock&Condition 实现的管程里只能使用前面的 await()、signal()、signalAll()，而后面的 wait()、notify()、notifyAll() 只有在 synchronized 实现的管程里才能使用。如果一不小心在 Lock&Condition 实现的管程里调用了 wait()、notify()、notifyAll()，那程序可就彻底玩儿完了。Java SDK 并发包里的 Lock 和 Condition 不过就是管程的一种实现而已。
+
+下面我们就来看看在知名项目 Dubbo 中，Lock 和 Condition 是怎么用的。不过在开始介绍源码之前，我还先要介绍两个概念：同步和异步。
+
+------
+
+同步与异步的区别是什么呢？通俗点讲就是调用方是否需要等待结果，如果需要等待结果，就是同步；如果不需要等待结果，就是异步。
+
+比如在以下代码中，比如在下面的代码里，有一个计算圆周率小数点后 100 万位的方法`pai1M()`，这个方法可能需要执行俩礼拜，如果调用`pai1M()`之后，线程一直等着计算结果，等俩礼拜之后结果返回，就可以执行 `printf("hello world")`了，这个属于同步；如果调用`pai1M()`之后，线程不用等待计算结果，立刻就可以执行 `printf("hello world")`，这个就属于异步。
+
+```java
+// 计算圆周率小说点后 100 万位 
+String pai1M() {
+  // 省略代码无数
+}
+ 
+pai1M()
+printf("hello world")
+```
+
+同步，是 Java 代码默认的处理方式。如果你想让你的程序支持异步，可以通过下面两种方式来实现：
+
+1. 调用方创建一个子线程，在子线程中执行方法调用，这种调用我们称为异步调用；
+2. 方法实现的时候，创建一个新的线程执行主要逻辑，主线程直接 return，这种方法我们一般称为异步方法。
+
+## 4.2 Dubbo 源码分析
+
+在编程领域，异步的场景还是挺多的，比如 TCP 协议本身就是异步的，我们工作中经常用到的 RPC 调用，**在 TCP 协议层面，发送完 RPC 请求后，线程是不会等待 RPC 的响应结果的**。可能你会觉得奇怪，平时工作中的 RPC 调用大多数都是同步的啊？这是怎么回事呢？
+
+其实很简单，一定是有人帮你做了异步转同步的事情，例如知名RPC 框架 Dubbo 就为我们做了异步转同步的事情。
+
+对于下面一个简单的 RPC 调用，默认情况下` sayHello() `方法，是个同步方法，也就是说，执行 `service.sayHello(“dubbo”) `的时候，线程会停下来等结果。
+
+```java
+DemoService service = 初始化部分省略
+String message = service.sayHello("dubbo");
+System.out.println(message);
+```
+
+如果此时你将调用线程 dump 出来的话，会是下图这个样子，你会发现调用线程阻塞了，线程状态是 TIMED_WAITING。本来发送请求是异步的，但是调用线程却阻塞了，说明 Dubbo 帮我们做了异步转同步的事情。通过调用栈，你能看到线程是阻塞在 DefaultFuture.get() 方法上，所以可以推断：Dubbo 异步转同步的功能应该是通过 DefaultFuture 这个类实现的。
+
+<div align="center">  
+<img src="../../images/dubbo/error.png" width="800px"/>
+</div>
+
+不过为了理清前后关系，还是有必要分析一下调用 DefaultFuture.get() 之前发生了什么。DubboInvoker 的 108 行调用了 DefaultFuture.get()，这一行很关键，我稍微修改了一下列在了下面。这一行先调用了 request(inv, timeout) 方法，这个方法其实就是发送 RPC 请求，之后通过调用 get() 方法等待 RPC 返回结果。
+
+```java
+public class DubboInvoker{
+  Result doInvoke(Invocation inv){
+    // 下面这行就是源码中 108 行
+    // 为了便于展示，做了修改
+    return currentClient 
+      .request(inv, timeout)
+      .get();
+  }
+}
+```
+
+DefaultFuture 这个类是很关键，我把相关的代码精简之后，列到了下面。不过在看代码之前，你还是有必要重复一下我们的需求：当 RPC 返回结果之前，阻塞调用线程，让调用线程等待；当 RPC 返回结果后，唤醒调用线程，让调用线程重新执行。不知道你有没有似曾相识的感觉，这不就是经典的等待 - 通知机制吗？这个时候想必你的脑海里应该能够浮现出管程的解决方案了。有了自己的方案之后，我们再来看看 Dubbo 是怎么实现的。
+
+```java
+// 创建锁与条件变量
+private final Lock lock = new ReentrantLock();
+private final Condition done = lock.newCondition();
+ 
+// 调用方通过该方法等待结果
+Object get(int timeout){
+  long start = System.nanoTime();
+  lock.lock();
+  try {
+	while (!isDone()) {
+	  done.await(timeout);
+      long cur=System.nanoTime();
+	  if (isDone() || 
+          cur-start > timeout){
+	    break;
+	  }
+	}
+  } finally {
+	lock.unlock();
+  }
+  if (!isDone()) {
+	throw new TimeoutException();
+  }
+  return returnFromResponse();
+}
+// RPC 结果是否已经返回
+boolean isDone() {
+  return response != null;
+}
+// RPC 结果返回时调用该方法   
+private void doReceived(Response res) {
+  lock.lock();
+  try {
+    response = res;
+    if (done != null) {
+      done.signal();
+    }
+  } finally {
+    lock.unlock();
+  }
+}
+```
+
+调用线程通过调用 get() 方法等待 RPC 返回结果，这个方法里面，你看到的都是熟悉的“面孔”：调用 lock() 获取锁，在 finally 里面调用 unlock() 释放锁；获取锁后，通过经典的在循环中调用 await() 方法来实现等待。
+
+当 RPC 结果返回时，会调用 doReceived() 方法，这个方法里面，调用 lock() 获取锁，在 finally 里面调用 unlock() 释放锁，获取锁后通过调用 signal() 来通知调用线程，结果已经返回，不用继续等待了。
+
+至此，Dubbo 里面的异步转同步的源码就分析完了，有没有觉得还挺简单的？最近这几年，工作中需要异步处理的越来越多了，其中有一个主要原因就是有些 API 本身就是异步 API。例如 websocket 也是一个异步的通信协议，如果基于这个协议实现一个简单的 RPC，你也会遇到异步转同步的问题。现在很多公有云的 API 本身也是异步的，例如创建云主机，就是一个异步的 API，调用虽然成功了，但是云主机并没有创建成功，你需要调用另外一个 API 去轮询云主机的状态。如果你需要在项目内部封装创建云主机的 API，你也会面临异步转同步的问题，因为同步的 API 更易用。
 
 # 参考
 

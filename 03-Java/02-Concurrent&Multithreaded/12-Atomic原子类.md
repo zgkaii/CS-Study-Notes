@@ -101,7 +101,7 @@ temValue:13;  i:3
 
 ### 1.2 数组类型
 
- 数组类型原子类有三个：`AtomicIntegerArray`、`AtomicLongArray`与`AtomicReferenceArray `。介于三个类提供的方法几乎相同，这里以 `AtomicIntegerArray`为例来学习。
+数组类型原子类有三个：`AtomicIntegerArray`、`AtomicLongArray`与`AtomicReferenceArray `。介于三个类提供的方法几乎相同，这里以 `AtomicIntegerArray`为例来学习。
 
 **AtomicIntegerArray常用方法**
 
@@ -350,9 +350,9 @@ CAS算法涉及到三个操作数：
 
 当且仅当V的值等于A时（旧值和内存中实际的值相同），表明旧值A已经是目前最新版本的值，自然而然可以将新值 N 赋值给 V。反之则表明V和A变量不同步，直接返回V即可。当多个线程使用CAS操作一个变量时，只有一个线程会更新成功，其余失败的线程会重新尝试。也就是说，“更新”是一个不断重试的操作。
 
-下面以基本原子类AtomicInteger为例，来理解原子操作的实现原理。
+下面以基本原子类`AtomicInteger`为例，来理解原子操作的实现原理。
 
-查看AtomicInteger源码：
+查看`AtomicInteger`源码：
 
 ```java
 public class AtomicInteger extends Number implements java.io.Serializable {
@@ -374,7 +374,7 @@ public class AtomicInteger extends Number implements java.io.Serializable {
     private volatile int value;
 ```
 
-接下来，查看AtomicInteger的自增函数incrementAndGet()的源码时，发现自增函数底层调用的是unsafe.getAndAddInt()。
+接下来，查看`AtomicInteger`的自增函数`incrementAndGet()`的源码时，发现自增函数底层调用的是`unsafe.getAndAddInt()`。
 
 ```java
     // AtomicInteger 自增方法
@@ -418,7 +418,7 @@ public final int getAndAddInt(Object o, long offset, int delta) {
 }
 ```
 
-根据OpenJDK 8的源码我们可以看出，getAndAddInt()循环获取给定对象o中的偏移量处的值v，然后判断内存值是否等于v。如果相等则将内存值设置为 v + delta，否则返回false，继续循环进行重试，直到设置成功才能退出循环，并且将旧值返回。整个“比较+更新”操作封装在compareAndSwapInt()中，在JNI里是借助于一个CPU指令完成的，属于原子操作，可以保证多个线程都能够看到同一个变量的修改值。
+根据OpenJDK 8的源码我们可以看出，`getAndAddInt()`循环获取给定对象o中的偏移量处的值v，然后判断内存值是否等于v。如果相等则将内存值设置为 v + delta，否则返回false，继续循环进行重试，直到设置成功才能退出循环，并且将旧值返回。整个“比较+更新”操作封装在`compareAndSwapInt()`中，在JNI里是借助于一个CPU指令完成的，属于原子操作，可以保证多个线程都能够看到同一个变量的修改值。
 
 后续JDK通过CPU的**cmpxchg指令**，去比较寄存器中的 A 和 内存中的值 V。如果相等，就把要写入的新值 B 存入内存中。如果不相等，就将内存值 V 赋值给寄存器中的值 A。然后通过Java代码中的**while循环调用cmpxchg指令进行重试，直到设置成功为止**。
 
