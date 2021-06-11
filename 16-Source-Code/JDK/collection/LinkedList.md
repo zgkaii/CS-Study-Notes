@@ -1,4 +1,5 @@
-- [1 LinkedList简介](#1-linkedlist简介)
+[1 LinkedList简介](#1-linkedlist简介)
+
 - [2 成员属性](#2-成员属性)
 - [3 构造方法](#3-构造方法)
 - [4 常用方法](#4-常用方法)

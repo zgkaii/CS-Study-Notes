@@ -28,7 +28,7 @@ public class ArrayList<E> extends AbstractList<E>
 
 - `ArrayList` 继承了`AbstractList`抽象方法，实现了List接口，提供了相关的**添加、删除、修改、遍历**等功能。
 - `RandomAccess` 是一个标志接口，表明实现这个这个接口的 List 集合是支持**快速随机访问**的。在 `ArrayList` 中，我们即可以通过元素的序号快速获取元素对象，这就是快速随机访问。在 `Collections.binarySearch()` 方法中，它要判断传入的list 是否 `RamdomAccess` 的实例，如果是，调用 `Collections.indexedBinarySearch(list, key)` 方法，如果不是，那么调用 `Collections.iteratorBinarySearch(list, key)` 方法。
-- `ArrayList` 实现了 `Cloneable` 接口，可以调用 `Object.clone()` 方法返回该对象的浅拷贝。
+- `ArrayList` 实现了 `Cloneable` 接，可以调用 `Object.clone()` 方法返回该对象的浅拷贝。
 - `ArrayList` 实现了` java.io.Serializable `接口，这意味着`ArrayList`支持序列化，能通过序列化去传输。
 
 > Tips：**`ArrayList`中的操作不是线程安全的**！建议在单线程中才使用`ArrayList`，多线程中选择使用Vector或者`CopyOnWriteArrayList`。
