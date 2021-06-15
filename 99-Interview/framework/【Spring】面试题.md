@@ -33,3 +33,21 @@ Spring Bean 有五个作用域，其中最基础的有下面两种：
 - Request，为每个 HTTP 请求创建单独的 Bean 实例。
 - Session，很显然 Bean 实例的作用域是 Session 范围。
 - GlobalSession，用于 Portlet 容器，因为每个 Portlet 有单独的 Session，GlobalSession 提供一个全局性的 HTTP Session。
+
+
+
+
+
+spring源码（bean生命周期、@Resource原理、@AutoWired原理）
+
+知道 Spring 的 bean 的作用域与生命周期吗?
+
+spring如何解决循环依赖问题
+
+spring中有到了那些设计模式，谈谈你对设计原则都理解，工作中最经常使用都设计模式有哪些。
+
+如何解决包依赖冲突
+
+简单说说spring IOC、AOP实现原理？
+
+Spring 中的事务传播行为了解吗?TransactionDefinition 接口中哪五个表示隔离级别的常量?

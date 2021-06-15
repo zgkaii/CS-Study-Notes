@@ -1140,14 +1140,10 @@ const store = createStore(
 
 # 参考资料
 
-[React实战教程](https://www.bilibili.com/video/BV184411x7F9)
+* [React实战教程](https://www.bilibili.com/video/BV184411x7F9)
+* [React中文文档](https://zh-hans.reactjs.org/docs/getting-started.html)
+* [React 入门实例教程](https://www.ruanyifeng.com/blog/2015/03/react.html)
+* [图解ES6中的React生命周期](https://juejin.im/post/6844903510538977287)
+* [React 的生命周期变化](https://juejin.im/post/6844904005152276487)
+* [让虚拟DOM和DOM-diff不再成为你的绊脚石](https://juejin.im/post/6844903806132568072)
 
-[React中文文档](https://zh-hans.reactjs.org/docs/getting-started.html)
-
-[React 入门实例教程](https://www.ruanyifeng.com/blog/2015/03/react.html)
-
-[图解ES6中的React生命周期](https://juejin.im/post/6844903510538977287)
-
-[React 的生命周期变化](https://juejin.im/post/6844904005152276487)
-
-[让虚拟DOM和DOM-diff不再成为你的绊脚石](https://juejin.im/post/6844903806132568072)

@@ -87,7 +87,10 @@ Netty 是通过三组类来处理粘包 / 半包问题的，主要对应于上�
 1. 运用一次解码将 “12345\r\n” 的字节数组拆分成 “123” 和 “45\r” 的字节数组；
 2. 运用二次解码将 “123” 和 “45\r” 转换成 Java 的 String 类型的对象；
 3. 打印上面的 String 对象；
-   ![图片描述](https://img1.sycdn.imooc.com/5f179e66000118ca10340264.png)
+
+<div align="center">  
+<img src="https://img1.sycdn.imooc.com/5f179e66000118ca10340264.png" width="800px"/>
+</div>
 
 既然一次解码的时候都已经解出了对应的字节数组，何不顺势而为将其序列化成 Java 对象呢？
 
@@ -107,7 +110,10 @@ Netty 是通过三组类来处理粘包 / 半包问题的，主要对应于上�
 - 二次编解码：`MessageToMessageEncoder/MessageToMessageDecoder`
 
 正常来说，继承自 `MessageToByteEncoder` 或者 `ByteToMessageDecoder` 类的就是一次编解码，继承自 `MessageToMessageEncoder` 或者 `MessageToMessageDecoder` 类的就是二次编解码，其实，也很好理解，服务端接收请求的过程也是先拿到字节数组（在 Netty 中可以理解为 ByteBuf），然后通过 ByteToMessageDecoder 转换成协议格式的字节数组，再把协议格式的字节数组通过 MessageToMessageDecoder 转换成 Java 对象。
-![图片描述](https://img1.sycdn.imooc.com/5f179e780001aa4710310142.png)
+
+<div align="center">  
+<img src="https://img1.sycdn.imooc.com/5f179e780001aa4710310142.png" width="800px"/>
+</div>
 
 > 正如前文所说，凡事都有特例，比如 MarshallingEncoder，它继承自 MessageToByteEncoder，但是它把二次编码的工作也给干了。从 ByteToMessageDecoder 的名称也可以知道，字节数组直接转成 Java 对象也没有毛病，而且，MessageToMessageDecoder 也可以表示 Java 对象 A 转换成 Java 对象 B。不过，对于我们自己来写编解码，最好还是遵循分层的思想来实现。
 
@@ -120,7 +126,10 @@ Netty 是通过三组类来处理粘包 / 半包问题的，主要对应于上�
 那么，Netty 中支持哪些二次编解码方式呢？
 
 让我们打开 Netty 工程，找到 `netty-codec` 这个工程，展开目录：
-![图片描述](https://img1.sycdn.imooc.com/5f179e8f0001c77704640379.png)
+
+<div align="center">  
+<img src="https://img1.sycdn.imooc.com/5f179e8f0001c77704640379.png" width="500px"/>
+</div>
 
 可以看到，这个目录下有 base64、bytes、json、protobuf 等等，让我们一个一个来看一下：
 
@@ -164,19 +173,38 @@ TCP 实际上自带的就有长连接选项，本身是也有心跳包机制，�
 
 # Netty 的零拷贝了解么？
 
-**讲讲 Netty 的零拷贝？**
+## 什么是零拷贝？
 
-维基百科是这样介绍零拷贝的：
+系统内核处理 IO 操作分为两个阶段——等待数据和拷贝数 据。等待数据，就是系统内核在等待网卡接收到数据后，把数据写到内核中；而拷贝数据， 就是系统内核在获取到数据后，将数据拷贝到用户进程的空间中。以下是具体流程：
 
-> 零复制（英语：Zero-copy；也译零拷贝）技术是指计算机执行操作时，CPU 不需要先将数据从某处内存复制到另一个特定区域。这种技术通常用于通过网络传输文件时节省 CPU 周期和内存带宽。
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20210615144859758.png" width="800px"/>
+</div>
 
-在 OS 层面上的 `Zero-copy` 通常指避免在 `用户态(User-space)` 与 `内核态(Kernel-space)` 之间来回拷贝数据。而在 Netty 层面 ，零拷贝主要体现在对于数据操作的优化。
+应用进程的每一次写操作，都会把数据写到用户空间的缓冲区中，再由 CPU 将数据拷贝到 系统内核的缓冲区中，之后再由 DMA 将这份数据拷贝到网卡中，最后由网卡发送出去。 这里我们可以看到，一次写操作数据要拷贝两次才能通过网卡发送出去，而用户进程的读操 作则是将整个流程反过来，数据同样会拷贝两次才能让应用程序读取到数据。 
+
+应用进程的一次完整的读写操作，都需要在用户空间与内核空间中来回拷贝，并且每一次拷 贝，都需要 CPU 进行一次上下文切换（由用户进程切换到系统内核，或由系统内核切换到 用户进程），这样是不是很浪费 CPU 和性能呢？那有没有什么方式，可以减少进程间的数 据拷贝，提高数据传输的效率呢？ 
+
+这时我们就需要**零拷贝（Zero-copy）技术**。 所谓的零拷贝，就是取消用户空间与内核空间之间的数据拷贝操作，应用进程每一次的读写操作，可以通过一种方式，直接将数据写入内核或从内核中读取数据，再通过 DMA 将内 核中的数据拷贝到网卡，或将网卡中的数据 copy 到内核。 那怎么做到零拷贝？你想一下是不是用户空间与内核空间都将数据写到一个地方，就不需要拷贝了？此时你有没有想到虚拟内存？
+
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/2021061514511858.png" width="800px"/>
+</div>
+
+零拷贝有两种解决方式，分别是 `mmap+write` 方式和 `sendfile` 方式，其核心原理都是 通过虚拟内存来解决的
+
+## 讲讲 Netty中 的零拷贝？
+
+在 OS 层面上的 `Zero-copy` 通常指避免在 `用户态(User-space)` 与 `内核态(Kernel-space)` 之间来回拷贝数据，可以提升 CPU 的利用率。
+
+而在 Netty 层面 ，零拷贝主要体现在对于数据操作的优化。
 
 Netty 中的零拷贝体现在以下几个方面
 
-1. 使用 Netty 提供的 `CompositeByteBuf` 类, 可以将多个`ByteBuf` 合并为一个逻辑上的 `ByteBuf`, 避免了各个 `ByteBuf` 之间的拷贝。
-2. `ByteBuf` 支持 slice 操作, 因此可以将 ByteBuf 分解为多个共享同一个存储区域的 `ByteBuf`, 避免了内存的拷贝。
-3. 通过 `FileRegion` 包装的`FileChannel.tranferTo` 实现文件传输, 可以直接将文件缓冲区的数据发送到目标 `Channel`, 避免了传统通过循环 write 方式导致的内存拷贝问题.
+1. 使用 Netty 提供的 `CompositeByteBuf` 类，可以将多个`ByteBuf` 合并为一个逻辑上的 `ByteBuf`，避免了各个 `ByteBuf` 之间的拷贝。
+2. `ByteBuf` 支持 `slice` 操作，因此可以将 ByteBuf 分解为多个共享同一个存储区域的 `ByteBuf`，避免了内存的拷贝。
+3. 通过 wrap 操作，我们可以将 byte[] 数组、ByteBuf、ByteBuffer 等包装成一个 Netty ByteBuf 对象, 进而避免拷贝操作。
+4. 通过 `FileRegion` 包装的`FileChannel.tranferTo` 实现文件传输，可以直接将文件缓冲区的数据发送到目标 `Channel`，避免了传统通过循环 write 方式导致的内存拷贝问题。
 
 # 参考
 
