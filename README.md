@@ -80,8 +80,6 @@ CS-Study-Notes
 ├── 框架汇总
 |   ├── Dubbo
 |   ├── Netty
-|   ├── 分布式数据库
-|   ├── 分布式服务   
 |   └── ORM
 |   |   ├── Hibernate 
 |   |   └── MyBatis
