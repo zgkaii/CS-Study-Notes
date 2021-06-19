@@ -1,4 +1,5 @@
 <!-- MarkdownTOC -->
+
 - [1 AQS概述](#1-aqs概述)
 - [2 AQS常用方法](#2-aqs常用方法)
 - [2 AQS实现分析](#2-aqs实现分析)
@@ -117,8 +118,6 @@ AQS 还主要提供了如下**方法**：
 <div align="center">  
 <img src="https://img-blog.csdnimg.cn/20210605211037575.png" width="600px"/>
 </div>
-
-
 > CLH（Craig,Landin,and Hagersten）队列是一个虚拟的双向队列（**FIFO双向队列**）（虚拟的双向队列即不存在队列实例，仅存在结点之间的关联关系）。**AQS 是将每条请求共享资源的线程封装成一个 CLH 锁队列的一个结点（Node）来实现锁的分配**。
 
 同步队列中的节点（Node）用来保存获取同步状态失败的线程引用、等待状态以及前驱和后继节点信息。

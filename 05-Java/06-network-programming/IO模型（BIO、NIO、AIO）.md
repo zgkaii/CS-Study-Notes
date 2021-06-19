@@ -199,7 +199,8 @@ public class IOClient {
                 Socket socket = new Socket("127.0.0.1", 6666);
                 while (true) {
                     try {
-                        socket.getOutputStream().write((new Date() + ": hello world").getBytes());
+                        socket.getOutputStream().write((new Date() 
+                                                        + ": hello world").getBytes());
                         Thread.sleep(2000);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -382,7 +383,8 @@ public class NIOEchoServer {
                     // 强制转换为ServerSocketChannel
                     ServerSocketChannel ssc = (ServerSocketChannel) selectionKey.channel();
                     SocketChannel socketChannel = ssc.accept();
-                    System.out.println("accept new conn: " + socketChannel.getRemoteAddress());
+                    System.out.println("accept new conn: " 
+                                       + socketChannel.getRemoteAddress());
                     socketChannel.configureBlocking(false);
                     // 将SocketChannel注册到Selector上，并注册读事件
                     socketChannel.register(selector, SelectionKey.OP_READ);

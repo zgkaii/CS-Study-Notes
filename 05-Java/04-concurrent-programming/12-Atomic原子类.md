@@ -16,7 +16,7 @@
 
 <!-- /MarkdownTOC -->
 
-## 1 Atomic原子类简介
+# 1 Atomic原子类简介
 
 原子（atomic）本意是“不能被进一步分割的最小粒子”，而原子操作（atomic operation）意为“不可被中断的一个或一系列操作”。
 
@@ -25,8 +25,9 @@
 并发包 `java.util.concurrent` 的原子类都存放在`java.util.concurrent.atomic`下。
 
 <div align="center">  
-<img src="https://img-blog.csdnimg.cn/20210606194422177.png" width="800px"/>
+<img src="https://img-blog.csdnimg.cn/20210606194422177.png" width="900px"/>
 </div>
+
 
 根据操作的数据类型，可以将JUC包中的原子类分为主要5类：
 
@@ -62,7 +63,7 @@
 - LongAccumulator
 - LongAdder
 
-### 1.1 基本类型
+## 1.1 基本类型
 
 基本类型原子类有三个：`AtomicInteger`、`AtomicLong`与`AtomicBoolean `。介于三个类提供的方法几乎相同，这里以整型原子类` AtomicInteger`为例来学习。
 
@@ -103,7 +104,7 @@ temValue:12;  i:13
 temValue:13;  i:3
 ```
 
-### 1.2 数组类型
+## 1.2 数组类型
 
 数组类型原子类有三个：`AtomicIntegerArray`、`AtomicLongArray`与`AtomicReferenceArray `。介于三个类提供的方法几乎相同，这里以 `AtomicIntegerArray`为例来学习。
 
@@ -156,7 +157,7 @@ temValue:3;  i:[8, -1, 1, 2, 3, 4]
 Process finished with exit code 0
 ```
 
-### 1.3 对象的属性修改类型
+## 1.3 对象的属性修改类型
 
 对象的属性修改类型原子类有`AtomicIntegerFieldUpdater`、`AtomicLongFieldUpdater`、`AtomicReferenceFieldUpdater `三个。
 
@@ -217,7 +218,7 @@ class User {
 21
 ```
 
-### 1.4  引用类型
+## 1.4  引用类型
 
 基本类型原子类只能更新一个变量，如果需要原子**更新多个变量**，需要使用引用类型原子类。引用类型原子类分为`AtomicReference`、`AtomicStampedReference`、`AtomicMarkableReference `三类。
 
@@ -322,7 +323,7 @@ public class SolveABAByAtomicMarkableReference {
 true
 ```
 
-### 1.5 原子累加器
+## 1.5 原子累加器
 
 **原子类型累加器**是**JDK1.8**引进的并发新技术，它可以看做**AtomicLong**和**AtomicDouble**的部分加强类型。
 
@@ -330,17 +331,29 @@ true
 
 原子类型累加器的用法及原理可以参考[Java多线程进阶（十七）—— J.U.C之atomic框架：LongAdder](https://segmentfault.com/a/1190000015865714)一文。
 
-原子累加器通过**分段思想**改进原子类，其改进思路：
+**有了AtomictLong为什么还要引入LongAdder？**
 
-1. AtomicInteger 和 AtomicLong 里的 value 是所有 线程竞争读写的热点数据；
-2. 将单个 value 拆分成跟线程一样多的数组 Cell[]；
-3. 每个线程写自己的 Cell[i]++，最后对数组求和。
+* 引入LongAdder累加器的初衷------解决高并发环境下AtomictLong的自旋瓶颈问题。
 
-## 2 原子操作实现原理
+**那LongAdder为什么高并发性场景能会更好？**
+
+* 原子累加器通过**分段思想**改进原子类，其改进思路：
+  * AtomicInteger 和 AtomicLong 里的 value 是所有线程竞争读写的热点数据；
+  * 将单个 value 拆分成跟线程一样多的数组 `Cell[]`；
+  * 每个线程写自己的 `Cell[i]++`，最后对数组求和。
+
+>  AtomicLong 里内部变量value保存着实际值，在高并发场景下，value变量也就成了多线程竞争的一个热点。而LongAdder的基本思路就是“分散热点”，将value值分散到一个数组中，不同线程会命中到数组的不同槽中，各个线程只对自己槽中的那个值进行CAS操作，这样分散热点，减小冲突的概率。如果要获取真正的值，只要将各个槽中的变量值累加返回即可。这种做法其实跟JDK1.8之前的ConcurrentHashMap“分段锁”的实现思路是一样的。
+
+**LongAdder能否替代AtomicLong吗？**
+
+* AtomicLong提供的功能更丰富，尤其是`addAndGet、decrementAndGet、compareAndSet`这些方法。addAndGet、decrementAndGet除了单纯的做自增自减外，还可以立即获取增减后的值，而LongAdder则需要做同步控制才能精确获取增减后的值。如果业务需求需要精确的控制计数，则使用AtomicLong比较合适；
+* 一般而言，**在低竞争的并发环境下 `AtomicInteger` 的性能是要比 `LongAdder` 的性能好，而高竞争环境下和者写多读少环境下， `LongAdder` 的性能比 `AtomicInteger` 好**。
+
+# 2 原子操作实现原理
 
 在Java中可以通过**锁**和**循环CAS**的方式来实现原子操作。
 
-### 2.1 简析CAS
+## 2.1 简析CAS
 
 CAS全称 **Compare And Swap（比较与交换）**，是一种无锁算法。在不使用锁（没有线程被阻塞）的情况下实现多线程之间的**变量同步**。
 
@@ -352,7 +365,7 @@ CAS算法涉及到三个操作数：
 - A 比较的旧值 
 - B 更新的新值
 
-当且仅当V的值等于A时（旧值和内存中实际的值相同），表明旧值A已经是目前最新版本的值，自然而然可以将新值 N 赋值给 V。反之则表明V和A变量不同步，直接返回V即可。当多个线程使用CAS操作一个变量时，只有一个线程会更新成功，其余失败的线程会重新尝试。也就是说，“更新”是一个不断重试的操作。
+**当且仅当V的值等于A时（旧值和内存中实际的值相同），表明旧值A已经是目前最新版本的值，自然而然可以将新值 N 赋值给 V**。反之则表明V和A变量不同步，直接返回V即可。当多个线程使用CAS操作一个变量时，只有一个线程会更新成功，其余失败的线程会重新尝试。也就是说，“更新”是一个不断重试的操作。
 
 下面以基本原子类`AtomicInteger`为例，来理解原子操作的实现原理。
 
@@ -426,11 +439,11 @@ public final int getAndAddInt(Object o, long offset, int delta) {
 
 后续JDK通过CPU的**cmpxchg指令**，去比较寄存器中的 A 和 内存中的值 V。如果相等，就把要写入的新值 B 存入内存中。如果不相等，就将内存值 V 赋值给寄存器中的值 A。然后通过Java代码中的**while循环调用cmpxchg指令进行重试，直到设置成功为止**。
 
-### 2.2 CAS实现原子操作的三大问题
+## 2.2 CAS实现原子操作的三大问题
 
 CAS虽然很高效地解决了原子操作，但是CAS仍然存在三大问题。ABA问题，循环时间长开销大，以及只能保证一个共享变量的原子操作。
 
-#### 2.2.1 ABA问题
+### 2.2.1 ABA问题
 
 CAS需要在操作值的时候去检查内存中的值是否发生变化，没有发生变化才会更新内存值。但是如果一个值原来是A，变成了B，又变成了A，那么使用CAS进行检查时会发现它的值没有发生变化，但是实际上却变化了。这就是一个典型的ABA问题。
 
@@ -515,21 +528,19 @@ JDK从1.5开始提供了**带版本号的引用类型AtomicStampedReference类**
 11:19:37.846 [main] INFO AtomicReferenceTest - success? true
 ```
 
-#### 2.2.2 循环时间长开销大
+### 2.2.2 循环时间长开销大
 
 CAS操作如果长时间不成功，会导致其一直自旋，给CPU带来非常大的开销。
 
 如果JVM能支持处理器提供的**pause指令**，那么效率会有一定的提升。pause指令有两个作用：第一，它可以延迟流水线执行指令（de-pipeline），使CPU不会消耗过多的执行资源，延迟的时间取决于具体实现的版本，在一些处理器上延迟时间是零；第二，它可以避免在退出循环的时候因内存顺序冲突（MemoryOrder Violation）而引起CPU流水线被清空（CPU Pipeline Flush），从而提高CPU的执行效率。
 
-#### 2.2.3 只能保证一个共享变量的原子操作
+### 2.2.3 只能保证一个共享变量的原子操作
 
 对一个共享变量执行操作时，CAS能够保证原子操作，但是对多个共享变量操作时，CAS是无法保证操作的原子性的。
 
-多个共享变量操作时，一般都用锁解决。
+多个共享变量操作时，一般都用锁解决。但Java从1.5开始JDK提供了**引用类型AtomicReference类**来保证引用对象之间的原子性，可以把多个变量放在一个对象里来进行CAS操作。
 
-但Java从1.5开始JDK提供了**引用类型AtomicReference类**来保证引用对象之间的原子性，可以把多个变量放在一个对象里来进行CAS操作。
-
-### 2.3 CAS应用
+## 2.3 CAS应用
 
 **（1）悲观锁**
 
@@ -560,10 +571,9 @@ private AtomicInteger atomicInteger = new AtomicInteger();  // 需要保证多�
 atomicInteger.incrementAndGet(); //执行自增1
 ```
 
-## 参考资料
+# 参考资料
 
 - 《Java并发编程的艺术》
 - [Java中的无锁编程](https://my.oschina.net/cqqcqqok/blog/1925073)
 - [Atomic原子类总结](https://github.com/Snailclimb/JavaGuide/blob/master/docs/java/multi-thread/Atomic%E5%8E%9F%E5%AD%90%E7%B1%BB%E6%80%BB%E7%BB%93.md)
 - [ABA问题的本质及其解决办法](https://segmentfault.com/a/1190000022798961)
-- [Java多线程进阶（十七）—— J.U.C之atomic框架：LongAdder](https://segmentfault.com/a/1190000015865714)

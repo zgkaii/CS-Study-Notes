@@ -1,4 +1,5 @@
 <!-- MarkdownTOC -->
+
 - [1 问题引出](#1-问题引出)
 - [2 ConcurrentHashMap结构](#2-concurrenthashmap结构)
   - [2.1 JDK1.7](#21-jdk17)
@@ -22,7 +23,7 @@
 
 HashMap不是线程安全的，在并发情况下可能会造成Race Condition，形成环形链表从而导致死循环（可参考[JAVA HASHMAP的死循环](https://coolshell.cn/articles/9606.html)一文）。在并发场景下要保证线程安全可以使用 `Collections.synchronizedMap()` 方法来包装HashMap。
 
-HashTable使用synchronized来保证线程安全，所有访问HashTable的线程都必须竞争同一把锁，在线程竞争激烈的情况下效率非常低下。
+Hashtable使用synchronized来保证线程安全，所有访问HashTable的线程都必须竞争同一把锁，在线程竞争激烈的情况下效率非常低下。
 
 基于此，ConcurrentHashMap应运而生。在 ConcurrentHashMap 中，无论是读操作还是写操作都能保证很高的性能：在进行读操作时(几乎)不需要加锁，而在写操作时通过**锁分段技术**（JDK1.7）只对所操作的段加锁而不影响客户端对其它段的访问。
 
@@ -32,13 +33,17 @@ HashTable使用synchronized来保证线程安全，所有访问HashTable的线�
 
 ## 2.1 JDK1.7
 
-![s](https://img-blog.csdnimg.cn/20201111105642652.png)
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20201111105642652.png" width="700px"/>
+</div>
 
 Java 7 中 ConcurrentHashMap 的存储结构如上图，ConcurrnetHashMap 由很多个 Segment  组合，而每一个 Segment 是一个类似于 HashMap 的结构，是一种数组和链表结构，可以进行扩容。一个Segment里包含一个 HashEntry数组，每个HashEntry是一个链表结构的元素，每个Segment 守护着一个HashEntry数组里的元素，当对HashEntry数组的数据进行修改时，必须首先获得与它对应的Segment锁。但是 Segment 的个数一旦**初始化就不能改变**，默认 Segment 的个数是 16 个，可以认为 ConcurrentHashMap 默认支持最多 16 个线程并发。
 
 ## 2.2 JDK1.8
 
-![](https://img-blog.csdnimg.cn/20201111105352696.png)
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20201111105352696.png" width="700px"/>
+</div>
 
 可以发现 Java8 的 ConcurrentHashMap  相对于 Java7 来说变化比较大，不再是之前的 **Segment 数组 + HashEntry 数组 + 链表**，而是 **Node 数组 + 链表 / 红黑树**。当冲突链表达到一定长度时，链表会转换成红黑树。
 

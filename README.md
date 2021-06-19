@@ -1,4 +1,4 @@
-## 写在最前 
+## 写在最前
 
 [John Washam](https://startupnextdoor.com/author/john/) 记录了自己从Web开发者（自学、非计算机科学学位）蜕变至 Google软件工程师的学习历程[coding-interview-university](https://github.com/jwasham/coding-interview-university)。
 
@@ -102,3 +102,4 @@ CS-Study-Notes
 ```
 
 ## Let's go!!!
+
