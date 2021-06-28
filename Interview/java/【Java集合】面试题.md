@@ -33,14 +33,3 @@ Java 提供了不同层面的线程安全支持。在传统集合框架内部，
 - 各种有序容器的线程安全版本等。
 
 具体保证线程安全的方式，包括有从简单的 synchronize 方式，到基于更加精细化的，比如基于分离锁实现的 ConcurrentHashMap 等并发实现等。具体选择要看开发的场景需求，总体来说，并发包内提供的容器通用场景，远优于早期的简单同步实现。
-
-
-
-
-
-- [ ] Java常用集合类（List、Map、Set），以及对应数据结构、CURD时间复杂度（理论及应用，都得滚瓜烂熟）
-- [ ] hashMap扩容方式？头插法尾插法区别？头插法会导致死循环？hashmap put的整个流程？( HashMap 的底层实现）
-- [ ] treeMap实现以及原理，一般使用场景？
-- [ ] ArrayList的扩容原理？ Arraylist 与 LinkedList 
-- [ ] 既然谈到了红黑树,你给我手绘一个出来吧,然后简单讲一下自己对于红黑树的理解
-- [ ] HashMap 和 Hashtable 的区别/HashSet 和 HashMap 区别
