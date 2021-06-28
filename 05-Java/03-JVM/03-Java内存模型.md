@@ -1,5 +1,5 @@
-
 <!-- MarkdownTOC -->
+
 - [1. Java内存模型](#1-java内存模型)
 - [2. 程序计数器](#2-程序计数器)
 - [3. 虚拟机栈](#3-虚拟机栈)
@@ -749,7 +749,7 @@ Minor GC会引发**STW**，暂停其它用户的线程，等垃圾回收结束�
 
 指发生在老年代的GC，对象从老年代消失时，我们说 “Major GC” 或 “Full GC” 发生了。
 
-出现了MajorGc，经常会伴随至少一次的Minor GC（但非绝对的，在Parallel Scavenge收集器的收集策略里就有直接进行Major GC的策略选择过程）
+出现了MajorGC，经常会伴随至少一次的Minor GC（但非绝对的，在Parallel Scavenge收集器的收集策略里就有直接进行Major GC的策略选择过程）
 
 - 也就是在老年代空间不足时，会先尝试触发Minor GC。如果之后空间还不足，则触发Major GC。
 

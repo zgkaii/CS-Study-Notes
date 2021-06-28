@@ -323,7 +323,7 @@ class Person {
 * hashCode() 的作用是获取哈希码（hashcode），也称为散列码；它实际上是返回一个int整数。这个哈希码的作用是确定该对象在哈希表中的索引位置。在使用Object的equals()方法进行对象比较时，Java会首先计算出两个对象的hashcode并进行对比（这个过程非常简单而且节省JVM的时间），如果两个两个对象的hashcode相同，则直接判定为两对象相等。
 
  * 按照一般hashCode()方法的实现来说，equals()相等的两个对象，hashcode()必须保持相等；equals()不相等的两个对象，hashcode()未必不相等；
- * 因此，在使用`HashSet, HashTable, HashMap`等等这些本质是**散列表**数据结构的集合类时，重写hashCode()是很有必要的。
+ * 因此，在使用`HashSet, Hashtable, HashMap`等等这些本质是**散列表**数据结构的集合类时，重写hashCode()是很有必要的。
 
 ## 参考资料
 
