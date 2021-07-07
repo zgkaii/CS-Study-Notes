@@ -1045,7 +1045,6 @@ ReadWriteLock读写锁执行流程：
 <div align="center">  
 <img src="https://img-blog.csdnimg.cn/20201104111903784.png" width="800px"/>
 </div>
-
 **读写锁不支持锁升级，支持锁降级**。锁降级指的是线程获取到了写锁，在没有释放写锁的情况下，又获取读锁。
 
 # 4 Condition接口

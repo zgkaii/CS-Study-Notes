@@ -68,7 +68,7 @@ String first = ss[0]; // 可以获取String对象
 
 ## 1.2 集合框架小结
 
-Collection与Map接口时所有所有集合框架的父接口，它们常用子接口及其实现类有：
+Collection与Map接口是所有集合框架的父接口，它们常用子接口及其实现类有：
 
 **（1）List**
 
@@ -140,11 +140,10 @@ public interface RandomAccess {
 
 ## 2.3 Array与ArrayList区别
 
-* `Array` 可以包含基本类型和对象类型，`ArrayList` 只能包含对象类型。
-
-* `Array` 大小是固定的，`ArrayList` 可以动态扩容。
-
-* `ArrayList` 最大的优势就是可以将很多数组操作的细节封装起来，比如：`addAll()，removeAll()，iterator()` 等等。
+* **存储数据**：`Array` 可以包含基本类型和引用类型，而`ArrayList` 只能包含引用类型，使用时经常涉及装箱拆箱，对性能有一定损耗。
+* **存储容量**：`Array` 大小是固定的，`ArrayList` 可以动态扩容（原先数组1.5倍）。
+* **支持操作**：`ArrayList` 最大的优势就是可以将很多数组操作的细节封装起来，比如：`addAll()、removeAll()、iterator()` 等等。
+* **使用建议**：对于平时的业务开发，直接使用`ArrayList`就足够了，省事省力。如果是非常底层的开发，比如开发网络框架，这个时候首选数组。
 
 ## 2.4 ArrayList扩容机制
 
@@ -443,7 +442,7 @@ static class Segment<K,V> extends ReentrantLock implements Serializable {
 
 ## 5.1 Arrays.sort与Collections.sort
 
-`Arrays.Sort`方法所用的排序算法主要涉及以下三种：双轴快速排序（`DualPivotQuicksort`）、归并排序（`MergeSort`)和`TimSort`，也同时包含了一些非基于比较的排序算法：例如计数排序。其**具体最终使用哪一种排序算法通常根据类型以及输入长度来动态抉择**。
+`Arrays.Sort`方法所用的排序算法主要涉及以下三种：双轴快速排序（`DualPivotQuicksort`）、归并排序（`MergeSort`)和`TimSort`，也同时包含了一些非基于比较的排序算法：计数排序。其**具体最终使用哪一种排序算法通常根据类型以及输入长度来动态抉择**。
 
 - 输入数组类型为基础类型时，采用**双轴快速排序，辅以计数排序**；
 
