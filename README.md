@@ -45,18 +45,23 @@ CS-Study-Notes
 |   ├── 数据结构
 |   ├── 算法
 |   └── LeetCode
-├── 编程规范
+├── 设计模式
 ├── Java
 |   ├── Java基础
 |   ├── Java集合
 |   ├── JVM
 |   ├── 并发编程
-|   ├── Java新特性
-|   └── 网络编程
-├── 其他编程语言
-|   ├── Golang
-|   └── Python
-├── 设计模式
+|   └── Java新特性
+├── 网络编程
+|   └── Netty
+├── 框架
+|   ├── Dubbo
+|   └── ORM
+|   |   └── MyBatis
+|   └── Spring
+|       ├── Spring 
+|       ├── SpringMVC 
+|       └── Spring Boot
 ├── 数据库
 |   ├── 关系型数据库
 |   |   ├── Mysql
@@ -67,38 +72,21 @@ CS-Study-Notes
 |   └── 分库分表
 ├── 分布式系统
 |   ├── 分布式算法
-|   ├── 分布式缓存
-|   ├── 分布式数据库
-|   ├── 分布式服务   
+|   ├── 分布式缓存  
 |   └── 消息队列
-|   |   ├── RocketMQ 
-|   |   └── Kafka
 |   └── RPC框架 
 ├── 微服务
 ├── 容器化/自动化运维
 ├── 机器学习/人工智能
-├── 框架汇总
-|   ├── Dubbo
-|   ├── Netty
-|   └── ORM
-|   |   ├── Hibernate 
-|   |   └── MyBatis
-|   └── Spring
-|   |   ├── Spring 
-|   |   ├── SpringMVC 
-|   |   └── Spring Boot
-|   └── Zookeeper 
-├── 前端
-|   ├── 前端基础
-|   ├── 模板引擎
-|   └── 组合框架
-|    	├── Vue
-|    	└── React
+├── 大数据
 ├── 架构设计
-|   └── 编程范式
-├── 开发工具
+├── 其他编程语言
+|   ├── Golang
+|   └── Python
+
 ├── 面试
-└── 思考
+├── 学习资源
+└── 开发工具
 ```
 
 ## Let's go!!!
