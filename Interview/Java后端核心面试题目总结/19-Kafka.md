@@ -1,7 +1,3 @@
-另外，这个面试题是建立在胖友看过 [《精尽【消息队列 】面试题》](http://svip.iocoder.cn/MQ/Interview) 。
-
-如果可能的话，推荐胖友先阅读了 [《Kafka 权威指南》](https://u.jd.com/jJpbF8) ，更加系统可靠。
-
 ## Apache Kafka 是什么?
 
 Kafka 是基于**发布与订阅**的**消息系统**。它最初由 LinkedIn 公司开发，之后成为 Apache 项目的一部分。Kafka 是一个分布式的，可分区的，冗余备份的持久性的日志服务。它主要用于处理活跃的流式数据。

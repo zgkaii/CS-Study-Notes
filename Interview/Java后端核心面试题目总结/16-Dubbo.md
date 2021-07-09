@@ -15,6 +15,8 @@
 
 官方提供提供了集成库 `dubbo-spring-boot` ，对应仓库为 https://github.com/apache/incubator-dubbo-spring-boot-project 。
 
+## spring boot、dubbo如何使用SPI
+
 ## Dubbo 框架的分层设计
 
 在 [《精尽 Dubbo 源码分析 —— 核心流程一览》](http://svip.iocoder.cn/) 一文中，对 Dubbo 框架的分层已经有过介绍，这里再来一次。

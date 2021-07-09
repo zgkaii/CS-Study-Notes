@@ -116,6 +116,8 @@ Spring 的完整名字，应该是 Spring Framework 。它提供了多个模块�
 - `spring-boot-starter-data-redis` ：提供 Redis 。
 - `mybatis-spring-boot-starter` ：提供 MyBatis 。
 
+## Spring Boot Starter原理
+
 ## 创建一个 Spring Boot Project 的最简单的方法是什么？
 
 Spring Initializr 是创建 Spring Boot Projects 的一个很好的工具。打开 `"https://start.spring.io/"` 网站，我们可以看到 Spring Initializr 工具，如下图所示：
@@ -276,7 +278,7 @@ YAML 是一种人类可读的数据序列化语言，它通常用于配置文件
 参考 [《Externalized Configuration》](https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html) 文档，我们整理顺序如下：
 
 1. `spring-boot-devtools`依赖的`spring-boot-devtools.properties`配置文件。
-   
+
    > 这个灰常小众，具体说明可以看看 [《Spring Boot参考文档（12）开发者工具》](https://blog.csdn.net/u011499747/article/details/71746325) ，建议无视。
 
 2. 单元测试上的`@TestPropertySource`和`@SpringBootTest`注解指定的参数。
@@ -363,7 +365,7 @@ YAML 是一种人类可读的数据序列化语言，它通常用于配置文件
         
     }
     ```
-
+    
     - 是不是很熟悉 😈
 
 目前主要使用 **Java Config** 配置为主。当然，三种配置方式是可以混合使用的。例如说：

@@ -1,4 +1,4 @@
-# Spring 整体
+# Spring 生态
 
 ## 什么是 Spring Framework？
 
@@ -80,8 +80,7 @@ Spring 是一个开源应用框架，旨在降低应用程序开发的复杂度�
 - WebFlux
 
   > 基于 Reactive 库的响应式的 Web 开发框架
-  >
-  
+
 - WebSocket
 
   > Spring 4.0 的一个最大更新是增加了对 Websocket 的支持。
@@ -162,7 +161,7 @@ Spring 框架中使用到了大量的设计模式，下面列举了比较有代�
 - 依赖注入 — 贯穿于 BeanFactory / ApplicationContext 接口的核心理念。
 - 工厂模式 — BeanFactory 用来创建对象的实例。
 
-当然，感兴趣的胖友，觉得不过瘾，可以看看艿艿基友知秋写的几篇文章：
+当然，感兴趣的胖友，觉得不过瘾，可以看看几篇文章：
 
 - [《Spring 框架中的设计模式(一)》](http://www.iocoder.cn/Spring/DesignPattern-1)
 - [《Spring 框架中的设计模式(二)》](http://www.iocoder.cn/Spring/DesignPattern-2)
@@ -201,6 +200,10 @@ Spring Bean 有五个作用域，其中最基础的有下面两种：
 - Session，很显然 Bean 实例的作用域是 Session 范围。
 - GlobalSession，用于 Portlet 容器，因为每个 Portlet 有单独的 Session，GlobalSession 提供一个全局性的 HTTP Session。
 
+## Spring中session是怎么管理的
+
+
+
 # Spring IoC
 
 > 下面，我们会将分成 IoC 和 Bean 两部分来分享 Spring 容器的内容。
@@ -218,7 +221,9 @@ Spring 框架的核心是 Spring IoC 容器。容器创建 Bean 对象，将它�
 - 容器通过读取提供的**配置元数据** Bean Definition 来接收对象进行实例化，配置和组装的指令。
 - 该配置元数据 Bean Definition 可以通过 XML，Java 注解或 Java Config 代码**提供**。
 
-![Spring IoC](http://static.iocoder.cn/images/Spring/2018-12-24/02.jpg)
+<div align="center">  
+<img src="http://static.iocoder.cn/images/Spring/2018-12-24/02.jpg" width="400px"/>
+</div>
 
 ## 什么是依赖注入？
 
@@ -322,13 +327,13 @@ BeanFactory 最常用的是 XmlBeanFactory 。它可以根据 XML 文件中定�
 
 - 1、ClassPathXmlApplicationContext ：从 ClassPath 的 XML 配置文件中读取上下文，并生成上下文定义。应用程序上下文从程序环境变量中取得。示例代码如下：
 
-  ```
+  ```java
   ApplicationContext context = new ClassPathXmlApplicationContext(“bean.xml”);
   ```
 
 - 2、FileSystemXmlApplicationContext ：由文件系统中的XML配置文件读取上下文。示例代码如下：
 
-  ```
+  ```java
   ApplicationContext context = new FileSystemXmlApplicationContext(“bean.xml”);
   ```
 
@@ -491,10 +496,7 @@ applicationContext.publishEvent(customEvent);
   您可以通过在相关的类，方法或字段声明上使用注解，将 Bean 配置为组件类本身，而不是使用 XML 来描述 Bean 装配。默认情况下，Spring 容器中未打开注解装配。因此，您需要在使用它之前在 Spring 配置文件中启用它。例如：
 
   ```java
-  <beans>
-  <context:annotation-config/>
-  <!-- bean definitions go here -->
-  </beans>
+  <beans><context:annotation-config/><!-- bean definitions go here --></beans>
   ```
 
 - 3、Java Config 配置。
@@ -508,16 +510,14 @@ applicationContext.publishEvent(customEvent);
   - 例如：
 
     ```java
-    @Configuration
-    public class StudentConfig {
-        
-        @Bean
-        public StudentBean myStudent() {
-            return new StudentBean();
+    @Configurationpublic class StudentConfig {        
+        @Bean    
+        public StudentBean myStudent() {        
+            return new StudentBean();    
         }
     }
     ```
-    
+
 - 是不是很熟悉 😈
 
 目前主要使用 **Java Config** 配置为主。当然，三种配置方式是可以混合使用的。例如说：
@@ -615,6 +615,9 @@ public class Person {
     
     // ... Setters and Getters
 }
+```
+
+```java
 <!-- bean.xml -->
 
 <bean id=“StudentBean" class="com.edureka.Student">
@@ -696,15 +699,7 @@ Spring 的 Java 配置是通过使用 `@Bean` 和 `@Configuration` 来实现。
 示例如下：
 
 ```java
-@Configuration
-public class StudentConfig {
-
-    @Bean
-    public StudentBean myStudent() {
-        return new StudentBean();
-    }
-    
-}
+@Configurationpublic class StudentConfig {    @Bean    public StudentBean myStudent() {        return new StudentBean();    }    }
 ```
 
 ## 如何在 Spring 中启动注解装配？
@@ -730,20 +725,7 @@ public class StudentConfig {
 示例代码如下：
 
 ```java
-public class Employee {
-
-    private String name;
-    
-    @Required
-    public void setName(String name){
-        this.name=name;
-    }
-    
-    public string getName(){
-        return name;
-    }
-    
-}
+public class Employee {    private String name;        @Required    public void setName(String name){        this.name=name;    }        public string getName(){        return name;    }    }
 ```
 
 ## @Autowired 注解有什么用？原理？
@@ -756,12 +738,7 @@ public class Employee {
 示例代码如下：
 
 ```java
-public class EmpAccount {
-    
-    @Autowired
-    private Employee emp;
-    
-}
+public class EmpAccount {        @Autowired    private Employee emp;    }
 ```
 
 ## @Qualifier 注解有什么用？原理？
@@ -771,14 +748,12 @@ public class EmpAccount {
 例如，应用中有两个类型为 Employee 的 Bean ID 为 `"emp1"` 和 `"emp2"` ，此处，我们希望 EmployeeAccount Bean 注入 `"emp1"` 对应的 Bean 对象。代码如下：
 
 ```java
-public class EmployeeAccount {
-
-    @Autowired
-    @Qualifier(emp1)
-    private Employee emp;
-
-}
+public class EmployeeAccount {    @Autowired    @Qualifier(emp1)    private Employee emp;}
 ```
+
+## @Resource原理
+
+
 
 # Spring AOP
 
@@ -1015,22 +990,23 @@ public interface PlatformTransactionManager {
 - PlatformTransactionManager 是负责事务管理的接口，一共有三个接口方法，分别负责事务的获得、提交、回滚。
 
 - `#getTransaction(TransactionDefinition definition)`方法，根据事务定义 TransactionDefinition ，获得 TransactionStatus 。
-  
+
   - 为什么不是创建事务呢？因为如果当前如果已经有事务，则不会进行创建，一般来说会跟当前线程进行绑定。如果不存在事务，则进行创建。
   - 为什么返回的是 TransactionStatus 对象？在 TransactionStatus 中，不仅仅包含事务属性，还包含事务的其它信息，例如是否只读、是否为新创建的事务等等。😈 下面，也会详细解析 TransactionStatus 。
   - 事务 TransactionDefinition 是什么？😈 下面，也会详细解析 TransactionStatus 。
 
 - `#commit(TransactionStatus status)`方法，根据 TransactionStatus 情况，提交事务。
-  
+
   - 为什么根据 TransactionStatus 情况，进行提交？例如说，带`@Transactional`注解的的 A 方法，会调用
 
     `@Transactional`注解的的 B 方法。
-    
+
     - 在 B 方法结束调用后，会执行 `PlatformTransactionManager#commit(TransactionStatus status)` 方法，此处事务**是不能**、**也不会**提交的。
+
   - 而是在 A 方法结束调用后，执行 `PlatformTransactionManager#commit(TransactionStatus status)` 方法，提交事务。
-  
+
 - `#rollback(TransactionStatus status)`方法，根据 TransactionStatus 情况，回滚事务。
-  
+
   - 为什么根据 TransactionStatus 情况，进行回滚？原因同 `#commit(TransactionStatus status)` 方法。
 
 ③ 再之后，PlatformTransactionManager 有**抽象子**类 `org.springframework.transaction.support.AbstractPlatformTransactionManager` ，基于 [模板方法模式](https://blog.csdn.net/carson_ho/article/details/54910518) ，实现事务整体逻辑的骨架，而抽象 `#doCommit(DefaultTransactionStatus status)`、`#doRollback(DefaultTransactionStatus status)` 等等方法，交由子类类来实现。

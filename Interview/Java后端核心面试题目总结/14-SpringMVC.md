@@ -1,13 +1,3 @@
-当然，艿艿还是非常推荐胖友去撸一撸 Spring MVC 的源码，特别是如下两篇：
-
-- [《精尽 Spring MVC 源码分析 —— 组件一览》](http://svip.iocoder.cn/Spring-MVC/Components-intro/)
-- [《精尽 Spring MVC 源码分析 —— 请求处理一览》](http://svip.iocoder.cn/Spring-MVC/DispatcherServlet-process-request-intro/)
-
-考虑到 Spring MVC 和 Rest 关系比较大，所以本文一共分成两大块：
-
-- Spring MVC
-- REST
-
 # Spring MVC
 
 ## Spring MVC 框架有什么用？
@@ -238,26 +228,20 @@ public interface HandlerExceptionResolver {
 
 ## Spring MVC 和 Struts2 的异同？
 
-1. 入口
-
-   不同
+1. 入口不同
 
    - Spring MVC 的入门是一个 Servlet **控制器**。
    - Struts2 入门是一个 Filter **过滤器**。
-
-2. 配置映射
-
-   不同，
+   
+2. 配置映射不同
 
    - Spring MVC 是基于**方法**开发，传递参数是通过**方法形参**，一般设置为**单例**。
-   - Struts2 是基于**类**开发，传递参数是通过**类的属性**，只能设计为**多例**。
+- Struts2 是基于**类**开发，传递参数是通过**类的属性**，只能设计为**多例**。
 
-- 视图
-
-  不同
+- 视图不同
 
   - Spring MVC 通过参数解析器是将 Request 对象内容进行解析成方法形参，将响应数据和页面封装成 **ModelAndView** 对象，最后又将模型数据通过 **Request** 对象传输到页面。其中，如果视图使用 JSP 时，默认使用 **JSTL** 。
-  - Struts2 采用**值栈**存储请求和响应的数据，通过 **OGNL** 存取数据。
+- Struts2 采用**值栈**存储请求和响应的数据，通过 **OGNL** 存取数据。
 
 当然，更详细的也可以看看 [《面试题：Spring MVC 和 Struts2 的区别》](http://www.voidcn.com/article/p-ylualwcj-c.html) 一文。
 

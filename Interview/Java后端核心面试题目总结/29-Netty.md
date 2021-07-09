@@ -522,20 +522,23 @@ public IdleStateHandler(
 
 - [NettyClient.java](https://github.com/YunaiV/TaroRPC/blob/master/transport/transport-netty4/src/main/java/cn/iocoder/taro/transport/netty4/NettyClient.java) 中，设置 IdleStateHandler 和 ClientHeartbeatHandler。核心代码如下：
 
-  ```
+  ```java
   // NettyHandler.java
   
-  .addLast("idleState", new IdleStateHandler(TaroConstants.TRANSPORT_CLIENT_IDLE, TaroConstants.TRANSPORT_CLIENT_IDLE, 0, TimeUnit.MILLISECONDS))
-  .addLast("heartbeat", new ClientHeartbeatHandler())
+  .addLast("idleState", new IdleStateHandler(TaroConstants.TRANSPORT_CLIENT_IDLE,
+                                             TaroConstants.TRANSPORT_CLIENT_IDLE, 0,
+                                             TimeUnit.MILLISECONDS))
+      .addLast("heartbeat", new ClientHeartbeatHandler())
   ```
 
 - [NettyServer.java](https://github.com/YunaiV/TaroRPC/blob/master/transport/transport-netty4/src/main/java/cn/iocoder/taro/transport/netty4/NettyServer.java) 中，设置 IdleStateHandler 和 ServerHeartbeatHandler。核心代码如下：
 
-  ```
+  ```java
   // NettyServer.java
   
-  .addLast("idleState", new IdleStateHandler(0, 0, TaroConstants.TRANSPORT_SERVER_IDLE, TimeUnit.MILLISECONDS))
-  .addLast("heartbeat", new ServerHeartbeatHandler())
+  .addLast("idleState", new IdleStateHandler(0, 0, TaroConstants.TRANSPORT_SERVER_IDLE,
+                                             TimeUnit.MILLISECONDS))
+      .addLast("heartbeat", new ServerHeartbeatHandler())
   ```
 
 - [ClientHeartbeatHandler.java](https://github.com/YunaiV/TaroRPC/blob/master/transport/transport-netty4/src/main/java/cn/iocoder/taro/transport/netty4/heartbeat/ClientHeartbeatHandler.java) 中，碰到空闲，则发起心跳。不过，如何重连，暂时没有实现。需要考虑，重新发起连接可能会失败的情况。具体的，可以看看 [《一起学Netty（十四）之 Netty生产级的心跳和重连机制》](https://blog.csdn.net/linuu/article/details/51509847) 文章中的，ConnectionWatchdog 的代码。
