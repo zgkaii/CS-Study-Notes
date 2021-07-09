@@ -180,7 +180,7 @@ mysql> update T set c=c+1 where ID=2;
 
 接下来，分析器会通过词法和语法解析知道这是一句更新语句。优化器决定要使用ID这个索引。然后执行器负责具体执行，找到这一行，然后更新。
 
-与查询流程不一样的是，更新流程还涉及两个重要的日志模块：**redo log（重做日志）与binglog（归档日志）**。
+与查询流程不一样的是，更新流程还涉及两个重要的日志模块：**redo log（重做日志）与binlog（归档日志）**。
 
 ## 2.1 redo log
 
@@ -204,8 +204,6 @@ mysql> update T set c=c+1 where ID=2;
 <div align="center">  
 <img src="https://img-blog.csdnimg.cn/2021061110060971.png" width="450px"/>
 </div>
-
-
 write pos是当前记录的位置，一边写一边后移，写到第3号文件末尾后就回到0号文件开头。checkpoint是当前要擦除的位置，也是往后推移并且循环的，擦除记录前要把记录更新到数据文件。
 
 write pos和checkpoint之间的是“粉板”上还空着的部分，可以用来记录新的操作。如果write pos追上checkpoint，表示“粉板”满了，这时候不能再执行新的更新，得停下来先擦掉一些记录，把checkpoint推进一下。

@@ -169,7 +169,7 @@ public static <T> Callable<T> callable(Runnable task, T result) // 假设返回�
 | 类型                      | 特性                                                         |
 | ------------------------- | ------------------------------------------------------------ |
 | `newSingleThreadExecutor` | 创建一个单线程的线程池。这个线程池只有一个线程在工作，也就是相当于单线程串行执行所有任务。如果这个唯一的线程因为异常结束，那么会有一个新的线程来替代它。此线程池保证所有任务的执行顺序按照任务的提交顺序执行。 |
-| `newFixedThreadPool`      | 创建固定大小的线程池。每次提交一个任务就创建一个线程，直到线程达到线程池的最大大小。线程池的大小一旦达到最大值就会保持不变，如果某个线程因为执行异常而结束，那么线程池会补充一个新线程 |
+| `newFixedThreadPool`      | 创建固定大小的线程池。每次提交一个任务就创建一个线程，直到线程达到线程池的最大大小。线程池的大小一旦达到最大值就会保持不变，如果某个线程因为执行异常而结束，那么线程池会补充一个新线程。 |
 | `newCachedThreadPool`     | 创建一个可缓存的线程池。如果线程池的大小超过了处理任务所需要的线程，那么就会回收部分空闲（60秒不执行任务）的线程，当任务数增加时，此线程池又可以智能的添加新线程来处理任务。 |
 | `newScheduledThreadPool`  | 创建一个大小无限的线程池，此线程池支持定时以及周期性执行任务的需求。 |
 | `newWorkStealingPool()`   | Java 8 才加入这个线程池，其内部会构建`ForkJoinPool`，利用`Work-Stealing`算法，并行地处理任务，不保证处理顺序。 |
@@ -563,11 +563,11 @@ try {
 
 ### 5.2.2 为什么不推荐使用`SingleThreadExecutor`？
 
-`SingleThreadExecutor` 使用无界队列 `LinkedBlockingQueue` 作为线程池的工作队列（队列的容量为 `Intger.MAX_VALUE`）。`SingleThreadExecutor` 使用无界队列作为线程池的工作队列会对线程池带来的影响与 `FixedThreadPool` 相同。说简单点就是可能会导致 OOM，
+`SingleThreadExecutor` 使用无界队列 `LinkedBlockingQueue` 作为线程池的工作队列（队列的容量为 `Intger.MAX_VALUE`）。`SingleThreadExecutor` 使用无界队列作为线程池的工作队列会对线程池带来的影响与 `FixedThreadPool` 相同。说简单点就是可能会导致 OOM。	
 
 ## 5.3 CachedThreadPool 详解
 
-### 5.3.1 SingleThreadExecutor 处理流程
+### 5.3.1 CachedThreadPool处理流程
 
 `CachedThreadPool` 是一个会根据需要创建新线程的线程池。下面通过源码来看看 `CachedThreadPool` 的实现：
 

@@ -89,7 +89,6 @@ size: 0
 <div align="center">  
 <img src="https://img-blog.csdnimg.cn/20201208171229148.png" width="600px"/>
 </div>
-
 `Thread`类有一个类型为`ThreadLocal.ThreadLocalMap`的实例变量`threadLocals`，也就是说每个线程有一个自己的`ThreadLocalMap`。
 
 `ThreadLocalMap`有自己的独立实现，可以简单地将它的`key`视作`ThreadLocal`，`value`为代码中放入的值（实际上`key`并不是`ThreadLocal`本身，而是它的一个**弱引用**）。
@@ -214,7 +213,7 @@ public void set(T value) {
 }
 
 void createMap(Thread t, T firstValue) {
-    t.threadLocals = new `ThreadLocalMap`(this, firstValue);
+    t.threadLocals = new ThreadLocalMap(this, firstValue);
 }
 ```
 
@@ -282,8 +281,6 @@ public class ThreadLocal<T> {
 <div align="center">  
 <img src="https://img-blog.csdnimg.cn/20201208171229634.png" width="800px"/>
 </div>
-
-
 如上图所示，如果我们插入一个`value=27`的数据，通过`hash`计算后应该落入第4个槽位中，而槽位4已经有了`Entry`数据。
 
 此时就会线性向后查找，一直找到`Entry`为`null`的槽位才会停止查找，将当前元素放入此槽位中。当然迭代过程中还有其他的情况，比如遇到了`Entry`不为`null`且`key`值相等的情况，还有`Entry`中的`key`值为`null`的情况等等都会有不同的处理，后面会一一详细讲解。
@@ -424,8 +421,6 @@ int i = key.threadLocalHashCode & (len-1);
 
 <div align="center"><img src="https://img-blog.csdnimg.cn/20201208171229539.png" width="600px"/>
 </div>
-
-
 ```java
 private static int nextIndex(int i, int len) {
     return ((i + 1 < len) ? i + 1 : 0);
@@ -564,8 +559,6 @@ if (slotToExpunge != staleSlot)
 
 <div align="center">   <img src="https://img-blog.csdnimg.cn/20201208171229772.png" width="1000px"/>
 </div>
-
-
 如果再有其他数据`set`到`map`中，就会触发**探测式清理**操作。
 
 如上图，执行**探测式清理**后，`index=5`的数据被清理掉，继续往后迭代，到`index=7`的元素时，经过`rehash`后发现该元素正确的`index=4`，而此位置已经已经有了数据，往后查找离`index=4`最近的`Entry=null`的节点(刚被探测式清理掉的数据：index=5)，找到后移动`index= 7`的数据到`index=5`中，此时桶的位置离正确的位置`index=4`更近了。
@@ -576,8 +569,6 @@ if (slotToExpunge != staleSlot)
 
 <div align="center">   <img src="https://img-blog.csdnimg.cn/20201208171229620.png" width="1000px"/>
 </div>
-
-
 我们假设`expungeStaleEntry(3)` 来调用此方法，如上图所示，我们可以看到`ThreadLocalMap`中`table`的数据情况，接着执行清理操作：
 
 <div align="center">   <img src="https://img-blog.csdnimg.cn/20201208171229521.png" width="600px"/>
@@ -588,16 +579,12 @@ if (slotToExpunge != staleSlot)
 
 <div align="center">   <img src="https://img-blog.csdnimg.cn/20201208171229760.png" width="1000px"/>
 </div>
-
-
 执行完第二步后，index=4的元素挪到index=3的槽位中。
 
 继续往后迭代检查，碰到正常数据，计算该数据位置是否偏移，如果被偏移，则重新计算`slot`位置，目的是让正常数据尽可能存放在正确位置或离正确位置更近的位置
 
 <div align="center">   <img src="https://img-blog.csdnimg.cn/20201208171229668.png" width="1000px"/>
 </div>
-
-
 在往后迭代的过程中碰到空的槽位，终止探测，这样一轮探测式清理工作就完成了，接着我们继续看看具体**实现源代码**：
 
 ```java
@@ -665,7 +652,7 @@ if (h != i) {
 
 ## `ThreadLocalMap`扩容机制
 
-在``ThreadLocalMap.set()`方法的最后，如果执行完启发式清理工作后，未清理到任何数据，且当前散列数组中`Entry`的数量已经达到了列表的扩容阈值`(len*2/3)`，就开始执行`rehash()`逻辑：
+在`ThreadLocalMap.set()`方法的最后，如果执行完启发式清理工作后，未清理到任何数据，且当前散列数组中`Entry`的数量已经达到了列表的扩容阈值`(len*2/3)`，就开始执行`rehash()`逻辑：
 
 ```java
 if (!cleanSomeSlots(i, sz) && sz >= threshold)
@@ -699,14 +686,10 @@ private void expungeStaleEntries() {
 
 <div align="center">   <img src="https://img-blog.csdnimg.cn/20201208171229726.png" width="1000px"/>
 </div>
-
-
 接着看看具体的`resize()`方法，为了方便演示，我们以`oldTab.len=8`来举例：
 
 <div align="center">   <img src="https://img-blog.csdnimg.cn/20201208171229703.png" width="1000px"/>
 </div>
-
-
 扩容后的`tab`的大小为`oldLen * 2`，然后遍历老的散列表，重新计算`hash`位置，然后放到新的`tab`数组中，如果出现`hash`冲突则往后寻找最近的`entry`为`null`的槽位，遍历完成之后，`oldTab`中所有的`entry`数据都已经放入到新的`tab`中了。重新计算`tab`下次扩容的**阈值**，具体代码如下：
 
 ```java
@@ -762,8 +745,6 @@ private void resize() {
 
 <div align="center">   <img src="https://img-blog.csdnimg.cn/20201208171229762.png" width="1000px"/>
 </div>
-
-
 ### `ThreadLocalMap.get()`源码详解
 
 `java.lang.ThreadLocal.ThreadLocalMap.getEntry()`:
@@ -808,8 +789,6 @@ private Entry getEntryAfterMiss(`ThreadLocal`<?> key, int i, Entry e) {
 
 <div align="center">   <img src="https://img-blog.csdnimg.cn/20201208171229753.png" width="1000px"/>
 </div>
-
-
 具体代码如下：
 
 ```java
@@ -898,14 +877,10 @@ private void init(ThreadGroup g, Runnable target, String name,
 
 <div align="center">   <img src="https://img-blog.csdnimg.cn/20201208172822969.png" width="1000px"/>
 </div>
-
-
 图中的`requestId`即为我们各个系统链路关联的`traceId`，系统间互相调用，通过这个`requestId`即可找到对应链路，这里还有会有一些其他场景：
 
 <div align="center">   <img src="https://img-blog.csdnimg.cn/20201208171229531.png" width="800px"/>
 </div>
-
-
 针对于这些场景，我们都可以有相应的解决方案，如下所示
 
 ### Feign远程调用解决方案

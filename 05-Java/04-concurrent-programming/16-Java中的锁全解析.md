@@ -337,6 +337,7 @@ public class Widget {
 <img src="https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/32536e7a.png" width="1000px"/>
 </div>
 
+
 # 6. 独享锁 VS 共享锁
 
 独享锁和共享锁同样是一种概念。我们先介绍一下具体的概念，然后通过ReentrantLock和ReentrantReadWriteLock的源码来介绍独享锁和共享锁。
