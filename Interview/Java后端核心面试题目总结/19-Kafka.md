@@ -565,3 +565,4 @@ Kafka 本身，并不像 RocketMQ 一样，提供顺序性的消息。所以，�
 - [《再谈基于 Kafka 和 ZooKeeper 的分布式消息队列原理》](https://gitbook.cn/books/5bc446269a9adf54c7ccb8bc/index.html)
 
 - [《如何保证消息的可靠性传输？（如何处理消息丢失的问题）》](https://github.com/doocs/advanced-java/blob/master/docs/high-concurrency/how-to-ensure-the-reliable-transmission-of-messages.md)
+

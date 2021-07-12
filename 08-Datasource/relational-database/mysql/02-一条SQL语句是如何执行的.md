@@ -36,8 +36,6 @@ mysql> select * from T where ID=10；
 <div align="center">  
 <img src="https://img-blog.csdnimg.cn/20210611090819527.png" width="500px"/>
 </div>
-
-
  MySQL 主要分为 Server 层和存储引擎层：
 
 * **Server层**：主要包括连接器、查询缓存、分析器、优化器、执行器等，涵盖MySQL的大多数核心服务功能，以及所有的内置函数（如日期、时间、数学和加密函数等），所有跨存储引擎的功能都在这一层实现，比如存储过程、触发器、视图等。有一个通用的日志模块 **binlog** 日志模块。
@@ -293,7 +291,7 @@ binlog会记录所有的日志操作，并采用的“追加写”的形式。�
 
 **思考题3**：为什么要有redo log？
 
-* （1）保证InnoDB 的持久性；（2）redo log 要进行磁盘操作是与Buffer Pool `磁盘随机写入`比， redo log 的磁盘操作有几个优势：`1.引入redo log buffer，按组写入，不是一条条写。2.磁盘为顺序写入。`这样， redo log 日志的磁盘操作比起 Buffer Pool 的磁盘操作 性能要好很多。
+* （1）保证InnoDB 的持久性；（2）redo log 要进行磁盘操作是与Buffer Pool `磁盘随机写入`比， redo log 的磁盘操作有几个优势：`1.引入redo log buffer，按组写入，不是一条条写。2.磁盘为顺序写入。`这样， redo log 日志的磁盘操作比起 Buffer Pool 的磁盘操作性能要好很多。
 
 ------
 
