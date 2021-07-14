@@ -55,7 +55,7 @@ Hibernate属于全自动ORM映射工具，使用Hibernate查询关联对象或�
 * MyBatis专注于SQL本身，是一个足够灵活的DAO层解决方案。
 * 对性能的要求很高，或者需求变化较多的项目，如互联网项目，MyBatis将是不错的选择。
 
-### MyBatis与Hibernate有哪些不同？
+## MyBatis与Hibernate有哪些不同？
 
 Mybatis和hibernate不同，它不完全是一个ORM框架，因为MyBatis需要程序员自己编写Sql语句。
 

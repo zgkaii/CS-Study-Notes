@@ -5,7 +5,7 @@
   - [hashCode()与equals()有什么联系呢？](#hashcode与equals有什么联系呢)
   - [如何重写equals()与hashCode()方法呢？](#如何重写equals与hashcode方法呢)
     - [重写equals()](#重写equals)
-      - [重写hashCode()](#重写hashcode)
+    - [重写hashCode()](#重写hashcode)
   - [总结](#总结)
   - [参考资料](#参考资料)
 
@@ -272,7 +272,7 @@ class Person {
 - **一致性**： 如果x.equals(y)返回是true，只要x和y内容一直不变，不管重复执行x.equals(y)多少次，返回都是true ；
 - 任何情况下，**x.equals(null)，永远返回是“false”；x.equals(和x不同类型的对象)永远返回false**。
 
-#### 重写hashCode()
+### 重写hashCode()
 
 一个好的hashCode的方法的目标：**为不相等的对象产生不相等的散列码**，同样的，相等的对象必须拥有相等的散列码。下面书写一种简单的解决方法：
 
