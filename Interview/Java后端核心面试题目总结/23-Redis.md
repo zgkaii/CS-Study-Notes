@@ -111,9 +111,16 @@ Redis 相比 Memcached 来说，拥有更多的数据结构，能支持更丰富
 
 也推荐阅读下 [《脚踏两只船的困惑 - Memcached 与 Redis》](https://www.imooc.com/article/23549) 。
 
+## Redis 为什么这么快？
+
+1. 完全基于内存，绝大部分请求是纯粹的内存操作，非常快速； 
+2. 数据结构简单，对数据操作也简单；
+3. 采⽤单线程，避免了不必要的上下下切换和竞争条件，也不存在多进程或者多线程导致的切换而消耗 CPU， 不用去考虑各种锁的问题，不存在加锁释放锁操作，没有因为可能出现死锁而导致的性能消耗； 
+4. 使用多路 I/O 复用模型，非阻塞 IO。
+
 ## 请说说 Redis 的线程模型？
 
-> 艿艿：这个是我从网络上找的资料，讲的灰常不错。**一般来说，回答道 Redis 是非阻塞 IO ，多路复用**。
+> **一般来说，回答道 Redis 是非阻塞 IO ，多路复用**。
 
 Redis 内部使用文件事件处理器 `file event handler`，这个文件事件处理器是单线程的，所以 Redis 才叫做单线程的模型。它采用 IO 多路复用机制同时监听多个 Socket，根据 Socket 上的事件来选择对应的事件处理器进行处理。
 
@@ -128,7 +135,7 @@ Redis 内部使用文件事件处理器 `file event handler`，这个文件事�
 
 来看客户端与 redis 的一次通信过程：
 
-[![redis-single-thread-model](http://static.iocoder.cn/images/Redis/2019_11_22/01.png)](http://static.iocoder.cn/images/Redis/2019_11_22/01.png)redis-single-thread-model
+![redis-single-thread-model](http://static.iocoder.cn/images/Redis/2019_11_22/01.png)
 
 - 客户端 Socket01 向 Redis 的 Server Socket 请求建立连接，此时 Server Socket 会产生一个 `AE_READABLE` 事件，IO 多路复用程序监听到 server socket 产生的事件后，将该事件压入队列中。文件事件分派器从队列中获取该事件，交给`连接应答处理器`。连接应答处理器会创建一个能与客户端通信的 Socket01，并将该 Socket01 的 `AE_READABLE` 事件与命令请求处理器关联。
 - 假设此时客户端发送了一个 `set key value` 请求，此时 Redis 中的 Socket01 会产生 `AE_READABLE` 事件，IO 多路复用程序将事件压入队列，此时事件分派器从队列中获取到该事件，由于前面 Socket01 的 `AE_READABLE` 事件已经与命令请求处理器关联，因此事件分派器将事件交给命令请求处理器来处理。命令请求处理器读取 Scket01 的 `set key value` 并在自己内存中完成 `set key value` 的设置。操作完成后，它会将 Scket01 的 `AE_WRITABLE` 事件与令回复处理器关联。
@@ -168,18 +175,16 @@ Redis 内部使用文件事件处理器 `file event handler`，这个文件事�
 
 ## Redis 有几种持久化方式？
 
-> 艿艿：这个问题有一丢丢长，耐心看完。
->
 > 面试的时候，如果不能完整回答出来，也不会有大问题。重点，在于有条理，对 RDB 和 AOF 有理解。
 
-🦅 **持久化方式**
+**持久化方式**
 
 Redis 提供了两种方式，实现数据的持久化到硬盘。
 
 - 1、【全量】RDB 持久化，是指在指定的时间间隔内将内存中的**数据集快照**写入磁盘。实际操作过程是，fork 一个子进程，先将数据集写入临时文件，写入成功后，再替换之前的文件，用二进制压缩存储。
 - 2、【增量】AOF持久化，以日志的形式记录服务器所处理的每一个**写、删除操作**，查询操作不会记录，以文本的方式记录，可以打开文件看到详细的操作记录。
 
-🦅 **RDB 优缺点**
+**RDB 优缺点**
 
 ① 优点
 
@@ -198,7 +203,7 @@ Redis 提供了两种方式，实现数据的持久化到硬盘。
 
   > 所以，RDB 建议在业务低估，例如在半夜执行。
 
-🦅 **AOF 优缺点**
+**AOF 优缺点**
 
 ① 优点
 
@@ -569,7 +574,7 @@ set 指令的方案，适合用于在单机 Redis 节点的场景下，在多 Re
 
 另外，在 Redis 5.0 增加了 Stream 功能，一个新的强大的支持多播的可持久化的消息队列，提供类似 Kafka 的功能。
 
-## 什么是 Redis Pipelining ？
+## 什么是 Redis Pipelining？
 
 一次请求/响应服务器能实现处理新的请求即使旧的请求还未被响应。这样就可以将多个命令发送到服务器，而不用等待回复，最后在一个步骤中读取该答复。
 
@@ -897,36 +902,3 @@ Redis 分区方案，主要分成两种类型：
 从 Redis 2.2 开始，可以从 AOF 切换到 RDB 的快照持久性或其他方式而不需要重启 Redis。检索 `CONFIG GET *` 命令获取更多信息。
 
 但偶尔重新启动是必须的，如为升级 Redis 程序到新的版本，或者当你需要修改某些目前 CONFIG 命令还不支持的配置参数的时候。
-
-## 其他问题
-
-有些比较凶残的面试官，可能会问我们一些 Redis 数据结构的问题，例如：
-
-- Skiplist 插入和查询原理？
-
-- 压缩列表的原理？
-
-- Redis 底层为什么使用跳跃表而不是红黑树？
-
-  > 跳跃表在范围查找的时候性能比较高。
-
-想要了解这块，需要花一定的时间去撸一撸源码，推荐可以看如下两块内容：
-
-- [《Redis 深度历险：核心原理与应用实践》](https://juejin.im/book/5afc2e5f6fb9a07a9b362527?referrer=5904c637b123db3ee479d923)
-- [《Redis 设计与实现》](https://u.jd.com/Fl5NTt)
-
-推荐先读第一本，可以深入浅出的了解 Redis 原理和源码。然后在读第二本，硬核了解 Redis 的设计与实现（源码）。
-
-## 666. 彩蛋
-
-哇哦，爽。虽然过程痛苦，但是中间请教了蛮多人问题，收获颇多哈。
-
-嘿嘿，在回答问题的过程中，胖友会发现一直在推荐 [《Redis 开发与运维》](https://u.jd.com/lDNJa9) 这本书。在艿艿整理完第一版 Redis 面试题后，发现对有些 Redis 的面试题，理解还是有所欠缺（当然现在可能也是，哈哈哈），重新翻看了下这本书，发现很多问题都得到了非常不错的解答。所以，推荐再推荐。
-
-参考与推荐如下文章：
-
-- JeffreyLcm [《Redis 面试题》](https://segmentfault.com/a/1190000014507534)
-- 烙印99 [《史上最全 Redis 面试题及答案》](https://www.imooc.com/article/36399)
-- yanglbme [《Redis 和 Memcached 有什么区别？Redis 的线程模型是什么？为什么单线程的 Redis 比多线程的 Memcached 效率要高得多？》](https://github.com/doocs/advanced-java/blob/master/docs/high-concurrency/redis-single-thread-model.md)
-- 老钱 [《天下无难试之 Redis 面试题刁难大全》](https://zhuanlan.zhihu.com/p/32540678)
-- yanglbme [《Redis 的持久化有哪几种方式？不同的持久化机制都有什么优缺点？持久化机制具体底层是如何实现的？》](https://github.com/doocs/advanced-java/blob/master/docs/high-concurrency/redis-persistence.md)

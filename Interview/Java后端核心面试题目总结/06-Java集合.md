@@ -1,9 +1,11 @@
 <!-- MarkdownTOC -->
+
 - [谈谈你对集合框架的理解](#谈谈你对集合框架的理解)
   - [List、Set与Map区别](#listset与map区别)
   - [有哪些集合是线程不安全的？怎么解决呢？](#有哪些集合是线程不安全的怎么解决呢)
 - [Collection子接口之List](#collection子接口之list)
   - [ArrarList](#arrarlist)
+    - [ArrayList实现了序列化接口，为什么很多字段还被transient修饰？](#arraylist实现了序列化接口为什么很多字段还被transient修饰)
     - [ArrayList扩容机制](#arraylist扩容机制)
     - [ArrayList和Vector区别](#arraylist和vector区别)
     - [Array与ArrayList区别](#array与arraylist区别)
@@ -17,12 +19,13 @@
   - [HashMap底层实现](#hashmap底层实现)
     - [JDK1.7之前](#jdk17之前)
     - [JDK1.8之后](#jdk18之后)
-  - [tableSizeFor(int cap)初始化容量时，为什么计算式为`cap - 1`呢？](#tablesizeforint-cap初始化容量时为什么计算式为cap---1呢)
+  - [tableSizeFor(int cap)初始化容量时，为什么计算式为`cap - 1`](#tablesizeforint-cap初始化容量时为什么计算式为cap---1)
   - [HashMap为什么使用扰动函数](#hashmap为什么使用扰动函数)
   - [HashMap的长度为什么是 2 的幂次方](#hashmap的长度为什么是-2-的幂次方)
-  - [HashMap的put方法处理流程是什么？](#hashmap的put方法处理流程是什么)
-  - [HashMap 多线程操作导致死循环问题](#hashmap-多线程操作导致死循环问题)
-  - [HashMap 有哪几种常见的遍历方式?](#hashmap-有哪几种常见的遍历方式)
+  - [HashMap的put方法处理流程是什么](#hashmap的put方法处理流程是什么)
+  - [HashMap的resize方法的执行过程](#hashmap的resize方法的执行过程)
+  - [HashMap多线程操作导致死循环问题](#hashmap多线程操作导致死循环问题)
+  - [HashMap有哪几种常见的遍历方式](#hashmap有哪几种常见的遍历方式)
   - [HashMap与HashSet区别](#hashmap与hashset区别)
   - [HashMap与TreeMap区别](#hashmap与treemap区别)
   - [HashMap与Hashtable区别](#hashmap与hashtable区别)
@@ -30,7 +33,9 @@
     - [JDK1.7](#jdk17)
     - [JDK1.8](#jdk18)
   - [ConcurrentHashMap与Hashtable区别](#concurrenthashmap与hashtable区别)
+  - [不同的Map使用场景与特点](#不同的map使用场景与特点)
 - [其他](#其他)
+  - [Iterator 怎么使用？有什么特点？](#iterator-怎么使用有什么特点)
   - [Arrays.sort与Collections.sort使用算法](#arrayssort与collectionssort使用算法)
   - [Comparable和Comparator异同](#comparable和comparator异同)
   - [fail-fast机制](#fail-fast机制)
@@ -80,7 +85,12 @@ Collection与Map接口是所有集合框架的父接口，它们常用子接口�
 * `LinkedHashSet`：`HashSet` 的子类，底层是数组 + 单链表 + 红黑树 + 双向链表的数据结构，内部是通过 `LinkedHashMap` 来实现的。
 * `TreeSet`（有序，唯一）： 红黑树（自平衡的排序二叉树），基于`TreeMap`实现的。
 
-**（3）Map**
+**（3）Queue** 
+
+* LinkedList：可以用它来实现双向队列。 
+* PriorityQueue：基于堆结构实现，可以用它来实现优先队列。
+
+**（4）Map**
 
 * `HashMap`：散列表，主要存放键值对。底层是数组+链表+红黑树（JDK1.8增加了红黑树部分）的数据结构。
 * `LinkedHashMap`： `LinkedHashMap` 继承自 `HashMap`，底层仍然是基于拉链式散列结构。另外，`LinkedHashMap` 在上面结构的基础上，增加了一条双向链表，使得上面的结构能够做到按照插入顺序或者访问顺序进行迭代。
@@ -110,6 +120,24 @@ Collection与Map接口是所有集合框架的父接口，它们常用子接口�
 # Collection子接口之List
 
 ## ArrarList
+
+### ArrayList实现了序列化接口，为什么很多字段还被transient修饰？
+
+ArrayList 属性主要由数组长度 size、对象数组 elementData、初始化容量 default_capacity 等组成， 其中初始化容量默认大小为 10。
+
+```java
+    //默认初始化容量
+    private static final int DEFAULT_CAPACITY = 10;
+    //对象数组
+    transient Object[] elementData; 
+    //数组长度
+    private int size;
+```
+
+transient 关键字修饰该字段则表示该属性不会被序列化，但 ArrayList 其实是实现了序列化接口，这到底是怎么回事呢？
+
+* 由于 ArrayList 基于数组实现，可以动态扩容，所以并不是所有被分配的内存空间都存储了数据。如果采用外部序列化法实现数组的序列化，会序列化整个数组。ArrayList 为了避免这些没有存储数据的内存空间被序列化，内部提供了两个私有方法 **writeObject 以及 readObject** 来自我完成序列化与反序列化，从而在序列化与反序列化数组时节省了空间和时间。
+* 因此使用 transient 修饰数组，是防止对象数组被其他外部方法序列化。
 
 ### ArrayList扩容机制
 
@@ -176,17 +204,21 @@ Collection与Map接口是所有集合框架的父接口，它们常用子接口�
 
 ### LinkedList为什么采用双向链表
 
-JDK1.6 之前LinkedList为循环链表，JDK1.7 取消了循环，成了双向链表，为什么呢？
-
-**双向链表：** 包含两个指针，一个 prev 指向前一个节点，一个 next 指向后一个节点。
-
-<div align="center"> <img src="../../05-Java/images/collection/doubly-linkedlist.png" width="400px"></div>
+JDK1.6 之前LinkedList为双向循环链表；JDK1.7 取消了循环，成了双向链表，其定义了一个 Node 结构，Node 结构中包含了 3 个部分：元素内容 data、前指针 prev 以及后指针 nex
 
 **双向循环链表：** 最后一个节点的 next 指向 head，而 head 的 prev 指向最后一个节点，构成一个环。
 
 <div align="center"> <img src="../../05-Java/images/collection/doubly-circular-linkedlist.png" width="400px"></div>
 
-> 待编写... ...
+**双向链表：** 包含两个指针，一个 prev 指向前一个节点，一个 next 指向后一个节点。
+
+<div align="center"> <img src="../../05-Java/images/collection/doubly-linkedlist.png" width="400px"></div>
+
+在 JDK1.7 之后，LinkedList 做了很大的改动，对链表进行了优化。链表的 Entry 结构换成了 Node，内部组成基本没有改变，但 LinkedList 里面的 header 属性去掉了，新增了一个 Node 结构的 first 属性和一个 Node 结构的 last 属性。这样做有以下几点好处：
+
+* first/last 属性能更清晰地表达链表的链头和链尾概念；
+* first/last 方式可以在初始化 LinkedList 的时候节省 new 一个 Entry；
+* first/last 方式最重要的性能优化是链头和链尾的插入删除操作更加快捷了。
 
 ## ArrayList与LinkedList区别
 
@@ -209,6 +241,11 @@ public interface RandomAccess {
 这里为什么只有`ArrayList`实现了`RandomAccess`接口呢？主要和它们底层数据结构具体实现相关。
 
 `ArrayList` 底层是数组，而 `LinkedList` 底层是链表。数组天然支持随机访问，时间复杂度为 O(1)，所以称为快速随机访问。链表需要遍历到特定位置才能访问特定位置的元素，时间复杂度为 O(n)，所以不支持快速随机访问。`ArrayList` 实现了 `RandomAccess` 接口，就表明了他具有快速随机访问功能。 `RandomAccess` 接口只是标识，并不是说 `ArrayList` 实现 `RandomAccess` 接口才具有快速随机访问功能的！
+
+需要==注意==的是，**ArrayList 的增删未必就是比 LinkedList 要慢**：
+
+* 如果增删都是在末尾来操作（每次调用的都是 `remove()` 和 `add()`），此时 ArrayList 就不需要移动和复制数组来进行操作了。如果数据量有百万级的时，速度是会比 LinkedList 要快的。 
+* 如果删除操作的位置是在中间。由于 LinkedList 的消耗主要是在遍历上，ArrayList 的消耗主要是在移动和复制上（底层调用的是 arrayCopy() 方法，是 native 方法）。LinkedList 的遍历速度是要慢于 ArrayList 的复制移动速度的如果数据量有百万级的时，还是 ArrayList 要快。
 
 # Collection子接口之Set
 
@@ -311,7 +348,7 @@ JDK1.7  `HashMap` 底层是 **数组和链表** 结合在一起使用也就是 *
 
 > `TreeMap`、`TreeSet` 以及 JDK1.8 之后的 `HashMap`底层都用到了红黑树。红黑树就是为了解决二叉查找树的缺陷，因为二叉查找树在某些情况下会退化成一个线性结构。
 
-## tableSizeFor(int cap)初始化容量时，为什么计算式为`cap - 1`呢？
+## tableSizeFor(int cap)初始化容量时，为什么计算式为`cap - 1`
 
 > 下面的分析都默认为JDK 1.8
 
@@ -442,7 +479,7 @@ tab[i = (n - 1) & hash]
 
 我们都知道为了找到 KEY 的位置在哈希表的哪个槽里面，需要计算 **hash(KEY) % 数组长度**，但是**取余(%)操作中如果除数是 2 的幂次则等价于与其除数减一的与(&)操作（也就是说 hash%length==hash&(length-1)的前提是 length 是 2 的 n 次方），同时二进制位操作 &，相对于%运算符运算更快**。还有一个问题是如果采用 % 计算方式，如果hash表length变化那么会导致计算出来的 hash 桶的位置不断变化，数据一致在漂移，影响性能！！这里也同样解释了`HashMap`的长度为什么是 2 的幂次方。
 
-## HashMap的put方法处理流程是什么？
+## HashMap的put方法处理流程是什么
 
 put方法中调用了`putVal`方法，传递的参数是调用了hash()方法计算key的hash值，主要逻辑写在`putVal`中。
 
@@ -518,14 +555,79 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
 
 **对putVal方法添加元素的过程如下：**
 
+当我们想往⼀个 HashMap 中添加⼀对 key-value 时，系统⾸先会计算 key 的 hash 值，然后根据 hash 值确认在桶中存储的位置：
+
 1. 如果桶容量为0，则初始化桶。
 2. 如果定位到的桶位置没有元素就直接插入元素。
-3. 如果定位到的桶位置有元素就和要插入的元素key比较，如果key相同就直接覆盖。
-4. 如果定位到的桶位置有元素且与插入的key不相同，就判断是否是一个树节点，如果是就调用`e = ((TreeNode<K,V>)p).putTreeVal(this, tab, hash, key, value)`将元素添加进入。
+3. 如果定位到的桶位置有元素就和要插入的元素key比较，如果key相同就直接覆盖（hash值相等key相等）。
+4. 如果定位到的桶位置有元素且与插入的key不相同（hash 值相等但 key 值不等），就判断是否是一个树节点，如果是就调用`e = ((TreeNode<K,V>)p).putTreeVal(this, tab, hash, key, value)`将元素添加进入。
 5. 如果不是树节点就遍历链表，判断链表长度是否大于8，大于8的话把链表转换为红黑树，在红黑树中执行插入操作，否则进行链表的插入操作(插入到链表尾部)。
 6. 每当插了元素，则实际键值对数量size加1后，需要判断是否扩容。
 
-## HashMap 多线程操作导致死循环问题
+## HashMap的resize方法的执行过程
+
+进行扩容，会伴随着一次重新hash分配，并且会遍历hash表中所有的元素，是非常耗时的。在编写程序中，要尽量避免resize。
+
+有两种情况会调用 resize 方法：
+
+* **table初始化时**。如果使用默认构造方法，则第一次插入元素时初始化为默认值，**容量为16，扩容门槛为12**；如果使用的是非默认构造方法，则第一次插入元素时初始化容量等于扩容门槛，扩容门槛在构造方法里为大于传入容量的**最小2的n次幂**。 
+* 当table中元素size > threshold（扩容门槛） 时，table 数组大小翻倍，则**新容量等于旧容量的2倍**。只要不超过最大容量2的30次方，新扩容门槛为旧扩容门槛的2倍。
+
+**每次扩容都会新建一个table，新建的table的大小为原大小的2倍**。
+
+==问题==在于，table扩容后重新计算hash值，往往伴随着链表拆分，这里如何进行的呢？
+
+针对链表的拆分，首先需要明确的是：
+
+* oldCap一定是2的整数次幂, 这里假设是2^m^
+
+* newCap是oldCap的两倍, 则会是2^(m+1)^
+
+* hash对数组大小取模`(n - 1) & hash` 其实就是取hash的低`m`位（上面扰动函数有讲到）
+
+以容量oldCap=16扩展为newCap=32为例：
+
+假如在桶的14位置上有两个hash值：
+
+```java
+hash1 =  0000 0000 1101 0000 0000 0000 0000 1110
+hash2 =  0000 0000 0000 0000 0000 1111 0001 1110
+```
+
+未扩容前桶中位置为：
+
+```java
+						16-1  =  0000 0000 0000 0000 0000 0000 0000 1111
+ 			            hash1 =  0000 0000 1101 0000 0000 0000 0000 1110
+(n - 1) & hash          hash2 =  0000 0000 0000 0000 0000 1111 0001 1110
+ ------------------------------------------------------------------------
+            	  (16-1)&hash1 = 0000 0000 0000 0000 0000 0000 0000 1110
+        		  (16-1)&hash2 = 0000 0000 0000 0000 0000 0000 0000 1110 
+```
+
+扩容后在桶中位置为：
+
+```java
+						32-1  =  0000 0000 0000 0000 0000 0000 0001 1111
+ 			            hash1 =  0000 0000 1101 0000 0000 0000 0000 1110
+(n - 1) & hash          hash2 =  0000 0000 0000 0000 0000 1111 0001 1110
+ ------------------------------------------------------------------------
+            	  (32-1)&hash1 = 0000 0000 0000 0000 0000 0000 0000 1110 // 1110
+        		  (32-1)&hash2 = 0000 0000 0000 0000 0000 0000 0001 1110 // 1110 + 10000 
+```
+
+可见，在扩充 HashMap 的时候，不需要重新计算 hash值，只需要检查二进制 hash 中与二进制桶下标中新增的有效位的位置相同的那个位（简称“新增位”）是0还是1即可，是0的话索引没变，是1的话索引变成“原索引+oldCap”。
+
+至于新增位是0还是1，可以认为是随机的，这样就均匀的把之前碰撞的节点分散到新旧桶中。
+
+<div align="center">  
+<img src="../../05-JAVA/images/collection/resize2.png" width="650px"/>
+</div>
+
+
+也就是说，HashMap在扩容时，会将原table中的节点re-hash到新的table中，但节点在新旧table中的位置存在一定联系，**要么下标相同，要么相差一个`oldCap`(原table的大小)**。这里也体现了 HashMap 中容量⼀定的是 2 的整数次幂带来的好处。
+
+## HashMap多线程操作导致死循环问题
 
 > 另外一种问法：为什么HashMap插入元素从头插法改为尾插法？
 
@@ -533,7 +635,7 @@ JDK1.7中，**HashMap采用头插法插入数据，在于并发下的 扩容reha
 
 >  可参考——[疫苗：JAVA HASHMAP的死循环](https://coolshell.cn/articles/9606.html)一文。
 
-## HashMap 有哪几种常见的遍历方式?
+## HashMap有哪几种常见的遍历方式
 
 HashMap 遍历从大的方向来说，可分为以下 4 类：
 
@@ -616,7 +718,38 @@ static class Segment<K,V> extends ReentrantLock implements Serializable {
 
 > 虽然 ConcurrentHashMap 的整体性能要优于 Hashtable，但在某些场景中，ConcurrentHashMap 依然不能代替 Hashtable。例如，在强一致的场景中 ConcurrentHashMap 就不适用，原因是 ConcurrentHashMap 中的 get、size 等方法没有用到锁，ConcurrentHashMap 是弱一致性的，因此有可能会导致某次读无法马上获取到写入的数据。
 
+## 不同的Map使用场景与特点
+
+| 类                | 介绍                                                                                                                          | 应用场景                         |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
+| Hashtable         | 线程安全的Map，通过synchronized实现线程安全                                                                                   | 基本不使用，除非需要保证强一致性 |
+| ConcurrentHashMap | 线程安全的Map，通过在synchronized + CAS实现线程安全                                                                           | 需要保证线程安全的场景下使用     |
+| LinkedHashMap     | 能记录访问顺序或插入顺序的Map，通过head、tail属性维护有序双向链表，通过Entry的after、before属性维护节点顺序                   | 需要记录访问顺序或插入顺序       |
+| TreeMap           | 通过实现Comparator实现自定义顺序的Map，如果没有指定Comparator则会按key的升序排序，key如果没有实现Comparable接口，则会抛出异常 | 需要自定义排序                   |
+| HashMap           | 最通用的Map，非线程安全、无序                                                                                                 | 无特殊需求可使用                 |
+
 # 其他
+
+## Iterator 怎么使用？有什么特点？
+
+迭代器是⼀种设计模式，它是⼀个对象，它可以遍历并选择序列中的对象，而开发⼈员不需要了解该序列的底层结构。迭代器通常被称为“轻量级”对象，因为创建它的代价小。Java 中的 Iterator 功能比简单，并且只能单向移动：　　 
+
+1. 使用方法 iterator() 要求容器返回⼀个 Iterator。第⼀次调用 Iterator 的 next() 方法时，它返回序列的第⼀个元素。注意：iterator() 方法是 java.lang.Iterable 接口，被 Collection 继承。　　
+2. 使用 next() 获得序列中的下⼀个元素。　
+3. 使用 hasNext() 检查序列中是否还有元素。　　
+4. 使用 remove() 将迭代器新返回的元素删除。　
+
+**Iterator 和 ListIterator 有什么区别？** 
+
+Iterator 可用来遍历 Set 和 List 集合，但是 ListIterator 只能用来遍历 List。Iterator 对集合只能是前向遍历， ListIterator 既可以前向也可以后向。ListIterator 实现了 Iterator 接口，并包含其他的功能，⽐如：增加元素，替 换元素，获取前⼀个和后⼀个元素的索引等等。
+
+**Iterator 和 Enumeration 接口的区别？** 
+
+与 Enumeration 相比，Iterator 更加安全，因为当⼀个集合正在被遍历的时候，它会阻⽌其它线程去修改集合。 否则会抛出 ConcurrentModificationException 异常。这其实就是 fail-fast 机制。具体区别有三点：
+
+1. Iterator 的方法名比 Enumeration 更科学；
+2. Iterator 有 fail-fast 机制，比 Enumeration 更安全； 
+3. Iterator 能够删除元素，Enumeration 并不能删除元素。
 
 ## Arrays.sort与Collections.sort使用算法
 

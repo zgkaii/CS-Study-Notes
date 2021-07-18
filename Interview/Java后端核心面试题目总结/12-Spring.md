@@ -153,21 +153,13 @@ Spring 是一个开源应用框架，旨在降低应用程序开发的复杂度�
 
 Spring 框架中使用到了大量的设计模式，下面列举了比较有代表性的：
 
-- 代理模式 — 在 AOP 和 remoting 中被用的比较多。
-- 单例模式 — 在 Spring 配置文件中定义的 Bean 默认为单例模式。
-- 模板方法 — 用来解决代码重复的问题。比如 [RestTemplate](http://howtodoinjava.com/2015/02/20/spring-restful-client-resttemplate-example/)、JmsTemplate、JdbcTemplate 。
-- 前端控制器 — Spring提供了 DispatcherServlet 来对请求进行分发。
-- 视图帮助(View Helper) — Spring 提供了一系列的 JSP 标签，高效宏来辅助将分散的代码整合在视图里。
-- 依赖注入 — 贯穿于 BeanFactory / ApplicationContext 接口的核心理念。
-- 工厂模式 — BeanFactory 用来创建对象的实例。
-
-当然，感兴趣的胖友，觉得不过瘾，可以看看几篇文章：
-
-- [《Spring 框架中的设计模式(一)》](http://www.iocoder.cn/Spring/DesignPattern-1)
-- [《Spring 框架中的设计模式(二)》](http://www.iocoder.cn/Spring/DesignPattern-2)
-- [《Spring 框架中的设计模式(三)》](http://www.iocoder.cn/Spring/DesignPattern-3)
-- [《Spring 框架中的设计模式(四)》](http://www.iocoder.cn/Spring/DesignPattern-4)
-- [《Spring 框架中的设计模式(五)》](http://www.iocoder.cn/Spring/DesignPattern-5)
+1. 工厂设计模式 : Spring 使用工厂模式通过 BeanFactory、ApplicationContext 创建 bean 对象；
+2. 代理设计模式 : Spring AOP 功能的实现； 
+3. 单例设计模式 : Spring 中的 Bean 默认都是单例的；
+4. 模板方法模式 : Spring 中 jdbcTemplate、hibernateTemplate 等以 Template 结尾的对数据库操作的类，它们就使用到了模板模式； 
+5. 包装器设计模式 : 我们的项目需要连接多个数据库，而且不同的客户在每次访问中根据需要会去访问不同的数据库。这种模式让我们可以根据客户的需求能够动态切换不同的数据源；
+6. 观察者模式：Spring 事件驱动模型就是观察者模式很经典的⼀个应用；
+7. 适配器模式：Spring AOP 的增强或通知(Advice)使用到了适配器模式、SpringMVC 中也是用到了适配器模式 适配 Controller。
 
 ## 谈谈Spring Bean的生命周期和作用域
 
@@ -325,19 +317,19 @@ BeanFactory 最常用的是 XmlBeanFactory 。它可以根据 XML 文件中定�
 
 以下是三种较常见的 ApplicationContext 实现方式：
 
-- 1、ClassPathXmlApplicationContext ：从 ClassPath 的 XML 配置文件中读取上下文，并生成上下文定义。应用程序上下文从程序环境变量中取得。示例代码如下：
+1、ClassPathXmlApplicationContext ：从 ClassPath 的 XML 配置文件中读取上下文，并生成上下文定义。应用程序上下文从程序环境变量中取得。示例代码如下：
 
-  ```java
-  ApplicationContext context = new ClassPathXmlApplicationContext(“bean.xml”);
-  ```
+```java
+ApplicationContext context = new ClassPathXmlApplicationContext(“bean.xml”);
+```
 
-- 2、FileSystemXmlApplicationContext ：由文件系统中的XML配置文件读取上下文。示例代码如下：
+2、FileSystemXmlApplicationContext ：由文件系统中的XML配置文件读取上下文。示例代码如下：
 
-  ```java
-  ApplicationContext context = new FileSystemXmlApplicationContext(“bean.xml”);
-  ```
+```java
+ApplicationContext context = new FileSystemXmlApplicationContext(“bean.xml”);
+```
 
-- 3、XmlWebApplicationContext ：由 Web 应用的XML文件读取上下文。例如我们在 Spring MVC 使用的情况。
+3、XmlWebApplicationContext ：由 Web 应用的XML文件读取上下文。例如我们在 Spring MVC 使用的情况。
 
 当然，目前我们更多的是使用 Spring Boot 为主，所以使用的是第四种 ApplicationContext 容器ConfigServletWebServerApplicationContext 。
 
