@@ -1,5 +1,4 @@
 <!-- MarkdownTOC -->
-
 - [谈谈你对集合框架的理解](#谈谈你对集合框架的理解)
   - [List、Set与Map区别](#listset与map区别)
   - [有哪些集合是线程不安全的？怎么解决呢？](#有哪些集合是线程不安全的怎么解决呢)
@@ -20,6 +19,7 @@
     - [JDK1.7之前](#jdk17之前)
     - [JDK1.8之后](#jdk18之后)
   - [tableSizeFor(int cap)初始化容量时，为什么计算式为`cap - 1`](#tablesizeforint-cap初始化容量时为什么计算式为cap---1)
+  - [为什么大部分 hashcode 方法使用 31](#为什么大部分-hashcode-方法使用-31)
   - [HashMap为什么使用扰动函数](#hashmap为什么使用扰动函数)
   - [HashMap的长度为什么是 2 的幂次方](#hashmap的长度为什么是-2-的幂次方)
   - [HashMap的put方法处理流程是什么](#hashmap的put方法处理流程是什么)
@@ -32,6 +32,9 @@
   - [ConcurrentHashMap底层实现](#concurrenthashmap底层实现)
     - [JDK1.7](#jdk17)
     - [JDK1.8](#jdk18)
+  - [ConcurrentHashMap的put方法流程？](#concurrenthashmap的put方法流程)
+  - [ConcurrentHashMap的put方法如何保证线程安全？](#concurrenthashmap的put方法如何保证线程安全)
+  - [ConcurrentHashMap的扩容流程？](#concurrenthashmap的扩容流程)
   - [ConcurrentHashMap与Hashtable区别](#concurrenthashmap与hashtable区别)
   - [不同的Map使用场景与特点](#不同的map使用场景与特点)
 - [其他](#其他)
@@ -136,7 +139,7 @@ ArrayList 属性主要由数组长度 size、对象数组 elementData、初始�
 
 transient 关键字修饰该字段则表示该属性不会被序列化，但 ArrayList 其实是实现了序列化接口，这到底是怎么回事呢？
 
-* 由于 ArrayList 基于数组实现，可以动态扩容，所以并不是所有被分配的内存空间都存储了数据。如果采用外部序列化法实现数组的序列化，会序列化整个数组。ArrayList 为了避免这些没有存储数据的内存空间被序列化，内部提供了两个私有方法 **writeObject 以及 readObject** 来自我完成序列化与反序列化，从而在序列化与反序列化数组时节省了空间和时间。
+* 由于 ArrayList 基于数组实现，可以动态扩容，所以并不是所有被分配的内存空间都存储了数据。如果采用外部序列化法实现数组的序列化，会序列化整个数组。ArrayList 为了避免这些没有存储数据的内存空间被序列化，内部提供了两个私有方法 **writeObject 以及 readObject** 来自我完成序列化与反序列化，就可以保证只序列化实际存储的那些元素，而不是整个数组，从而在序列化与反序列化数组时节省了空间和时间。
 * 因此使用 transient 修饰数组，是防止对象数组被其他外部方法序列化。
 
 ### ArrayList扩容机制
@@ -145,8 +148,7 @@ transient 关键字修饰该字段则表示该属性不会被序列化，但 Arr
   * 参数等于0，初始化一个容量为0的空数组（`EMPTY_ELEMENTDATA`）；
   * 参数大于0，初始化一个容量为传入参数大小的空数组。
 * 无参构造函数
-  * 初始化一个未指定容量的空数组（`DEFAULTCAPACITY_EMPTY_ELEMENTDATA`）；
-  * 当调用`add()`方法添加第一个元素，才会将空数组容量扩容至`DEFAULT_CAPACITY=10`；
+  * 初始化一个未指定容量的空数组（`DEFAULTCAPACITY_EMPTY_ELEMENTDATA`），当调用`add()`方法添加第一个元素，才会将空数组容量扩容至`DEFAULT_CAPACITY=10`；
   * 继续添加元素，当添加元素数量大于10后，调用`grow()`方法进行扩容；
   * `ArrayList`默认扩容大小是原大小的**1.5倍左右**，如果扩容后的容量仍小于最小需求容量，就将数组大小直接调整为最小需求容量大小；如果最小需求容量的值在`MAX_ARRAY_SIZE`和`Integer.MAX_VALUE`之间，那么新数组分配`Integer.MAX_VALUE`大小，否则分配`MAX_ARRAY_SIZE`。
 
@@ -185,6 +187,11 @@ transient 关键字修饰该字段则表示该属性不会被序列化，但 Arr
             MAX_ARRAY_SIZE;
     }
 ```
+
+从上面的分析中可以看出**EMPTY_ELEMENTDATA**与**DEFAULTCAPACITY_EMPTY_ELEMENTDATA**的区别：
+
+* `EMPTY_ELEMENTDATA`表示实例化对象时指定了容量为0，当添加1个元素后，那么`elementData.length=1`。
+* `DEFAULTCAPACITY_EMPTY_ELEMENTDATA`表示实例化时是无参构造，未指定容量，在调用add方法添加第1个元素后会默认扩容容量为10，即`elementData.length=10`。
 
 > 上面仅简述了`ArrayList`的扩容机制，详细分析见[`ArrayList`源码分析](https://blog.csdn.net/KAIZ_LEARN/article/details/109555269)
 
@@ -240,7 +247,9 @@ public interface RandomAccess {
 
 这里为什么只有`ArrayList`实现了`RandomAccess`接口呢？主要和它们底层数据结构具体实现相关。
 
-`ArrayList` 底层是数组，而 `LinkedList` 底层是链表。数组天然支持随机访问，时间复杂度为 O(1)，所以称为快速随机访问。链表需要遍历到特定位置才能访问特定位置的元素，时间复杂度为 O(n)，所以不支持快速随机访问。`ArrayList` 实现了 `RandomAccess` 接口，就表明了他具有快速随机访问功能。 `RandomAccess` 接口只是标识，并不是说 `ArrayList` 实现 `RandomAccess` 接口才具有快速随机访问功能的！
+`ArrayList` 底层是数组，而 `LinkedList` 底层是链表。数组天然支持随机访问，时间复杂度为 O(1)，所以称为快速随机访问。链表需要遍历到特定位置才能访问特定位置的元素，时间复杂度为 O(n)，所以不支持快速随机访问。`ArrayList` 实现了 `RandomAccess` 接口，就表明了他具有快速随机访问功能。 `RandomAccess` 接口**只是标识**，并不是说 `ArrayList` 实现 `RandomAccess` 接口才具有快速随机访问功能的！
+
+`LinkedList`采取的是顺序访问方式，iterator中的next()方法，采用的即是顺序访问方法，因此在`LinkedList`中，使用iterator的速度较快。而Iterator 适合访问链式存储结构，因为迭代器是通过next()来定位的，但它也可以访问顺序存储结构的集合。
 
 需要==注意==的是，**ArrayList 的增删未必就是比 LinkedList 要慢**：
 
@@ -389,6 +398,12 @@ static final int tableSizeFor(int cap) {
 
 例如，二进制数0100，即4。如果不进行减1操作，通过运算会等到1000，即8，直接翻倍了，不符合结果。进行减1操作后，二进制数为0011，再进行运算会得到0100，即4。
 
+## 为什么大部分 hashcode 方法使用 31
+
+之所以使用 31， 是因为他是一个奇素数。如果乘数是偶数，并且乘法溢出的话，信息就会丢失，因为与2相乘等价于移位运算（低位补0）。选择质数的优势并不是特别的明显，但这是一个传统。 同时，数字31有个很好的性能，即用移位和减法来代替乘法，可以得到更好的性能： `31 * i == (i << 5）- i`， 现代的 JVM 可以自动完成这种优化。
+
+此外，选择系数的时候要选择尽量长的系数并且让乘法尽量不要溢出的系数，因为如果计算出来的hash地址越大，所谓的“冲突”就越少，查找起来效率也会提高。使用31的原因可能是为了更好的分配hash地址，并且31只占用`5bits`！在java乘法中如果数字相乘过大会导致溢出的问题，从而导致数据的丢失，而31则是素数（质数）而且不是很长的数字，最终它被选择为相乘的系数的原因。
+
 ## HashMap为什么使用扰动函数
 
 HashMap先是通过**扰动函数**`hash(Object key)`处理key的`hashCode`而得到其hash 值，然后通过**桶下标计算公式** `(n - 1) & hash` 判断当前元素存放的位置（这里的 n 指的是数组的长度）。
@@ -481,88 +496,23 @@ tab[i = (n - 1) & hash]
 
 ## HashMap的put方法处理流程是什么
 
-put方法中调用了`putVal`方法，传递的参数是调用了hash()方法计算key的hash值，主要逻辑写在`putVal`中。
+put方法中调用了`putVal`方法，传递的参数是hash()方法计算key的hash值，主要逻辑写在`putVal`方法中。
 
-```java
-public V put(K key, V value) {
-    return putVal(hash(key), key, value, false, true);
-}
+HashMap插入中一个数据插入的整体流程，包括了：计算下标、何时扩容、何时链表转红黑树等，大致如下：
 
-final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
-                   boolean evict) {
-    Node<K,V>[] tab; Node<K,V> p; int n, i;
-    // 步骤1：桶数组未初始化或者长度为0，进行扩容
-    if ((tab = table) == null || (n = tab.length) == 0)
-        n = (tab = resize()).length;
-    // 步骤2：指定桶为空，新生成结点直接放入
-    // (n - 1) & hash 计算元素在哪个桶中
-    if ((p = tab[i = (n - 1) & hash]) == null)
-        tab[i] = newNode(hash, key, value, null);
-    // 指定位置已经存在元素
-    else {
-        Node<K,V> e; K k;
-        // 步骤3： 如果桶中第一个元素的key与待插入元素的key相同，保存到e中用于后续修改value值
-        if (p.hash == hash &&
-            ((k = p.key) == key || (key != null && key.equals(k))))
-                // 将第一个元素赋值给e，用e来记录
-                e = p;
-        // 步骤4：如果第一个元素是树节点，则调用树节点的putTreeVal插入元素
-        else if (p instanceof TreeNode)
-            e = ((TreeNode<K,V>)p).putTreeVal(this, tab, hash, key, value);
-        // 步骤5：为链表结点，遍历链表进行操作
-        else {
-            // inCount用于存储链表中元素的个数
-            for (int binCount = 0; ; ++binCount) {
-                // 到达链表的尾部还没有找到相同key的元素，则在尾部插入新结点
-                if ((e = p.next) == null) {
-                    p.next = newNode(hash, key, value, null);
-                    // 结点数量达到扩容门槛，转化为红黑树
-                    if (binCount >= TREEIFY_THRESHOLD - 1) 
-                        treeifyBin(tab, hash);
-                    break;
-                }
-                // 判断链表中结点的key值与插入的元素的key值相等，则退出循环
-                if (e.hash == hash &&
-                    ((k = e.key) == key || (key != null && key.equals(k))))
-                    break;
-                // 用于遍历桶中的链表，与前面的e = p.next组合，可以遍历链表
-                p = e;
-            }
-        }
-        // 步骤6：表示在桶中找到key值、hash值与插入元素相等的结点
-        if (e != null) { 
-            // 记录e的旧value
-            V oldValue = e.value;
-            // 判断是否要置换旧值
-            if (!onlyIfAbsent || oldValue == null)
-                // 直接覆盖，并返回旧值
-                e.value = value;
-            // 访问后回调
-            afterNodeAccess(e);
-            // 返回旧值
-            return oldValue;
-        }
-    }
+1. 首先进行哈希值的扰动，获取一个新的哈希值。` (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);`
 
-    ++modCount;
-    // 步骤7：判断是否扩容
-    if (++size > threshold)
-        resize();
-    afterNodeInsertion(evict);
-    return null;
-} 
-```
+2. 判断tab 桶是否为空或者长度是否为0，如果是则进行扩容操作。
 
-**对putVal方法添加元素的过程如下：**
+3. 根据哈希值计算下标，如果桶中对应的下标没有存放数据，直接插入即可；如果对应桶中存在数据且与插入数据key相等，则直接覆盖（hash值相等key相等）。`tab[i = (n - 1) & hash]`
 
-当我们想往⼀个 HashMap 中添加⼀对 key-value 时，系统⾸先会计算 key 的 hash 值，然后根据 hash 值确认在桶中存储的位置：
+4. 如果桶中堆的下标存放数据但与插入的数据key不相同（hash 值相等key不等），则判断桶中 tab[i]是否是一个树节点。如果是树节点，就调用`putTreeVal()`方法将节点插入树中；如果不是树节点，则在链表的尾步插入元素。
 
-1. 如果桶容量为0，则初始化桶。
-2. 如果定位到的桶位置没有元素就直接插入元素。
-3. 如果定位到的桶位置有元素就和要插入的元素key比较，如果key相同就直接覆盖（hash值相等key相等）。
-4. 如果定位到的桶位置有元素且与插入的key不相同（hash 值相等但 key 值不等），就判断是否是一个树节点，如果是就调用`e = ((TreeNode<K,V>)p).putTreeVal(this, tab, hash, key, value)`将元素添加进入。
-5. 如果不是树节点就遍历链表，判断链表长度是否大于8，大于8的话把链表转换为红黑树，在红黑树中执行插入操作，否则进行链表的插入操作(插入到链表尾部)。
-6. 每当插了元素，则实际键值对数量size加1后，需要判断是否扩容。
+5. 如果链表中插入节点的时候，首先需要判断链表长度是否**>=**8，是的话则调用`treeifyBin(tab, hash)`方法把链表转换为红黑树。
+
+   并不是所有链表长度为8后就会转成树，还需要判断存放key值的数组桶长度是否小于`MIN_TREEIFY_CAPACITY=64`，如果小于则优先扩容 tab桶，扩容后链表上的数据会被拆分散列的对应的桶节点上，也就把链表的长度缩短了。
+
+6. 每当插入元素后，HashMap中实际键值对数量 size 都会 `+1`操作，如果`++size > 阈值threshold`，则会再次扩容。
 
 ## HashMap的resize方法的执行过程
 
@@ -633,6 +583,8 @@ hash2 =  0000 0000 0000 0000 0000 1111 0001 1110
 
 JDK1.7中，**HashMap采用头插法插入数据，在于并发下的 扩容rehash时会造成元素之间会形成一个循环链表（死链）**。JDK 1.8 后解决了这个问题（变成了尾插法），但是还是不建议大家在多线程下使用 `HashMap`，因为多线程下使用 `HashMap` 还是会存在其他问题比如数据丢失。并发环境下推荐使用 `ConcurrentHashMap `。
 
+实际上，`ConcurrentHashMap` 也会有死循环，不要在`mappingFunction`中再对当前`map`进行更新操作。
+
 >  可参考——[疫苗：JAVA HASHMAP的死循环](https://coolshell.cn/articles/9606.html)一文。
 
 ## HashMap有哪几种常见的遍历方式
@@ -675,7 +627,9 @@ HashMap 遍历从大的方向来说，可分为以下 4 类：
 
 <div align="center"> <img src="../../05-Java/images/collection/TreeMap.png" width="600px"></div>
 
-实现 `NavigableMap` 接口让 `TreeMap` 有了对集合内元素的搜索的能力，实现`SortMap`接口让 `TreeMap` 有了对集合中的元素根据键排序的能力。也就是说，**相比于`HashMap`来说 `TreeMap` 主要多了对集合中的元素根据键排序的能力以及对集合内元素的搜索的能力**。
+实现 `NavigableMap` 接口让 `TreeMap` 有了对集合内元素的搜索的能力，实现`SortMap`接口让 `TreeMap` 有了对集合中的元素根据键排序的能力，**默认是按键值的升序排序**，也可以指定排序的比较器，当用Iterator遍历TreeMap时，得到的记录是排过序的。也就是说，**相比于`HashMap`来说 `TreeMap` 主要多了对集合中的元素根据键排序的能力以及对集合内元素的搜索的能力**。
+
+在使用TreeMap时，key必须实现Comparable接口或者在构造TreeMap传入自定义的Comparator，否则会在运行时抛出`java.lang.ClassCastException`类型的异常。底层数据结构是红黑树。
 
 ## HashMap与Hashtable区别
 
@@ -708,6 +662,43 @@ static class Segment<K,V> extends ReentrantLock implements Serializable {
 可以发现 Java8 的` ConcurrentHashMap ` 相对于 Java7 来说变化比较大，不再是之前的 **Segment 数组 + HashEntry 数组 + 链表**，而是 **Node 数组 + 链表 / 红黑树**。当其中链表长度超过一定阈值（8）时将链表（寻址时间复杂度为 O(N)）转换为红黑树（寻址时间复杂度为 O(log(N))）。
 
 `ConcurrentHashMap `取消了 Segment 分段锁，**采用 CAS 和 synchronized** 来保证并发安全。数据结构跟 HashMap1.8 的结构类似，数组+链表/红黑二叉树。synchronized 只锁定当前链表或红黑二叉树的首节点，这样只要 hash 不冲突，就不会产生并发，效率又提升 N 倍。
+
+## ConcurrentHashMap的put方法流程？
+
+1. key为null或者value为null，抛出空指针异常；
+2. for死循环，为了实现CAS的无锁化更新。如果table为null或者table的长度为0，则初始化table，调用initTable()方法（第一次put数据，调用默认参数实现，其中重要的sizeCtl参数）。
+3. 计算hash值，计算索引值。
+4. 通过tableAt()方法找到位置`tab[i]`的Node，当Node为null时为没有hash冲突的话，使用casTabAt()方法CAS操作将元素插入到Hash表中，ConcurrentHashmap使用CAS无锁化操作，这样在高并发hash冲突低的情况下，性能良好。
+5. 发生hash冲突，也没有扩容的情况下，synchronized锁住Node，遍历链表，如果是红黑树就插入红黑树。
+6. 放置结束后，退出synchronized。
+7. 检查binCount，如果大于`TREEIFY_THRESHOLD = 8`则进行treeifyBin操作尝试将该链表转换为红黑树。
+8. addCount方法决定是否扩容。
+
+## ConcurrentHashMap的put方法如何保证线程安全？
+
+1. 第一次put的时候，调用initTable方法，使用sizeCtl参数作为控制标志的作用，当在插入元素时，才会初始化Hash表。
+   * 如果sizeCtl<0，说明有现成初始化，当前线程便放弃初始化操作；
+   * 否则讲sizeCtl置为`-1`，Hash表进行初始化。
+
+2. 不存在hash冲突的时候，直接CAS去操作结点；
+3. 存在hash冲突的时候，先把当前节点使用关键字`synchronized`加锁，然后再使用`tabAt()`原子操作判断下有没有线程对数组进行了修改，最后再进行其他操作。
+
+> sizeCtl的作用：
+>
+> - 多线程之间，以volatile的方式读取sizeCtl属性，来判断ConcurrentHashMap当前所处的状态。（初始化和扩容状态）
+>
+> - 通过cas设置sizeCtl属性，告知其他线程ConcurrentHashMap的状态变更。
+>
+> get的流程不需要上锁：
+>
+> * 因为值和next结点都是volatile修饰的，具有可见性，并且读数据不会影响扩容，因为不需要加锁。
+
+## ConcurrentHashMap的扩容流程？
+
+1. 线程执行put操作，发现容量已经达到扩容阈值，需要进行扩容操作，例如此时`transferindex=tab.length=32`；
+2. 扩容线程A以CAS的方式修改`transferindex=31-16=16` ，然后按照降序迁移table[31]至table[16]这个区间的hash桶(逆序遍历扩容)
+3. 迁移hash桶时，如果不是null和占位符，需要上锁synchronized，会将桶内的链表或者红黑树，按照一定算法（`hash值>`0为链表，等于`-2`为红黑树），拆分成2份，将其插入`nextTable[i]`和`nextTable[i+n]`（n是table数组的长度） 迁移完毕的hash桶，会被设置成`ForwardingNode`节点，以此告知访问此桶的其他线程，此节点已经迁移完毕。
+4. 此时线程2访问到了`ForwardingNode`节点，如果线程2执行的put或remove等写操作，那么就会先帮其扩容。如果线程2执行的是get等读方法，则会调用`ForwardingNode`的find方法，去nextTable里面查找相关元素。
 
 ## ConcurrentHashMap与Hashtable区别
 

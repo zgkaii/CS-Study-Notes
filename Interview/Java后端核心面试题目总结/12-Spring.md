@@ -200,12 +200,24 @@ Spring 框架的核心是 Spring IoC (Inversion of Control)容器。容器创建
 <div align="center">  
 <img src="https://img-blog.csdnimg.cn/20210719104744359.png" width="600px"/>
 </div>
-
 ## IoC 和 DI 有什么区别？
 
-将对象的实例化交给容器处理，而非用户通过new 关键字主动创建，这就是所谓的控制反转 (Inversion of Control)，而依赖注入 (Dependency Injection)指的是IoC容器在运行期间，动态地将某种依赖关系的目标对象实例注入到应用系统中的各个关联的组件之中。
+**什么是控制反转（IoC）？**
 
-依赖注入（DI）和控制反转（IoC）是从不同的角度描述的同一件事情，就是指通过引入IoC容器，利用依赖关系注入的方式，实现对象之间的解耦。其本质是用反射获取对象。
+* 实际上，控制反转（Inversion Of Control）是一个比较笼统的设计思想，并不是一种具体的实现方法，一般用来指导框架层面的设计。这里所说的“控制”指的是对程序执行流程的控制，而“反转”指的是在没有使用框架之前，程序员自己控制整个程序的执行。在使用框架之后，整个程序的执行流程通过框架来控制。流程的控制权从程序员“反转”给了框架。
+
+**什么是依赖注入（DI）？**
+
+* 依赖注入（Dependency Injection）和控制反转恰恰相反，它是一种具体的编码技巧。我们不通过 new 的方式在类内部创建依赖类的对象，而是将依赖的类对象在外部创建好之后，通过构造函数、函数参数等方式传递（或注入）给类来使用。
+
+**什么是依赖注入框架（DI Framework）？**
+
+* 我们通过依赖注入框架提供的扩展点，简单配置一下所有需要的类及其类与类之间依赖关系，就可以实现由框架来自动创建对象、管理对象的生命周期、依赖注入等原本需要程序员来做的事情。
+* 实际上，现成的依赖注入框架有很多，比如 Google Guice、Java Spring、Pico Container、Butterfly Container 等。Spring 框架自己声称是控制反转容器（Inversion Of Control Container）。
+
+**IoC与DI的区别？**
+
+* 依赖注入（DI）和控制反转（IoC）是从不同的角度描述的同一件事情，就是指通过引入IoC容器，利用依赖关系注入的方式，实现对象之间的解耦。其本质是用反射获取对象。
 
 > **Dependency Injection**原来就叫 IoC 。但后来Martin Flower 发话，是个框架都有 IoC ，这不足以新生容器反转的“如何定位插件的具体实现”，于是，它有了个新名字，Dependency Injection 。
 > 
@@ -641,7 +653,9 @@ Spring 框架并没有对单例 Bean 进行任何多线程的封装处理。
 
 当然，但实际上，大部分的 Spring Bean 并没有可变的状态(比如Serview 类和 DAO 类)，所以在某种程度上说 Spring 的单例 Bean 是线程安全的。
 
-如果你的 Bean 有多种状态的话，就需要自行保证线程安全。最浅显的解决办法，就是将多态 Bean 的作用域( Scope )由 Singleton 变更为 Prototype 。
+如果你的 Bean 有多种状态的话，就需要自行保证线程安全。最浅显的解决办法，就是将多态 Bean 的作用域( Scope )由 Singleton 变更为 Prototype。当然也可以通过加锁的方法来解决线程安全，这种以时间换空间的场景在高并发场景下显然是不实际的。
+
+对于有状态的bean，Spring官方提供的Bean，一般提供了通过ThreadLocal去解决线程安全的方法，比如RequestContextHolder、TransactionSynchronizationManager、LocaleContextHolder等。
 
 ## Spring 如何解决循环依赖？
 

@@ -104,9 +104,20 @@ Java 中的线程分为两种：守护线程（Daemon）和用户线程（User�
 
 ## Runnable和Callable区别
 
- Runnable 接口中的 run() 方法的返回值是 void，它做的事情只是纯粹地去执行 run() 方法中的代码； 
+创建线程有三种方式：
 
-Callable 接口中的 call() 方法是有返回值的，是⼀个泛型，和 Future、FutureTask 配合可以用来获取异步执行的结果。
+1. 继承Thread类创建线程；
+2. 通过Runnable接口创建线程；
+3. 通过Callable和Future接口创建线程；
+
+Runnable和Callable区别在于：
+
+* Runnable是自从Java 1.1就有了，而Callable是Java 1.5之后才加上去的；
+
+* Runnable 接口中的 run() 方法的返回值是 void，它做的事情只是纯粹地去执行 run() 方法中的代码，不能抛出异常； 
+
+* Callable 接口中的 call() 方法是有返回值的，可以抛出异常，是⼀个泛型，和 Future、FutureTask 配合可以用来获取异步执行的结果；
+* 加入线程池运行，Runnable使用`ExecutorService`的execute方法，Callable使用submit方法。
 
 ## run()与start()方法区别
 
@@ -119,6 +130,16 @@ run()方法是在本线程里的，只是线程里的一个函数，而不是多
 **解答**：Java线程是不允许一个线程两次调用`start()`方法的，第二次调用必然会抛出`IllegalThreadStateException`，这是一种运行时异常，多次调用start会被认为是编译错误。
 
 在第二次调用 start() 方法的时候，线程可能处于终止或者其他（非 NEW）状态，但是不论如何，都是不可以再次启动的。
+
+## wait方法和sleep方法的区别
+
+主要有以下几个不同：
+
+* 所属的类不同：sleep()属于Thread类，wait()属于Object类；
+* 时间不同：sleep()必须指定时间，wait()可以指定时间也可以不指定时间；
+* 释放锁不同：sleep()释放CPU执行权不释放同步锁；wait()即释放CPU执行权也释放同步锁；
+* 使用的地方不同：sleep()可以在任意地方使用；wait()只能在同步代码方法或者同步代码块中使用；
+* 捕获异常不同：sleep()必须捕获异常；wait()是Object方法，调用也许捕获/抛出异常。
 
 ## Thread.interrupt() 方法的工作原理
 
