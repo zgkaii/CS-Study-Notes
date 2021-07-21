@@ -1,4 +1,53 @@
-# 核心技术篇
+<!-- MarkdownTOC -->
+- [基础篇](#基础篇)
+  - [Spring Boot 是什么？](#spring-boot-是什么)
+  - [Spring Boot 提供了哪些核心功能？](#spring-boot-提供了哪些核心功能)
+  - [Spring Boot 有什么优缺点？](#spring-boot-有什么优缺点)
+  - [Spring Boot、Spring MVC 和 Spring 有什么区别？](#spring-bootspring-mvc-和-spring-有什么区别)
+  - [Spring Boot 中的 Starter 是什么？](#spring-boot-中的-starter-是什么)
+  - [pring-boot-starter-parent 有什么用?](#pring-boot-starter-parent-有什么用)
+  - [创建一个 Spring Boot Project 的最简单的方法是什么？](#创建一个-spring-boot-project-的最简单的方法是什么)
+  - [如何统一引入 Spring Boot 版本？](#如何统一引入-spring-boot-版本)
+  - [运行 Spring Boot 有哪几种方式？](#运行-spring-boot-有哪几种方式)
+  - [如何打包 Spring Boot 项目？](#如何打包-spring-boot-项目)
+  - [如果更改内嵌 Tomcat 的端口？](#如果更改内嵌-tomcat-的端口)
+  - [如何重新加载 Spring Boot 上的更改，而无需重新启动服务器？](#如何重新加载-spring-boot-上的更改而无需重新启动服务器)
+  - [Spring Boot 2.X 有什么新特性？](#spring-boot-2x-有什么新特性)
+  - [如何在 Spring Boot 启动的时候运行一些特殊的代码？](#如何在-spring-boot-启动的时候运行一些特殊的代码)
+- [配置篇](#配置篇)
+  - [Spring Boot 的配置文件有哪几种格式？](#spring-boot-的配置文件有哪几种格式)
+  - [Spring Boot 默认配置文件是什么？](#spring-boot-默认配置文件是什么)
+  - [Spring Boot 如何定义多套不同环境配置？](#spring-boot-如何定义多套不同环境配置)
+  - [Spring Boot 配置文件不同加载位置？](#spring-boot-配置文件不同加载位置)
+  - [Spring Boot 配置加载顺序？](#spring-boot-配置加载顺序)
+  - [Spring Boot 有哪些配置方式？](#spring-boot-有哪些配置方式)
+  - [什么是 JavaConfig？](#什么是-javaconfig)
+  - [Spring Boot 读取配置的方式？](#spring-boot-读取配置的方式)
+  - [Spring Boot 的核心注解？](#spring-boot-的核心注解)
+  - [Spring Boot 自动配置原理？](#spring-boot-自动配置原理)
+  - [@Conditional 扩展注解有哪些？](#conditional-扩展注解有哪些)
+- [安全篇](#安全篇)
+  - [如何集成 Spring Boot 和 Spring Security ？](#如何集成-spring-boot-和-spring-security-)
+  - [如何集成 Spring Boot 和 Spring Security OAuth2 ？](#如何集成-spring-boot-和-spring-security-oauth2-)
+  - [比较一下Spring Security 和Shiro各自的优缺点 ?](#比较一下spring-security-和shiro各自的优缺点-)
+  - [Spring Boot 中如何解决跨域问题 ?](#spring-boot-中如何解决跨域问题-)
+  - [什么是 CSRF 攻击？](#什么是-csrf-攻击)
+  - [Spring Boot 中的监视器是什么](#spring-boot-中的监视器是什么)
+  - [如何在 Spring Boot 中禁用Actuator端点安全性？](#如何在-spring-boot-中禁用actuator端点安全性)
+  - [如何监视所有 Spring Boot 微服务？](#如何监视所有-spring-boot-微服务)
+- [进阶篇](#进阶篇)
+  - [Swagger 用过吗？它用来做什么？](#swagger-用过吗它用来做什么)
+  - [Spring Boot 项目如何热部署？](#spring-boot-项目如何热部署)
+  - [微服务中如何实现 session 共享?](#微服务中如何实现-session-共享)
+  - [Spring Boot 中如何实现定时任务?](#spring-boot-中如何实现定时任务)
+  - [如何将内嵌服务器换成 Jetty ？](#如何将内嵌服务器换成-jetty-)
+  - [如何集成 Spring Boot 和 Spring MVC ？](#如何集成-spring-boot-和-spring-mvc-)
+  - [Spring Boot 支持哪些日志框架？](#spring-boot-支持哪些日志框架)
+- [整合篇](#整合篇)
+
+<!-- /MarkdownTOC -->
+
+# 基础篇
 
 ## Spring Boot 是什么？
 
@@ -18,113 +67,108 @@ Spring Boot 提供了各种 Starter 启动器，提供标准化的默认配置�
 
 ## Spring Boot 提供了哪些核心功能？
 
-- 1、独立运行 Spring 项目
+**1、独立运行 Spring 项目**
 
-  Spring Boot 可以以 jar 包形式独立运行，运行一个 Spring Boot 项目只需要通过 `java -jar xx.jar` 来运行。
+Spring Boot 可以以 jar 包形式独立运行，运行一个 Spring Boot 项目只需要通过 `java -jar xx.jar` 来运行。
 
-- 2、内嵌 Servlet 容器
+**2、内嵌 Servlet 容器**
 
-  Spring Boot 可以选择内嵌 Tomcat、Jetty 或者 Undertow，这样我们无须以 war 包形式部署项目。
+Spring Boot 可以选择内嵌 Tomcat、Jetty 或者 Undertow，这样我们无须以 war 包形式部署项目。
 
-  > 第 2 点是对第 1 点的补充，在 Spring Boot 未出来的时候，大多数 Web 项目，是打包成 war 包，部署到 Tomcat、Jetty 等容器。
+> 第 2 点是对第 1 点的补充，在 Spring Boot 未出来的时候，大多数 Web 项目，是打包成 war 包，部署到 Tomcat、Jetty 等容器。
 
-- 3、提供 Starter 简化 Maven 配置
+**3、提供 Starter 简化 Maven 配置**
 
-  Spring 提供了一系列的 starter pom 来简化 Maven 的依赖加载。例如，当你使用了 `spring-boot-starter-web` ，会自动加入如下依赖：![`spring-boot-starter-web` 的 pom 文件](http://static.iocoder.cn/images/Spring/2018-12-26/01.png)
+Spring 提供了一系列的 starter pom 来简化 Maven 的依赖加载。例如，当你使用了 `spring-boot-starter-web` ，会自动加入如下依赖：
 
-- 4、[自动配置 Spring Bean](https://www.jianshu.com/p/ddb6e32e3faf)
+<div align="center">  
+<img src="http://static.iocoder.cn/images/Spring/2018-12-26/01.png" width="600px"/>
+</div>
 
-  Spring Boot 检测到特定类的存在，就会针对这个应用做一定的配置，进行自动配置 Bean ，这样会极大地减少我们要使用的配置。
+**4、自动配置 Spring Bean**
 
-  当然，Spring Boot 只考虑大多数的开发场景，并不是所有的场景，若在实际开发中我们需要配置Bean ，而 Spring Boot 没有提供支持，则可以自定义自动配置进行解决。
+Spring Boot 检测到特定类的存在，就会针对这个应用做一定的配置，进行自动配置 Bean ，这样会极大地减少我们要使用的配置。
 
-- 5、[准生产的应用监控](https://blog.csdn.net/wangshuang1631/article/details/72810412)
+当然，Spring Boot 只考虑大多数的开发场景，并不是所有的场景，若在实际开发中我们需要配置Bean ，而 Spring Boot 没有提供支持，则可以自定义自动配置进行解决。
 
-  Spring Boot 提供基于 HTTP、JMX、SSH 对运行时的项目进行监控。
+**5、准生产的应用监控**
 
-- 6、无代码生成和 XML 配置
+Spring Boot 提供基于 HTTP、JMX、SSH 对运行时的项目进行监控。
 
-  Spring Boot 没有引入任何形式的代码生成，它是使用的 Spring 4.0 的条件 `@Condition` 注解以实现根据条件进行配置。同时使用了 Maven /Gradle 的**依赖传递解析机制**来实现 Spring 应用里面的自动配置。
+**6、无代码生成和 XML 配置**
 
-  > 第 6 点是第 3 点的补充。
+Spring Boot 没有引入任何形式的代码生成，它是使用的 Spring 4.0 的条件 `@Condition` 注解以实现根据条件进行配置。同时使用了 Maven /Gradle 的**依赖传递解析机制**来实现 Spring 应用里面的自动配置。
 
 ## Spring Boot 有什么优缺点？
 
-> 另外，这个问题的回答，我们是基于 [《Spring Boot浅谈(是什么/能干什么/优点和不足)》](https://blog.csdn.net/fly_zhyu/article/details/76407830) 整理，所以胖友主要看下这篇文章。
-
 **Spring Boot 的优点**
 
-> 艿艿：优点和 [「Spring Boot 提供了哪些核心功能？」](http://svip.iocoder.cn/Spring-Boot/Interview/#) 问题的答案，是比较重叠的。
+> 优点和 「Spring Boot 提供了哪些核心功能？」 问题的答案，是比较重叠的。
 
-- 1、使【编码】变简单。
-- 2、使【配置】变简单。
-- 3、使【部署】变简单。
-- 4、使【监控】变简单。
+- 快速构建项目。
+- 对主流开发框架的无配置集成。
+- 项目可独立运行，无须外部依赖Servlet容器。
+- 提供运行时的应用监控。
+- 极大地提高了开发、部署效率。
+- 与云计算的天然集成。
 
 **Spring Boot 的缺点**
 
-> 艿艿：如下的缺点，基于 [《Spring Boot浅谈(是什么/能干什么/优点和不足)》](https://blog.csdn.net/fly_zhyu/article/details/76407830)，考虑的出发点是把 Spring Boot 作为微服务的框架的选型的角度进行考虑。
+- 版本迭代速度很快，一些模块改动很大。
 
-- 1、没有提供相应的【服务发现和注册】的配套功能。
-
-  > 艿艿：当然，实际上 Spring Boot 本身是不需要提供这样的功能。服务发现和注册的功能，是在 Spring Cloud 中进行提供。
-
-- 2、自身的 acturator 所提供的【监控功能】，也需要与现有的监控对接。
-
-- 3、没有配套的【安全管控】方案。
-
-  > 艿艿：关于这一点，艿艿也有点迷糊，Spring Security 是可以比较方便的集成到 Spring Boot 中，所以不晓得这里的【安全管控】的定义是什么。所以这一点，面试的时候回答，可以暂时先省略。
-
-- 4、对于 REST 的落地，还需要自行结合实际进行 URI 的规范化工作
-
-  > 艿艿：这个严格来说，不算缺点。本身，是规范的范畴。
-
-所以，上面的缺点，严格来说可能不太适合在面试中回答。艿艿认为，Spring Boot 的缺点主要是，因为自动配置 Spring Bean 的功能，我们可能无法知道，哪些 Bean 被进行创建了。这个时候，如果我们想要自定义一些 Bean ，可能存在冲突，或者不知道实际注入的情况。
+- 由于不用自己做配置，报错时很难定位。
+- 网上现成的解决方案比较少。
 
 ## Spring Boot、Spring MVC 和 Spring 有什么区别？
 
-Spring 的完整名字，应该是 Spring Framework 。它提供了多个模块，Spring IoC、Spring AOP、Spring MVC 等等。所以，Spring MVC 是 Spring Framework 众多模块中的一个。
+Spring的完整名字，应该是 Spring Framework ，它是一个一站式的轻量级的Java开发框架，核心是控制反转（IoC）和面向切面编程（AOP），针对于开发的WEB层(Spring MVC)、业务层(IoC/AOP)、持久层(JDBC Template)等都提供了多种配置解决方案；
 
-而 Spring Boot 是构造在 Spring Framework 之上的 Boot 启动器，旨在更容易的配置一个 Spring 项目。
+Spring MVC是 Spring Framework 众多模块中的一个，主要用来处理WEB开发的路径映射和视图渲染；
 
-总结说来，如下图所示：
+Spring Boot 是构造在 Spring Framework 之上的 Boot 启动器，它遵循“约定大于配置”的原则，极大地简化了开发配置流程，集成了快速开发Spring的多个插件，简化了项目的开发配置流程，能够做到“自动配置，开箱即用”。
 
-![Spring Boot 对比 Spring MVC 对比 Spring ？](http://static.iocoder.cn/images/Spring/2018-12-26/02.png)
+所以，用最简练的语言概括就是:
+
+* Spring 是一个“引擎”;
+* Spring MVC 是基于Spring的一个 MVC 框架;
+* Spring Boot 是基于Spring4的条件注册的一套快速开发整合包。
 
 ## Spring Boot 中的 Starter 是什么？
 
-比较**通俗**的说法：
+谈到Spring Boot的特点， 每个人都能说出“**开箱即用、约定大于配置**”等词句，而这些都与Spring Boot Starter有关。
 
-> FROM [《Spring Boot 中 Starter 是什么》](https://www.cnblogs.com/EasonJim/p/7615801.html)
->
-> 比如我们要在 Spring Boot 中引入 Web MVC 的支持时，我们通常会引入这个模块 `spring-boot-starter-web` ，而这个模块如果解压包出来会发现里面什么都没有，只定义了一些 **POM** 依赖。如下图所示：![`spring-boot-starter-web`](http://static.iocoder.cn/images/Spring/2018-12-26/03.png)
->
-> 经过研究，Starter 主要用来简化依赖用的。比如我们之前做MVC时要引入日志组件，那么需要去找到log4j的版本，然后引入，现在有了Starter之后，直接用这个之后，log4j就自动引入了，也不用关心版本这些问题。
+SpringBoot 提供的依赖模块都约定以 `spring-boot-starter-` 作为命名的前缀，并且皆位于 `org.springframework.boot` 包或者命名空间下。当我们需要使用的时候，只要将 `spring-boot-starter-`作为依赖加入到当前应用的 classpath，则“开箱即用”，不需要做任何多余的配置。
 
-比较**书名**的说法：
+所有的 `spring-boot-starte`r 都有约定俗成的默认配置，但允许我们调整这些配置以改变默认的配置行为，即“约定优先于配置”。
 
-> FROM [《Spring Boot Starter 介绍》](http://www.importnew.com/27101.html)
->
-> 依赖管理是任何复杂项目的关键部分。以手动的方式来实现依赖管理不太现实，你得花更多时间，同时你在项目的其他重要方面能付出的时间就会变得越少。
->
-> Spring Boot Starter 就是为了解决这个问题而诞生的。Starter **POM** 是一组方便的依赖描述符，您可以将其包含在应用程序中。您可以获得所需的所有 Spring 和相关技术的一站式服务，无需通过示例代码搜索和复制粘贴依赖。
-
-## Spring Boot 常用的 Starter 有哪些？
+**Spring Boot 常用的 Starter 有：**
 
 - `spring-boot-starter-web` ：提供 Spring MVC + 内嵌的 Tomcat 。
 - `spring-boot-starter-data-jpa` ：提供 Spring JPA + Hibernate 。
 - `spring-boot-starter-data-redis` ：提供 Redis 。
 - `mybatis-spring-boot-starter` ：提供 MyBatis 。
 
-## Spring Boot Starter原理
+## pring-boot-starter-parent 有什么用?
+
+新创建一个 SpringBoot 项目，默认都是有 parent 的，这个 parent 就是 s`pring-boot-starter-parent` ，spring-boot-starter-parent 主要有如下作用：
+
+1. 定义了 Java 编译版本为 1.8 。
+2. 使用 UTF-8 格式编码。
+3. 继承自 `spring-boot-dependencies`，这个里边定义了依赖的版本，也正是因为继承了这个依赖，所以我们在写依赖时才不需要写版本号。
+4. 执行打包操作的配置。
+5. 自动化的资源过滤。
+6. 自动化的插件配置。
+7. 针对 `application.properties` 和 `application.yml` 的资源过滤，包括通过 profile 定义的不同环境的配置文件，例如 `application-dev.properties` 和 `application-dev.yml`。
 
 ## 创建一个 Spring Boot Project 的最简单的方法是什么？
 
 Spring Initializr 是创建 Spring Boot Projects 的一个很好的工具。打开 `"https://start.spring.io/"` 网站，我们可以看到 Spring Initializr 工具，如下图所示：
 
-![Spring Initializr](http://static.iocoder.cn/images/Spring/2018-12-26/04.png)
+<div align="center">  
+<img src="http://static.iocoder.cn/images/Spring/2018-12-26/04.png" width="600px"/>
+</div>
 
-- 图中的每一个**红线**，都可以填写相应的配置。相信胖友都很熟悉，就不哔哔了。
+- 图中的每一个**红线**，都可以填写相应的配置。
 - 点击生 GenerateProject ，生成 Spring Boot Project 。
 - 将项目导入 IDEA ，记得选择现有的 Maven 项目。
 
@@ -146,7 +190,7 @@ Spring Initializr 是创建 Spring Boot Projects 的一个很好的工具。打�
 </parent>
 ```
 
-② 方式二：导入 spring-boot-dependencies 项目依赖。配置代码如下：
+② 方式二：导入 `spring-boot-dependencies` 项目依赖。配置代码如下：
 
 ```java
 <dependencyManagement>
@@ -166,10 +210,6 @@ Spring Initializr 是创建 Spring Boot Projects 的一个很好的工具。打�
 
 因为一般我们的项目中，都有项目自己的 Maven parent 项目，所以【方式一】显然会存在冲突。所以实际场景下，推荐使用【方式二】。
 
-详细的，推荐阅读 [《Spring Boot 不使用默认的 parent，改用自己的项目的 parent》](https://blog.csdn.net/rainbow702/article/details/55046298) 文章。
-
-另外，在使用 Spring Cloud 的时候，也可以使用这样的方式。
-
 ## 运行 Spring Boot 有哪几种方式？
 
 - 1、打包成 Fat Jar ，直接使用 `java -jar` 运行。目前主流的做法，推荐。
@@ -179,8 +219,6 @@ Spring Initializr 是创建 Spring Boot Projects 的一个很好的工具。打�
 ## 如何打包 Spring Boot 项目？
 
 通过引入 `spring-boot-maven-plugin` 插件，执行 `mvn clean package` 命令，将 Spring Boot 项目打成一个 Fat Jar 。后续，我们就可以直接使用 `java -jar` 运行。
-
-关于 `spring-boot-maven-plugin` 插件，更多详细的可以看看 [《创建可执行 jar》](https://qbgbook.gitbooks.io/spring-boot-reference-guide-zh/II. Getting started/11.5. Creating an executable jar.html) 。
 
 ## 如果更改内嵌 Tomcat 的端口？
 
@@ -212,6 +250,27 @@ Spring Initializr 是创建 Spring Boot Projects 的一个很好的工具。打�
 
 关于如何使用 `spring-boot-devtools` 和 Spring Loaded 插件，胖友可以看看 [《Spring Boot 学习笔记：Spring Boot Developer Tools 与热部署》](https://segmentfault.com/a/1190000014488100) 。
 
+## Spring Boot 2.X 有什么新特性？
+
+1. 起步 JDK 8 和支持 JDK 9
+2. 第三方库的升级
+3. Reactive Spring
+4. HTTP/2 支持
+5. 配置属性的绑定
+6. Gradle 插件
+7. Actuator 改进
+8. 数据支持的改进
+9. Web 的改进
+10. 支持 Quartz 自动配置
+11. 测试的改进
+12. ... …
+
+## 如何在 Spring Boot 启动的时候运行一些特殊的代码？
+
+如果需要在 SpringApplication 启动后执行一些特殊的代码，你可以实现 ApplicationRunner 或 CommandLineRunner 接口，这两个接口工作方式相同，都只提供单一的 run 方法，该方法仅在 `SpringApplication#run(...)` 方法**完成之前调用**。
+
+# 配置篇
+
 ## Spring Boot 的配置文件有哪几种格式？
 
 Spring Boot 目前支持两种格式的配置文件：
@@ -236,20 +295,13 @@ Spring Boot 目前支持两种格式的配置文件：
 YAML 是一种人类可读的数据序列化语言，它通常用于配置文件。
 
 - 与 Properties 文件相比，如果我们想要在配置文件中添加复杂的属性 YAML 文件就更加**结构化**。从上面的示例，我们可以看出 YAML 具有**分层**配置数据。
-
-- 当然 YAML 在 Spring 会存在一个缺陷，`@PropertySource`注解不支持读取 YAML 配置文件，仅支持 Properties 配置文件。
-
-  - 不过这个问题也不大，可以麻烦一点使用 [`@Value`](https://blog.csdn.net/lafengwnagzi/article/details/74178374) 注解，来读取 YAML 配置项。
-
-实际场景下，艿艿相对比较喜欢使用 Properties 配置文件。个人喜欢~当然，YAML 已经越来越流行了。
+- 当然 YAML 在 Spring 会存在一个缺陷，`@PropertySource`注解不支持读取 YAML 配置文件，仅支持 Properties 配置文件。不过这个问题也不大，可以麻烦一点使用 `@Value`注解，来读取 YAML 配置项。
 
 ## Spring Boot 默认配置文件是什么？
 
 对于 Spring Boot 应用，默认的配置文件根目录下的 **application** 配置文件，当然可以是 Properties 格式，也可以是 YAML 格式。
 
 可能有胖友说，我在网上看到面试题中，说还有一个根目录下的 **bootstrap** 配置文件。这个是 Spring Cloud 新增的启动配置文件，[需要引入 `spring-cloud-context` 依赖后，才会进行加载](https://my.oschina.net/freeskyjs/blog/1843048)。它的特点和用途主要是：
-
-> 参考 [《Spring Cloud 中配置文件名 bootstrap.yml 和 application.yml 区别》](https://my.oschina.net/neverforget/blog/1525947) 文章。
 
 - 【特点】因为 bootstrap 由父 ApplicationContext 加载，比 application 优先加载。
 - 【特点】因为 bootstrap 优先于 application 加载，所以不会被它覆盖。
@@ -259,150 +311,178 @@ YAML 是一种人类可读的数据序列化语言，它通常用于配置文件
 
 ## Spring Boot 如何定义多套不同环境配置？
 
-可以参考 [《Spring Boot 教程 - Spring Boot Profiles 实现多环境下配置切换》](https://blog.csdn.net/top_code/article/details/78570047) 一文。
+生产环境的配置文件的安全性，显然我们不能且不应该把生产的配置放到项目的 Git 仓库中进行管理。那么应该怎么办呢？
 
-但是，需要考虑一个问题，生产环境的配置文件的安全性，显然我们不能且不应该把生产的配置放到项目的 Git 仓库中进行管理。那么应该怎么办呢？
-
-- 方案一，生产环境的配置文件放在生产环境的服务器中，以 `java -jar myproject.jar --spring.config.location=/xxx/yyy/application-prod.properties` 命令，设置 参数 `spring.config.location` 指向配置文件。
-- 方案二，使用 Jenkins 在执行打包，配置上 Maven Profile 功能，使用服务器上的配置文件。😈 整体来说，和【方案一】的差异是，将配置文件打包进了 Jar 包中。
+- 方案一，生产环境的配置文件放在生产环境的服务器中，以 `java -jar myproject.jar --spring.config.location=/xxx/yyy/application-prod.properties` 命令，设置参数 `spring.config.location` 指向配置文件（`application-dev.properties`、`application-prod.properties`）。
+- 方案二，使用 Jenkins 在执行打包，配置上 Maven Profile 功能，使用服务器上的配置文件。 整体来说，和【方案一】的差异是，将配置文件打包进了 Jar 包中。
 - 方案三，使用配置中心。
+
+> **什么是Spring Profiles？**
+>
+> * 主要用来**区分环境**； Spring Profiles 允许用户根据配置文件（dev，test，prod 等）来注册 bean。因此，当应用程序在开发中运行时，只有某些 bean 可以加载，而在 PRODUCTION中，某些其他 bean 可以加载。假设我们的要求是 Swagger 文档仅适用于 QA 环境，并且禁用所有其他文档。这可以使用配置文件来完成。Spring Boot 使得使用配置文件非常简单。
+
+## Spring Boot 配置文件不同加载位置？
+
+Spring Boot 启动会扫描以下位置的`application.properties`或者`application.yml`文件作为Spring boot的默认配置文件。加载的优先度为：
+
+1. `– file:./config/`
+
+2. `– file:./`
+
+3. `– classpath:/config/`
+
+4. `– classpath:/`
+
+优先级由高到底，**高优先级配置内容**会覆盖**低优先级配置**的重复内容。
+
+Spring Boot会从这四个位置**全部加载**主配置文件——**互补配置**。
+
+![](https://img-blog.csdnimg.cn/20200923111052310.png)
+
+
+
+==我们还可以通过spring.config.location来改变默认的配置文件位置。==项目打包好以后，我们可以使用命令行参数的形式，启动项目的时候来指定配置文件的新位置，指定配置文件和默认加载的这些配置文件共同起作用形成互补配置。
+
+```shell
+java -jar spring-boot-config-0.0.1-SNAPSHOT.jar --spring.config.location=C:/application.properties
+```
 
 ## Spring Boot 配置加载顺序？
 
-在 Spring Boot 中，除了我们常用的 application 配置文件之外，还有：
+> 官方文档：[Externalized Configuration](https://docs.spring.io/spring-boot/docs/2.5.0-SNAPSHOT/reference/html/features.html#features.external-config)
 
-- 系统环境变量
-- 命令行参数
-- 等等…
+在 Spring Boot 中，除了我们常用的 application 配置文件之外，还有：系统环境变量，命令行参数... ...
 
-参考 [《Externalized Configuration》](https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html) 文档，我们整理顺序如下：
+Spring Boot也可以从以下位置加载配置，**优先级从高到低，高优先级的配置覆盖低优先级的配置，所有的配置会形成互补配置**。
 
 1. `spring-boot-devtools`依赖的`spring-boot-devtools.properties`配置文件。
+2. 单元测试上的`@TestPropertySource`和`@SpringBootTest`注解指定的参数。（前者优先度高于后者）
+3. **命令行参数**：所有的配置都可以在命令行上进行指定，多个配置用空格分开：`--配置项=值`
 
-   > 这个灰常小众，具体说明可以看看 [《Spring Boot参考文档（12）开发者工具》](https://blog.csdn.net/u011499747/article/details/71746325) ，建议无视。
-
-2. 单元测试上的`@TestPropertySource`和`@SpringBootTest`注解指定的参数。
-
-   > 前者的优先级高于后者。可以看看 [《Spring、Spring Boot 和TestNG 测试指南 - @TestPropertySource》](https://segmentfault.com/a/1190000010854607) 一文。
-
-3. 命令行指定的参数。例如 `java -jar springboot.jar --server.port=9090` 。
+```shell
+java -jar spring-boot-config-0.0.1-SNAPSHOT.jar --server.port=8087  --server.context-path=/abc
+```
 
 4. 命令行中的 `spring.application.json` 指定参数。例如 `java -Dspring.application.json='{"name":"Java"}' -jar springboot.jar` 。
-
 5. ServletConfig 初始化参数。
-
 6. ServletContext 初始化参数。
-
 7. JNDI 参数。例如 `java:comp/env` 。
-
 8. Java 系统变量，即 `System#getProperties()` 方法对应的。
-
 9. 操作系统环境变量。
-
-10. RandomValuePropertySource 配置的 `random.*` 属性对应的值。
-
+10. RandomValuePropertySource配置的`random.*`属性值
 11. Jar **外部**的带指定 profile 的 application 配置文件。例如 `application-{profile}.yaml` 。
-
 12. Jar **内部**的带指定 profile 的 application 配置文件。例如 `application-{profile}.yaml` 。
-
 13. Jar **外部** application 配置文件。例如 `application.yaml` 。
-
 14. Jar **内部** application 配置文件。例如 `application.yaml` 。
-
 15. 在自定义的 `@Configuration` 类中定于的 `@PropertySource` 。
-
 16. 启动的 main 方法中，定义的默认配置。即通过 `SpringApplication#setDefaultProperties(Map<String, Object> defaultProperties)` 方法进行设置。
-
-嘿嘿，是不是很多很长，不用真的去记住。
-
-- 一般来说，面试官不会因为这个题目回答的不好，对你扣分。
-- 实际使用时，做下测试即可。
-- 每一种配置方式的详细说明，可以看看 [《Spring Boot 参考指南（外部化配置）》](https://segmentfault.com/a/1190000015069140) 。
 
 ## Spring Boot 有哪些配置方式？
 
 和 Spring 一样，一共提供了三种方式。
 
-- 1、XML 配置文件。
+1、XML 配置文件。
 
-  Bean 所需的依赖项和服务在 XML 格式的配置文件中指定。这些配置文件通常包含许多 bean 定义和特定于应用程序的配置选项。它们通常以 bean 标签开头。例如：
+Bean 所需的依赖项和服务在 XML 格式的配置文件中指定。这些配置文件通常包含许多 bean 定义和特定于应用程序的配置选项。它们通常以 bean 标签开头。例如：
+
+```java
+<bean id="studentBean" class="org.edureka.firstSpring.StudentBean">
+    <property name="name" value="Edureka"></property>
+</bean>
+```
+
+2、注解配置。
+
+您可以通过在相关的类，方法或字段声明上使用注解，将 Bean 配置为组件类本身，而不是使用 XML 来描述 Bean 装配。默认情况下，Spring 容器中未打开注解装配。因此，您需要在使用它之前在 Spring 配置文件中启用它。例如：
+
+```java
+<beans>
+<context:annotation-config/>
+<!-- bean definitions go here -->
+</beans>
+```
+
+3、**Java Config** 配置。
+
+Spring 的 Java 配置是通过使用 @Bean 和 @Configuration 来实现。
+
+- `@Bean` 注解扮演与 `<bean />` 元素相同的角色。
+
+- `@Configuration` 类允许通过简单地调用同一个类中的其他 `@Bean` 方法来定义 Bean 间依赖关系。
+
+- 例如：
 
   ```java
-  <bean id="studentBean" class="org.edureka.firstSpring.StudentBean">
-      <property name="name" value="Edureka"></property>
-  </bean>
+  @Configuration
+  public class StudentConfig {
+      
+      @Bean
+      public StudentBean myStudent() {
+          return new StudentBean();
+      }
+      
+  }
   ```
 
-- 2、注解配置。
-
-  您可以通过在相关的类，方法或字段声明上使用注解，将 Bean 配置为组件类本身，而不是使用 XML 来描述 Bean 装配。默认情况下，Spring 容器中未打开注解装配。因此，您需要在使用它之前在 Spring 配置文件中启用它。例如：
-
-  ```java
-  <beans>
-  <context:annotation-config/>
-  <!-- bean definitions go here -->
-  </beans>
-  ```
-
-- 3、Java Config 配置。
-
-  Spring 的 Java 配置是通过使用 @Bean 和 @Configuration 来实现。
-
-  - `@Bean` 注解扮演与 `<bean />` 元素相同的角色。
-
-  - `@Configuration` 类允许通过简单地调用同一个类中的其他 `@Bean` 方法来定义 Bean 间依赖关系。
-
-  - 例如：
-
-    ```java
-    @Configuration
-    public class StudentConfig {
-        
-        @Bean
-        public StudentBean myStudent() {
-            return new StudentBean();
-        }
-        
-    }
-    ```
-    
-    - 是不是很熟悉 😈
 
 目前主要使用 **Java Config** 配置为主。当然，三种配置方式是可以混合使用的。例如说：
 
-- Dubbo 服务的配置，艿艿喜欢使用 XML 。
-- Spring MVC 请求的配置，艿艿喜欢使用 `@RequestMapping` 注解。
-- Spring MVC 拦截器的配置，艿艿喜欢 Java Config 配置。
+- Dubbo 服务的配置，喜欢使用 XML 。
+- Spring MVC 请求的配置，喜欢使用 `@RequestMapping` 注解。
+- Spring MVC 拦截器的配置，喜欢 Java Config 配置。
 
-------
+## 什么是 JavaConfig？
 
-另外，现在已经是 Spring Boot 的天下，所以更加是 **Java Config** 配置为主。
+Spring JavaConfig 是 Spring 社区的产品，它提供了配置 Spring IoC 容器的纯Java 方法。因此它有助于避免使用 XML 配置。使用 JavaConfig 的优点在于：
 
-## Spring Boot 的核心注解是哪个？
+- **面向对象的配置**。 由于配置被定义为 JavaConfig 中的类，因此用户可以充分利用 Java 中的面向对象功能。一个配置类可以继承另一个，重写它的@Bean 方法等。
+- **减少或消除 XML 配置**。 基于依赖注入原则的外化配置的好处已被证明。但是，许多开发人员不希望在 XML 和 Java 之间来回切换。JavaConfig 为开发人员提供了一种纯 Java 方法来配置与 XML 配置概念相似的 Spring 容器。从技术角度来讲，只使用 JavaConfig 配置类来配置容器是可行的，但实际上很多人认为将JavaConfig 与 XML 混合匹配是理想的。
+- **类型安全和重构友好**。 JavaConfig 提供了一种类型安全的方法来配置 Spring容器。由于 Java 5.0 对泛型的支持，现在可以按类型而不是按名称检索 bean，不需要任何强制转换或基于字符串的查找。
+
+## Spring Boot 读取配置的方式？
+
+Spring Boot 目前支持 **2** 种读取配置：
+
+* `@Value` 注解，读取配置到属性，最常用。
+
+* `@ConfigurationProperties` 注解，读取配置到类上。
+
+两者都可以和 `@PropertySource` 注解一起使用，指定使用的配置文件。
+
+| 比较                 | @ConfigurationProperties | @Value     |
+| -------------------- | ------------------------ | ---------- |
+| 功能                 | 批量注入配置文件中的属性 | 一个个指定 |
+| 松散绑定（松散语法） | 支持                     | 不支持     |
+| SpEL                 | 不支持                   | 支持       |
+| JSR303数据校验       | 支持                     | 不支持     |
+| 复杂类型封装         | 支持                     | 不支持     |
+
+> 松散绑定（Realxed binding）是指person.firstName/first-name/first_name不同写法都能识别。
+
+不论配置文件yml还是properties他们都能获取到值。在某个业务逻辑中需要获取配置文件中的某项值——使用@Value；专门编写了一个JavaBean来和配置文件进行映射——使用@ConfigurationProperties。
+
+## Spring Boot 的核心注解？
 
 ```java
-package cn.iocoder.skywalking.web01;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
+/**
+ *  @Spring BootApplication 标注主程序类，说明这是一个Spring Boot应用
+ */
 @SpringBootApplication
-public class Web01Application {
-
+public class HelloWorldApplication {
     public static void main(String[] args) {
-        SpringApplication.run(Web01Application.class, args);
-    }
 
+        // 启动Spring应用
+        SpringApplication.run(HelloWorldApplication.class,args);
+    }
 }
 ```
 
-- `@SpringBootApplication` 注解，就是 Spring Boot 的核心注解。
+`@SpringBootApplication` 注解，就是 Spring Boot 的核心注解。**@Spring BootApplication 标注在某个类上说明这个类是Spring Boot的主配置类**，Spring Boot就应该运行这个类的main方法来启动Spring Boot应用。
 
 `org.springframework.boot.autoconfigure.@SpringBootApplication` 注解的代码如下：
 
 ```java
 // SpringBootApplication.java
-
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
@@ -419,110 +499,357 @@ public class Web01Application {
 )}
 )
 public @interface SpringBootApplication {
-    @AliasFor(
-        annotation = EnableAutoConfiguration.class
-    )
-    Class<?>[] exclude() default {};
+	// omit   
+}
 
-    @AliasFor(
-        annotation = EnableAutoConfiguration.class
-    )
-    String[] excludeName() default {};
-
-    @AliasFor(
-        annotation = ComponentScan.class,
-        attribute = "basePackages"
-    )
-    String[] scanBasePackages() default {};
-
-    @AliasFor(
-        annotation = ComponentScan.class,
-        attribute = "basePackageClasses"
-    )
-    Class<?>[] scanBasePackageClasses() default {};
+// SpringBootConfiguration.java
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Configuration //实际上它也是一个配置类
+public @interface SpringBootConfiguration {
 }
 ```
 
-- 它组合了 3 个注解，详细说明，胖友看看 [《Spring Boot 系列：@SpringBootApplication 注解》](https://blog.csdn.net/claram/article/details/75125749) 。
+大概可以把 `@SpringBootApplication`看作是 `@Configuration`、`@EnableAutoConfiguration`、`@ComponentScan` 注解的集合。这三个注解的作用分别是：
 
-- `@Configuration` 注解，指定类是 **Bean 定义**的配置类。
+- `@EnableAutoConfiguration`：启用 SpringBoot 的自动配置机制（ Spring Boot带来的）；
+- `@Configuration`：允许在上下文中注册额外的 bean 或导入其他配置类；
+- `@ComponentScan`： 扫描被`@Component` (`@Service`，`@Controller`)注解的 bean，注解默认会扫描启动类所在的包下所有的类 ，可以自定义不扫描某些 bean。
 
-  > `@Configuration` 注解，来自 `spring-context` 项目，用于 Java Config ，不是 Spring Boot 新带来的。
+## Spring Boot 自动配置原理？
 
-- `#ComponentScan` 注解，扫描指定包下的 Bean 们。
+上面提到`@EnableAutoConfiguration` 注解，打开了Spring Boot 自动配置的功能。如何实现的呢？先说总结：
 
-  > `@ComponentScan` 注解，来自 `spring-context` 项目，用于 Java Config ，不是 Spring Boot 新带来的。
+* Spring Boot 通过`@EnableAutoConfiguration`开启自动装配，通过 `SpringFactoriesLoader` 最终加载`META-INF/spring.factories`中的自动配置类实现自动装配，这些自动配置类都是以`AutoConfiguration`结尾命名的，而自动配置类的相关属性都是封装在对应的`Properties`结尾命名的类中，通过`@ConfigurationProperties`注解与全局配置文件中对应的属性进行绑定的。
+* 自动配置类其实就是通过`@Conditional`按需加载的配置类，想要其生效必须引入`spring-boot-starter-xxx`包实现起步依赖。
 
-- `@EnableAutoConfiguration` 注解，打开自动配置的功能。如果我们想要关闭某个类的自动配置，可以设置注解的 `exclude` 或 `excludeName` 属性。
+------
 
-  > `@EnableAutoConfiguration` 注解，来自 `spring-boot-autoconfigure` 项目，**它才是 Spring Boot 新带来的**。
+@EnableAutoConfiguration用于开启自动配置功能：
 
-## 什么是 Spring Boot 自动配置？
+```java
+// EnableAutoConfiguration.java
+// ... ...
+@AutoConfigurationPackage
+@Import({AutoConfigurationImportSelector.class})
+public @interface EnableAutoConfiguration {
+	// omit
+}
 
-在 [「Spring Boot 的核心注解是哪个？」](http://svip.iocoder.cn/Spring-Boot/Interview/#) 中，我们已经看到，使用 `@@EnableAutoConfiguration` 注解，打开 Spring Boot 自动配置的功能。具体如何实现的，可以看看如下两篇文章：
+// AutoConfigurationPackage.java
+// ... ...
+@Import({Registrar.class})
+public @interface AutoConfigurationPackage {
+    // omit
+}
+```
 
-- [《@EnableAutoConfiguration 注解的工作原理》](https://www.jianshu.com/p/464d04c36fb1) 。
-- [《一个面试题引起的 Spring Boot 启动解析》](https://juejin.im/post/5b679fbc5188251aad213110)
-- 建议，能一边调试，一边看这篇文章。调试很简单，任一搭建一个 Spring Boot 项目即可。
+@**AutoConfigurationPackage**，它用于自动配置包，点进去可以发现**@Import({Registrar.class})** 
 
-如下是一个比较简单的总结：
+* @Import是Spring中的底层注解，给容器中导入一个组件，导入的组件由Registrar.class指定，==将主配置类（@Spring BootApplication标注的类）的所在包及下面所在子包里面的所有组件扫描到Spring容器。==
 
-1. Spring Boot 在启动时扫描项目所依赖的 jar 包，寻找包含`spring.factories` 文件的 jar 包。
-2. 根据 `spring.factories` 配置加载 AutoConfigure 类。
-3. 根据 [`@Conditional` 等条件注解](http://svip.iocoder.cn/Spring-Boot/Interview/Spring Boot 条件注解) 的条件，进行自动配置并将 Bean 注入 Spring IoC 中。
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20210508094441448.png" width="800px"/>
+</div>
 
-## Spring Boot 有哪几种读取配置的方式？
+**@Import({AutoConfigurationImportSelector.class})**：导入组件的选择器，将所有需要导入的组件以全类名的方式返回，这些组件就会被添加到容器中。它会给容器中导入非常多的自动配置类（xxxAutoConfiguration），也就是给容器中导入这个场景需要的所有组件，并配置好这些组件。
 
-Spring Boot 目前支持 **2** 种读取配置：
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20201016140609878.png" width="1000px"/>
+</div>
 
-1. `@Value` 注解，读取配置到属性。最最最常用。
+查看`spring-boot-autoconfigure-2.3.3.RELEASE.jar`下的`META-INF/spring.factories`：
 
-   > 另外，支持和 `@PropertySource` 注解一起使用，指定使用的配置文件。
+```properties
+# Auto Configure
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+org.springframework.boot.autoconfigure.admin.SpringApplicationAdminJmxAutoConfiguration,\
+org.springframework.boot.autoconfigure.aop.AopAutoConfiguration,\
+org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration,\
+org.springframework.boot.autoconfigure.batch.BatchAutoConfiguration,\
+org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration,\
+org.springframework.boot.autoconfigure.cassandra.CassandraAutoConfiguration,\
+org.springframework.boot.autoconfigure.cloud.CloudAutoConfiguration,\
+org.springframework.boot.autoconfigure.context.ConfigurationPropertiesAutoConfiguration,\
+org.springframework.boot.autoconfigure.context.MessageSourceAutoConfiguration,\
+org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration,\
+org.springframework.boot.autoconfigure.couchbase.CouchbaseAutoConfiguration,\
+org.springframework.boot.autoconfigure.dao.PersistenceExceptionTranslationAutoConfiguration,\
+org.springframework.boot.autoconfigure.data.cassandra.CassandraDataAutoConfiguration,\
+// omit
+```
 
-2. `@ConfigurationProperties` 注解，读取配置到类上。
+可见，Spring Boot在启动的时候从类路径下的META-INF/spring.factories中获取EnableAutoConfiguration指定的值，将这些值作为自动配置类导入到容器中，自动配置类就生效，帮我们进行自动配置工作。
 
-   > 另外，支持和 `@PropertySource` 注解一起使用，指定使用的配置文件。
+J2EE的整体整合解决方案和自动配置都在`spring-boot-autoconfigure-2.3.3.RELEASE.jar`中。
 
-详细的使用方式，可以参考 [《Spring Boot 读取配置的几种方式》](https://aoyouzi.iteye.com/blog/2422837) 。
+下面以HttpEncodingAutoConfiguration（Http编码自动配置）为例：
 
-## 使用 Spring Boot 后，项目结构是怎么样的呢？
+```java
+@Configuration //表示这是一个配置类，以前编写的配置文件一样，也可以给容器中添加组件
+// 启动指定类的ConfigurationProperties功能，将配置文件中对应的和HttpEncodingProperties绑定起来
+// 并把HttpEncodingProperties加入到IoC容器中。
+@EnableConfigurationProperties(HttpEncodingProperties.class)  
+// 判断当前应用是否是web应用，如果是则当前配置类生效。
+@ConditionalOnWebApplication
+// 判断当前项目有没有这个类CharacterEncodingFilter，SpringMVC中进行乱码解决的过滤器。
+@ConditionalOnClass(CharacterEncodingFilter.class) 
+// 判断配置文件中是否存在某个配置  spring.http.encoding.enabled，如果不存在，判断也是成立的。
+// 即使我们配置文件中不配置pring.http.encoding.enabled=true，也是默认生效的。
+@ConditionalOnProperty(prefix = "spring.http.encoding", value = "enabled", matchIfMissing = true)  
+public class HttpEncodingAutoConfiguration {
+  	// 它已经和Spring Boot的配置文件映射
+  	private final HttpEncodingProperties properties;
+  
+   // 只有一个有参构造器的情况下，参数的值就会从容器中获取
+  	public HttpEncodingAutoConfiguration(HttpEncodingProperties properties) {
+		this.properties = properties;
+	}
+  
+    @Bean //给容器中添加一个组件，这个组件的某些值需要从properties中获取。
+	@ConditionalOnMissingBean(CharacterEncodingFilter.class) //判断容器没有这个组件？
+	public CharacterEncodingFilter characterEncodingFilter() {
+		CharacterEncodingFilter filter = new OrderedCharacterEncodingFilter();
+        // 配置文件书写内容，都是来自这些properties
+        // spring.http.encoding.enabled=true
+		// spring.http.encoding.charset=utf-8
+		// spring.http.encoding.force=true
+		filter.setEncoding(this.properties.getCharset().name());
+		filter.setForceRequestEncoding(this.properties.shouldForce(Type.REQUEST));
+		filter.setForceResponseEncoding(this.properties.shouldForce(Type.RESPONSE));
+		return filter;
+	}
+```
 
-我们先来说说项目的分层。一般来说，主流的有两种方式：
+根据当前不同的条件判断，决定这个配置类是否生效。一旦这个配置类生效，这个配置类就会给容器中添加各种组件，这些组件的属性是从对应的properties类中获取的，这些类里面的每一个属性又是和配置文件绑定的。
 
-- 方式一，`controller`、`service`、`dao` 三个包，每个包下面添加相应的 XXXController、YYYService、ZZZDAO 。
-- 方式二，按照业务模块分包，每个包里面放 Controller、Service、DAO 类。例如，业务模块分成 `user`、`order`、`item` 等等包，在 `user` 包里放 UserController、UserService、UserDAO 类。
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20201016235003799.png" width="800px"/>
+</div>
 
-那么，使用 Spring Boot 的项目怎么分层呢？艿艿自己的想法
+而所有在配置文件中能配置的属性都是在`xxxProperties`类中封装的，配置文件能配置什么就可以参照某个功能对应的这个属性类。
 
-- 现在项目都会进行服务化分拆，每个项目不会特别复杂，所以建议使用【方式一】。
-- 以前的项目，大多是单体的项目，动则项目几万到几十万的代码，当时多采用【方式二】。
+```java
+// 从配置文件中获取指定的值和bean的属性进行绑定。
+@ConfigurationProperties(prefix = "spring.http.encoding")  
+public class HttpEncodingProperties {
 
-下面是一个简单的 Spring Boot 项目的 Demo ，如下所示：![Spring Boot 项目的 Demo](http://static.iocoder.cn/images/Spring/2018-12-26/05.png)
+   public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
+}
+```
 
-## 如何在 Spring Boot 启动的时候运行一些特殊的代码？
+## @Conditional 扩展注解有哪些？
 
-如果需要在 SpringApplication 启动后执行一些特殊的代码，你可以实现 ApplicationRunner 或 CommandLineRunner 接口，这两个接口工作方式相同，都只提供单一的 run 方法，该方法仅在 `SpringApplication#run(...)` 方法**完成之前调用**。
+ @**Conditional**派生注解：@Conditional指定的条件成立，才给容器中添加组件，配置配里面的所有内容才生效。
 
-一般情况下，我们不太会使用该功能。如果真需要，胖友可以详细看看 [《使用 ApplicationRunner 或 CommandLineRunner 》](https://qbgbook.gitbooks.io/spring-boot-reference-guide-zh/IV. Spring Boot features/23.8 Using the ApplicationRunner or CommandLineRunner.html) 。
+| @Conditional扩展注解            | 作用（判断是否满足当前指定条件）                 |
+| ------------------------------- | ------------------------------------------------ |
+| @ConditionalOnJava              | 系统的java版本是否符合要求                       |
+| @ConditionalOnBean              | 容器中存在指定Bean                               |
+| @ConditionalOnMissingBean       | 容器中不存在指定Bean                             |
+| @ConditionalOnExpression        | 满足SpEL表达式指定                               |
+| @ConditionalOnClass             | 系统中有指定的类                                 |
+| @ConditionalOnMissingClass      | 系统中没有指定的类                               |
+| @ConditionalOnSingleCandidate   | 容器中只有一个指定的Bean，或者这个Bean是首选Bean |
+| @ConditionalOnProperty          | 系统中指定的属性是否有指定的值                   |
+| @ConditionalOnResource          | 类路径下是否存在指定资源文件                     |
+| @ConditionalOnWebApplication    | 当前是web环境                                    |
+| @ConditionalOnNotWebApplication | 当前不是web环境                                  |
+| @ConditionalOnJndi              | JNDI存在指定项                                   |
 
-## Spring Boot 2.X 有什么新特性？
+**自动配置类必须在一定的条件下才能生效**，我们怎么知道哪些自动配置类生效呢?
 
-1. 起步 JDK 8 和支持 JDK 9
-2. 第三方库的升级
-3. Reactive Spring
-4. HTTP/2 支持
-5. 配置属性的绑定
-6. Gradle 插件
-7. Actuator 改进
-8. 数据支持的改进
-9. Web 的改进
-10. 支持 Quartz 自动配置
-11. 测试的改进
-12. 其它…
+在配置文件中启用 **debug=true**属性，让控制台打印自动配置报告，这样我们就可以很方便的知道哪些自动配置类生效。
 
-详细的说明，可以看看 [《Spring Boot 2.0系列文章(二)：Spring Boot 2.0 新特性详解》](http://www.54tianzhisheng.cn/2018/03/06/SpringBoot2-new-features) 。
+```java
+=========================
+AUTO-CONFIGURATION REPORT
+=========================
 
-# 整合篇
+
+Positive matches:（自动配置类启用的）
+-----------------
+
+   DispatcherServletAutoConfiguration matched:
+      - @ConditionalOnClass found required class 'org.springframework.web.servlet.DispatcherServlet'; @ConditionalOnMissingClass did not find unwanted class (OnClassCondition)
+      - @ConditionalOnWebApplication (required) found StandardServletEnvironment (OnWebApplicationCondition)
+        
+    
+Negative matches:（没有启动，没有匹配成功的自动配置类）
+-----------------
+
+   ActiveMQAutoConfiguration:
+      Did not match:
+         - @ConditionalOnClass did not find required classes 'javax.jms.ConnectionFactory', 'org.apache.activemq.ActiveMQConnectionFactory' (OnClassCondition)
+
+   AopAutoConfiguration:
+      Did not match:
+         - @ConditionalOnClass did not find required classes 'org.aspectj.lang.annotation.Aspect', 'org.aspectj.lang.reflect.Advice' (OnClassCondition)
+```
+
+# 安全篇
+
+## 如何集成 Spring Boot 和 Spring Security ？
+
+目前比较主流的安全框架有两个：
+
+1. Spring Security
+2. Apache Shiro
+
+对于任何项目来说，安全认证总是少不了，同样适用于使用 Spring Boot 的项目。相对来说，Spring Security 现在会比 Apache Shiro 更流行。
+
+Spring Boot 和 Spring Security 的配置方式比较简单：
+
+1. 引入 `spring-boot-starter-security` 的依赖。
+2. 继承 WebSecurityConfigurerAdapter ，添加**自定义**的安全配置。
+
+当然，每个项目的安全配置是不同的，需要胖友自己选择。更多详细的使用，建议认真阅读如下文章：
+
+- [《Spring Boot中 使用 Spring Security 进行安全控制》](http://blog.didispace.com/springbootsecurity/) ，快速上手。
+- [《Spring Security 实现原理与源码解析系统 —— 精品合集》](http://www.iocoder.cn/Spring-Security/good-collection/) ，深入源码。
+- 安全相关可看看 [《Spring Boot 十种安全措施》](https://www.jdon.com/49653) 一文。
+
+## 如何集成 Spring Boot 和 Spring Security OAuth2 ？
+
+参见 [《Spring Security OAuth2 入门》](http://www.iocoder.cn/Spring-Security/OAuth2-learning/) 文章，内容有点多。
+
+## 比较一下Spring Security 和Shiro各自的优缺点 ?
+
+由于SpringBoot官方提供了大量的非常方便的开箱即用的Starter，包括Spring Security的Starter ，使得在 SpringBoot中使用Spring Security变得更加容易，甚至只需要添加一个依赖就可以保护所有的接口，所以，如果是SpringBoot 项目，一般选择 Spring Security 。当然这只是一个建议的组合，单纯从技术上来说，无论怎么组合，都是没有问题的。Shiro和Spring Security相比，主要有如下一些特点：
+
+1. Spring Security 是一个重量级的安全管理框架；Shiro 则是一个轻量级的安全管理框架；
+2. Spring Security 概念复杂，配置繁琐；Shiro 概念简单、配置简单；
+3. Spring Security 功能强大；Shiro 功能简单。
+
+## Spring Boot 中如何解决跨域问题 ?
+
+跨域可以在前端通过 JSONP 来解决，但是 JSONP 只可以发送 GET 请求，无法发送其他类型的请求，在 RESTful 风格的应用中，就显得非常鸡肋，因此我们推荐在后端通过 **CORS**，（Cross-origin resource sharing） 来解决跨域问题。这种解决方案并非 Spring Boot 特有的，在传统的 SSM 框架中，就可以通过 CORS 来解决跨域问题，只不过之前我们是在 XML 文件中配置CORS ，现在可以通过实现`WebMvcConfigurer`接口然后重写`addCorsMappings`方法解决跨域问题。
+
+```java
+@Configuration
+public class CorsConfig implements WebMvcConfigurer {
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("*")
+                .allowCredentials(true)
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .maxAge(3600);
+    }
+}
+```
+
+项目中前后端分离部署，所以需要解决跨域的问题。 我们使用cookie存放用户登录的信息，在Spring拦截器进行权限控制，当权限不符合时，直接返回给用户固定的json结果。 当用户登录以后，正常使用；当用户退出登录状态时或者token过期时，由于拦截器和跨域的顺序有问题，出现了跨域的现象。 我们知道一个http请求，先走filter，到达servlet后才进行拦截器的处理，如果我们把cors放在filter里，就可以优先于权限拦截器执行。
+
+```java
+@Configuration
+public class CorsConfig {
+    @Bean
+    public CorsFilter corsFilter() {
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        corsConfiguration.addAllowedOrigin("*");
+        corsConfiguration.addAllowedHeader("*");
+        corsConfiguration.addAllowedMethod("*");
+        corsConfiguration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = 
+            new UrlBasedCorsConfigurationSource();
+        urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
+        return new CorsFilter(urlBasedCorsConfigurationSource);
+    }
+}
+```
+
+## 什么是 CSRF 攻击？
+
+CSRF 代表跨站请求伪造。这是一种攻击，迫使最终用户在当前通过身份验证的Web 应用程序上执行不需要的操作。CSRF 攻击专门针对状态改变请求，而不是数据窃取，因为攻击者无法查看对伪造请求的响应。
+
+## Spring Boot 中的监视器是什么
+
+`spring-boot-actuator` 提供 Spring Boot 的监视器功能，可帮助我们访问生产环境中正在运行的应用程序的**当前状态**。有几个指标必须在生产环境中进行检查和监控。即使一些外部应用程序可能正在使用这些服务来向相关人员触发警报消息。监视器模块公开了一组可直接作为HTTPURL访问的REST端点来检查状态。
+
+```java
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-actuator</artifactId>
+    <version>2.0.4.RELEASE</version>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+```
+
+```java
+server.tomcat.uri-encoding=UTF-8
+# 程序运行端口
+server.port=8888
+# 监视程序运行端口
+management.server.port=8090
+# 激活所有的内置Endpoints
+management.endpoints.web.exposure.include=*
+# 开启shutdown这个endpoint
+management.endpoint.shutdown.enabled=true
+```
+
+Spring Boot 2.X 默认情况下，`spring-boot-actuator` 产生的 Endpoint 是没有安全保护的，但是 Actuator 可能暴露敏感信息。所以一般的做法是，引入 `spring-boot-start-security` 依赖，使用 Spring Security 对它们进行安全保护。
+
+## 如何在 Spring Boot 中禁用Actuator端点安全性？
+
+默认情况下，所有敏感的HTTP端点都是安全的，只有具有ACTUATOR角色的用户才能访问它们。安全性是使用标准的 `HttpServletRequest.isUserlnRole` 方法实施的。我们可以使用`management.security.enabled=false`来禁用安全性。只有在执行机构端点在防火墙后访问时，才建议禁用安全性。
+
+## 如何监视所有 Spring Boot 微服务？
+
+SpringBoot提供监视器端点以监控各个微服务的度量。这些端点对于获取有关应用程序的信息（如它们是否已启动）以及它们的组件（如数据库等）是否正常运行很有帮助。但是，使用监视器的一个主要缺点或困难是，我们必须单独打开应用程序的知识点以了解其状态或健康状况。想象一下涉及 50 个应用程序的微服务，管理员将不得不击中所有 50 个应用程序的执行终端。为了帮助我们处理这种情况，我们将使用位于的开源项目。 它建立在 `Spring Boot Actuato`r 之上，它提供了一个 Web UI，使我们能够可视化多个应用程序的度量。
+
+# 进阶篇
+
+## Swagger 用过吗？它用来做什么？
+
+Swagger广泛用于可视化API，使用SwaggerUl**为前端开发人员提供在线沙箱**。Swagger 是用于生成RESTful Web服务的可视化表示的工具，规范和完整框架实现。它**使文档能够以与服务器相同的速度更新**。当通过Swagger 正确定义时，消费者可以使用最少量的实现逻辑来理解远程服务并与其进行交互。因此，Swagger 消除了调用服务时的猜测。
+
+```java
+<!--https://mvnrepository.com/artifact/io.springfox/springfox-swagger2-->
+<dependency>
+    <groupId>io.springfox</groupId>
+    <artifactId>springfox-swagger2</artifactId>
+    <version>2.9.2</version>
+</dependency>
+<!--https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui-->
+<dependency>
+    <groupId>io.springfox</groupId>
+    <artifactId>springfox-swagger-ui</artifactId>
+    <version>2.9.2</version>
+</dependency>
+```
+
+> 前后端分离，如何维护接口文档 ?
+>
+> 使用 Swagger 我们可以快速生成一个接口文档网站，接口一旦发生变化，文档就会自动更新。
+
+## Spring Boot 项目如何热部署？
+
+这可以使用 DEV 工具来实现。通过这种依赖关系，您可以节省任何更改，嵌入式tomcat 将重新启动。Spring Boot 有一个开发工具（DevTools）模块，它有助于提高开发人员的生产力。Java 开发人员面临的一个主要挑战是将文件更改自动部署到服务器并自动重启服务器。开发人员可以重新加载 Spring Boot 上的更改，而无需重新启动服务器。这将消除每次手动部署更改的需要。Spring Boot 在发布它的第一个版本时没有这个功能。这是开发人员最需要的功能。DevTools 模块完全满足开发人员的需求。该模块将在生产环境中被禁用。它还提供 H2 数据库控制台以更好地测试应用程序。
+
+```java
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-devtools</artifactId>
+</dependency>
+```
+
+## 微服务中如何实现 session 共享?
+
+在微服务中，一个完整的项目被拆分成多个不相同的独立的服务，各个服务独立部署在不同的服务器上，各自的 session 被从物理空间上隔离开了，但是经常，我们需要在不同微服务之间共享 session ，常见的方案就是 `Spring session + Redis` 来实现 session 共享。将所有微服务的 session 统一保存在 Redis 上，当各个微服务对 session 有相关的读写操作时，都去操作 Redis 上的 session 。这样就实现了 session 共享，Spring Session 基于 Spring 中的代理过滤器实现，使得 session 的同步操作对开发人员而言是透明的，非常简便。
+
+##  Spring Boot 中如何实现定时任务?
+
+定时任务也是一个常见的需求，SpringBoot 中对于定时任务的支持主要还是来自 Spring 框架。
+
+在 SpringBoot 中使用定时任务主要有两种不同的方式，一个就是使用 Spring 中的 @Scheduled 注解，另一个则是使用第三方框架 Quartz。
+
+- 使用Spring中的 @Scheduled的方式主要通过@Scheduled注解来实现。
+- 使用Quartz，则按照Quartz的方式，定义Job和Trigger即可。
 
 ## 如何将内嵌服务器换成 Jetty ？
 
@@ -544,19 +871,6 @@ Spring Boot 目前支持 **2** 种读取配置：
     <artifactId>spring-boot-starter-jetty</artifactId>
 </dependency>
 ```
-
-## Spring Boot 中的监视器 Actuator 是什么？
-
-`spring-boot-actuator` 提供 Spring Boot 的监视器功能，可帮助我们访问生产环境中正在运行的应用程序的**当前状态**。
-
-- 关于 Spring Boot Actuator 的教程，可以看看 [《Spring Boot Actuator 使用》](https://www.jianshu.com/p/af9738634a21) 。
-- 上述教程是基于 Spring Boot 1.X 的版本，如果胖友使用 Spring Boot 2.X 的版本，你将会发现 `/beans` 等 Endpoint 是不存在的，参考 [《Spring boot 2 - Actuator endpoint, where is /beans endpoint》](https://stackoverflow.com/questions/49174700/spring-boot-2-actuator-endpoint-where-is-beans-endpoint) 问题来解决。
-
-**安全性**
-
-Spring Boot 2.X 默认情况下，`spring-boot-actuator` 产生的 Endpoint 是没有安全保护的，但是 Actuator 可能暴露敏感信息。
-
-所以一般的做法是，引入 `spring-boot-start-security` 依赖，使用 Spring Security 对它们进行安全保护。
 
 ## 如何集成 Spring Boot 和 Spring MVC ？
 
@@ -637,111 +951,26 @@ Spring Boot 2.X 默认情况下，`spring-boot-actuator` 产生的 Endpoint 是�
 
 - `spring-boot-starter-web` 的依赖，帮我们解决的是 Spring MVC 的依赖以及相关的 Tomcat 等组件。
 
-## 如何集成 Spring Boot 和 Spring Security ？
-
-目前比较主流的安全框架有两个：
-
-1. Spring Security
-2. Apache Shiro
-
-对于任何项目来说，安全认证总是少不了，同样适用于使用 Spring Boot 的项目。相对来说，Spring Security 现在会比 Apache Shiro 更流行。
-
-Spring Boot 和 Spring Security 的配置方式比较简单：
-
-1. 引入 `spring-boot-starter-security` 的依赖。
-2. 继承 WebSecurityConfigurerAdapter ，添加**自定义**的安全配置。
-
-当然，每个项目的安全配置是不同的，需要胖友自己选择。更多详细的使用，建议认真阅读如下文章：
-
-- [《Spring Boot中 使用 Spring Security 进行安全控制》](http://blog.didispace.com/springbootsecurity/) ，快速上手。
-- [《Spring Security 实现原理与源码解析系统 —— 精品合集》](http://www.iocoder.cn/Spring-Security/good-collection/) ，深入源码。
-
-另外，安全是一个很大的话题，感兴趣的胖友，可以看看 [《Spring Boot 十种安全措施》](https://www.jdon.com/49653) 一文。
-
-## 如何集成 Spring Boot 和 Spring Security OAuth2 ？
-
-参见 [《Spring Security OAuth2 入门》](http://www.iocoder.cn/Spring-Security/OAuth2-learning/) 文章，内容有点多。
-
-## 如何集成 Spring Boot 和 JPA ？
-
-1. 引入 `spring-boot-starter-data-jpa` 的依赖。
-2. 在 application 配置文件中，加入 JPA 相关的少量配置。当然，数据库的配置也要添加进去。
-3. 具体编码。
-
-详细的使用，胖友可以参考：
-
-- [《一起来学 SpringBoot 2.x | 第六篇：整合 Spring Data JPA》](http://www.iocoder.cn/Spring-Boot/battcn/v2-orm-jpa/)
-
-有两点需要注意：
-
-- Spring Boot 2 默认使用的数据库连接池是 [HikariCP](https://github.com/brettwooldridge/HikariCP) ，目前最好的性能的数据库连接池的实现。
-- `spring-boot-starter-data-jpa` 的依赖，使用的默认 JPA 实现是 Hibernate 5.X 。
-
-## 如何集成 Spring Boot 和 MyBatis ？
-
-1. 引入 `mybatis-spring-boot-starter` 的依赖。
-2. 在 application 配置文件中，加入 MyBatis 相关的少量配置。当然，数据库的配置也要添加进去。
-3. 具体编码。
-
-详细的使用，胖友可以参考：
-
-- [《一起来学 SpringBoot 2.x | 第七篇：整合 Mybatis》](http://www.iocoder.cn/Spring-Boot/battcn/v2-orm-mybatis/)
-
-## 如何集成 Spring Boot 和 RabbitMQ ？
-
-1. 引入 `spring-boot-starter-amqp` 的依赖
-2. 在 application 配置文件中，加入 RabbitMQ 相关的少量配置。
-3. 具体编码。
-
-详细的使用，胖友可以参考：
-
-- [《一起来学 SpringBoot 2.x | 第十二篇：初探 RabbitMQ 消息队列》](http://www.iocoder.cn/Spring-Boot/battcn/v2-queue-rabbitmq/)
-- [《一起来学 SpringBoot 2.x | 第十三篇：RabbitMQ 延迟队列》](http://www.iocoder.cn/Spring-Boot/battcn/v2-queue-rabbitmq-delay/)
-
-## 如何集成 Spring Boot 和 Kafka ？
-
-1. 引入 `spring-kafka` 的依赖。
-2. 在 application 配置文件中，加入 Kafka 相关的少量配置。
-3. 具体编码。
-
-详细的使用，胖友可以参考：
-
-- [《Spring Boot系列文章（一）：SpringBoot Kafka 整合使用》](http://www.54tianzhisheng.cn/2018/01/05/SpringBoot-Kafka/)
-
-## 如何集成 Spring Boot 和 RocketMQ ？
-
-1. 引入 `rocketmq-spring-boot` 的依赖。
-2. 在 application 配置文件中，加入 RocketMQ 相关的少量配置。
-3. 具体编码。
-
-详细的使用，胖友可以参考：
-
-- [《我用这种方法在 Spring 中实现消息的发送和消费》](http://www.iocoder.cn/RocketMQ/start/spring-boot-example)
-
 ## Spring Boot 支持哪些日志框架？
 
-Spring Boot 支持的日志框架有：
+市场上存在非常多的日志框架：
 
-- Logback
-- Log4j2
-- Log4j
-- Java Util Logging
+JUL、JCL、Jboss-logging、logback、log4j、log4j2、slf4j... ...
 
-默认使用的是 Logback 日志框架，也是目前较为推荐的，具体配置，可以参见 [《一起来学 SpringBoot 2.x | 第三篇：SpringBoot 日志配置》](http://www.iocoder.cn/Spring-Boot/battcn/v2-config-logs/) 。
+| 日志门面  （日志的抽象层）                                                                                  | 日志实现                                                       |
+| ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| ~~JCL（Jakarta  Commons Logging）~~  <br>SLF4j（Simple  Logging Facade for Java） <br>**~~jboss-logging~~** | Log4j <br>JUL（java.util.logging）<br/>Log4j2 <br/>**Logback** |
 
-因为 Log4j2 的性能更加优秀，也有人在生产上使用，可以参考 [《Spring Boot Log4j2 日志性能之巅》](https://www.jianshu.com/p/f18a9cff351d) 配置。
+Spring框架默认是用JCL，Spring Boot的底层是Spring框架。Spring Boot在框架内容部使用JCL，spring-boot-starter-logging采用了 **SLF4j+Logback**的形式，Spring Boot也能自动适配（JUL、log4j2、logback） 并简化配置。
 
-# 666. 彩蛋
+**Spring Boot能自动适配所有的日志，而且底层使用slf4j+logback的方式记录日志，引入其他框架的时候，只需要把这个框架依赖的日志框架排除掉即可。**
 
-😈 看完之后，复习复习 Spring Boot 美滋滋。有一种奇怪的感觉，把面试题写成了 Spring 的学习指南。
+# 整合篇
 
-当然，如果胖友有新的面试题，欢迎在星球一起探讨补充。
-
-参考和推荐如下文章：
-
-- 我有面试宝典 [《[经验分享\] Spring Boot面试题总结》](http://www.wityx.com/post/242_1_1.html)
-- Java 知音 [《Spring Boot 面试题精华》](https://cloud.tencent.com/developer/article/1348086)
-- 祖大帅 [《一个面试题引起的 Spring Boot 启动解析》](https://juejin.im/post/5b679fbc5188251aad213110)
-- 大胡子叔叔_ [《Spring Boot + Spring Cloud 相关面试题》](https://blog.csdn.net/panhaigang123/article/details/79587612)
-- 墨斗鱼博客 [《20 道 Spring Boot 面试题》](https://www.mudouyu.com/article/26)
-- 夕阳雨晴 [《Spring Boot Starter 的面试题》](https://blog.csdn.net/sun1021873926/article/details/78176354)
+* 如何集成 Spring Boot 和 JPA ？
+* 如何集成 Spring Boot 和 MyBatis ？
+* 如何集成 Spring Boot 和 RabbitMQ ？
+* 如何集成 Spring Boot 和 Kafka ？
+* 如何集成 Spring Boot 和 RocketMQ ？
+* 如何集成 Spring Boot 和 Docker?
+* ... ...
