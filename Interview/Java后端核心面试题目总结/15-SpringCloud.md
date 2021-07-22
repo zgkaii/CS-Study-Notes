@@ -1,6 +1,75 @@
+<!-- MarkdownTOC -->
+- [什么是 Spring Cloud ？](#什么是-spring-cloud-)
+  - [Spring Cloud 和 Spring Boot 的区别和关系？](#spring-cloud-和-spring-boot-的区别和关系)
+  - [Spring Cloud 核心功能是什么？](#spring-cloud-核心功能是什么)
+  - [Spring Cloud 有哪些组件？](#spring-cloud-有哪些组件)
+  - [Spring Cloud 和 Dubbo 的区别？](#spring-cloud-和-dubbo-的区别)
+- [什么是微服务？](#什么是微服务)
+  - [微服务的优缺点分别是什么？](#微服务的优缺点分别是什么)
+- [注册中心](#注册中心)
+  - [为什么要使用服务发现？](#为什么要使用服务发现)
+  - [Eureka](#eureka)
+    - [Eureka 如何实现集群？](#eureka-如何实现集群)
+    - [聊聊 Eureka 缓存机制？](#聊聊-eureka-缓存机制)
+    - [什么是 Eureka 自我保护机制？](#什么是-eureka-自我保护机制)
+- [负载均衡](#负载均衡)
+  - [为什么要负载均衡？](#为什么要负载均衡)
+  - [常见的几种负载均衡算法](#常见的几种负载均衡算法)
+  - [Ribbon](#ribbon)
+    - [Ribbon 有哪些负载均衡算法？](#ribbon-有哪些负载均衡算法)
+    - [聊聊 Ribbon 缓存机制？](#聊聊-ribbon-缓存机制)
+    - [聊聊 Ribbon 重试机制？](#聊聊-ribbon-重试机制)
+    - [Ribbon 是怎么和 Eureka 整合的？](#ribbon-是怎么和-eureka-整合的)
+- [声明式调用](#声明式调用)
+  - [Feign](#feign)
+    - [Feign 实现原理？](#feign-实现原理)
+    - [Feign 和 Ribbon 的区别？](#feign-和-ribbon-的区别)
+    - [Feign 是怎么和 Ribbon、Eureka 整合的？](#feign-是怎么和-ribboneureka-整合的)
+    - [聊聊 Feign 重试机制？](#聊聊-feign-重试机制)
+- [服务保障](#服务保障)
+  - [为什么要使用服务保障？](#为什么要使用服务保障)
+  - [Hystrix](#hystrix)
+    - [Hystrix 隔离策略？](#hystrix-隔离策略)
+    - [聊聊 Hystrix 缓存机制？](#聊聊-hystrix-缓存机制)
+    - [什么是 Hystrix 断路器？](#什么是-hystrix-断路器)
+    - [什么是 Hystrix 服务降级？](#什么是-hystrix-服务降级)
+- [网关服务](#网关服务)
+  - [为什么要网关服务？](#为什么要网关服务)
+  - [Zuul](#zuul)
+  - [Spring Cloud Gateway](#spring-cloud-gateway)
+- [配置中心](#配置中心)
+  - [Spring Cloud Config](#spring-cloud-config)
+  - [Apollo](#apollo)
+- [链路追踪](#链路追踪)
+  - [SkyWalking](#skywalking)
+  - [Spring Cloud Sleuth](#spring-cloud-sleuth)
+
+<!-- /MarkdownTOC -->
+
 # 什么是 Spring Cloud ？
 
-Spring Cloud 是构建在 Spring Boot 基础之上，用于快速构建分布式系统的通用模式的工具集。或者说，换成大家更为熟知的，用于构建微服务的技术栈。
+Spring Cloud事实上是一整套基于Spring Boot的微服务解决方案。它为开发者提供了很多工具，用于快速构建分布式系统的一些通用模式，例如：配置管理、注册中心、服务发现、限流、网关、链路追踪等。
+
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/2020122115550081.png" width="600px"/>
+</div>
+
+如下图所示，很好的说明了Spring Boot和Spring Cloud的关系，Spring Boot是build anything，而Spring Cloud是coordinate anything，Spring Cloud的每一个微服务解决方案都是基于Spring Boot构建的。
+
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/20201221140615747.png" width="600px"/>
+</div>
+
+## Spring Cloud 和 Spring Boot 的区别和关系？
+
+1. Spring Boot 专注于快速方便的开发单个个体微服务。
+2. Spring Cloud 是关注全局的微服务协调整理治理框架以及一整套的落地解决方案，它将 Spring Boot 开发的一个个单体微服务整合并管理起来，为各个微服务之间提供：配置管理，服务发现，断路器，路由，微代理，事件总线等的集成服务。
+3. Spring Boot 可以离开 Spring Cloud 独立使用，但是 Spring Cloud 离不开 Spring Boot ，属于依赖的关系。
+
+总结：
+
+- Spring Boot ，专注于快速，方便的开发单个微服务个体。
+- Spring Cloud ，关注全局的服务治理框架。
 
 ## Spring Cloud 核心功能是什么？
 
@@ -20,7 +89,9 @@ Spring Cloud 是构建在 Spring Boot 基础之上，用于快速构建分布式
 
 Spring Cloud的 组件相当繁杂，拥有诸多子项目。如下脑图所示：
 
-![Spring Cloud的 组件](http://static.iocoder.cn/4935fcc0a209fd1d4b70cade94986f59)
+<div align="center">  
+<img src="http://static.iocoder.cn/4935fcc0a209fd1d4b70cade94986f59" width="600px"/>
+</div>
 
 我们最为熟知的，可能就是 [Spring Cloud Netflix](https://github.com/spring-cloud/spring-cloud-netflix) ，它是 Netflix 公司基于它们自己的 Eureka、Hystrix、Zuul、Ribbon 等组件，构建的一个 Spring Cloud 实现技术栈。
 
@@ -28,29 +99,57 @@ Spring Cloud的 组件相当繁杂，拥有诸多子项目。如下脑图所示�
 
 > [《Spring Cloud Netflix 项目进入维护模式》](https://blog.csdn.net/alex_xfboy/article/details/85258425) ，感兴趣的胖友，可以看看新闻。
 
-|          | Netflix | 阿里        | 其它                                                         |
-| :------- | :------ | :---------- | :----------------------------------------------------------- |
-| 注册中心 | Eureka  | Nacos       | Zookeeper、Consul、Etcd                                      |
-| 熔断器   | Hystrix | Sentinel    | Resilience4j                                                 |
-| 网关     | Zuul1   | 暂无        | Spring Cloud Gateway                                         |
+|          | Netflix | 阿里        | 其它                                                                                                                      |
+| :------- | :------ | :---------- | :------------------------------------------------------------------------------------------------------------------------ |
+| 注册中心 | Eureka  | Nacos       | Zookeeper、Consul、Etcd                                                                                                   |
+| 熔断器   | Hystrix | Sentinel    | Resilience4j                                                                                                              |
+| 网关     | Zuul1   | 暂无        | Spring Cloud Gateway                                                                                                      |
 | 负载均衡 | Ribbon  | Dubbo(未来) | [`spring-cloud-loadbalancer`](https://github.com/spring-cloud/spring-cloud-commons/tree/master/spring-cloud-loadbalancer) |
 
-其它组件，例如配置中心、链路追踪、服务引用等等，都有相应其它的实现。妥妥的~
-
-## Spring Cloud 和 Spring Boot 的区别和关系？
-
-1. Spring Boot 专注于快速方便的开发单个个体微服务。
-2. Spring Cloud 是关注全局的微服务协调整理治理框架以及一整套的落地解决方案，它将 Spring Boot 开发的一个个单体微服务整合并管理起来，为各个微服务之间提供：配置管理，服务发现，断路器，路由，微代理，事件总线等的集成服务。
-3. Spring Boot 可以离开 Spring Cloud 独立使用，但是 Spring Cloud 离不开 Spring Boot ，属于依赖的关系。
-
-总结：
-
-- Spring Boot ，专注于快速，方便的开发单个微服务个体。
-- Spring Cloud ，关注全局的服务治理框架。
+其它组件，例如配置中心、链路追踪、服务引用等等，都有相应其它的实现。
 
 ## Spring Cloud 和 Dubbo 的区别？
 
-参见 [《精尽 Dubbo 面试题》](http://svip.iocoder.cn/Dubbo/Interview) 文章的 [「Spring Cloud 与 Dubbo 怎么选择？」](http://svip.iocoder.cn/Spring-Cloud/Interview/#) 问题的解答。
+首先，我们来看看这两个技术栈在国内的流行程度：
+
+- 对于国外，Spring Cloud 基本已经统一国外的微服务体系。
+- 对于国内，老的系统使用 Dubbo 较多，新的系统使用 Spring Cloud 较多。
+
+这样说起来，仿佛 Spring Cloud 和 Dubbo 是冲突的关系？！
+
+实际上，并不然。我们现在所使用的 Spring Cloud 技术体系，实际上是 Spring Cloud Netflix 为主，例如说：
+
+- Netflix Eureka 注册中心
+- Netflix Hystrix 熔断组件
+- Netflix Ribbon 负载均衡
+- Netflix Zuul 网关服务
+
+但是，开源的世界，总是这么有趣。目前 Alibaba 基于 Spring Cloud 的**接口**，对的是接口，实现了一套 [Spring Cloud Alibaba](https://github.com/spring-cloud-incubator/spring-cloud-alibaba) 技术体系，并且已经获得 Spring Cloud 的认可，处于孵化状态。组件如下：
+
+- Nacos 注册中心，对标 Eureka 。
+- Nacos 配置中心，集成到 Spring Cloud Config 。
+- Sentinel 服务保障，对标 Hystrix 。
+- Dubbo 服务调用( 包括负载均衡 )，对标 Ribbon + Feign 。
+- **缺失** 网关服务。
+- RocketMQ 队列服务，集成到 Spring Cloud Stream 。
+
+更多的讨论，胖友可以尾随知乎上的 [《请问哪位大神比较过 spring cloud 和 dubbo ，各自的优缺点是什么?》](https://www.zhihu.com/question/45413135) 。
+
+还是非常看好 Spring Cloud Alibaba 技术体系的。为什么呢？因为 Alibaba 背后有阿里云的存在，提供开源项目和商业服务的统一。这个，是 Netflix 所无法比拟的。例如说：
+
+| 开源项目 | 阿里云服务 |
+| :------- | :--------- |
+| Tengine  | LBS        |
+| Dubbo    | EDAS       |
+| RocketMQ | ONS        |
+
+这里在抛出一个话题。目前传说 Dubbo 在国外的接受度比较低，那么在 Spring Cloud Alibaba 成功孵化完后，是否能够杀入国外的市场呢？让我们拭目以待。
+
+**在聊一丢丢有意思的事情**。
+
+事实上，Netflix 已经基本不再维护 Eureka、Hystrix ，更有趣的是，因为网关的事情，Zuul 和 Spring Cloud 团队有点闹掰了，因而后来有了 Spring Cloud Gateway 。因而，Zuul2 后续在 Spring Cloud 体系中的情况，会非常有趣~
+
+另外，Spring Cloud 貌似也实现了一个 LoadBalance 负载均衡组件哟。
 
 # 什么是微服务？
 
@@ -118,7 +217,9 @@ Spring Cloud的 组件相当繁杂，拥有诸多子项目。如下脑图所示�
 
 在应用启动时，Eureka 客户端向服务端注册自己的服务信息，同时将服务端的服务信息缓存到本地。客户端会和服务端周期性的进行心跳交互，以更新服务租约和服务信息。
 
-Eureka 原理，整体如下图：![Eureka 原理](http://static.iocoder.cn/80c74f1d7cb9fc2a416e7b61a055d778)
+Eureka 原理，整体如下图：
+
+![Eureka 原理](http://static.iocoder.cn/80c74f1d7cb9fc2a416e7b61a055d778)
 
 关于 Eureka 的源码解析，可以看看艿艿写的 [《Eureka 源码解析系列》](http://www.iocoder.cn/categories/Eureka/) 。
 
@@ -130,21 +231,17 @@ Eureka 原理，整体如下图：![Eureka 原理](http://static.iocoder.cn/80c7
 
 ### 聊聊 Eureka 缓存机制？
 
-艿艿画了下 Eureka 的缓存机制，如下图所示：
+Eureka 的缓存机制，如下图所示：
 
-![Eureka 缓存机制](http://svip.iocoder.cn/images/SpringCloud/2018_10_28/01.png)
-
-> 原图可见地址：https://www.processon.com/view/link/5f49e2055653bb0c71de11e4
->
-> 建议胖友可以手绘下，便于面试和面试官你侬我侬~
+<div align="center">  
+<img src="https://img-blog.csdnimg.cn/img_convert/c740a108af2f39bbb559fd949d17e228.png" width="800px"/>
+</div>
 
 推荐额外阅读下如下三篇文章：
 
 - [《详解 Eureka 缓存机制》](https://www.infoq.cn/article/y_1BCrbLONU61s1gbGsU)
 - [《Eureka 的多级缓存机制》](https://blog.csdn.net/qq_38545713/article/details/105535950)
 - [《Eureka 缓存细节以及生产环境的最佳配置》](http://bhsc881114.github.io/2018/04/01/eureka缓存细节以及生产环境的最佳配置/)
-
-### consul、eureka、zk区别
 
 ### 什么是 Eureka 自我保护机制？
 
@@ -174,7 +271,7 @@ Eureka 原理，整体如下图：![Eureka 原理](http://static.iocoder.cn/80c7
 
 ## 常见的几种负载均衡算法
 
-🦅 **负载平衡的意义什么？**
+**负载平衡的意义什么？**
 
 在计算中，负载平衡可以改善跨计算机，计算机集群，网络链接，中央处理单元或磁盘驱动器等多种计算资源的工作负载分布。负载平衡旨在优化资源使用，最大化吞吐量，最小化响应时间并避免任何单一资源的过载。使用多个组件进行负载平衡而不是单个组件可能会通过冗余来提高可靠性和可用性。负载平衡通常涉及专用软件或硬件，例如多层交换机或域名系统服务器进程。
 
@@ -226,7 +323,7 @@ Ribbon 原理，整体如下图：![Ribbon 原理](http://static.iocoder.cn/3646
 
 如果熟悉 Dubbo 胖友的会知道，Dubbo 的 Service API 接口，也是一种声明式调用的提现。
 
-> 艿艿：注意噢，Feign 并非 Netflix 团队开发的组件。所有基于 Netflix 组件都在 `spring-cloud-netflix` 项目下噢。
+> 注意噢，Feign 并非 Netflix 团队开发的组件。所有基于 Netflix 组件都在 `spring-cloud-netflix` 项目下噢。
 
 ## Feign
 
@@ -451,19 +548,3 @@ Zuul 原理，整体如下图：![Zuul 原理](http://static.iocoder.cn/20944a73
 ## Spring Cloud Sleuth
 
 Spring Cloud Sleuth 原理，整体如下图：![Spring Cloud Sleuth 原理](http://static.iocoder.cn/43f306a2aa7bc27015d3baa7832d13b6)
-
-# TODO 消息队列
-
-# 彩蛋
-
-第一个版本的 Spring Cloud 面试题，主要把整个文章的大体结构定了，后续在慢慢完善补充~
-
-如下是 Eureka + Ribbon + Feign + Hystrix + Zuul 整合后的图：![Eureka + Ribbon + Feign + Hystrix + Zuul](http://static.iocoder.cn/64e9a7827c76d38f899160da6f736ea2)
-
-参考与推荐如下文章：
-
-- [《微服务框架之 Spring Cloud 面试题汇总》](http://www.3da4.com/thread-4948-1-1.html)
-- [《Spring Boot 和 Spring Cloud 面试题》](https://yiweifen.com/v-1-339414.html)
-- [《Spring Cloud 简介与 5 大常用组件》](https://www.toutiao.com/a6642286207961137671/)
-- [《面试必问的 Spring Cloud 实现原理图》](https://www.youdingyi.com/thread-2500-1-1.html)
-- [《拜托！面试请不要再问我 Spring Cloud 底层原理》](https://juejin.im/post/5be13b83f265da6116393fc7)

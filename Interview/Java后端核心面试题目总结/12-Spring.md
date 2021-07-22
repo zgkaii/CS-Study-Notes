@@ -1,4 +1,5 @@
 <!-- MarkdownTOC -->
+
 - [Spring Framework](#spring-framework)
   - [什么是 Spring Framework？](#什么是-spring-framework)
   - [Spring Framework 有哪些重要模块？](#spring-framework-有哪些重要模块)
@@ -155,11 +156,11 @@ Spring Framework是分层的 Java SE/EE 应用 full-stack **轻量级开源框�
 
 Spring 框架中使用到了大量的设计模式，下面列举了比较有代表性的：
 
-1. **工厂设计模式** : Spring 使用工厂模式通过 BeanFactory、ApplicationContext 创建 Bean 对象；
-2. **代理设计模式** : Spring AOP 功能的实现； 
-3. **单例设计模式** : Spring 中的 Bean 默认都是单例的；
-4. **模板方法模式** : Spring 中 jdbcTemplate、hibernateTemplate 等以 Template 结尾的对数据库操作的类，它们就使用到了模板模式； 
-5. **包装器设计模式** : 我们的项目需要连接多个数据库，而且不同的客户在每次访问中根据需要会去访问不同的数据库。这种模式让我们可以根据客户的需求能够动态切换不同的数据源；
+1. **工厂设计模式** ： Spring 使用工厂模式通过 BeanFactory、ApplicationContext 创建 Bean 对象；
+2. **代理设计模式** ： Spring AOP 功能的实现； 
+3. **单例设计模式** ： Spring 中的 Bean 默认都是单例的；
+4. **模板方法模式** ： Spring 中 jdbcTemplate、hibernateTemplate 等以 Template 结尾的对数据库操作的类，它们就使用到了模板模式； 
+5. **装饰器模式** ：我们的项目需要连接多个数据库，而且不同的客户在每次访问中根据需要会去访问不同的数据库。这种模式让我们可以根据客户的需求能够动态切换不同的数据源；
 6. **观察者模式**：Spring 事件驱动模型就是观察者模式很经典的⼀个应用；
 7. **适配器模式**：Spring AOP 的增强或通知(Advice)使用到了适配器模式、SpringMVC 中也是用到了适配器模式适配 Controller。
 8. ... ...
@@ -646,16 +647,47 @@ Spring 容器能够自动装配 Bean 。也就是说，可以通过检查 BeanFa
 
 ## Spring 框架中的单例 Bean 是线程安全的么？
 
-Spring 框架并没有对单例 Bean 进行任何多线程的封装处理。
+通常，通常情况下 60% 的业务代码是三层架构，数据经过无状态的 Controller、Service、Repository 流转到数据库，默认情况下 Controller、Service、Repository 是单例的。Spring 框架并没有对这些单例 Bean 进行任何多线程的封装处理，关于单例 Bean 的线程安全和并发问题，需要开发者自行去搞定。
 
-- 关于单例 Bean 的线程安全和并发问题，需要开发者自行去搞定。
-- 并且，单例的线程安全问题，也不是 Spring 应该去关心的。Spring 应该做的是，提供根据配置，创建单例 Bean 或多例 Bean 的功能。
+如果你的 Bean 有多种状态的话，就需要自行保证线程安全。**对于Web项目，最浅显的解决办法，就是将多态 Bean 的作用域( Scope )由 Singleton 变更为 Prototype 或者Request；非Web项目将 Singleton 变更为 Prototype** 。
 
-当然，但实际上，大部分的 Spring Bean 并没有可变的状态(比如Serview 类和 DAO 类)，所以在某种程度上说 Spring 的单例 Bean 是线程安全的。
+当然也可以通过加锁的方法（例如synchronized）来解决线程安全，但这类方式一般性能消耗大，显然是不实际的。
 
-如果你的 Bean 有多种状态的话，就需要自行保证线程安全。最浅显的解决办法，就是将多态 Bean 的作用域( Scope )由 Singleton 变更为 Prototype。当然也可以通过加锁的方法来解决线程安全，这种以时间换空间的场景在高并发场景下显然是不实际的。
+这里需要注意的是，TreadLocal可以实现线程隔离，但还是无法保证并发操作下共享变量的线程安全（使用前三思）。
 
-对于有状态的bean，Spring官方提供的Bean，一般提供了通过ThreadLocal去解决线程安全的方法，比如RequestContextHolder、TransactionSynchronizationManager、LocaleContextHolder等。
+下面这个例子：
+
+```java
+@Controller
+public class HomeController {
+    private int i;
+    @GetMapping("testsingleton1")
+    @ResponseBody
+    public int test1() {
+        return ++i;
+    }
+}
+```
+
+最好的处理方式就是：**尽量避免使用成员变量**。
+
+```javascript
+@Controller
+public class HomeController {
+    @GetMapping("testsingleton1")
+    @ResponseBody
+    public int test1() {
+         int i = 0;
+         // TODO biz code
+         return ++i;
+    }
+}
+```
+
+如果在特殊情况下，非要使用成员变量，那怎么保证单例bean的线程安全呢？
+
+* **使用并发安全的类**：Java作为功能性超强的编程语言，API丰富，如果非要在单例bean中使用成员变量，可以考虑使用并发安全的容器，如ConcurrentHashMap、ConcurrentHashSet等等，将我们的成员变量（一般可以是当前运行中的任务列表等这类变量）包装到这些并发安全的容器中进行管理即可。
+* **分布式或微服务的并发安全**：如果还要进一步考虑到微服务或分布式服务的影响，上面这个方法便不足以应付了，可以借助共享某些信息的分布式缓存中间件如Redis等，来保证同一种服务的不同服务实例都拥有同一份共享信息（如当前运行中的任务列表等这类变量）。
 
 ## Spring 如何解决循环依赖？
 
