@@ -867,6 +867,16 @@ Read View（一致性视图）主要是用来做**可见性**判断的，即当�
 * 主从复制：在master端开启 `binlog` ，然后将 `binlog` 发送给各个slaver端，slaver端读取 `binlog` 日志，从而使得主从数据库中数据一致 。
 * 数据恢复：通过 `binlog` 获取想要恢复的时间段数据。
 
+**binlog的三种模式**
+
+* **Row Level**：`ROW` 基于行的复制(`row-based replication, RBR`)，不记录每条SQL语句的上下文信息，仅需记录哪条数据被修改。
+  * 优点：不会出现某些特定情况下的存储过程、或function、或trigger的调用和触发无法被正确复制的问题； 
+  * 缺点：会产生大量的日志，尤其是`alter table`的时候会让日志暴涨，效率和空间上消耗是最大的。
+* **Statement Level（默认）**：`STATMENT` 基于`SQL`语句的复制(`statement-based replication, SBR`)，每一条会修改数据的SQL语句会记录到`binlog`中。 
+  * 优点：不需要记录每一行的变化，减少了`binlog`日志量，节约了`IO`, 从而提高了性能； 
+  * 缺点：在某些情况下会导致主从数据不一致，比如执行`sysdate()`、`slepp()`等。
+* **Mixed Level**：`MIXED` 基于`STATMENT`和`ROW`两种模式的混合复制(`mixed-based replication, MBR`)，一般的复制使用`STATEMENT`模式保存`binlog`，对于`STATEMENT`模式无法复制的操作使用`ROW`模式保存`binlog`。
+
 **如何在线正确清理 MySQL binlog？**
 
 MySQL 中的 `binlog` 日志记录了数据中的数据变动，便于对数据的基于时间点和基于位置的恢复。但日志文件的大小会越来越大，占用大量的磁盘空间，因此需要定时清理一部分日志信息。
