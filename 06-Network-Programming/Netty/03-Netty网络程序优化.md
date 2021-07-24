@@ -1,4 +1,5 @@
 <!-- MarkdownTOC -->
+
 - [TCP 粘包/拆包](#tcp-粘包拆包)
   - [什么是 TCP 粘包/拆包?有什么解决办法呢？](#什么是-tcp-粘包拆包有什么解决办法呢)
   - [为什么会出现粘包/拆包？](#为什么会出现粘包拆包)
@@ -223,10 +224,11 @@ TCP 实际上自带的就有长连接选项，本身是也有心跳包机制，�
 
 Netty 中的零拷贝体现在以下几个方面
 
-1. 使用 Netty 提供的 `CompositeByteBuf` 类，可以将多个`ByteBuf` 合并为一个逻辑上的 `ByteBuf`，避免了各个 `ByteBuf` 之间的拷贝。
-2. `ByteBuf` 支持 `slice` 操作，因此可以将 ByteBuf 分解为多个共享同一个存储区域的 `ByteBuf`，避免了内存的拷贝。
-3. 通过 wrap 操作，我们可以将 byte[] 数组、ByteBuf、ByteBuffer 等包装成一个 Netty ByteBuf 对象, 进而避免拷贝操作。
-4. 通过 `FileRegion` 包装的`FileChannel.tranferTo` 实现文件传输，可以直接将文件缓冲区的数据发送到目标 `Channel`，避免了传统通过循环 write 方式导致的内存拷贝问题。
+1. Netty 的接收和发送 `ByteBuffer` 采用堆外直接内存Direct Buffer。
+2. 使用 Netty 提供的 `CompositeByteBuf` 类，可以将多个`ByteBuf` 合并为一个逻辑上的 `ByteBuf`，避免了各个 `ByteBuf` 之间的拷贝。
+3. `ByteBuf` 支持 `slice` 操作，因此可以将 `ByteBuf` 分解为多个共享同一个存储区域的 `ByteBuf`，避免了内存的拷贝。
+4. 通过 wrap 操作，我们可以将 byte[] 数组、`ByteBuf`、`ByteBuffer` 等包装成一个 `Netty ByteBuf` 对象, 进而避免拷贝操作。
+5. 通过 `FileRegion` 包装的`FileChannel.tranferTo()` 实现文件传输，可以直接将文件缓冲区的数据发送到目标 `Channel`，避免了传统通过循环 write 方式导致的内存拷贝问题。
 
 # 参考
 

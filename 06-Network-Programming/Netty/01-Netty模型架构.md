@@ -172,7 +172,7 @@ NioEventLoop 可以理解为是 NioEventLoopGroup 中的工作线程，类似于
 
 Netty中ByteBuf 声明了两个指针：一个读指针 `readIndex` 用于读取数据，一个写指针 `writeIndex` 用于写数据。
 
- <div align="center"> <img src="..\images\netty\ByteBuf1.png" width="900px"></div>
+ <div align="center"> <img src="..\images\nio\ByteBuf1.png" width="900px"></div>
 
 使用读写指针分离带来的好处是明显的，彻底解决了读写模式与position 指针频繁变换的问题。那么，新的 **ByteBuf 都有哪些特性呢？**
 
@@ -329,7 +329,7 @@ Netty作为异步事件驱动的网络，高性能之处主要来自于其I/O模
 
 Netty的非阻塞I/O的实现关键是基于I/O多路复用模型：单个线程里同时监控多个套接字，通过 select 或 poll 轮询所负责的所有 socket，当某个 socket 有数据到达了，就通知用户进程。
 
- <div align="center"> <img src="..\images\netty\复用IO.png" width="1000px"></div>
+ <div align="center"> <img src="..\images\nio\复用IO.png" width="1000px"></div>
 
 Netty的IO线程NioEventLoop由于聚合了多路复用器Selector，可以同时并发处理成百上千个客户端连接。当线程从某客户端Socket通道进行读写数据时，若没有数据可用时，该线程可以进行其他任务。线程通常将非阻塞 IO 的空闲时间用于在其他通道上执行 IO 操作，所以单独的线程可以管理多个输入和输出通道。
 

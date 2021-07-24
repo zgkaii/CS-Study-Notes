@@ -45,7 +45,7 @@ public class App {
         HelloApplicationContext obj = (HelloApplicationContext) context.getBean("helloApplicationContext");
         obj.getMsg();
     }
-}Copy to clipboardErrorCopied
+}
 ```
 
 ## 单例设计模式
@@ -99,7 +99,7 @@ public Object getSingleton(String beanName, ObjectFactory<?> singletonFactory) {
 
             }
         }
-}Copy to clipboardErrorCopied
+}
 ```
 
 ## 代理设计模式
@@ -158,7 +158,6 @@ public class TemplateImpl extends Template {
         //当前类实现
     }
 }
-Copy to clipboardErrorCopied
 ```
 
 Spring 中 `jdbcTemplate`、`hibernateTemplate` 等以 Template 结尾的对数据库操作的类，它们就使用到了模板模式。一般情况下，我们都是使用继承的方式来实现模板模式，但是 Spring 并没有使用这种方式，而是使用Callback 模式与模板方法模式配合，既达到了代码复用的效果，同时增加了灵活性。
@@ -208,7 +207,6 @@ public interface ApplicationEventPublisher {
 
     void publishEvent(Object var1);
 }
-Copy to clipboardErrorCopied
 ```
 
 `ApplicationEventPublisher` 接口的`publishEvent（）`这个方法在`AbstractApplicationContext`类中被实现，阅读这个方法的实现，你会发现实际上事件真正是通过`ApplicationEventMulticaster`来广播出去的。具体内容过多，就不在这里分析了，后面可能会单独写一篇文章提到。
