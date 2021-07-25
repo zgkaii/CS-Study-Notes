@@ -1,6 +1,30 @@
-> 友情提示：在开始阅读之前，胖友至少对 [《RocketMQ —— 角色与术语详解》](http://jaskey.github.io/blog/2016/12/15/rocketmq-concept/) 有简单的了解。
+<!-- MarkdownTOC -->
+- [RocketMQ 是什么？](#rocketmq-是什么)
+- [RocketMQ 由哪些角色组成？](#rocketmq-由哪些角色组成)
+- [请描述下 RocketMQ 的整体流程？](#请描述下-rocketmq-的整体流程)
+- [请说说你对 Namesrv 的了解？](#请说说你对-namesrv-的了解)
+- [如何配置 Namesrv 地址到生产者和消费者？](#如何配置-namesrv-地址到生产者和消费者)
+- [请说说你对 Broker 的了解？](#请说说你对-broker-的了解)
+- [Broker 如何实现消息的存储？](#broker-如何实现消息的存储)
+- [请说说你对 Producer 的了解？](#请说说你对-producer-的了解)
+- [Producer 发送消息有几种方式？](#producer-发送消息有几种方式)
+- [请说说你对 Consumer 的了解？](#请说说你对-consumer-的了解)
+- [消费者消费模式有几种？](#消费者消费模式有几种)
+- [消费者获取消息有几种模式？](#消费者获取消息有几种模式)
+- [如何对消息进行重放？](#如何对消息进行重放)
+- [什么是顺序消息？如何实现？](#什么是顺序消息如何实现)
+- [顺序消息扩容的过程中，如何在不停写的情况下保证消息顺序？](#顺序消息扩容的过程中如何在不停写的情况下保证消息顺序)
+- [什么是定时消息？如何实现？](#什么是定时消息如何实现)
+- [什么是消息重试？如何实现？](#什么是消息重试如何实现)
+- [多次消费失败后，怎么办？](#多次消费失败后怎么办)
+- [什么是事务消息？如何实现？](#什么是事务消息如何实现)
+- [如何实现 RocketMQ 高可用？](#如何实现-rocketmq-高可用)
+- [RocketMQ 是否会弄丢数据？](#rocketmq-是否会弄丢数据)
+- [如何保证消费者的消费消息的幂等性？](#如何保证消费者的消费消息的幂等性)
+- [重点补充说明](#重点补充说明)
+- [彩蛋](#彩蛋)
 
-另外，这个面试题是建立在胖友看过 [《精尽【消息队列 】面试题》](http://svip.iocoder.cn/MQ/Interview) 。
+<!-- /MarkdownTOC -->
 
 ## RocketMQ 是什么？
 
@@ -46,7 +70,7 @@ RocketMQ 是阿里巴巴在 2012 年开源的分布式消息中间件，目前�
 
 ------
 
-> 艿艿：下面，我们先逐步对 RocketMQ 每个角色进行介绍。
+> 下面，我们先逐步对 RocketMQ 每个角色进行介绍。
 >
 > 对不了解 RocketMQ 的胖友来说，可能概念会有点多。淡定~
 
@@ -129,7 +153,7 @@ RocketMQ 是阿里巴巴在 2012 年开源的分布式消息中间件，目前�
 
 ## Broker 如何实现消息的存储？
 
-关于 Broker 如何实现消息的存储，这是一个很大的话题，所以艿艿建议直接看如下的资料，保持耐心。
+关于 Broker 如何实现消息的存储，这是一个很大的话题，所以建议直接看如下的资料，保持耐心。
 
 - 《读懂这篇文章，你的阿里技术面就可以过关了 | Apache RocketMQ》的如下部分：
 
@@ -195,7 +219,7 @@ Producer 发送消息，有三种方式：
 
 消费者消费模式有两种：集群消费和广播消费。
 
-🦅 **1. 集群消费**
+**1. 集群消费**
 
 消费者的一种消费模式。一个 Consumer Group 中的各个 Consumer 实例分摊去消费消息，即一条消息只会投递到一个 Consumer Group 下面的一个实例。
 
@@ -206,7 +230,7 @@ Producer 发送消息，有三种方式：
 
 具体的代码实现，可以看看 [《芋道 Spring Boot 消息队列 RocketMQ 入门》](http://www.iocoder.cn/Spring-Boot/RocketMQ/?vip)的[「3. 快速入门」](http://svip.iocoder.cn/RocketMQ/Interview/#) 小节，在[「3.10 简单测试」](http://svip.iocoder.cn/RocketMQ/Interview/#)中有集群消费的示例。
 
-🦅 **2. 广播消费**
+**2. 广播消费**
 
 消费者的一种消费模式。消息将对一 个Consumer Group 下的各个 Consumer 实例都投递一遍。即即使这些 Consumer 属于同一个Consumer Group ，消息也会被 Consumer Group 中的每个 Consumer 都消费一次。
 
@@ -219,19 +243,19 @@ Producer 发送消息，有三种方式：
 
 消费者获取消息有两种模式：推送模式和拉取模式。
 
-🦅 **1. PushConsumer**
+**1. PushConsumer**
 
 推送模式（虽然 RocketMQ 使用的是长轮询）的消费者。消息的能及时被消费。使用非常简单，内部已处理如线程池消费、流控、负载均衡、异常处理等等的各种场景。
 
 - 长轮询，就是我们在 [《 精尽【消息队列 】面试题》](http://svip.iocoder.cn/MQ/Interview) 提到的，push + pull 模式结合的方式。
 
-🦅 **2. PullConsumer**
+**2. PullConsumer**
 
 拉取模式的消费者。应用主动控制拉取的时机，怎么拉取，怎么消费等。主动权更高。但要自己处理各种场景。
 
 ------
 
-决绝绝大多数场景下，我们只会使用 PushConsumer 推送模式。😈 至少艿艿目前，暂时还没用过 PullConsumer 。
+决绝绝大多数场景下，我们只会使用 PushConsumer 推送模式。至少目前，暂时还没用过 PullConsumer 。
 
 ## 如何对消息进行重放？
 
@@ -252,23 +276,23 @@ Producer 发送消息，有三种方式：
 
   > 也就说，顺序消息包括两块：Producer 的顺序发送，和 Consumer 的顺序消费。
 
-🦅 **1. 普通顺序消息**
+**1. 普通顺序消息**
 
 顺序消息的一种，正常情况下可以保证完全的顺序消息，但是一旦发生异常，Broker 宕机或重启，由于队列总数发生发化，消费者会触发负载均衡，而默认地负载均衡算法采取哈希取模平均，这样负载均衡分配到定位的队列会发化，使得队列可能分配到别的实例上，则会短暂地出现消息顺序不一致。
 
 如果业务能容忍在集群异常情况（如某个 Broker 宕机或者重启）下，消息短暂的乱序，使用普通顺序方式比较合适。
 
-🦅 **2. 严格顺序消息**
+**2. 严格顺序消息**
 
 顺序消息的一种，无论正常异常情况都能保证顺序，但是牺牲了分布式 Failover 特性，即 Broker 集群中只要有一台机器不可用，则整个集群都不可用，服务可用性大大降低。
 
 如果服务器部署为同步双写模式，此缺陷可通过备机自动切换为主避免，不过仍然会存在几分钟的服务不可用。（依赖同步双写，主备自动切换，自动切换功能目前并未实现）
 
-🦅 **小结**
+**小结**
 
 目前已知的应用只有数据库 binlog 同步强依赖严格顺序消息，其他应用绝大部分都可以容忍短暂乱序，推荐使用普通的顺序消息。
 
-🦅 **实现原理**
+**实现原理**
 
 顺序消息的实现，相对比较复杂，想要深入理解的胖友，可以看看 [《RocketMQ 源码分析 —— Message 顺序发送与消费》](http://www.iocoder.cn/RocketMQ/message-send-and-consume-orderly/) 。
 
@@ -310,7 +334,7 @@ Producer 发送消息，有三种方式：
 - 可通过配置文件，自定义每个延迟级别对应的延迟时间。当然，这是全局的。
 - 如果胖友想要实现任一时刻的延迟消息，比较简单的方式是插入延迟消息到数据库中，然后通过定时任务轮询，到达指定时间，发送到 RocketMQ 中。
 
-🦅 **实现原理**
+**实现原理**
 
 - 1、 定时消息发送到 Broker 后，会被存储 Topic 为 `SCHEDULE_TOPIC_XXXX` 中，并且所在 Queue 编号为延迟级别 `-1` 。
 
@@ -332,23 +356,23 @@ Producer 发送消息，有三种方式：
 - Consumer 会将消费失败的消息发回 Broker，进入延迟消息队列。即，消费失败的消息，不会立即消费。
 - 也就是说，消息重试是构建在定时消息之上的功能。
 
-🦅 **消息重试的主要流程**
+**消息重试的主要流程**
 
 1. Consumer 消费失败，将消息发送回 Broker 。
 2. Broker 收到重试消息之后置换 Topic ，存储消息。
 3. Consumer 会拉取该 Topic 对应的 retryTopic 的消息。
 4. Consumer 拉取到 retryTopic 消息之后，置换到原始的 Topic ，把消息交给 Listener 消费。
 
-这里，可能有几个点，胖友会比较懵逼，艿艿简单解释下：
+这里，可能有几个点，胖友会比较懵逼，简单解释下：
 
 1. Consumer 消息失败后，会将消息的 Topic 修改为 `%RETRY%` + Topic 进行，添加 `"RETRY_TOPIC"` 属性为原始 Topic ，然后再返回给 Broker 中。
 2. Broker 收到重试消息之后，会有两次修改消息的 Topic 。
-   - 首先，会将消息的 Topic 修改为 `%RETRY%` + ConsumerGroup ，因为这个消息是当前消费这分组消费失败，只能被这个消费组所重新消费。😈 注意噢，消费者会默认订阅 Topic 为 `%RETRY%` + ConsumerGroup 的消息。
+   - 首先，会将消息的 Topic 修改为 `%RETRY%` + ConsumerGroup ，因为这个消息是当前消费这分组消费失败，只能被这个消费组所重新消费。注意噢，消费者会默认订阅 Topic 为 `%RETRY%` + ConsumerGroup 的消息。
    - 然后，会将消息的 Topic 修改为 `SCHEDULE_TOPIC_XXXX` ，添加 `"REAL_TOPIC"` 属性为 `%RETRY%` + ConsumerGroup ，因为重试消息需要延迟消费。
 3. Consumer 会拉取该 Topic 对应的 retryTopic 的消息，此处的 retryTopic 为 `%RETRY%` + ConsumerGroup 。
 4. Consumer 拉取到 retryTopic 消息之后，置换到原始的 Topic ，因为有消息的 `"RETRY_TOPIC"` 属性是原始 Topic ，然后把消息交给 Listener 消费。
 
-😈 有一丢丢复杂，胖友可以在思考思考~详细的，胖友可以看看 [《RocketMQ 源码分析 —— 定时消息与消息重试》](http://www.iocoder.cn/RocketMQ/message-schedule-and-retry/) 。
+有一丢丢复杂，胖友可以在思考思考~详细的，胖友可以看看 [《RocketMQ 源码分析 —— 定时消息与消息重试》](http://www.iocoder.cn/RocketMQ/message-schedule-and-retry/) 。
 
 具体的代码实现，可以看看 [《芋道 Spring Boot 消息队列 RocketMQ 入门》](http://www.iocoder.cn/Spring-Boot/RocketMQ/?vip)的[「6. 消费重试」](http://svip.iocoder.cn/RocketMQ/Interview/#) 小节。
 
@@ -364,7 +388,7 @@ Producer 发送消息，有三种方式：
 
 关于事务消息的概念和原理，胖友可以看看官方对这块的解答，即 [《RocketMQ 4.3 正式发布，支持分布式事务》](https://www.infoq.cn/article/2018%2F08%2Frocketmq-4.3-release) 的 [「四 事务消息」](http://svip.iocoder.cn/RocketMQ/Interview/#) 小节。
 
-艿艿 16 年的时候，基于 RocketMQ 早期的版本，写了 [《RocketMQ 源码分析 —— 事务消息》](http://www.iocoder.cn/RocketMQ/message-transaction/) 文章，虽然 RocketMQ 版本不太一样，但是大体的思路是差不多的，可以帮助胖友更容易的读懂事务消息相关的源码。
+ 16 年的时候，基于 RocketMQ 早期的版本，写了 [《RocketMQ 源码分析 —— 事务消息》](http://www.iocoder.cn/RocketMQ/message-transaction/) 文章，虽然 RocketMQ 版本不太一样，但是大体的思路是差不多的，可以帮助胖友更容易的读懂事务消息相关的源码。
 
 - 简单看了下最新版本的 RocketMQ 的事务代码，新增了`RMQ_SYS_TRANS_HALF_TOPIC`和
 
@@ -382,27 +406,27 @@ Producer 发送消息，有三种方式：
 
 ![RocketMQ 集群](http://static.iocoder.cn/images/RocketMQ/2019_11_12/02.png)
 
-🦅 **1. Producer**
+**1. Producer**
 
 - 1、Producer 自身在应用中，所以无需考虑高可用。
 - 2、Producer 配置多个 Namesrv 列表，从而保证 Producer 和 Namesrv 的连接高可用。并且，会从 Namesrv 定时拉取最新的 Topic 信息。
 - 3、Producer 会和所有 Broker 直连，在发送消息时，会选择一个 Broker 进行发送。如果发送失败，则会使用另外一个 Broker 。
 - 4、Producer 会定时向 Broker 心跳，证明其存活。而 Broker 会定时检测，判断是否有 Producer 异常下线。
 
-🦅 **2. Consumer**
+**2. Consumer**
 
 - 1、Consumer 需要部署多个节点，以保证 Consumer 自身的高可用。当相同消费者分组中有新的 Consumer 上线，或者老的 Consumer 下线，会重新分配 Topic 的 Queue 到目前消费分组的 Consumer 们。
 - 2、Consumer 配置多个 Namesrv 列表，从而保证 Consumer 和 Namesrv 的连接高可用。并且，会从 Consumer 定时拉取最新的 Topic 信息。
 - 3、Consumer 会和所有 Broker 直连，消费相应分配到的 Queue 的消息。如果消费失败，则会发回消息到 Broker 中。
 - 4、Consumer 会定时向 Broker 心跳，证明其存活。而 Broker 会定时检测，判断是否有 Consumer 异常下线。
 
-🦅 **3. Namesrv**
+**3. Namesrv**
 
 - 1、Namesrv 需要部署多个节点，以保证 Namesrv 的高可用。
 - 2、Namesrv 本身是无状态，不产生数据的存储，是通过 Broker 心跳将 Topic 信息同步到 Namesrv 中。
 - 3、多个 Namesrv 之间不会有数据的同步，是通过 Broker 向多个 Namesrv 多写。
 
-🦅 **4. Broker**
+**4. Broker**
 
 - 1、多个 Broker 可以形成一个 Broker 分组。每个 Broker 分组存在一个 Master 和多个 Slave 节点。
   - Master 节点，可提供读和写功能。Slave 节点，可提供读功能。
@@ -412,7 +436,7 @@ Producer 发送消息，有三种方式：
   - Broker 集群和集群之间，不存在通信与数据同步。
 - 3、Broker 可以配置同步刷盘或异步刷盘，根据消息的持久化的可靠性来配置。
 
-🦅 **总结**
+**总结**
 
 目前官方提供三套配置：
 
@@ -445,15 +469,15 @@ Producer 发送消息，有三种方式：
 
 ## RocketMQ 是否会弄丢数据？
 
-> 艿艿：注意，RocketMQ 是否会丢数据，主要取决于我们如何使用。这点，非常重要噢。
+> ：注意，RocketMQ 是否会丢数据，主要取决于我们如何使用。这点，非常重要噢。
 
-🦅 **消费端弄丢了数据？**
+**消费端弄丢了数据？**
 
 对于消费端，如果我们在使用 Push 模式的情况下，只有我们消费返回成功，才会异步定期更新消费进度到 Broker 上。
 
 如果消费端异常崩溃，可能导致消费进度未更新到 Broker 上，那么无非是 Consumer 可能重复拉取到已经消费过的消息。关于这个，就需要消费端做好消费的幂等性。
 
-🦅 **Broker 弄丢了数据？**
+**Broker 弄丢了数据？**
 
 在上面的问题中，我们已经看到了 Broker 提供了两个特性：
 
@@ -464,7 +488,7 @@ Producer 发送消息，有三种方式：
 
 如果想要在可靠性和性能之间做一个平衡，可以选择同步复制，加主从 Broker 都是和异步刷盘。因为，刷盘比较消耗性能。
 
-🦅 **生产者会不会弄丢数据？**
+**生产者会不会弄丢数据？**
 
 Producer 可以设置三次发送消息重试。
 
@@ -484,9 +508,9 @@ RocketMQ 涉及的内容很多，能够问的问题也特别多，但是我们�
 - [《RocketMQ 原理简介》](http://alibaba.github.io/RocketMQ-docs/document/design/RocketMQ_design.pdf) 基于 RocketMQ 3 的版本。
 - [《RocketMQ 最佳实践》](http://gd-rus-public.cn-hangzhou.oss-pub.aliyun-inc.com/attachment/201604/08/20160408164929/RocketMQ_experience.pdf) 基于 RocketMQ 3 的版本。
 
-## 666. 彩蛋
+## 彩蛋
 
-RocketMQ 能够问的东西，真的挺多的，中间也和一些朋友探讨过。如果胖友有什么想要问的，可以在星球给艿艿留言。
+RocketMQ 能够问的东西，真的挺多的，中间也和一些朋友探讨过。如果胖友有什么想要问的，可以在星球给留言。
 
 参考与推荐如下文章：
 

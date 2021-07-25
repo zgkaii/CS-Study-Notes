@@ -19,7 +19,6 @@ Apache Dubbo 是一款高性能、轻量级的开源 Java 服务框架。它有�
 <div align="center">  
 <img src="https://img-blog.csdnimg.cn/20210621132853628.png" width="800px"/>
 </div>
-
 **基础功能：RPC调用**
 
 * 多协议（序列化，传输，RPC）

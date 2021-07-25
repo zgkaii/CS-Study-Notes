@@ -1,3 +1,19 @@
+<!-- MarkdownTOC -->
+- [Zookeeper 是什么？](#zookeeper-是什么)
+- [Zookeeper 的设计目标？](#zookeeper-的设计目标)
+- [Zookeeper 有哪些应用场景？](#zookeeper-有哪些应用场景)
+- [Zookeeper 提供了什么？](#zookeeper-提供了什么)
+- [Zookeeper 的文件系统是什么？](#zookeeper-的文件系统是什么)
+- [Zookeeper 的通知机制是什么？](#zookeeper-的通知机制是什么)
+- [Zookeeper 采用什么权限控制机制？](#zookeeper-采用什么权限控制机制)
+- [Zookeeper 的会话管理是怎么样的？](#zookeeper-的会话管理是怎么样的)
+- [Zookeeper 的部署方式？](#zookeeper-的部署方式)
+- [ZooKeeper 的工作原理？](#zookeeper-的工作原理)
+- [Zookeeper 的选举过程？](#zookeeper-的选举过程)
+- [Zookeeper 的同步流程？](#zookeeper-的同步流程)
+
+<!-- /MarkdownTOC -->
+
 ## Zookeeper 是什么？
 
 ZooKeeper 是一个开放源码的分布式协调服务，它是集群的管理者，监视着集群中各个节点的状态根据节点提交的反馈进行下一步合理操作。最终，将简单易用的接口和性能高效、功能稳定的系统提供给用户。
@@ -36,12 +52,12 @@ Zookeeper 对于读写请求有所不同：
 - 客户端的读请求可以被集群中的任意一台机器处理，如果读请求在节点上注册了监听器，这个监听器也是由所连接的 Zookeeper 机器来处理。
 - 对于写请求，这些请求会同时发给其他 Zookeeper 机器并且达成一致后，请求才会返回成功。因此，随着 Zookeeper 的集群机器增多，读请求的吞吐会提高但是写请求的吞吐会下降。
 
-🦅 **Chubby 是什么？和 Zookeeper 对比你怎么看？**
+**Chubby 是什么？和 Zookeeper 对比你怎么看？**
 
 - Chubby 是 Google 的，完全实现 Paxos 算法，不开源。
 - Zookeeper 是 Chubby 的开源实现，使用 ZAB 协议(Paxos 算法的变种)。
 
-🦅 **Zookeeper 的 Java 客户端都有哪些？**
+**Zookeeper 的 Java 客户端都有哪些？**
 
 - Zookeeper 自带的 zkclient
 
@@ -103,7 +119,7 @@ Zookeeper 的功能很强大，应用场景很多，结合我们实际工作中�
   > - 1、保持独占，我们把 znode 看作是一把锁，通过 createZnode 的方式来实现。所有客户端都去创建 `/distribute_lock` 节点，最终成功创建的那个客户端也即拥有了这把锁。用完删除掉自己创建的 `/distribute_lock` 节点就释放出锁。
   > - 2、控制时序，`/distribute_lock` 已经预先存在，所有客户端在它下面创建临时顺序编号目录节点，和 Master 一样，编号最小的获得锁，用完删除，依次方便。
   >
-  > 最近艿艿画了一个 Curator 基于 ZooKeeper 实现分布式锁的流程图，胖友可以点击[传送门](https://www.processon.com/view/link/5f4dc9a91e0853452d463ea5)查看。
+  > 最近画了一个 Curator 基于 ZooKeeper 实现分布式锁的流程图，胖友可以点击[传送门](https://www.processon.com/view/link/5f4dc9a91e0853452d463ea5)查看。
 
 - 队列管理
 
@@ -114,9 +130,9 @@ Zookeeper 的功能很强大，应用场景很多，结合我们实际工作中�
 
 当然，详细的可以看看 [《Zookeeper 技术浅析》](http://www.cnblogs.com/sharpxiajun/archive/2013/06/02/3113923.html) 文章。另外，该问对 Zookeeper 的“特点”介绍，也要重点看看。
 
-😈 上述的很多功能，在 Apache Curator 已经默认提供实现了，直接调用 API 即可使用。
+ 上述的很多功能，在 Apache Curator 已经默认提供实现了，直接调用 API 即可使用。
 
-🦅 **作为服务注册中心，Eureka 比 Zookeeper 好在哪里？**
+**作为服务注册中心，Eureka 比 Zookeeper 好在哪里？**
 
 参见 [《作为服务注册中心，Eureka 比 Zookeeper 好在哪里》](https://blog.csdn.net/xuyw10000/article/details/79851697) 文章。
 
@@ -133,7 +149,7 @@ Zookeeper 提供一个多层级的节点命名空间(节点称为 znode)。与�
 
 Zookeeper 为了保证高吞吐和低延迟，在内存中维护了这个树状的目录结构，这种特性使得 Zookeeper 不能用于存放大量的数据，每个节点的存放数据上限为 1M 。
 
-🦅 **Zookeeper 有哪几种节点类型？**
+**Zookeeper 有哪几种节点类型？**
 
 - PERSISTENT 持久节点
 
@@ -151,7 +167,7 @@ Zookeeper 为了保证高吞吐和低延迟，在内存中维护了这个树状�
 
   > 基本特性同临时节点，增加了顺序属性，节点名后边会追加一个由父节点维护的自增整型数字。
 
-如下是艿艿整理的 Elastic-Job-Lite 使用 Zookeeper 作为存储的明细：
+如下是整理的 Elastic-Job-Lite 使用 Zookeeper 作为存储的明细：
 
 ![Elastic-Job-Lite 详细](http://static.iocoder.cn/images/Elastic-Job/2017_10_07/02.png)
 
@@ -173,7 +189,7 @@ Watcher 的特性总结：
 
   > 无论是服务端还是客户端，一旦一个 Watcher 被触发， Zookeeper 都会将其从相应的存储中移除。这样的设计有效的减轻了服务端的压力，不然对于更新非常频繁的节点，服务端会不断的向客户端发送事件通知，无论对于网络还是服务端的压力都非常大。
   >
-  > 😈 注意哟，这个特性可以变成一个面试题「Zookeeper 对节点的 watch 监听通知是永久的吗？」。
+  >  注意哟，这个特性可以变成一个面试题「Zookeeper 对节点的 watch 监听通知是永久的吗？」。
   >
   > 如果我们使用 [Apache Curator](https://curator.apache.org/) 作为操作 Zookeeper 的客户端，它可以帮我们自动透明的实现持续的 watch 操作，非常方便。
 
@@ -194,11 +210,11 @@ Watcher 的特性总结：
 
 - 7、当一个 Client 连接到一个新的服务器上时，watch 将会被以任意会话事件触发。当与一个服务器失去连接的时候，是无法接收到 watch 的。而当 Client 重新连接时，如果需要的话，所有先前注册过的watch ，都会被重新注册。通常这是完全透明的。只有在一个特殊情况下，watch 可能会丢失：对于一个未创建的 znode 的 exists watch ，如果在客户端断开连接期间被创建了，并且随后在客户端连接上之前又删除了，这种情况下，这个 watch 事件可能会被丢失。
 
-😈 看了这么多特性总结，最最最重要的是【**一次性**】。
+ 看了这么多特性总结，最最最重要的是【**一次性**】。
 
-> 艿艿：下面三个步骤，选择性了解即可。面试如果问到，就当倒霉。
+> ：下面三个步骤，选择性了解即可。面试如果问到，就当倒霉。
 
-🦅 **第一步，客户端注册 Watcher 实现？**
+**第一步，客户端注册 Watcher 实现？**
 
 - 1、调用 getData、getChildren、exist 三个 API ，传入Watcher 对象。
 - 2、标记请求 request ，封装 Watcher 到 WatchRegistration 。
@@ -206,7 +222,7 @@ Watcher 的特性总结：
 - 4、收到服务端响应后，将 Watcher 注册到 ZKWatcherManager 中进行管理。
 - 5、请求返回，完成注册。
 
-🦅 **第二步，服务端处理 Watcher 实现？**
+**第二步，服务端处理 Watcher 实现？**
 
 - 1、服务端接收 Watcher 并存储。
 
@@ -231,7 +247,7 @@ Watcher 的特性总结：
 
   > 这里 process 主要就是通过 ServerCnxn 对应的 TCP 连接发送 Watcher 事件通知。
 
-🦅 **第三步，客户端回调 Watcher 实现？**
+**第三步，客户端回调 Watcher 实现？**
 
 客户端 SendThread 线程接收事件通知，交由 EventThread 线程回调Watcher 。
 
@@ -266,13 +282,13 @@ Watcher 的特性总结：
   > - WRITE ：数据节点更新权限，允许授权对象对该数据节点进行更新操作。
   > - ADMIN ：数据节点管理权限，允许授权对象对该数据节点进行 ACL 相关设置操作。
 
-🦅 **Chroot 特性是什么？**
+**Chroot 特性是什么？**
 
 Zookeeper 3.2.0 版本后，添加了 Chroot 特性。该特性允许每个客户端为自己设置一个命名空间。如果一个客户端设置了 Chroot ，那么该客户端对服务器的任何操作，都将会被限制在其自己的命名空间下。
 
 通过设置 Chroot ，能够将一个客户端应用于 Zookeeper 服务端的一颗子树相对应，在那些多个应用公用一个 Zookeeper 进群的场景下，对实现不同应用间的相互隔离非常有帮助。
 
-> 艿艿：貌似实际还用的比较少。
+> ：貌似实际还用的比较少。
 
 ## Zookeeper 的会话管理是怎么样的？
 
@@ -306,7 +322,7 @@ Zookeeper 有两种部署方式：
 
 一般来说，测试环境部署单机，而生产环境必须必须必须部署集群。
 
-🦅 **集群中的机器角色有哪些？**
+**集群中的机器角色有哪些？**
 
 集群中一共有三种角色：
 
@@ -335,11 +351,11 @@ Zookeeper 有两种部署方式：
 
 在一个集群中，最少需要 3 台。或者保证 2N + 1 台，即奇数。为什么保证奇数？主要是为了选举算法。
 
-🦅 **集群如果有 3 台机器，挂掉 1 台集群还能工作吗？挂掉 2 台呢？**
+**集群如果有 3 台机器，挂掉 1 台集群还能工作吗？挂掉 2 台呢？**
 
 记住一个原则：过半存活即可用。所以挂掉 1 台可以继续工作，挂掉 2 台不可以工作。
 
-🦅 **集群支持动态添加机器吗？**
+**集群支持动态添加机器吗？**
 
 在 3.5 版本开始，支持动态扩容。
 
@@ -348,7 +364,7 @@ Zookeeper 有两种部署方式：
 - 全部重启：关闭所有 Zookeeper 服务，修改配置之后启动。不影响之前客户端的会话。
 - 逐个重启：顾名思义。这是比较常用的方式。
 
-🦅 **Zookeeper 下 Server 工作状态？**
+**Zookeeper 下 Server 工作状态？**
 
 服务器具有四种状态，分别是：
 
@@ -388,7 +404,7 @@ ZooKeeper 的核心是原子广播，这个机制保证了各个 Server 之间�
   >
   > Leader 服务器开始接收客户端的事务请求，生成事务提案来进行事务请求处理。
 
-🦅 **ZooKeeper 是如何保证事务的顺序一致性的？**
+**ZooKeeper 是如何保证事务的顺序一致性的？**
 
 ZooKeeper 采用了递增的事务 id 来识别，所有的 proposal（提议）都在被提出的时候加上了 zxid 。zxid 实际上是一个 64 位数字。
 
@@ -397,14 +413,14 @@ ZooKeeper 采用了递增的事务 id 来识别，所有的 proposal（提议）
 
 当新产生的 peoposal 的时候，会依据数据库的两阶段过程，首先会向其他的 Server 发出事务执行请求，如果超过半数的机器都能执行并且能够成功，那么就会开始执行。
 
-🦅 **ZooKeeper 集群中个服务器之间是怎样通信的？**
+**ZooKeeper 集群中个服务器之间是怎样通信的？**
 
 Leader 服务器会和每一个 Follower/Observer 服务器都建立 TCP 连接，同时为每个 Follower/Observer 都创建一个叫做 LearnerHandler 的实体。
 
 - LearnerHandler 主要负责 Leader 和 Follower/Observer 之间的网络通讯，包括数据同步，请求转发和 Proposal 提议的投票等。
 - Leader 服务器保存了所有 Follower/Observer 的 LearnerHandler 。
 
-🦅 **ZAB 和 Paxos 算法的联系与区别？**
+**ZAB 和 Paxos 算法的联系与区别？**
 
 Paxos 算法是分布式选举算法，Zookeeper 使用的 ZAB 协议（Zookeeper 原子广播）。
 
@@ -439,9 +455,9 @@ Zookeeper 的选举算法有两种：一种是基于 basic paxos 实现的，另
 >   - AuthFastLeaderElection ：在 FastLeaderElection 的基础上，增加认证。
 >   - 最终在 Zookeeper 3.4.0 版本之后，只保留 FastLeaderElection 版本。
 
-😈 看下面的原理描述，还是有点懵逼。等后面艿艿自己去撸下源码，可能会清晰一些。
+ 看下面的原理描述，还是有点懵逼。等后面自己去撸下源码，可能会清晰一些。
 
-🦅 **Zookeeper 选主流程(basic paxos)？**
+**Zookeeper 选主流程(basic paxos)？**
 
 > 选择性了解。
 
@@ -457,7 +473,7 @@ Zookeeper 的选举算法有两种：一种是基于 basic paxos 实现的，另
 
 ![流程](http://static.iocoder.cn/4c9358ff89ffef1089190c6472ebe51c)
 
-🦅 **Zookeeper 选主流程(fast paxos)？**
+**Zookeeper 选主流程(fast paxos)？**
 
 > 重点了解。这块在 [《Zookeeper 源码分析 —— Zookeeper Leader 选举算法》](https://juejin.im/post/5b949d595188255c6a041c22) 写的比较详细。
 
@@ -469,7 +485,7 @@ FastLeaderElection 算法通过异步的通信方式来收集其它节点的选�
 
 [![流程](http://static.iocoder.cn/6591164c09fd2dadef24bd984c9f3a14)](http://static.iocoder.cn/6591164c09fd2dadef24bd984c9f3a14)流程
 
-🦅 **为什么 Zookeeper 集群推荐节点数是单数？**
+**为什么 Zookeeper 集群推荐节点数是单数？**
 
 在统计投票时，有个过半的概念，大于集群机器数量的一半，即大于或等于(`n/2+1`)。那么我们来看看如下的统计：
 
@@ -488,11 +504,11 @@ FastLeaderElection 算法通过异步的通信方式来收集其它节点的选�
 
 简单的来说，**节省资源**！
 
-另外，因为 Zookeeper 使用一致性协议，过多的节点，反倒会降低性能。😈
+另外，因为 Zookeeper 使用一致性协议，过多的节点，反倒会降低性能。
 
-🦅 **Zookeeper 是否需存在脑裂？**
+**Zookeeper 是否需存在脑裂？**
 
-按道理说，Zookeeper 选举不会存在脑裂问题，因为需要 `n / 2 + 1` 投票通过，才能执行对应的写操作。但是听朋友说，实际场景下，貌似发生过脑裂问题。关于这块，艿艿心里也不太有底，欢迎在星球一起讨论。
+按道理说，Zookeeper 选举不会存在脑裂问题，因为需要 `n / 2 + 1` 投票通过，才能执行对应的写操作。但是听朋友说，实际场景下，貌似发生过脑裂问题。关于这块，心里也不太有底，欢迎在星球一起讨论。
 
 - [《Zookeeper 已经分布式环境中的假死脑裂》](https://blog.csdn.net/u010185262/article/details/49910301)
 
@@ -502,7 +518,7 @@ FastLeaderElection 算法通过异步的通信方式来收集其它节点的选�
 
   > 认为不会存在脑裂问题。
 
-🦅 **机器中为什么会有 Leader？**
+**机器中为什么会有 Leader？**
 
 在分布式环境中，有些业务逻辑只需要集群中的某一台机器进行执行，其他的机器可以共享这个结果，这样可以大大减少重复计算，提高性能，于是就需要进行 Leader 选举。
 

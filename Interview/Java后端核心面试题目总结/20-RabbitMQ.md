@@ -1,3 +1,21 @@
+<!-- MarkdownTOC -->
+- [RabbitMQ 是什么？](#rabbitmq-是什么)
+- [RabbitMQ 中的 Broker 是指什么？Cluster 又是指什么？](#rabbitmq-中的-broker-是指什么cluster-又是指什么)
+- [什么是元数据？元数据分为哪些类型？包括哪些内容？](#什么是元数据元数据分为哪些类型包括哪些内容)
+- [RabbitMQ 概念里的 channel、exchange 和 queue 是什么？](#rabbitmq-概念里的-channelexchange-和-queue-是什么)
+- [如何确保消息正确地发送至 RabbitMQ？](#如何确保消息正确地发送至-rabbitmq)
+- [如何确保消息接收方消费了消息？](#如何确保消息接收方消费了消息)
+- [为什么不应该对所有的 message 都使用持久化机制？](#为什么不应该对所有的-message-都使用持久化机制)
+- [什么是死信队列？](#什么是死信队列)
+- [RabbitMQ 中的 cluster、mirrored queue，以及 warrens 机制分别用于解决什么问题？](#rabbitmq-中的-clustermirrored-queue以及-warrens-机制分别用于解决什么问题)
+- [RabbitMQ 如何实现高可用？](#rabbitmq-如何实现高可用)
+- [如何使用 RabbitMQ 实现 RPC](#如何使用-rabbitmq-实现-rpc)
+- [RabbitMQ 是否会弄丢数据？](#rabbitmq-是否会弄丢数据)
+- [RabbitMQ 如何保证消息的顺序性？](#rabbitmq-如何保证消息的顺序性)
+- [彩蛋](#彩蛋)
+
+<!-- /MarkdownTOC -->
+
 ## RabbitMQ 是什么？
 
 RabbitMQ 是一个由 Erlang 语言开发的 AMQP 的开源实现。
@@ -55,7 +73,7 @@ RabbitMQ 最初起源于金融系统，用于在分布式系统中存储转发�
 - Broker ，是指一个或多个 erlang node 的逻辑分组，且 node 上运行着 RabbitMQ 应用程序。
 - Cluster ，是在 Broker 的基础之上，增加了 node 之间共享元数据的约束。
 
-🦅 **vhost 是什么？起什么作用？**
+**vhost 是什么？起什么作用？**
 
 vhost 可以理解为虚拟 Broker ，即 mini-RabbitMQ server 。其内部均含有独立的 queue、exchange 和 binding 等，但最最重要的是，其拥有独立的权限系统，可以做到 vhost 范围的用户控制。当然，从 RabbitMQ 的全局角度，vhost 可以作为不同权限隔离的手段（一个典型的例子就是不同的应用可以跑在不同的 vhost 中）。
 
@@ -70,7 +88,7 @@ vhost 可以理解为虚拟 Broker ，即 mini-RabbitMQ server 。其内部均�
 - Binding 元数据（存放路由关系的查找表）
 - Vhost 元数据（vhost 范围内针对前三者的名字空间约束和安全属性设置）。
 
-🦅 **与 Cluster 相关的元数据有哪些？元数据是如何保存的？元数据在 Cluster 中是如何分布的？**
+**与 Cluster 相关的元数据有哪些？元数据是如何保存的？元数据在 Cluster 中是如何分布的？**
 
 在 Cluster 模式下，还包括 Cluster 中 node 位置信息和 node 关系信息。
 
@@ -78,9 +96,9 @@ vhost 可以理解为虚拟 Broker ，即 mini-RabbitMQ server 。其内部均�
 
 下图所示为 queue 的元数据在单 node 和 cluster 两种模式下的分布图：
 
-[![分布图](http://static.iocoder.cn/c7566feb7a61cb647296a7224ba7f39d)](http://static.iocoder.cn/c7566feb7a61cb647296a7224ba7f39d)分布图
+![分布图](http://static.iocoder.cn/c7566feb7a61cb647296a7224ba7f39d)
 
-🦅 **RAM node 和 Disk node 的区别？**
+**RAM node 和 Disk node 的区别？**
 
 - RAM node 仅将 fabric（即 queue、exchange 和 binding等 RabbitMQ基础构件）相关元数据保存到内存中，但 Disk node 会在内存和磁盘中均进行存储。
 - RAM node 上唯一会存储到磁盘上的元数据是 Cluster 中使用的 Disk node 的地址。并且要求在 RabbitMQ Cluster 中至少存在一个 Disk node 。
@@ -105,36 +123,36 @@ vhost 可以理解为虚拟 Broker ，即 mini-RabbitMQ server 。其内部均�
 
   - 其中每一个 channel 运行在一个独立的线程上，多线程共享同一个 socket 。
 
-🦅 **消息基于什么传输？**
+**消息基于什么传输？**
 
 由于 TCP 连接的创建和销毁开销较大，且并发数受系统资源限制，会造成性能瓶颈。RabbitMQ 使用信道的方式来传输数据。信道是建立在真实的 TCP 连接内的虚拟连接，且每条 TCP连接上的信道数量没有限制。
 
-🦅 **RabbitMQ 上的一个 queue 中存放的 message 是否有数量限制？**
+**RabbitMQ 上的一个 queue 中存放的 message 是否有数量限制？**
 
 可以认为是无限制，因为限制取决于机器的内存，但是消息过多会导致处理效率的下降。
 
 > 下面的几个问题，Cluster 相关。
 
-🦅 **在单 node 系统和多 node 构成的 cluster 系统中声明 queue、exchange ，以及进行 binding 会有什么不同？**
+**在单 node 系统和多 node 构成的 cluster 系统中声明 queue、exchange ，以及进行 binding 会有什么不同？**
 
 - 当你在单 node 上声明 queue 时，只要该 node 上相关元数据进行了变更，你就会得到 `Queue.Declare-ok` 回应；而在 cluster 上声明 queue ，则要求 cluster 上的全部 node 都要进行元数据成功更新，才会得到 `Queue.Declare-ok` 回应。
 - 另外，若 node 类型为 RAM node 则变更的数据仅保存在内存中，若类型为 Disk node 则还要变更保存在磁盘上的数据。
 
-🦅 **客户端连接到 Cluster 中的任意 node 上是否都能正常工作？**
+**客户端连接到 Cluster 中的任意 node 上是否都能正常工作？**
 
 是的。客户端感觉不到有何不同。
 
-🦅 **若 Cluster 中拥有某个 queue 的 owner node 失效了，且该 queue 被声明具有 durable 属性，是否能够成功从其他 node 上重新声明该 queue ？**
+**若 Cluster 中拥有某个 queue 的 owner node 失效了，且该 queue 被声明具有 durable 属性，是否能够成功从其他 node 上重新声明该 queue ？**
 
 - 不能，在这种情况下，将得到 404 NOT_FOUND 错误。只能等 queue 所属的 node 恢复后才能使用该 queue 。
 - 但若该 queue 本身不具有 durable 属性，则可在其他 node 上重新声明。
 
-🦅 **Cluster 中 node 的失效会对 consumer 产生什么影响？若是在 cluster 中创建了 mirrored queue ，这时 node 失效会对 consumer 产生什么影响？**
+**Cluster 中 node 的失效会对 consumer 产生什么影响？若是在 cluster 中创建了 mirrored queue ，这时 node 失效会对 consumer 产生什么影响？**
 
 - 若是 consumer 所连接的那个 node 失效（无论该 node 是否为 consumer 所订阅 queue 的 owner node），则 consumer 会在发现 TCP 连接断开时，按标准行为执行重连逻辑，并根据 “Assume Nothing” 原则重建相应的 fabric 即可。
 - 若是失效的 node 为 consumer 订阅 queue 的 owner node，则 consumer 只能通过 Consumer Cancellation Notification 机制来检测与该 queue 订阅关系的终止，否则会出现傻等却没有任何消息来到的问题。
 
-🦅 **Consumer Cancellation Notification 机制用于什么场景？**
+**Consumer Cancellation Notification 机制用于什么场景？**
 
 用于保证当镜像 queue 中 master 挂掉时，连接到 slave 上的 consumer 可以收到自身 consume 被取消的通知，进而可以重新执行 consume 动作从新选出的 master 出获得消息。
 
@@ -142,7 +160,7 @@ vhost 可以理解为虚拟 Broker ，即 mini-RabbitMQ server 。其内部均�
 
 另外，因为在镜像 queue 模式下，存在将 message 进行 requeue 的可能，所以实现 consumer 的逻辑时需要能够正确处理出现重复 message 的情况。
 
-🦅 **能够在地理上分开的不同数据中心使用 RabbitMQ cluster 么？**
+**能够在地理上分开的不同数据中心使用 RabbitMQ cluster 么？**
 
 不能。
 
@@ -159,11 +177,11 @@ RabbitMQ 使用**发送方确认模式**，确保消息正确地发送到 Rabbit
 
 具体的代码实现，可以看看 [《芋道 Spring Boot 消息队列 RabbitMQ 入门》](http://www.iocoder.cn/Spring-Boot/RabbitMQ/?vip)的[「14. 生产者的发送确认」](http://svip.iocoder.cn/RabbitMQ/Interview/#) 小节
 
-🦅 **向不存在的 exchange 发 publish 消息会发生什么？向不存在的 queue 执行 consume 动作会发生什么？**
+**向不存在的 exchange 发 publish 消息会发生什么？向不存在的 queue 执行 consume 动作会发生什么？**
 
 都会收到 `Channel.Close` 信令告之不存在（内含原因 404 NOT_FOUND）。
 
-🦅 **什么情况下会出现 blackholed 问题？**
+**什么情况下会出现 blackholed 问题？**
 
 > blackholed ，对应中文为“黑洞”。
 
@@ -172,17 +190,17 @@ blackholed 问题是指，向 exchange 投递了 message ，而由于各种原�
 - 1、向未绑定 queue 的 exchange 发送 message 。
 - 2、exchange 以 binding_key key_A 绑定了 queue queue_A，但向该 exchange 发送 message 使用的 routing_key 却是 key_B 。
 
-🦅 **如何防止出现 blackholed 问题？**
+**如何防止出现 blackholed 问题？**
 
 没有特别好的办法，只能在具体实践中通过各种方式保证相关 fabric 的存在。另外，如果在执行 `Basic.Publish` 时设置 `mandatory=true` ，则在遇到可能出现 blackholed 情况时，服务器会通过返回 `Basic.Return` 告之当前 message 无法被正确投递（内含原因 312 NO_ROUTE）。
 
 具体的代码实现，可以看看 [《芋道 Spring Boot 消息队列 RabbitMQ 入门》](http://www.iocoder.cn/Spring-Boot/RabbitMQ/?vip)的[「14.3 ReturnCallback」](http://svip.iocoder.cn/RabbitMQ/Interview/#) 小节
 
-🦅 **routing_key 和 binding_key 的最大长度是多少？**
+**routing_key 和 binding_key 的最大长度是多少？**
 
 255 字节。
 
-🦅 **消息怎么路由？**
+**消息怎么路由？**
 
 从概念上来说，消息路由必须有三部分：交换器、路由、绑定。
 
@@ -223,17 +241,17 @@ RabbitMQ 使用**接收方消息确认机制**，确保消息接收方消费了�
 
 具体的代码实现，可以看看 [《芋道 Spring Boot 消息队列 RabbitMQ 入门》](http://www.iocoder.cn/Spring-Boot/RabbitMQ/?vip)的[「13. 消费者的消息确认」](http://svip.iocoder.cn/RabbitMQ/Interview/#) 小节。
 
-🦅 **如何避免消息重复投递或重复消费？**
+**如何避免消息重复投递或重复消费？**
 
 在消息生产时，MQ 内部针对每条生产者发送的消息生成一个 inner-msg-id ，作为去重和幂等的依据（消息投递失败并重传），避免重复的消息进入队列
 
 在消息消费时，要求消息体中必须要有一个 bizId（对于同一业务全局唯一，如支付 ID、订单 ID、帖子 ID 等）作为去重和幂等的依据，避免同一条消息被重复消费。
 
-🦅 **消息如何分发？**
+**消息如何分发？**
 
 若该队列至少有一个消费者订阅，消息将以循环（round-robin）的方式发送给消费者。每条消息只会分发给一个订阅的消费者（前提是消费者能够正常处理消息并进行确认）。
 
-🦅 **RabbitMQ 有几种消费模式？**
+**RabbitMQ 有几种消费模式？**
 
 RabbitMQ 有 pull 和 push 两种消费模式。具体的使用，可参见 [《RabbitMQ 之 Consumer 消费模式（Push & Pull）》](https://blog.csdn.net/u013256816/article/details/62890189) 文章。
 
@@ -248,18 +266,18 @@ RabbitMQ 有 pull 和 push 两种消费模式。具体的使用，可参见 [《
 
 所以，是否要对 message 进行持久化，需要综合考虑性能需要，以及可能遇到的问题。若想达到 100,000 条/秒以上的消息吞吐量（单 RabbitMQ 服务器），则要么使用其他的方式来确保 message 的可靠 delivery ，要么使用非常快速的存储系统以支持全持久化（例如使用 SSD）。另外一种处理原则是：仅对关键消息作持久化处理（根据业务重要程度），且应该保证关键消息的量不会导致性能瓶颈。
 
-🦅 **RabbitMQ 允许发送的 message 最大可达多大？**
+**RabbitMQ 允许发送的 message 最大可达多大？**
 
 根据 AMQP 协议规定，消息体的大小由 64-bit 的值来指定，所以你就可以知道到底能发多大的数据了。
 
-🦅 **为什么说保证 message 被可靠持久化的条件是 queue 和 exchange 具有 durable 属性，同时 message 具有 persistent 属性才行？**
+**为什么说保证 message 被可靠持久化的条件是 queue 和 exchange 具有 durable 属性，同时 message 具有 persistent 属性才行？**
 
 binding 关系可以表示为 exchange–binding–queue 。从文档中我们知道，若要求投递的 message 能够不丢失，要求 message 本身设置 persistent 属性，同时要求 exchange 和 queue 都设置 durable 属性。
 
 - 其实这问题可以这么想，若 exchange 或 queue 未设置 durable 属性，则在其 crash 之后就会无法恢复，那么即使 message 设置了 persistent 属性，仍然存在 message 虽然能恢复但却无处容身的问题。
 - 同理，若 message 本身未设置 persistent 属性，则 message 的持久化更无从谈起。
 
-🦅 **如何确保消息不丢失？**
+**如何确保消息不丢失？**
 
 消息持久化的前提是：将交换器/队列的 durable 属性设置为 true ，表示交换器/队列是持久交换器/队列，在服务器崩溃或重启之后不需要重新创建交换器/队列（交换器/队列会自动创建）。
 
@@ -284,11 +302,11 @@ DLX，Dead-Letter-Exchange。利用 DLX ，当消息在一个队列中变成死�
 
 详细的，可以看看 [《RabbitMQ 之死信队列》](http://www.iocoder.cn/RabbitMQ/dead-letter-queue/?vip) 文章。
 
-🦅 **“dead letter”queue 的用途？**
+**“dead letter”queue 的用途？**
 
 当消息被 RabbitMQ server 投递到 consumer 后，但 consumer 却通过 `Basic.Reject` 进行了拒绝时（同时设置 `requeue=false`），那么该消息会被放入 “dead letter” queue 中。该 queue 可用于排查 message 被 reject 或 undeliver 的原因。
 
-🦅 **`Basic.Reject` 的用法是什么？**
+**`Basic.Reject` 的用法是什么？**
 
 该信令可用于 consumer 对收到的 message 进行 reject 。
 
@@ -299,18 +317,18 @@ DLX，Dead-Letter-Exchange。利用 DLX ，当消息在一个队列中变成死�
 
 ## RabbitMQ 中的 cluster、mirrored queue，以及 warrens 机制分别用于解决什么问题？
 
-🦅 **1）cluster**
+**1）cluster**
 
 - cluster 是为了解决当 cluster 中的任意 node 失效后，producer 和 consumer 均可以通过其他 node 继续工作，即提高了可用性；另外可以通过增加 node 数量增加 cluster 的消息吞吐量的目的。
 - cluster 本身不负责 message 的可靠性问题（该问题由 producer 通过各种机制自行解决）；cluster 无法解决跨数据中心的问题（即脑裂问题）。
 - 另外，在cluster 前使用 HAProxy 可以解决 node 的选择问题，即业务无需知道 cluster 中多个 node 的 ip 地址。可以利用 HAProxy 进行失效 node 的探测，可以作负载均衡。下图为 HAProxy + cluster 的模型：[HAProxy + cluster 的模型](https://img-blog.csdnimg.cn/20181219191433895)
 
-🦅 **2）Mirrored queue**
+**2）Mirrored queue**
 
 - Mirrored queue 是为了解决使用 cluster 时所创建的 queue 的完整信息仅存在于单一 node 上的问题，从另一个角度增加可用性。
 - 若想正确使用该功能，需要保证：1）consumer 需要支持 Consumer Cancellation Notification 机制；2）consumer 必须能够正确处理重复 message 。
 
-🦅 **3）Warrens**
+**3）Warrens**
 
 Warrens 是为了解决 cluster 中 message 可能被 blackholed 的问题，即不能接受 producer 不停 republish message 但 RabbitMQ server 无回应的情况。
 
@@ -334,11 +352,11 @@ RabbitMQ 的高可用，是基于**主从**做高可用性的。它有三种模�
 - 普通集群模式
 - 镜像集群模式
 
-🦅 **1）单机模式**
+**1）单机模式**
 
 单机模式，就是启动单个 RabbitMQ 节点，一般用于本地开发或者测试环境。实际生产环境下，基本不会使用。
 
-🦅 **普通集群模式（无高可用性）**
+**普通集群模式（无高可用性）**
 
 > 这种方式，就是上面问题的 **cluster** 。
 
@@ -347,7 +365,7 @@ RabbitMQ 的高可用，是基于**主从**做高可用性的。它有三种模�
 - 你**创建的 queue，只会放在一个 RabbitMQ 实例上**，但是每个实例都同步 queue 的元数据（元数据可以认为是 queue 的一些配置信息，通过元数据，可以找到 queue 所在实例）。
 - 你消费的时候，实际上如果连接到了另外一个实例，那么那个实例会从 queue 所在实例上拉取数据过来。
 
-[![架构图](http://static.iocoder.cn/75d36ed17c91932e28b5eeba681ad8ec)](http://static.iocoder.cn/75d36ed17c91932e28b5eeba681ad8ec)架构图
+![架构图](http://static.iocoder.cn/75d36ed17c91932e28b5eeba681ad8ec)
 
 这种方式确实很麻烦，也不怎么好，**没做到所谓的分布式**，就是个普通集群。因为这导致你要么消费者每次随机连接一个实例然后拉取数据，要么固定连接那个 queue 所在实例消费数据，前者有**数据拉取的开销**，后者导致**单实例性能瓶颈**。
 
@@ -355,7 +373,7 @@ RabbitMQ 的高可用，是基于**主从**做高可用性的。它有三种模�
 
 所以这个事儿就比较尴尬了，这就**没有什么所谓的高可用性**，**这方案主要是提高吞吐量的**，就是说让集群中多个节点来服务某个 queue 的读写操作。
 
-🦅 **镜像集群模式（高可用性）**
+**镜像集群模式（高可用性）**
 
 > 艿艿：请教了下胖友，他们采用这种方式。
 >
@@ -363,7 +381,7 @@ RabbitMQ 的高可用，是基于**主从**做高可用性的。它有三种模�
 
 这种模式，才是所谓的 RabbitMQ 的高可用模式。跟普通集群模式不一样的是，在镜像集群模式下，你创建的 queue，无论元数据还是 queue 里的消息都会**存在于多个实例上**，就是说，每个 RabbitMQ 节点都有这个 queue 的一个**完整镜像**，包含 queue 的全部数据的意思。然后每次你写消息到 queue 的时候，都会自动把**消息同步**到多个实例的 queue 上。
 
-[![架构图](http://static.iocoder.cn/20a6c4d82a08becf7e8d913662b00357)](http://static.iocoder.cn/20a6c4d82a08becf7e8d913662b00357)架构图
+![架构图](http://static.iocoder.cn/20a6c4d82a08becf7e8d913662b00357)
 
 那么**如何开启这个镜像集群模式**呢？其实很简单，RabbitMQ 有很好的管理控制台，就是在后台新增一个策略，这个策略是**镜像集群模式的策略**，指定的时候是可以要求数据同步到所有节点的，也可以要求同步到指定数量的节点，再次创建 queue 的时候，应用这个策略，就会自动将数据同步到其他的节点上去了。
 
@@ -375,7 +393,7 @@ RabbitMQ 的高可用，是基于**主从**做高可用性的。它有三种模�
 
 具体的代码实现，可以看看 [《芋道 Spring Boot 消息队列 RabbitMQ 入门》](http://www.iocoder.cn/Spring-Boot/RabbitMQ/?vip)的[「15. RPC 远程调用」](http://svip.iocoder.cn/RabbitMQ/Interview/#) 小节。
 
-🦅 **使用 RabbitMQ 实现 RPC 有什么好处？**
+**使用 RabbitMQ 实现 RPC 有什么好处？**
 
 - 1、将客户端和服务器解耦：客户端只是发布一个请求到 MQ 并消费这个请求的响应。并不关心具体由谁来处理这个请求，MQ 另一端的请求的消费者可以随意替换成任何可以处理请求的服务器，并不影响到客户端。
 
@@ -393,17 +411,17 @@ RabbitMQ 的高可用，是基于**主从**做高可用性的。它有三种模�
 
 当然，虽然有这些优点，实际场景下，我们并不会这么做。😈
 
-🦅 **为什么 heavy RPC 的使用场景下不建议采用 disk node ？**
+**为什么 heavy RPC 的使用场景下不建议采用 disk node ？**
 
 heavy RPC 是指在业务逻辑中高频调用 RabbitMQ 提供的 RPC 机制，导致不断创建、销毁 reply queue ，进而造成 disk node 的性能问题（因为会针对元数据不断写盘）。所以在使用 RPC 机制时需要考虑自身的业务场景，一般来说不建议。
 
 ## RabbitMQ 是否会弄丢数据？
 
-> 艿艿：这个问题，基本是我们前面看到的几个问题的总结合并。
+> 这个问题，基本是我们前面看到的几个问题的总结合并。
 
 ![弄丢消息的几种情况](http://static.iocoder.cn/6303e69011255831c54d605250a6aa67)
 
-🦅 **生产者弄丢了数据？**
+**生产者弄丢了数据？**
 
 生产者将数据发送到 RabbitMQ 的时候，可能数据就在半路给搞丢了，因为网络问题啥的，都有可能。
 
@@ -442,9 +460,9 @@ channel.txCommit
 
 所以一般在生产者这块**避免数据丢失**，都是用 `confirm` 机制的。
 
-> 😈 不过 confirm 功能，也可能存在丢消息的情况。举个例子，如果回调到 `nack` 接口，此时 JVM 挂掉了，那么此消息就丢失了。（这个是艿艿的猜想，还在找胖友探讨中。关于这块，欢迎星球讨论。）
+> 不过 confirm 功能，也可能存在丢消息的情况。举个例子，如果回调到 `nack` 接口，此时 JVM 挂掉了，那么此消息就丢失了。
 
-🦅 **Broker 弄丢了数据**
+**Broker 弄丢了数据**
 
 就是 Broker 自己弄丢了数据，这个你必须**开启 Broker 的持久化**，就是消息写入之后会持久化到磁盘，哪怕是 Broker 自己挂了，**恢复之后会自动读取之前存储的数据**，一般数据不会丢。除非极其罕见的是，Broker 还没持久化，自己就挂了，**可能导致少量数据丢失**，但是这个概率较小。
 
@@ -461,13 +479,13 @@ channel.txCommit
 
 所以，持久化可以跟生产者那边的 `confirm` 机制配合起来，只有消息被持久化到磁盘之后，才会通知生产者 `ack` 了，所以哪怕是在持久化到磁盘之前，Broker 挂了，数据丢了，生产者收不到 `ack`，你也是可以自己重发的。
 
-🦅 **消费端弄丢了数据？**
+**消费端弄丢了数据？**
 
 RabbitMQ 如果丢失了数据，主要是因为你消费的时候，**刚消费到，还没处理，结果进程挂了**，比如重启了，那么就尴尬了，RabbitMQ 认为你都消费了，这数据就丢了。
 
 这个时候得用 RabbitMQ 提供的 `ack` 机制，简单来说，就是你必须关闭 RabbitMQ 的自动 `ack`，可以通过一个 api 来调用就行，然后每次你自己代码里确保处理完的时候，再在程序里 `ack` 一把。这样的话，如果你还没处理完，不就没有 `ack` 了？那 RabbitMQ 就认为你还没处理完，这个时候 RabbitMQ 会把这个消费分配给别的 consumer 去处理，消息是不会丢的。
 
-🦅 **总结**
+**总结**
 
 ![总结](http://static.iocoder.cn/83213e2ac79cd8899b09a66a5cf71669)
 
@@ -477,7 +495,7 @@ RabbitMQ 如果丢失了数据，主要是因为你消费的时候，**刚消费
 
 🚀 **来看看 RabbitMQ 顺序错乱的场景**：
 
-一个 queue，多个 consumer。比如，生产者向 RabbitMQ 里发送了三条数据，顺序依次是 data1/data2/data3，压入的是 RabbitMQ 的一个内存队列。有三个消费者分别从 MQ 中消费这三条数据中的一条，结果消费者 2 先执行完操作，把 data2 存入数据库，然后是 data1/data3。这不明显乱了。😈 也就是说，乱序消费的问题。
+一个 queue，多个 consumer。比如，生产者向 RabbitMQ 里发送了三条数据，顺序依次是 data1/data2/data3，压入的是 RabbitMQ 的一个内存队列。有三个消费者分别从 MQ 中消费这三条数据中的一条，结果消费者 2 先执行完操作，把 data2 存入数据库，然后是 data1/data3。这不明显乱了。也就是说，乱序消费的问题。
 
 ![乱序](http://static.iocoder.cn/29ea655479f826f9a6a5d9d005f46c7c)
 
@@ -497,7 +515,7 @@ RabbitMQ 如果丢失了数据，主要是因为你消费的时候，**刚消费
 
 具体的代码实现，可以看看 [《芋道 Spring Boot 消息队列 RabbitMQ 入门》](http://www.iocoder.cn/Spring-Boot/RabbitMQ/?vip)的[「11. 顺序消息」](http://svip.iocoder.cn/RabbitMQ/Interview/#) 小节
 
-# 666. 彩蛋
+## 彩蛋
 
 写的很糟糕，一度想删除。后来想想，先就酱紫，可能这就是此时自己对 RabbitMQ 掌握的情况。后面等自己业务场景真的开始使用 RabbitMQ 之后，在好好倒腾倒腾。Sad But Tree 。
 

@@ -1,3 +1,21 @@
+<!-- MarkdownTOC -->
+- [Apache Kafka 是什么?](#apache-kafka-是什么)
+- [Kafka 的架构是怎么样的？](#kafka-的架构是怎么样的)
+- [Kafka 的应用场景有哪些？](#kafka-的应用场景有哪些)
+- [Kafka 消息发送和消费的简化流程是什么？](#kafka-消息发送和消费的简化流程是什么)
+- [Kafka 的网络模型是怎么样的？](#kafka-的网络模型是怎么样的)
+- [Kafka 的数据存储模型是怎么样的?](#kafka-的数据存储模型是怎么样的)
+- [Kafka 的消息格式是怎么样的？](#kafka-的消息格式是怎么样的)
+- [Kafka 的副本机制是怎么样的？](#kafka-的副本机制是怎么样的)
+- [ZooKeeper 在 Kafka 中起到什么作用？](#zookeeper-在-kafka-中起到什么作用)
+- [Kafka 如何实现高可用？](#kafka-如何实现高可用)
+- [什么是 Kafka 事务？](#什么是-kafka-事务)
+- [Kafka 是否会弄丢数据？](#kafka-是否会弄丢数据)
+- [Kafka 如何保证消息的顺序性？](#kafka-如何保证消息的顺序性)
+- [666. 彩蛋](#666-彩蛋)
+
+<!-- /MarkdownTOC -->
+
 ## Apache Kafka 是什么?
 
 Kafka 是基于**发布与订阅**的**消息系统**。它最初由 LinkedIn 公司开发，之后成为 Apache 项目的一部分。Kafka 是一个分布式的，可分区的，冗余备份的持久性的日志服务。它主要用于处理活跃的流式数据。
@@ -7,7 +25,7 @@ Kafka 是基于**发布与订阅**的**消息系统**。它最初由 LinkedIn �
 - 降低系统组网复杂度。
 - 降低编程复杂度，各个子系统不在是相互协商接口，各个子系统类似插口插在插座上，Kafka 承担高速**数据总线**的作用。
 
-🦅 **Kafka 的主要特点？**
+**Kafka 的主要特点？**
 
 - 1、同时为发布和订阅提供高吞吐量。据了解，Kafka 每秒可以生产约 25 万消息（50MB），每秒处理 55 万消息（110MB）。
 
@@ -24,9 +42,9 @@ Kafka 是基于**发布与订阅**的**消息系统**。它最初由 LinkedIn �
 
 - 5、支持 online 和 offline 的场景。
 
-🦅 **聊聊 Kafka 的设计要点？**
+**聊聊 Kafka 的设计要点？**
 
-1）吞吐量
+（1）吞吐量
 
 高吞吐是 Kafka 需要实现的核心目标之一，为此 kafka 做了以下一些设计：
 
@@ -56,13 +74,13 @@ Kafka 是基于**发布与订阅**的**消息系统**。它最初由 LinkedIn �
   > 发布者发到某个 Topic 的消息会被均匀的分布到多个 Partition 上（随机或根据用户指定的回调函数进行分布），Broker 收到发布消息往对应 Partition 的最后一个 segment 上添加该消息。
   > 当某个 segment上 的消息条数达到配置值或消息发布时间超过阈值时，segment上 的消息会被 flush 到磁盘，只有 flush 到磁盘上的消息订阅者才能订阅到，segment 达到一定的大小后将不会再往该 segment 写数据，Broker 会创建新的 segment 文件。
 
-2）负载均衡
+（2）负载均衡
 
 - 1、Producer 根据用户指定的算法，将消息发送到指定的 Partition 中。
 - 2、Topic 存在多个 Partition ，每个 Partition 有自己的replica ，每个 replica 分布在不同的 Broker 节点上。多个Partition 需要选取出 Leader partition ，Leader Partition 负责读写，并由 Zookeeper 负责 fail over 。
 - 3、相同 Topic 的多个 Partition 会分配给不同的 Consumer 进行拉取消息，进行消费。
 
-3）拉取系统
+（3）拉取系统
 
 由于 Kafka Broker 会持久化数据，Broker 没有内存压力，因此， Consumer 非常适合采取 pull 的方式消费数据，具有以下几点好处：
 
@@ -70,7 +88,7 @@ Kafka 是基于**发布与订阅**的**消息系统**。它最初由 LinkedIn �
 - 2、Consumer 根据消费能力自主控制消息拉取速度。
 - 3、Consumer 根据自身情况自主选择消费模式，例如批量，重复消费，从尾端开始消费等。
 
-4）可扩展性
+（4）可扩展性
 
 > 通过 Zookeeper 管理 Broker 与 Consumer 的动态加入与离开。
 
@@ -114,7 +132,7 @@ Kafka 的整体架构非常简单，是分布式架构，Producer、Broker 和Co
 
 - ZooKeeper：Kafka 通过 ZooKeeper 来存储集群的 Topic、Partition 等元信息等。
 
-😈 单纯角色来说，Kafka 和 RocketMQ 是基本一致的。比较明显的差异是：
+单纯角色来说，Kafka 和 RocketMQ 是基本一致的。比较明显的差异是：
 
 > RocketMQ 从 Kafka 演化而来。
 
@@ -130,7 +148,7 @@ Kafka 的整体架构非常简单，是分布式架构，Producer、Broker 和Co
 
 - … 当然还有其它 …
 
-🦅 **Kafka 为什么要将 Topic 进行分区？**
+**Kafka 为什么要将 Topic 进行分区？**
 
 正如我们在 [「聊聊 Kafka 的设计要点？」](http://svip.iocoder.cn/Kafka/Interview/#) 问题中所看到的，是为了负载均衡，从而能够水平拓展。
 
@@ -145,35 +163,35 @@ Kafka 的整体架构非常简单，是分布式架构，Producer、Broker 和Co
 
 ![Kafka 的应用场景](http://static.iocoder.cn/3636ff4bd554ee1dfcfb92448073b5b8)
 
-1）消息队列
+（1）消息队列
 
 比起大多数的消息系统来说，Kafka 有更好的吞吐量，内置的分区，冗余及容错性，这让 Kafka 成为了一个很好的大规模消息处理应用的解决方案。消息系统一般吞吐量相对较低，但是需要更小的端到端延时，并常常依赖于 Kafka 提供的强大的持久性保障。在这个领域，Kafka 足以媲美传统消息系统，如 ActiveMQ 或 RabbitMQ 。
 
-2）行为跟踪
+（2）行为跟踪
 
 Kafka 的另一个应用场景，是跟踪用户浏览页面、搜索及其他行为，以发布订阅的模式实时记录到对应的 Topic 里。那么这些结果被订阅者拿到后，就可以做进一步的实时处理，或实时监控，或放到 Hadoop / 离线数据仓库里处理。
 
-3）元信息监控
+（3）元信息监控
 
 作为操作记录的监控模块来使用，即汇集记录一些操作信息，可以理解为运维性质的数据监控吧。
 
-4）日志收集
+（4）日志收集
 
 日志收集方面，其实开源产品有很多，包括 Scribe、Apache Flume 。很多人使用 Kafka 代替日志聚合（log aggregation）。日志聚合一般来说是从服务器上收集日志文件，然后放到一个集中的位置（文件服务器或 HDFS）进行处理。
 
 然而， Kafka 忽略掉文件的细节，将其更清晰地抽象成一个个日志或事件的消息流。这就让 Kafka 处理过程延迟更低，更容易支持多数据源和分布式数据处理。比起以日志为中心的系统比如 Scribe 或者 Flume 来说，Kafka 提供同样高效的性能和因为复制导致的更高的耐用性保证，以及更低的端到端延迟。
 
-5）流处理
+（5）流处理
 
 这个场景可能比较多，也很好理解。保存收集流数据，以提供之后对接的 Storm 或其他流式计算框架进行处理。很多用户会将那些从原始 Topic 来的数据进行阶段性处理，汇总，扩充或者以其他的方式转换到新的 Topic 下再继续后面的处理。
 
 例如一个文章推荐的处理流程，可能是先从 RSS 数据源中抓取文章的内容，然后将其丢入一个叫做“文章”的 Topic 中。后续操作可能是需要对这个内容进行清理，比如回复正常数据或者删除重复数据，最后再将内容匹配的结果返还给用户。这就在一个独立的 Topic 之外，产生了一系列的实时数据处理的流程。Strom 和 Samza 是非常著名的实现这种类型数据转换的框架。
 
-6）事件源
+（6）事件源
 
 事件源，是一种应用程序设计的方式。该方式的状态转移被记录为按时间顺序排序的记录序列。Kafka 可以存储大量的日志数据，这使得它成为一个对这种方式的应用来说绝佳的后台。比如动态汇总（News feed）。
 
-7）持久性日志（Commit Log）
+（7）持久性日志（Commit Log）
 
 Kafka 可以为一种外部的持久性日志的分布式系统提供服务。这种日志可以在节点间备份数据，并为故障节点数据回复提供一种重新同步的机制。Kafka 中日志压缩功能为这种用法提供了条件。在这种用法中，Kafka 类似于 Apache BookKeeper 项目。
 
@@ -185,7 +203,7 @@ Kafka 可以为一种外部的持久性日志的分布式系统提供服务。�
 - 2、Kafka 集群，接收到 Producer 发过来的消息后，将其持久化到硬盘，并保留消息指定时长（可配置），而不关注消息是否被消费。
 - 3、Consumer ，从 Kafka 集群 pull 数据，并控制获取消息的 offset 。至于消费的进度，可手动或者自动提交给 Kafka 集群。
 
-🦅 **1）Producer 发送消息**
+**（1）Producer 发送消息**
 
 Producer 采用 push 模式将消息发布到 Broker，每条消息都被 append 到 Patition 中，属于顺序写磁盘（顺序写磁盘效率比随机写内存要高，保障 Kafka 吞吐率）。Producer 发送消息到 Broker 时，会根据分区算法选择将其存储到哪一个 Partition 。
 
@@ -209,11 +227,11 @@ Producer 采用 push 模式将消息发布到 Broker，每条消息都被 append
 
 - 5、leader 收到所有 ISR 中的 replica 的 ACK 后，增加 HW（high watermark ，最后 commit 的 offset） 并向 Producer 发送 ACK 。
 
-🦅 **2）Broker 存储消息**
+**（2）Broker 存储消息**
 
 物理上把 Topic 分成一个或多个 Patition，每个 Patition 物理上对应一个文件夹（该文件夹存储该 Patition 的所有消息和索引文件）。
 
-🦅 **3）Consumer 消费消息**
+**（3）Consumer 消费消息**
 
 high-level Consumer API 提供了 consumer group 的语义，一个消息只能被 group 内的一个 Consumer 所消费，且 Consumer 消费消息时不关注 offset ，最后一个 offset 由 ZooKeeper 保存（下次消费时，该 group 中的 Consumer 将从 offset 记录的位置开始消费）。
 
@@ -228,7 +246,7 @@ Consumer 采用 pull 模式从 Broker 中读取数据。
 - push 模式，很难适应消费速率不同的消费者，因为消息发送速率是由 Broker 决定的。它的目标是尽可能以最快速度传递消息，但是这样很容易造成 Consumer 来不及处理消息，典型的表现就是拒绝服务以及网络拥塞。而 pull 模式，则可以根据 Consumer 的消费能力以适当的速率消费消息。
 - 对于 Kafka 而言，pull 模式更合适，它可简化 Broker 的设计，Consumer 可自主控制消费消息的速率，同时 Consumer 可以自己控制消费方式——即可批量消费也可逐条消费，同时还能选择不同的提交方式从而实现不同的传输语义。
 
-🦅 **Kafka Producer 有哪些发送模式？**
+**Kafka Producer 有哪些发送模式？**
 
 Kafka 的发送模式由 Producer 端的配置参数 `producer.type`来设置。
 
@@ -249,11 +267,11 @@ Kafka 的发送模式由 Producer 端的配置参数 `producer.type`来设置。
 
 具体的代码实现，可以看看 [《芋道 Spring Boot 消息队列 Kafka 入门》](http://www.iocoder.cn/Spring-Boot/RabbitMQ/?vip)的[「3. 快速入门」](http://svip.iocoder.cn/Kafka/Interview/#)和[「4. 批量发送消息」](http://svip.iocoder.cn/Kafka/Interview/#)小节。
 
-🦅 **Kafka Consumer 是否可以消费指定的分区消息？**
+**Kafka Consumer 是否可以消费指定的分区消息？**
 
 Consumer 消费消息时，向 Broker 发出“fetch”请求去消费特定分区的消息，Consumer 指定消息在日志中的偏移量(offset)，就可以消费从这个位置开始的消息，Consumer 拥有了 offset 的控制权，可以向后回滚去重新消费之前的消息，这是很有意义的。
 
-🦅 **Kafka 的 high-level API 和 low-level API 的区别？**
+**Kafka 的 high-level API 和 low-level API 的区别？**
 
 High Level API
 
@@ -271,7 +289,7 @@ Low Level API
 
 Kafka 基于高吞吐率和效率考虑，并没有使用第三方网络框架，而且自己基于 Java NIO 封装的。
 
-🦅 **1）KafkaClient ，单线程 Selector 模型。**
+**（1）KafkaClient ，单线程 Selector 模型。**
 
 ![KafkaClient](http://static.iocoder.cn/00e8ec59cf40c62db53b4d66dc45e17c)
 
@@ -280,7 +298,7 @@ Kafka 基于高吞吐率和效率考虑，并没有使用第三方网络框架�
 - 单线程模式适用于并发链接数小，逻辑简单，数据量小。
 - 在 Kafka 中，Consumer 和 Producer 都是使用的上面的单线程模式。这种模式不适合 Kafka 的服务端，在服务端中请求处理过程比较复杂，会造成线程阻塞，一旦出现后续请求就会无法处理，会造成大量请求超时，引起雪崩。而在服务器中应该充分利用多线程来处理执行逻辑。
 
-🦅 **2）KafkaServer ，多线程 Selector 模型。**
+**（2）KafkaServer ，多线程 Selector 模型。**
 
 > KafkaServer ，指的是 Kafka Broker 。
 
@@ -302,9 +320,9 @@ Broker 的内部处理流水线化，分为多个阶段来进行(SEDA)，以提�
 
   > 相当于业务线程池。
 
-😈 实际上，艿艿的想法，如果自己实现 MQ ，完全可以直接使用 Netty 作为网络通信框架。包括，RocketMQ 就是如此实现的。
+实际上，艿艿的想法，如果自己实现 MQ ，完全可以直接使用 Netty 作为网络通信框架。包括，RocketMQ 就是如此实现的。
 
-🦅 **解释如何提高远程用户的吞吐量?**
+**解释如何提高远程用户的吞吐量?**
 
 如果 Producer、Consumer 位于与 Broker 不同的数据中心，则可能需要调优套接口缓冲区大小，以对长网络延迟进行摊销。
 
@@ -326,7 +344,7 @@ LogSegment 文件由两部分组成，分别为 `.index` 文件和 `.log` 文件
 
 - 由于 Kafka 消息数据太大，如果全部建立索引，即占了空间又增加了耗时，所以 Kafka 选择了稀疏索引的方式（通过 `.index` 索引 `.log` 文件），这样的话索引可以直接进入内存，加快偏查询速度。
 
-🦅 **简单介绍一下如何读取数据？**
+**简单介绍一下如何读取数据？**
 
 如果我们要读取第 911 条数据。
 
@@ -337,7 +355,7 @@ LogSegment 文件由两部分组成，分别为 `.index` 文件和 `.log` 文件
   > - 10 表示，第 10 条消息开始。
   > - 1367 表示，在 `.log` 的第 1367 字节开始。
   >
-  > 😈 所以，本图的第 911 条的“1360”是错的，相比“1367” 反倒小了。
+  > 所以，本图的第 911 条的“1360”是错的，相比“1367” 反倒小了。
 
 - 然后，我们通过这条索引的物理位置 1367 ，开始往后找，直到找到 911 条数据。
 
@@ -347,7 +365,7 @@ LogSegment 文件由两部分组成，分别为 `.index` 文件和 `.log` 文件
 
 更详尽的，推荐阅读 [《Kafka 之数据存储》](http://matt33.com/2016/03/08/kafka-store/) 文章。
 
-🦅 **为什么不能以 Partition 作为存储单位？**
+**为什么不能以 Partition 作为存储单位？**
 
 如果就以 Partition 为最小存储单位，可以想象，当 Kafka Producer 不断发送消息，必然会引起 Partition 文件的无限扩张，将对消息文件的维护以及已消费的消息的清理带来严重的影响，因此，需以 segment 为单位将 Partition 进一步细分。
 
@@ -361,16 +379,16 @@ message 中的物理结构为：
 
 参数说明：
 
-| 关键字              | 解释说明                                                     |
-| :------------------ | :----------------------------------------------------------- |
+| 关键字              | 解释说明                                                                                                                                                       |
+| :------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 8 byte offset       | 在parition(分区)内的每条消息都有一个有序的id号，这个id号被称为偏移(offset),它可以唯一确定每条消息在parition(分区)内的位置。即offset表示partiion的第多少message |
-| 4 byte message size | message大小                                                  |
-| 4 byte CRC32        | 用crc32校验message                                           |
-| 1 byte “magic”      | 表示本次发布Kafka服务程序协议版本号                          |
-| 1 byte “attributes” | 表示为独立版本、或标识压缩类型、或编码类型                   |
-| 4 byte key length   | 表示key的长度,当key为-1时，K byte key字段不填                |
-| K byte key          | 可选                                                         |
-| value bytes payload | 表示实际消息数据                                             |
+| 4 byte message size | message大小                                                                                                                                                    |
+| 4 byte CRC32        | 用crc32校验message                                                                                                                                             |
+| 1 byte “magic”      | 表示本次发布Kafka服务程序协议版本号                                                                                                                            |
+| 1 byte “attributes” | 表示为独立版本、或标识压缩类型、或编码类型                                                                                                                     |
+| 4 byte key length   | 表示key的长度,当key为-1时，K byte key字段不填                                                                                                                  |
+| K byte key          | 可选                                                                                                                                                           |
+| value bytes payload | 表示实际消息数据                                                                                                                                               |
 
 不过，这是早期 Kafka 的版本，最新版本的格式，推荐阅读如下两篇文章：
 
@@ -466,13 +484,13 @@ Kafka 的副本机制，是多个 Broker 节点对其他节点的 Topic 分区�
 
   > 注意噢，此处说的都是同一个 Kafka Consumer group 。
 
-总的来说，Kafka 和 RocketMQ 的高可用方式是比较类似的，主要的差异在 Kafka Broker 的副本机制，和 RocketMQ Broker 的主从复制，两者的差异，以及差异带来的生产和消费不同。😈 当然，实际上，都是和“主” Broker 做消息的发送和读取不是？！
+总的来说，Kafka 和 RocketMQ 的高可用方式是比较类似的，主要的差异在 Kafka Broker 的副本机制，和 RocketMQ Broker 的主从复制，两者的差异，以及差异带来的生产和消费不同当然，实际上，都是和“主” Broker 做消息的发送和读取不是？！
 
 ## 什么是 Kafka 事务？
 
 推荐阅读 [《Kafka 事务简介》](https://blog.csdn.net/ransom0512/article/details/78840042) 文章。
 
-😈 和想象中的，是不是有点差别？！
+和想象中的，是不是有点差别？！
 
 具体的代码实现，可以看看 [《芋道 Spring Boot 消息队列 Kafka 入门》](http://www.iocoder.cn/Spring-Boot/RabbitMQ/?vip)的[「11. 事务消息」](http://svip.iocoder.cn/Kafka/Interview/#)小节。
 
@@ -480,7 +498,7 @@ Kafka 的副本机制，是多个 Broker 节点对其他节点的 Topic 分区�
 
 > 艿艿：注意，Kafka 是否会丢数据，主要取决于我们如何使用。这点，非常重要噢。
 
-🦅 **消费端弄丢了数据？**
+**消费端弄丢了数据？**
 
 唯一可能导致消费者弄丢数据的情况，就是说，你消费到了这个消息，然后消费者那边自动提交了 offset ，让 Broker 以为你已经消费好了这个消息，但其实你才刚准备处理这个消息，你还没处理，你自己就挂了，此时这条消息就丢咯。
 
@@ -492,7 +510,7 @@ Kafka 的副本机制，是多个 Broker 节点对其他节点的 Topic 分区�
 
 具体的代码实现，可以看看 [《芋道 Spring Boot 消息队列 Kafka 入门》](http://www.iocoder.cn/Spring-Boot/RabbitMQ/?vip)的[「12. 消费进度的提交机制」](http://svip.iocoder.cn/Kafka/Interview/#)小节。
 
-🦅 **Broker 弄丢了数据？**
+**Broker 弄丢了数据？**
 
 这块比较常见的一个场景，就是 Kafka 某个 Broker 宕机，然后重新选举 Partition 的 leader。大家想想，要是此时其他的 follower 刚好还有些数据没有同步，结果此时 leader 挂了，然后选举某个 follower 成 leader 之后，不就少了一些数据？这就丢了一些数据啊。
 
@@ -514,7 +532,7 @@ Kafka 的副本机制，是多个 Broker 节点对其他节点的 Topic 分区�
 
 我们生产环境就是按照上述要求配置的，这样配置之后，至少在 Kafka broker 端就可以保证在 leader 所在 Broker 发生故障，进行 leader 切换时，数据不会丢失。
 
-🦅 **生产者会不会弄丢数据？**
+**生产者会不会弄丢数据？**
 
 如果按照上述的思路设置了 `acks=all` ，一定不会丢，要求是，你的 leader 接收到消息，所有的 follower 都同步到了消息之后，才认为本次写成功了。如果没满足这个条件，生产者会自动不断的重试，重试无限次。
 
@@ -522,7 +540,7 @@ Kafka 的副本机制，是多个 Broker 节点对其他节点的 Topic 分区�
 
 ------
 
-😈 另外，在推荐一篇文章 [《360 度测试：KAFKA 会丢数据么？其高可用是否满足需求？》](https://juejin.im/post/5bf8f2bee51d4507c12bc722) ，提供了一些测试示例。
+另外，在推荐一篇文章 [《360 度测试：KAFKA 会丢数据么？其高可用是否满足需求？》](https://juejin.im/post/5bf8f2bee51d4507c12bc722) ，提供了一些测试示例。
 
 关于这一块，可以重点看看 [《Kafka 权威指南》](https://u.jd.com/jJpbF8) 的 [「6.4 在可靠的系统里使用生产者」](http://svip.iocoder.cn/Kafka/Interview/#) 和 [「6.5 在可靠的系统里使用消费者」](http://svip.iocoder.cn/Kafka/Interview/#) 小节。
 
@@ -544,9 +562,9 @@ Kafka 本身，并不像 RocketMQ 一样，提供顺序性的消息。所以，�
 
 具体的代码实现，可以看看 [《芋道 Spring Boot 消息队列 Kafka 入门》](http://www.iocoder.cn/Spring-Boot/RabbitMQ/?vip)的[「10. 顺序消息」](http://svip.iocoder.cn/Kafka/Interview/#)小节。
 
-## 666. 彩蛋
+## 彩蛋
 
-😈 略显仓促的一篇文章，后续会重新在梳理一下。如果胖友对 Kafka 有什么疑惑，一定要在星球里提出，我们一起在讨论和解答一波，然后整理到这篇文章中。
+略显仓促的一篇文章，后续会重新在梳理一下。如果胖友对 Kafka 有什么疑惑，一定要在星球里提出，我们一起在讨论和解答一波，然后整理到这篇文章中。
 
 同时，期待下厮大的 Kafka 新书。
 
