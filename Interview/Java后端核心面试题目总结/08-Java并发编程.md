@@ -350,6 +350,12 @@ synchronized通过monitor机制来实现线程同步，而monitor机制有依赖
 
 为了减少获得锁和释放锁带来的性能消耗，从JDK 6开始，引入了“偏向锁”和“轻量级锁”。所以，目前锁一共有4种状态，级别从低到高依次是：**无锁状态、偏向锁状态、轻量级锁状态和重量级锁状态，这几个状态会随着竞争情况逐渐升级**。**锁可以升级但不能降级**，为的是提高获得锁与释放锁的效率。
 
+> synchronized其实是可以锁降级的，当JVM进入安全点（`SafePoint`）的时候（垃圾回收时），会检查是否有闲置的 Monitor，有的话试图进行降级，降级对象为仅仅能被 `VMThread` 访问而没有其他 `JavaThread` 访问的对象，所以我们在正常使用synchronized的时候，自然认定只有锁升级没有锁降级。
+>
+> * [synchronizer.cpp](https://hg.openjdk.java.net/jdk/jdk/file/896e80158d35/src/hotspot/share/runtime/)中**deflate_idle_monitors**是分析**锁降级**逻辑的入口，这部分行为还在进行持续改进，因为其逻辑是在安全点内运行，处理不当可能拖长 JVM 停顿（STW，stop-the-world）的时间。
+>
+> - fast_exit 或者 slow_exit 是对应的锁释放逻辑。
+
 四种锁状态对应的的Mark Word内容描述如下：
 
 <div align="center">  
