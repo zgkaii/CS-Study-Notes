@@ -1,4 +1,5 @@
 <!-- MarkdownTOC -->
+
 - [Apache Kafka 是什么?](#apache-kafka-是什么)
 - [Kafka 的架构是怎么样的？](#kafka-的架构是怎么样的)
 - [Kafka 的应用场景有哪些？](#kafka-的应用场景有哪些)
@@ -583,4 +584,6 @@ Kafka 本身，并不像 RocketMQ 一样，提供顺序性的消息。所以，�
 - [《再谈基于 Kafka 和 ZooKeeper 的分布式消息队列原理》](https://gitbook.cn/books/5bc446269a9adf54c7ccb8bc/index.html)
 
 - [《如何保证消息的可靠性传输？（如何处理消息丢失的问题）》](https://github.com/doocs/advanced-java/blob/master/docs/high-concurrency/how-to-ensure-the-reliable-transmission-of-messages.md)
+
+- [Kafka](http://mp.weixin.qq.com/s?__biz=Mzk0MjA4ODcxNQ==&mid=2247499538&idx=1&sn=d45e0576d8289ef21e26e4f93dc50043&chksm=c2cac876f5bd4160f9ba1c080068b92870120fcbcb688830946b9577566566747c50294ba81f&mpshare=1&scene=24&srcid=0729xr3OylV805JzquacVOZE&sharer_sharetime=1627557375658&sharer_shareid=e499283e20b4332b3e28ce3a4958c6ae#rd)
 

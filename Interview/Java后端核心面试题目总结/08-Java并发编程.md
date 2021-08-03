@@ -5,6 +5,7 @@
   - [线程的生命周期](#线程的生命周期)
   - [Runnable和Callable区别](#runnable和callable区别)
   - [run()与start()方法区别](#run与start方法区别)
+  - [wait方法和sleep方法的区别](#wait方法和sleep方法的区别)
   - [Thread.interrupt() 方法的工作原理](#threadinterrupt-方法的工作原理)
   - [什么是线程上下文切换](#什么是线程上下文切换)
   - [可见性、原子性、有序性问题产生原因](#可见性原子性有序性问题产生原因)
@@ -38,10 +39,10 @@
     - [DelayQueue](#delayqueue)
     - [SynchronousQueue](#synchronousqueue)
 - [常见并发工具类](#常见并发工具类)
-    - [Semaphore 信号量](#semaphore-信号量)
-    - [CountDownLatch 倒计时器](#countdownlatch-倒计时器)
-    - [CyclicBarrier 循环栅栏](#cyclicbarrier-循环栅栏)
-    - [CyclicBarrier和CountDownLatch的区别](#cyclicbarrier和countdownlatch的区别)
+  - [Semaphore 信号量](#semaphore-信号量)
+  - [CountDownLatch 倒计时器](#countdownlatch-倒计时器)
+  - [CyclicBarrier 循环栅栏](#cyclicbarrier-循环栅栏)
+  - [CyclicBarrier和CountDownLatch的区别](#cyclicbarrier和countdownlatch的区别)
 - [AQS原理](#aqs原理)
 - [ThreadLocal应用及原理](#threadlocal应用及原理)
 - [线程池](#线程池)
@@ -768,7 +769,7 @@ SynchronousQueue可以看成是一个传球手，负责把生产者线程处理�
 
 # 常见并发工具类
 
-### Semaphore 信号量
+## Semaphore 信号量
 
 Semaphore（信号量）用来控制同时访问特定资源的线程数量，它可以指定多个线程同时访问某个资源。
 
@@ -776,7 +777,7 @@ Semaphore可以选择公平|非公平的构造方式，但都是共享锁的实�
 
 Semaphore常用于做流量控制，特别是公用资源有限的应用场景。
 
-### CountDownLatch 倒计时器
+## CountDownLatch 倒计时器
 
 CountDownLatch是一种同步辅助工具，它允许一个或多个线程等待其他线程完成操作，例如阻塞主线程，N 个子线程满足条件时主线程继续。
 
@@ -793,7 +794,7 @@ CountDownLatch主要应用场景：
 1. **实现最大的并行性**：同时启动多个线程，实现最大程度的并行性。例如110跨栏比赛中，所有运动员准备好起跑姿势，进入到预备状态，等待裁判一声枪响。裁判开了枪，所有运动员才可以开跑。
 2. **开始执行前等待N个线程完成各自任务**：例如Master 线程等待 Worker 线程把任务执行完。形象理解为等所有人干完手上的活，一起去吃饭。
 
-### CyclicBarrier 循环栅栏
+## CyclicBarrier 循环栅栏
 
 CyclicBarrier的字面意思是可循环使用（Cyclic）的屏障（Barrier）。它要做的事情是，让一组线程到达一个屏障（也可以叫同步点）时被阻塞，直到最后一个线程到达屏障时，屏障才会开门，所有被屏障拦截的线程才会继续运行。CyclicBarrier 可以用于多线程计算数据，最后合并计算结果的应用场景。
 
@@ -805,7 +806,7 @@ CyclicBarrier的字面意思是可循环使用（Cyclic）的屏障（Barrier）
 - 如果在等待的过程中，线程中断都也会抛出BrokenBarrierException异常，并且这个异常会传播到其他所有的线程，CyclicBarrier会被损坏。
 - 如果超出指定的等待时间，当前线程会抛出 TimeoutException 异常，其他线程会抛出BrokenBarrierException异常，CyclicBarrier会被损坏。
 
-### CyclicBarrier和CountDownLatch的区别
+## CyclicBarrier和CountDownLatch的区别
 
 | CountDownLatch                         | CyclicBarrier                              |
 | -------------------------------------- | ------------------------------------------ |

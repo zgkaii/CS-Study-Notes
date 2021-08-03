@@ -2,7 +2,7 @@
 - [Spring MVC](#spring-mvc)
   - [Spring MVC 框架有什么用？](#spring-mvc-框架有什么用)
   - [描述一下 Spring MVC 的工作原理及流程？](#描述一下-spring-mvc-的工作原理及流程)
-  - [SpringMVC 有哪些重要组件？](#springmvc-有哪些重要组件)
+  - [Spring MVC 有哪些重要组件？](#spring-mvc-有哪些重要组件)
   - [@Controller 注解有什么用？](#controller-注解有什么用)
   - [@RestController 和 @Controller 有什么区别？](#restcontroller-和-controller-有什么区别)
   - [@RequestMapping 注解有什么用？](#requestmapping-注解有什么用)
@@ -133,7 +133,7 @@ ViewResolver 结合 Model 和 View，来渲染视图，并写回给用户( 浏�
 
 但是 HTTP 是不支持返回 Java POJO 对象的，所以需要将结果使用HttpMessageConverter 进行转换后，才能返回。例如说，大家所熟悉的 FastJsonHttpMessageConverter在-Spring-中集成-Fastjson，将 POJO 转换成 JSON 字符串返回。
 
-## SpringMVC 有哪些重要组件？
+## Spring MVC 有哪些重要组件？
 
 
 **1、前端控制器DispatcherServlet（不需要工程师开发）,由框架提供（重要）**

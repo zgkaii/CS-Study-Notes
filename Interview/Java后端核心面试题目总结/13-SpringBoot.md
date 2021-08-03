@@ -1,4 +1,5 @@
 <!-- MarkdownTOC -->
+
 - [基础篇](#基础篇)
   - [Spring Boot 是什么？](#spring-boot-是什么)
   - [Spring Boot 提供了哪些核心功能？](#spring-boot-提供了哪些核心功能)
@@ -853,9 +854,19 @@ Swagger广泛用于可视化API，使用SwaggerUl**为前端开发人员提供�
 
 ## 如何将内嵌服务器换成 Jetty ？
 
-默认情况下，`spring-boot-starter-web` 模块使用 Tomcat 作为内嵌的服务器。所以需要去除对 `spring-boot-starter-tomcat` 模块的引用，添加 `spring-boot-starter-jetty` 模块的引用。代码如下：
+Spring Boot主要能够集成Tomcat 、Jetty 、Undertow三种嵌入式 web 容器。默认情况下，`spring-boot-starter-web` 模块使用 Tomcat 作为内嵌的服务器。
 
-```java
+```xml
+<dependency>
+   <groupId>org.springframework.boot</groupId>
+   <artifactId>spring-boot-starter-web</artifactId>
+   <!-- 引入web模块默认就是使用嵌入式的Tomcat作为Servlet容器 -->
+</dependency>
+```
+
+所以需要去除对 `spring-boot-starter-tomcat` 模块的引用，添加 `spring-boot-starter-jetty` 模块的引用。代码如下：
+
+```xml
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-web</artifactId>
@@ -869,6 +880,27 @@ Swagger广泛用于可视化API，使用SwaggerUl**为前端开发人员提供�
 <dependency> <!-- 引入 Jetty -->
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-jetty</artifactId>
+</dependency>
+```
+
+添加 `spring-boot-starter-undertow` 模块的引用：
+
+```xml
+<!-- 引入web模块 -->
+<dependency>
+   <groupId>org.springframework.boot</groupId>
+   <artifactId>spring-boot-starter-web</artifactId>
+   <exclusions>
+      <exclusion>
+         <artifactId>spring-boot-starter-tomcat</artifactId>
+         <groupId>org.springframework.boot</groupId>
+      </exclusion>
+   </exclusions>
+</dependency>
+<!--引入其他的Servlet容器-->
+<dependency>
+   <artifactId>spring-boot-starter-undertow</artifactId>
+   <groupId>org.springframework.boot</groupId>
 </dependency>
 ```
 

@@ -1,4 +1,5 @@
 <!-- MarkdownTOC -->
+
 - [IO模型](#io模型)
   - [I/O 模型有哪几类呢？](#io-模型有哪几类呢)
   - [BIO、NIO、AIO 是什么？](#bionioaio-是什么)
@@ -252,8 +253,6 @@ Netty 的分层很清晰：
 2. 创建 Selector，将之前创建的 ServerSocketChannel 注册到 Selector 上，监听 SelectionKey.OP_ACCEPT 。循环执行 Selector#select() 方法，轮询就绪的 Channel。	
 
 3. 轮询就绪的 Channel 时，如果是处于 OP_ACCEPT 状态，说明是新的客户端接入，调用`ServerSocketChannel#accept()` 方法，接收新的客户端。设置新接入的 SocketChannel 为非阻塞模式，并注册到 Selector 上，监听 OP_READ 。
-
-
 
 4. 如果轮询的 Channel 状态是 OP_READ ，说明有新的就绪数据包需要读取，则构造 ByteBuffer 对象，读取数据。这里，解码数据包的过程，需要我们自己编写。
 
@@ -662,7 +661,7 @@ TCP 实际上自带的就有长连接选项，本身是也有心跳包机制，�
 
 IdleStateHandler 目前提供三种类型的心跳检测，通过构造方法来设置。代码如下：
 
-```
+```java
 // IdleStateHandler.java
 
 public IdleStateHandler(

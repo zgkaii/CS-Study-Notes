@@ -40,6 +40,7 @@
 - [其他](#其他)
   - [Iterator 怎么使用？有什么特点？](#iterator-怎么使用有什么特点)
   - [Arrays.sort与Collections.sort使用算法](#arrayssort与collectionssort使用算法)
+  - [Arrays.toList() 和Collections.singletonList()的区别？](#arraystolist-和collectionssingletonlist的区别)
   - [Comparable和Comparator异同](#comparable和comparator异同)
   - [fail-fast机制](#fail-fast机制)
   - [fail-safe机制](#fail-safe机制)
@@ -47,7 +48,7 @@
 <!-- /MarkdownTOC -->
 # 谈谈你对集合框架的理解
 
-什么是集合呢？在数学中，集合就是“由若干个确定的原宿所构成的整体”。例如：
+什么是集合呢？在数学中，集合就是“由若干个确定的元素所构成的整体”。例如：
 
 * 有限集合：一个班所有同学构成的集合；
 * 无限集合：所有自然数集合（1，2，3，......）
@@ -767,6 +768,22 @@ Java在实现`DualPivotQuickSort`时，并未盲目使用双轴快速排序，�
 
 - 当待排序数目小于**29**，采用**插入排序**；
 - 当待排序数目大于**29**，采用**计数排序（CountingSort）**
+
+## Arrays.toList() 和Collections.singletonList()的区别？
+
+`Arrays.asList(strArray)`返回值是仍然是一个可变的集合，但是返回值是其内部类，不具有add方法，可以通过set方法进行增加值，默认长度是10。
+
+`Collections.singletonList()`返回的是不可变的集合，但是这个长度的集合只有1，可以减少内存空间。但是返回的值依然是Collections的内部实现类，同样没有add的方法，调用add，set方法会报错。
+
+```java
+java.lang.UnsupportedOperationException  //调用add（）都会报错
+```
+
+如何将元素优雅的转换成一个集合：
+
+```java
+List<K> authcChannels = Stream.of(K).collect(Collectors.toList());
+```
 
 ## Comparable和Comparator异同
 

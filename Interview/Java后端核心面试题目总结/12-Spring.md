@@ -13,7 +13,7 @@
   - [Spring 中有多少种 IoC 容器？](#spring-中有多少种-ioc-容器)
   - [常用的 ApplicationContext 容器？](#常用的-applicationcontext-容器)
   - [列举一些 IoC 的一些好处？](#列举一些-ioc-的一些好处)
-  - [IoC 容器的初始化过程？？](#ioc-容器的初始化过程)
+  - [IoC 容器的初始化过程？](#ioc-容器的初始化过程)
   - [Spring 框架中有哪些不同类型的事件？](#spring-框架中有哪些不同类型的事件)
 - [Spring AOP](#spring-aop)
   - [什么是 AOP ？](#什么是-aop-)
@@ -307,7 +307,7 @@ Spring Boot 使用的是第四种 ApplicationContext 容器**ConfigServletWebSer
 - 它支持即时的实例化和延迟加载 Bean 对象。
 - 它将使您的应用程序易于测试，因为它不需要单元测试用例中的任何单例或 JNDI 查找机制。
 
-## IoC 容器的初始化过程？？
+## IoC 容器的初始化过程？
 
 简单来说，Spring 中的 IoC 的实现原理，就是**工厂模式**加**反射机制**。
 

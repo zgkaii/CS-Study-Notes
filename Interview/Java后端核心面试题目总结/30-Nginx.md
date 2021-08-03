@@ -43,7 +43,7 @@ Nginx 的主要功能如下：
 
 > web 服务器收到一个请求时，他不会重新 fork 一个进程（因为这个进程在 web 服务器启动时就开启了，而且不会退出），web 服务器直接把内容传递给这个进程（进程间通信，但 fastcgi 使用了别的方式，tcp 方式通信），这个进程收到请求后进行处理，把结果返回给 web 服务器，最后自己接着等待下一个请求的到来，而不是退出。
 
-🚀 综上，差别在于是否重复 fork 进程，处理请求。
+综上，差别在于是否重复 fork 进程，处理请求。
 
 关于 Nginx 和 fastcgi 是如何运行的，可以看看 [《Nginx + FastCGI运行原理》](https://www.linuxba.com/archives/7682) 。
 
@@ -142,11 +142,11 @@ index  index.php index.html index.htm; # 访问根文件
 
   > Nginx 引入 [TCP 插件](https://docs.nginx.com/nginx/admin-guide/load-balancer/tcp-udp-load-balancer/)之后，也可以支持四层的转发。
 
-🚀 区别
+ **区别**
 
 LVS 由于是基于四层的转发所以只能做端口的转发，而基于 URL 的、基于目录的这种转发 LVS 就做不了。
 
-🚀 工作选择：
+ **工作选择：**
 
 HAproxy 和 Nginx 由于可以做七层的转发，所以 URL 和目录的转发都可以做，在很大并发量的时候我们就要选择 LVS ，像中小型公司的话并发量没那么大选择 HAproxy 或者 Nginx 足已。
 
@@ -176,7 +176,7 @@ HAproxy 和 Nginx 由于可以做七层的转发，所以 URL 和目录的转发
 
 - 4、Squid 的优势在于完整的庞大的 cache 技术资料，和很多的应用生产环境。
 
-🚀 工作选择：
+**工作选择：**
 
 要做 cache 服务的话，我们肯定是要选择专业的 cache 服务，优先选择Squid 或者 Varnish 。
 
