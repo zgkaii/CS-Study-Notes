@@ -68,7 +68,7 @@ Spring是一个**生态体系**（也可以说是技术体系），它包含了�
 
 ## 什么是 Spring Framework？
 
-Spring Framework是分层的 Java SE/EE 应用 full-stack **轻量级开源框架**，用于构建企业级应用的轻量级一站式解决方案，它以（Inverse Of Control： 反转控制）和 AOP（Aspect Oriented Programming：面向切面编程）为内核，提供了展现层 Spring MVC 和持久层 Spring JDBC 以及业务层事务管理等众多的企业级应用技术，还能整合开源世界众多著名的第三方框架和类库，逐渐成为使用最多的 Java EE 企业应用开源框架。
+Spring Framework是分层的 Java SE/EE 应用 full-stack **轻量级开源框架**，用于构建企业级应用的轻量级一站式解决方案，它以IoC（Inverse Of Control： 反转控制）和 AOP（Aspect Oriented Programming：面向切面编程）为内核，提供了展现层 Spring MVC 和持久层 Spring JDBC 以及业务层事务管理等众多的企业级应用技术，还能整合开源世界众多著名的第三方框架和类库，逐渐成为使用最多的 Java EE 企业应用开源框架。
 
 - 它是轻量级、松散耦合的。
 - 它具有分层体系结构，允许用户选择组件，同时还为 J2EE 应用程序开发提供了一个有凝聚力的框架。

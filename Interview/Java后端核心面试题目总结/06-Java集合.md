@@ -12,7 +12,7 @@
     - [LinkedList为什么采用双向链表](#linkedlist为什么采用双向链表)
   - [ArrayList与LinkedList区别](#arraylist与linkedlist区别)
 - [Collection子接口之Set](#collection子接口之set)
-  - [HashSet、TreeSet与LinkedHashSet区别](#hashsettreeset与linkedhashset区别)
+  - [HashSet、TreeSet与TreeSet区别](#hashsettreeset与treeSet区别)
   - [HashSet是如何保证数据不重复](#hashset是如何保证数据不重复)
 - [Map接口](#map接口)
   - [HashMap底层实现](#hashmap底层实现)
@@ -140,7 +140,7 @@ ArrayList 属性主要由数组长度 size、对象数组 elementData、初始�
 
 transient 关键字修饰该字段则表示该属性不会被序列化，但 ArrayList 其实是实现了序列化接口，这到底是怎么回事呢？
 
-* 由于 ArrayList 基于数组实现，可以动态扩容，所以并不是所有被分配的内存空间都存储了数据。如果采用外部序列化法实现数组的序列化，会序列化整个数组。ArrayList 为了避免这些没有存储数据的内存空间被序列化，内部提供了两个私有方法 **writeObject 以及 readObject** 来自我完成序列化与反序列化，就可以保证只序列化实际存储的那些元素，而不是整个数组，从而在序列化与反序列化数组时节省了空间和时间。
+* 由于 ArrayList 基于数组实现，可以动态扩容，所以并不是所有被分配的内存空间都存储数据。如果采用外部序列化法实现数组的序列化，会序列化整个数组。ArrayList 为了避免这些没有存储数据的内存空间被序列化，内部提供了两个私有方法 **writeObject 以及 readObject** 来自我完成序列化与反序列化，就可以保证只序列化实际存储的那些元素，而不是整个数组，从而在序列化与反序列化数组时节省了空间和时间。
 * 因此使用 transient 修饰数组，是防止对象数组被其他外部方法序列化。
 
 ### ArrayList扩容机制
@@ -259,7 +259,7 @@ public interface RandomAccess {
 
 # Collection子接口之Set
 
-## HashSet、TreeSet与LinkedHashSet区别
+## HashSet、TreeSet与TreeSet区别
 
 * `HashSet `是 Set 接口的主要实现类 ，`HashSet` 的底层是 `HashMap`，线程不安全的，可以存储 null 值；
 
@@ -350,7 +350,7 @@ JDK1.7  `HashMap` 底层是 **数组和链表** 结合在一起使用也就是 *
 
 众所周知，数组的查询效率为O(1)，链表的查询效率是O(n)，红黑树的查询效率是O(log n)，n为桶中的元素个数。
 
-所有当位于链表中的结点过多，显然通过key值依次查找效率就太低了。因此JDK 1.8在解决哈希冲突时有了较大的变化，**当链表长度大于阈值（默认为8）时，将链表转化为红黑树**，以提高查询效率（将链表转换成红黑树前会判断，如果当前数组的长度小于 64，那么会选择先进行数组扩容，而不是转换为红黑树）。
+所有当位于链表中的结点过多，显然通过key值顺序查找效率就太低了。因此JDK 1.8在解决哈希冲突时有了较大的变化，**当链表长度大于阈值（默认为8）时，将链表转化为红黑树**，以提高查询效率（将链表转换成红黑树前会判断，如果当前数组的长度小于 64，那么会优先选择数组扩容，而不是转换为红黑树）。
 
 也就是说，JDK 1.8之后，`HashMap`底层数据结构是**数组+链表+红黑树**。
 
@@ -409,7 +409,7 @@ static final int tableSizeFor(int cap) {
 
 HashMap先是通过**扰动函数**`hash(Object key)`处理key的`hashCode`而得到其hash 值，然后通过**桶下标计算公式** `(n - 1) & hash` 判断当前元素存放的位置（这里的 n 指的是数组的长度）。
 
-所谓扰动函数指的就是 `HashMap` 的 `hash` 方法。使用 hash 方法也就是扰动函数是为了防止一些实现比较差的 `hashCode() `方法，换句话说使用扰动函数之后可以减少碰撞。
+所谓扰动函数指的就是 `HashMap` 的 `hash` 方法。使用扰动函数是为了防止一些实现比较差的 `hashCode() `方法，换句话说使用扰动函数可以减少碰撞。
 
 **JDK 1.8 HashMap 的hash方法源码:**
 
@@ -498,6 +498,72 @@ tab[i = (n - 1) & hash]
 ## HashMap的put方法处理流程是什么
 
 put方法中调用了`putVal`方法，传递的参数是hash()方法计算key的hash值，主要逻辑写在`putVal`方法中。
+
+```java
+final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
+                   boolean evict) {
+    Node<K,V>[] tab; Node<K,V> p; int n, i;
+    // 步骤1：桶数组未初始化或者长度为0，进行扩容
+    if ((tab = table) == null || (n = tab.length) == 0)
+        n = (tab = resize()).length;
+    // 步骤2：指定桶为空，新生成结点直接放入
+    // (n - 1) & hash 计算元素在哪个桶中
+    if ((p = tab[i = (n - 1) & hash]) == null)
+        tab[i] = newNode(hash, key, value, null);
+    // 指定位置已经存在元素
+    else {
+        Node<K,V> e; K k;
+        // 步骤3： 如果桶中第一个元素的key与待插入元素的key相同，保存到e中用于后续修改value值
+        if (p.hash == hash &&
+            ((k = p.key) == key || (key != null && key.equals(k))))
+                // 将第一个元素赋值给e，用e来记录
+                e = p;
+        // 步骤4：如果第一个元素是树节点，则调用树节点的putTreeVal插入元素
+        else if (p instanceof TreeNode)
+            e = ((TreeNode<K,V>)p).putTreeVal(this, tab, hash, key, value);
+        // 步骤5：为链表结点，遍历链表进行操作
+        else {
+            // inCount用于存储链表中元素的个数
+            for (int binCount = 0; ; ++binCount) {
+                // 到达链表的尾部还没有找到相同key的元素，则在尾部插入新结点
+                if ((e = p.next) == null) {
+                    p.next = newNode(hash, key, value, null);
+                    // 结点数量达到扩容门槛，转化为红黑树
+                    if (binCount >= TREEIFY_THRESHOLD - 1) 
+                        treeifyBin(tab, hash);
+                    break;
+                }
+                // 判断链表中结点的key值与插入的元素的key值相等，则退出循环
+                if (e.hash == hash &&
+                    ((k = e.key) == key || (key != null && key.equals(k))))
+                    break;
+                // 用于遍历桶中的链表，与前面的e = p.next组合，可以遍历链表
+                p = e;
+            }
+        }
+        // 步骤6：表示在桶中找到key值、hash值与插入元素相等的结点
+        if (e != null) { 
+            // 记录e的旧value
+            V oldValue = e.value;
+            // 判断是否要置换旧值
+            if (!onlyIfAbsent || oldValue == null)
+                // 直接覆盖，并返回旧值
+                e.value = value;
+            // 访问后回调
+            afterNodeAccess(e);
+            // 返回旧值
+            return oldValue;
+        }
+    }
+
+    ++modCount;
+    // 步骤7：判断是否扩容
+    if (++size > threshold)
+        resize();
+    afterNodeInsertion(evict);
+    return null;
+} 
+```
 
 HashMap插入中一个数据插入的整体流程，包括了：计算下标、何时扩容、何时链表转红黑树等，大致如下：
 
@@ -634,12 +700,12 @@ HashMap 遍历从大的方向来说，可分为以下 4 类：
 
 ## HashMap与Hashtable区别
 
-| 异同                         | `HashMap`                                                                                                                                        | `Hashtable`                                                                                                             |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
-| 线程是否安全                 | 否                                                                                                                                               | 是，内部的方法基本都经过`synchronized` 修饰。                                                                           |
-| 效率                         | 稍微比`Hashtable`高一点                                                                                                                          | 效率低                                                                                                                  |
-| 对null key和null value的支持 | 可以存储 null 的 key 和 value，但null作为键只能有一个，null作为值可以有多个。                                                                    | 不允许有 null 键和 null 值，否则会抛出`NullPointerException`。                                                          |
-| 始容量大小和每次扩充容量大小 | 创建时指定容量大小：扩充为大于指定值的最小 2 的幂次方大小。<br/>创建时不指定容量大小：默认的初始化大小为 16。之后每次扩充，容量变为原来的 2 倍。 | 创建时指定容量大小：扩充为指定值大小。<br/>创建时不指定容量大小：默认的初始大小为 11，之后每次扩充，容量变为原来的 2n+1 |
+| 异同                         | `HashMap`                                                    | `Hashtable`                                                  |
+| ---------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| 线程是否安全                 | 否                                                           | 是，内部的方法基本都经过`synchronized` 修饰。                |
+| 效率                         | 稍微比`Hashtable`高一点                                      | 效率低                                                       |
+| 对null key和null value的支持 | 可以存储 null 的 key 和 value，但null作为键只能有一个，null作为值可以有多个。 | 不允许有 null 键和 null 值，否则会抛出`NullPointerException`。 |
+| 始容量大小和每次扩充容量大小 | 创建时指定容量大小：扩充为大于等于指定值的最小 2次幂 的大小。<br/>创建时不指定容量大小：默认的初始化大小为 16。之后每次扩充，容量变为原来的 2 倍。 | 创建时指定容量大小：扩充为指定值大小。<br/>创建时不指定容量大小：默认的初始大小为 11，之后每次扩充，容量变为原来的 2n+1 |
 
 ## ConcurrentHashMap底层实现
 
@@ -665,6 +731,84 @@ static class Segment<K,V> extends ReentrantLock implements Serializable {
 `ConcurrentHashMap `取消了 Segment 分段锁，**采用 CAS 和 synchronized** 来保证并发安全。数据结构跟 HashMap1.8 的结构类似，数组+链表/红黑二叉树。synchronized 只锁定当前链表或红黑二叉树的首节点，这样只要 hash 不冲突，就不会产生并发，效率又提升 N 倍。
 
 ## ConcurrentHashMap的put方法流程？
+
+```java
+public V put(K key, V value) {
+    return putVal(key, value, false);
+}
+
+/** Implementation for put and putIfAbsent */
+final V putVal(K key, V value, boolean onlyIfAbsent) {
+    // key 和 value 不能为空
+    if (key == null || value == null) throw new NullPointerException();
+    int hash = spread(key.hashCode());
+    int binCount = 0;
+    for (Node<K,V>[] tab = table;;) {
+        // f = 目标位置元素
+        Node<K,V> f; int n, i, fh;// fh 后面存放目标位置的元素 hash 值
+        if (tab == null || (n = tab.length) == 0)
+            // 数组桶为空，初始化数组桶（自旋+CAS)
+            tab = initTable();
+        else if ((f = tabAt(tab, i = (n - 1) & hash)) == null) {
+            // 桶内为空，CAS 放入，不加锁，成功了就直接 break 跳出
+            if (casTabAt(tab, i, null,new Node<K,V>(hash, key, value, null)))
+                break;  // no lock when adding to empty bin
+        }
+        else if ((fh = f.hash) == MOVED)
+            tab = helpTransfer(tab, f);
+        else {
+            V oldVal = null;
+            // 使用 synchronized 加锁加入节点
+            synchronized (f) {
+                if (tabAt(tab, i) == f) {
+                    // 说明是链表
+                    if (fh >= 0) {
+                        binCount = 1;
+                        // 循环加入新的或者覆盖节点
+                        for (Node<K,V> e = f;; ++binCount) {
+                            K ek;
+                            if (e.hash == hash &&
+                                ((ek = e.key) == key ||
+                                 (ek != null && key.equals(ek)))) {
+                                oldVal = e.val;
+                                if (!onlyIfAbsent)
+                                    e.val = value;
+                                break;
+                            }
+                            Node<K,V> pred = e;
+                            if ((e = e.next) == null) {
+                                pred.next = new Node<K,V>(hash, key,
+                                                          value, null);
+                                break;
+                            }
+                        }
+                    }
+                    else if (f instanceof TreeBin) {
+                        // 红黑树
+                        Node<K,V> p;
+                        binCount = 2;
+                        if ((p = ((TreeBin<K,V>)f).putTreeVal(hash, key,
+                                                       value)) != null) {
+                            oldVal = p.val;
+                            if (!onlyIfAbsent)
+                                p.val = value;
+                        }
+                    }
+                }
+            }
+            if (binCount != 0) {
+                if (binCount >= TREEIFY_THRESHOLD)
+                    treeifyBin(tab, i);
+                if (oldVal != null)
+                    return oldVal;
+                break;
+            }
+        }
+    }
+    addCount(1L, binCount);
+    return null;
+}
+```
 
 1. key为null或者value为null，抛出空指针异常；
 2. for死循环，为了实现CAS的无锁化更新。如果table为null或者table的长度为0，则初始化table，调用initTable()方法（第一次put数据，调用默认参数实现，其中重要的sizeCtl参数）。
@@ -706,7 +850,7 @@ static class Segment<K,V> extends ReentrantLock implements Serializable {
 `ConcurrentHashMap`和 `Hashtable`的区别主要体现在实现线程安全的方式上不同。
 
 - **底层数据结构：** JDK1.7 的 `ConcurrentHashMap` 底层采用 **分段的数组+链表** 实现，JDK1.8 采用的数据结构跟 HashMap1.8 的结构一样，数组+链表/红黑二叉树。`Hashtable`和 JDK1.8 之前的 `HashMap `的底层数据结构类似都是采用 **数组+链表** 的形式，数组是 `HashMap` 的主体，链表则是主要为了解决哈希冲突而存在的；
-- **实现线程安全的方式（重要）：** ① **在 JDK1.7 的时候，`ConcurrentHashMap`（分段锁）** 对整个桶数组进行了分割分段(Segment)，每一把锁只锁容器其中一部分数据，多线程访问容器里不同数据段的数据，就不会存在锁竞争，提高并发访问率。 **到了 JDK1.8 的时候已经摒弃了 Segment 的概念，而是直接用 Node 数组+链表+红黑树的数据结构来实现，并发控制使用 synchronized 和 CAS 来操作。（JDK1.6 以后 对 synchronized 锁做了很多优化）** 整个看起来就像是优化过且线程安全的 HashMap，虽然在 JDK1.8 中还能看到 Segment 的数据结构，但是已经简化了属性，只是为了兼容旧版本；② **Hashtable(同一把锁)** :使用 synchronized 来保证线程安全，效率非常低下。当一个线程访问同步方法时，其他线程也访问同步方法，可能会进入阻塞或轮询状态，如使用 put 添加元素，另一个线程不能使用 put 添加元素，也不能使用 get，竞争会越来越激烈效率越低。
+- **实现线程安全的方式（重要）：** ① **在 JDK1.7 的时候，`ConcurrentHashMap`（分段锁）** 对整个桶数组进行了分割分段(Segment)，每一把锁只锁容器其中一部分数据，多线程访问容器里不同数据段的数据，就不会存在锁竞争，提高并发访问率。 **到了 JDK1.8 的时候已经摒弃了 Segment 的概念，而是直接用 Node 数组+链表+红黑树的数据结构来实现，并发控制使用 synchronized 和 CAS 来操作。（JDK1.6 以后 对 synchronized 锁做了很多优化）** 整个看起来就像是优化过且线程安全的 HashMap，虽然在 JDK1.8 中还能看到 Segment 的数据结构，但是已经简化了属性，只是为了兼容旧版本；② **Hashtable(同一把锁)** ：使用 synchronized 来保证线程安全，效率非常低下。当多个线程访问同步方法时，只有一个线程线程能访问同步方法，其他线程会进入阻塞或轮询状态；如使用 put 添加元素，其他线程不能使用 put 添加元素，也不能使用 get，竞争激烈效率越低。
 
 > 虽然 ConcurrentHashMap 的整体性能要优于 Hashtable，但在某些场景中，ConcurrentHashMap 依然不能代替 Hashtable。例如，在强一致的场景中 ConcurrentHashMap 就不适用，原因是 ConcurrentHashMap 中的 get、size 等方法没有用到锁，ConcurrentHashMap 是弱一致性的，因此有可能会导致某次读无法马上获取到写入的数据。
 
@@ -726,7 +870,7 @@ static class Segment<K,V> extends ReentrantLock implements Serializable {
 
 迭代器是⼀种设计模式，它是⼀个对象，它可以遍历并选择序列中的对象，而开发⼈员不需要了解该序列的底层结构。迭代器通常被称为“轻量级”对象，因为创建它的代价小。Java 中的 Iterator 功能比简单，并且只能单向移动：　　 
 
-1. 使用方法 iterator() 要求容器返回⼀个 Iterator。第⼀次调用 Iterator 的 next() 方法时，它返回序列的第⼀个元素。注意：iterator() 方法是 java.lang.Iterable 接口，被 Collection 继承。　　
+1. 使用方法 iterator() 要求容器返回⼀个 Iterator。第⼀次调用 Iterator 的 next() 方法时，它返回序列的第⼀个元素。注意：iterator() 方法是 `java.lang.Iterable` 接口，被 Collection 继承。　　
 2. 使用 next() 获得序列中的下⼀个元素。　
 3. 使用 hasNext() 检查序列中是否还有元素。　　
 4. 使用 remove() 将迭代器新返回的元素删除。　
