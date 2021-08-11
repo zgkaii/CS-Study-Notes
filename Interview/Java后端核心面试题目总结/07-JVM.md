@@ -41,7 +41,7 @@
   - [如何正确选择GC？](#如何正确选择gc)
   - [JDK 的默认 GC 是什么？](#jdk-的默认-gc-是什么)
 - [执行引擎](#执行引擎)
-  - [Java为什么是半执行半编译语言？](#java为什么是半执行半编译语言)
+  - [Java为什么是半解释半编译语言？](#java为什么是半解释半编译语言)
   - [Java中编译器分类有哪些？](#java中编译器分类有哪些)
 - [命令行参数与命令行工具](#命令行参数与命令行工具)
   - [JVM常用命令行参数 jmap、jps？](#jvm常用命令行参数-jmapjps)
@@ -124,11 +124,10 @@ Java虚拟机与Java语言并没有必然的联系，它只与特定的**二进�
 
 **解析阶段**：解析符号引用阶段主要将**常量池**内的**符号引用转换为直接引用的过程**。
 
-* 解析动作主要针**加载阶段**：是整个“类加载”(Class Loading)过程中的第一个阶段，JVM需要完成三件事：
+* 事实上，解析操作往往会伴随着JVM在执行完初始化之后再执行。
+* 符号引用就是一组符号来描述所引用的目标。符号引用的字面量形式明确定义在《Java虚拟机规范》的class文件格式中。直接引用就是直接指向目标的指针、相对偏移量或一个间接定位到目标的句柄。
 
-  * 通过一个类的**全限定名获取定义此类的二进制字节流**，简单点说就是 **找到文件系统中/jar包中/或存在于任何地方的“ class文件 ”**。 如果找不到则会抛出 `NoClassDefFound `错误。
-  * 将这个字节流所代表的静态存储结构转化为方法区的运行时数据结构。
-  * **在内存中生成一个代表这个类的`java.lang.Class`对象**，作为方法区这个类的各种数据的访问入口。
+* 解析动作主要针对**类或接口、字段、类方法、接口方法、方法类型**等。对应常量池中的`CONSTANT Class info、CONSTANT Fieldref info、CONSTANT_Methodref_info`等。
 
 
 **初始化阶段**：JVM规范明确规定, 必须在类的首次“主动使用”时才能执行类初始化。 初始化的过程包括执行： **类构造器方法，static静态变量赋值语句 和static静态代码块**。
@@ -577,7 +576,7 @@ CMS GC的官方名称为 “Mostly Concurrent Mark and Sweep Garbage Collector�
 
  <div align="center"> <img src="..\..\05-Java\images\jvm\CMS.png" width="750px"></div>
 
-启动参数：*-XX:+UseConcMarkSweepGC*。
+启动参数：`-XX:+UseConcMarkSweepGC`。
 
 CMS整个过程比之前的收集器要复杂，整个过程分为6个主要阶段：
 
@@ -771,7 +770,7 @@ JDK11与JDK12起，分别开始支持ZGC与Shennandoah GC：
 
 # 执行引擎
 
-## Java为什么是半执行半编译语言？
+## Java为什么是半解释半编译语言？
 
 JVM在执行Java代码的时候，通常都会将解释执行与编译执行二者结合起来进行。我们编写的`.java`源文件先是通过javac编译器编译成bytecode字节码文件，然后通过JVM内嵌的解释器将字节码文件转换成机器码。但是，我们常用的JVM例如Hotspot JVM中，提供了 JIT(Just-In-Time)编译器，也就是所谓的动态编译器。JIT编译器能够在运行时将热点代码编译成机器码，这种情况下部分热点代码就是属于编译执行了。
 
@@ -952,7 +951,7 @@ jmc是目前Oracle提供最强大的JVM可视化工具，它支持远程连接JV
 
 (3)**显示指定永久代/元空间的大小**
 
-从Java 8开始，如果我们没有指定 Metaspace 的大小，随着更多类的创建，虚拟机会耗尽所有可用的系统内存(永久代并不会出现这种情况)。
+从Java 8开始，如果我们没有指定 Metaspace 的大小，随着更多类的创建，虚拟机会耗尽所有可用的系统内存(永久代并不会出现这种情况)。`-XX:MetaspaceSize=size`设置元空间初始大小，`-XX:MaxPermSize=size` 元空间最大内存,
 
 JDK1.7 及之前永久代还没被彻底移除的时候通常通过下面这些参数来调节方法区大小，JDK 1.8设置此类参数会无效。
 
@@ -984,6 +983,19 @@ JDK 1.8 的时候，方法区(HotSpot 的永久代)被彻底移除了，取而�
 ## GC设置参数
 
 **垃圾回收器**
+
+`-XX:+PrintGCDetails` 打印GC日志详情
+`-Xloggc:gc.demo.log` 指定日志文件
+`-Xloggc:/log/gc.demo.log` 指定GC日志文件存放的绝对路径
+`-XX:+UseGCLogFileRotation` 
+`-XX:NumberOfGCLogFiles=5` 
+`-XX:GCLogFileSize=20M` log文件大小
+`-XX:+PrintGCDateStamps` 打印GC事件发生的日期时间
+`-XX:+PrintGCApplicationStoppedTime` 输出每次GC的持续时间和程序暂停时间
+
+`-XX:+PrintReferenceGC` 输出GC清理了多少引用类型
+
+
 
 ```java
 -XX:+UseSerialGC——使用串行垃圾回收器(Serial/Serial Old 组合)

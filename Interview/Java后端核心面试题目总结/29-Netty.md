@@ -463,10 +463,10 @@ Reactor模型中有2个关键组成：
 
 在 Netty 主要靠 `NioEventLoopGroup` 线程池来实现具体的线程模型的 。
 
-| 线程模式                  | 实现                                                                                                                                                                                                                                  |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Reacto单线程              | EventLoopGroup eventGroup = new NioEventLoopGroup(**1**); <br/><br/>ServerBootstrap serverBootstrap = new ServerBootstrap(); <br/>serverBootstrap.group(eventGroup);                                                                  |
-| 非主从 Reactor 多线程模式 | EventLoopGroup eventGroup = new NioEventLoopGroup(); <br/><br/>ServerBootstrap serverBootstrap = new ServerBootstrap(); <br/>serverBootstrap.group(eventGroup);                                                                       |
+| 线程模式                  | 实现                                                         |
+| ------------------------- | ------------------------------------------------------------ |
+| Reactor单线程             | EventLoopGroup eventGroup = new NioEventLoopGroup(**1**); <br/><br/>ServerBootstrap serverBootstrap = new ServerBootstrap(); <br/>serverBootstrap.group(eventGroup); |
+| 非主从 Reactor 多线程模式 | EventLoopGroup eventGroup = new NioEventLoopGroup(); <br/><br/>ServerBootstrap serverBootstrap = new ServerBootstrap(); <br/>serverBootstrap.group(eventGroup); |
 | 主从 Reactor 多线程模式   | EventLoopGroup bossGroup = new NioEventLoopGroup(); <br/>EventLoopGroup workerGroup = new NioEventLoopGroup(); <br/><br/>ServerBootstrap serverBootstrap = new ServerBootstrap(); <br/>serverBootstrap.group(bossGroup, workerGroup); |
 
 我们实现服务端的时候，一般会初始化两个线程组：
@@ -633,7 +633,7 @@ Java NIO Epoll 会导致 Selector 空轮询，最终导致 CPU 100% 。
 
 对 Selector 的 select 操作周期进行**统计**，每完成一次**空**的 select 操作进行一次计数，若在某个周期内连续发生 N 次空轮询，则判断触发了 Epoll 死循环 Bug 。
 
-> 艿艿：此处**空**的 select 操作的定义是，select 操作执行了 0 毫秒。
+> 此处**空**的 select 操作的定义是，select 操作执行了 0 毫秒。
 
 此时，Netty **重建** Selector 来解决。判断是否是其他线程发起的重建请求，若不是则将原 SocketChannel 从旧的 Selector 上取消注册，然后重新注册到新的 Selector 上，最后将原来的 Selector 关闭。
 

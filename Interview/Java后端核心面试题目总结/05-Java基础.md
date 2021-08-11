@@ -162,7 +162,7 @@ Java支持的数据类型包括基本数据类型和引用类型。
 
 String是Java中非常基础而又重要的类，它提供了构造和处理字符串的各种逻辑。String类是典型的immutable类，被声明为final class，所以的属性都是不可变的。也正是也由于它的不可变性，类似拼接、裁剪字符串等动作，都会产生新的String对象。这些频繁的操作往往对应用性能有很大的影响。
 
-StringBuffe是为了解决String拼接产生太多中间对象的问题而提供的一个类，我们可以用 append 或者 add 方法，把字符串添加到已有序列的末尾或者指定位置。StringBuffer 本质是一个线程安全的可修改字符序列，它保证了线程安全，也随之带来了额外的性能开销，所以除非有线程安全的需要，不然还是推荐使用它的后继者，也就是 StringBuilder。
+StringBuffer是为了解决String拼接产生太多中间对象的问题而提供的一个类，我们可以用 append 或者 add 方法，把字符串添加到已有序列的末尾或者指定位置。StringBuffer 本质是一个线程安全的可修改字符序列，它保证了线程安全，也随之带来了额外的性能开销，所以除非有线程安全的需要，不然还是推荐使用它的后继者，也就是 StringBuilder。
 
 StringBuilder是Java 1.5中新增的，在能力上和 StringBuffer 没有本质区别，但是它去掉了线程安全的部分，有效减小了开销，是绝大部分情况下进行字符串拼接的首选。
 
@@ -378,7 +378,7 @@ InvocationHandler handler) throws IllegalArgumentException
 
 * handler：一个 InvocationHandler 对象，表示的是当我这个动态代理对象在调用方法的时候，会关联到哪一个 InvocationHandler 对象上。 
 
-通过 Proxy.newProxyInstance 创建的代理对象是在 JVM运行时动态生成的一个对象，它并不是我们的 InvocationHandler 类型，也不是我们定义的那组接口的类型，而是在运行是动态生成的一个对象。
+通过 Proxy.newProxyInstance 创建的代理对象是在 JVM运行时动态生成的一个对象，它并不是我们的 InvocationHandler 类型，2也不是我们定义的那组接口的类型，而是在运行是动态生成的一个对象。
 
 
 

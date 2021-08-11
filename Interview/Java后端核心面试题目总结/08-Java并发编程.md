@@ -194,7 +194,7 @@ Java程序中，线程上下文切换的主要原因可分为：
 
 ## volatile原理
 
-这要从**Java内存模型**（JMM）说起， JMM定义了线程和主内存的抽象关系：线程之间的共享遍历存储在主内存（Main Memory）中，每个线程都有一个私有的本地内存（Local Memory），本地内存中存储了该线程以读/写共享变量的副本。在并发编程场景中，**多线程读写共享内存中的全局变量及静态变量容易引发竞态条件**，这会导致可见性问题。
+这要从**Java内存模型**（JMM）说起， JMM定义了线程和主内存的抽象关系：线程之间的共享变量存储在主内存（Main Memory）中，每个线程都有一个私有的本地内存（Local Memory），本地内存中存储了该线程以读/写共享变量的副本。在并发编程场景中，**多线程读写共享内存中的全局变量及静态变量容易引发竞态条件**，这会导致可见性问题。
 
 除此之外，在执行程序时，为了提高性能，**编译器和处理器常常会对指令做重排序**，这会导致有序性问题。
 
@@ -212,13 +212,13 @@ Java程序中，线程上下文切换的主要原因可分为：
 
 下面是完成happens-before规则所需要的内存屏障：
 
-| 是否能重排序   | 第二个操作 | 第二个操作 | 第二个操作 | 第二个操作 |
-| -------------- | ---------- | ---------- | ---------- | ---------- |
-| **第一个操作** | 普通读     | 普通写     | Volatile读 | Volatile写 |
-| 普通读         |            |            |            | LoadStore  |
-| 普通写         |            |            |            | StoreStore |
-| Volatile读     | LoadLoad   | LoadStore  | LoadLoad   | LoadStore  |
-| Volatile写     |            |            | StoreLoad  | StoreStore |
+| 是否能重排序   | 第二个操作 | 第二个操作  | 第二个操作  | 第二个操作   |
+| -------------- | ---------- | ----------- | ----------- | ------------ |
+| **第一个操作** | 普通读     | 普通写      | Volatile读  | Volatile写   |
+| 普通读         |            |             |             | `LoadStore`  |
+| 普通写         |            |             |             | `StoreStore` |
+| Volatile读     | `LoadLoad` | `LoadStore` | `LoadLoad`  | `LoadStore`  |
+| Volatile写     |            |             | `StoreLoad` | `StoreStore` |
 
 > volatile常见应用——双重检查锁
 
@@ -366,7 +366,6 @@ synchronized通过monitor机制来实现线程同步，而monitor机制有依赖
 <div align="center">  
 <img src="https://img-blog.csdnimg.cn/20201026011946370.png" width="600px"/>
 </div>
-
 **无锁**：通过CAS操作来加锁（CAS原理下面讲解）
 
 **偏向锁**：锁总是由同一线程获得，锁升级为偏向锁。**在线程进入和退出同步块时不再通过CAS操作来加锁和解锁，而是检测Mark Word里是否存储着指向当前线程的偏向锁**。引入偏向锁是为了在没有多线程竞争的情况下尽量减少不必要的轻量级锁执行路径，**偏向锁只需要在置换ThreadID的时候依赖一次CAS原子指令即可**。
@@ -374,7 +373,6 @@ synchronized通过monitor机制来实现线程同步，而monitor机制有依赖
 <div align="center">  
 <img src="https://img-blog.csdnimg.cn/20201029093518296.png" width="650px"/>
 </div>
-
 **轻量级锁**：偏向锁多应用只有一个线程访问同步块场景中，一旦偏向锁被其他线程访问，就会升级为轻量级锁。线程会通过**自旋**的形式尝试获取锁，不会阻塞，从而提高性能。
 
 **使用轻量级锁的多线程之间不存在锁竞争，线程是交替执行同步块的**。引入轻量级锁的目的正是**在没有多线程竞争的前提下，减少传统的重量级锁使用操作系统互斥量产生的性能消耗**。
@@ -545,7 +543,7 @@ ReadWriteLock读写锁执行流程：
 **LongAdder能否替代AtomicLong吗？**
 
 * AtomicLong提供的功能更丰富，尤其是`addAndGet、decrementAndGet、compareAndSet`这些方法。addAndGet、decrementAndGet除了单纯的做自增自减外，还可以立即获取增减后的值，而LongAdder则需要做同步控制才能精确获取增减后的值。如果业务需求需要精确的控制计数，则使用AtomicLong比较合适；
-* 一般而言，**在低竞争的并发环境下 `AtomicInteger` 的性能是要比 `LongAdder` 的性能好，而高竞争环境下和者写多读少环境下， `LongAdder` 的性能比 `AtomicInteger` 好**。
+* 一般而言，**在低竞争的并发环境下 `AtomicLong` 的性能是要比 `LongAdder` 的性能好，而高竞争环境下和者写多读少环境下， `LongAdder` 的性能比 `AtomicLong` 好**。
 
 ## CAS原理
 
@@ -664,7 +662,7 @@ HashMap不是线程安全的，在并发情况下可能会造成`Race Condition`
 
 ConcurrentHashMap 是基于 HashMap 实现的，该容器在数据量比较大的时候，链表会转换为红黑树。红黑树在并发情况下，删除和插入过程中有个平衡的过程，会牵涉到大量节点，因此竞争锁资源的代价相对比较高。因此，ConcurrentHashMap 对于小数据量的存取比较有优势。
 
-ConcurrentSkipListMap 是基于基于**跳表**实现，ConcurrentSkipListMap 的特点是跳表**插入、删除、查询操作平均的时间复杂度是 O(log n)**，适用于大数据量存取的场景，最常见的是基于跳跃表实现的数据量比较大的缓存。
+ConcurrentSkipListMap 是基于**跳表**实现，ConcurrentSkipListMap 的特点是跳表**插入、删除、查询操作平均的时间复杂度是 O(log n)**，适用于大数据量存取的场景，最常见的是基于跳跃表实现的数据量比较大的缓存。
 
 ## CopyOnWriteArrayList
 
@@ -689,7 +687,7 @@ CopyOnWriteArrayList 会将 array 复制一份，然后在新复制处理的数�
 
 ### ConcurrentLinkedQueue
 
-ConcurrentLinkedQueue是一个基于链接节点的无界线程安全队 列，它采用先进先出的规则对节点进行排序，当我们添加一个元素的时候，它会添加到队列的尾部；当我们获取一个元素时，它会返回队 列头部的元素。它采用了“wait-free”算法（即CAS算法）来实现，该算 法在Michael&Scott算法上进行了一些修改。
+ConcurrentLinkedQueue是一个基于链接节点的无界线程安全队列，它采用先进先出的规则对节点进行排序，当我们添加一个元素的时候，它会添加到队列的尾部；当我们获取一个元素时，它会返回队列头部的元素。它采用了“wait-free”算法（即CAS算法）来实现，该算 法在Michael&Scott算法上进行了一些修改。
 
 ConcurrentLinkedQueue 源码这里就不分析了，我们只需要记住 ConcurrentLinkedQueue 主要使用 **CAS** 非阻塞算法来实现线程安全就好了。ConcurrentLinkedQueue 适合在对性能要求相对较高，同时对队列的读写存在多个线程同时进行的场景。
 
@@ -806,13 +804,13 @@ CyclicBarrier的字面意思是可循环使用（Cyclic）的屏障（Barrier）
 
 ## CyclicBarrier和CountDownLatch的区别
 
-| CountDownLatch                         | CyclicBarrier                              |
-| -------------------------------------- | ------------------------------------------ |
-| 在主线程里 await 阻塞并做聚合          | 直接在各个子线程里 await 阻塞，回调聚合    |
-| N 个线程执行了countdown，主线程继续    | N个线程执行了 await 时，N 个线程继续       |
-| 主线程里拿到同步点                     | 回调被最后到达同步点的线程执行             |
-| 基于 AQS 实现，state 为 count，递减到0 | 基于可重入锁 condition.await/signalAll实现 |
-| 不可以复用                             | 计数为0时重置为 N，可以复用                |
+| `CountDownLatch`                       | `CyclicBarrier`                              |
+| -------------------------------------- | -------------------------------------------- |
+| 在主线程里 await 阻塞并做聚合          | 直接在各个子线程里 await 阻塞，回调聚合      |
+| N 个线程执行了countdown，主线程继续    | N个线程执行了 await 时，N 个线程继续         |
+| 主线程里拿到同步点                     | 回调被最后到达同步点的线程执行               |
+| 基于 AQS 实现，state 为 count，递减到0 | 基于可重入锁 `condition.await/signalAll`实现 |
+| 不可以复用                             | 计数为0时重置为 N，可以复用                  |
 
 形象地比较：
 
@@ -1014,7 +1012,7 @@ GC时，key一定会被回收吗？
                               long keepAliveTime,
                               TimeUnit unit,
                               BlockingQueue<Runnable> workQueue,
-                              ThreadFactory threadFactory,
+                              RejectedExecutionHandler threadFactory,
                               RejectedExecutionHandler handler) {
         // --- omit ---
     }
@@ -1029,9 +1027,9 @@ GC时，key一定会被回收吗？
 `ThreadPoolExecutor`其他参数：
 
 * **`keepAliveTime`**：当线程数大于核心线程数`corePoolSize`时，多余出来的空闲线程存活的最长时间（多余出来的空闲线程不会立即销毁，而是会等待，直到等待的时间超过了 `keepAliveTime`会被回收销毁）。
-* **`unit`** : `keepAliveTime` 参数的时间单位（时、分、秒、毫秒等）。
+* **`TimeUnit`** : `keepAliveTime` 参数的时间单位（时、分、秒、毫秒等）。
 * **`threadFactory`** ：线程工厂，用来创建线程，一般默认即可。
-* **`handler`** ：拒绝策略，当提交的任务过多而不能及时处理时，我们可以定制策略来处理任务。
+* **`RejectedExecutionHandler`** ：拒绝策略，当提交的任务过多而不能及时处理时，我们可以定制策略来处理任务。
 
 线程池有两个线程数的设置，一个为核心线程数，一个为最大线程数。如果当前的线程总个数 < `corePoolSize`，那么新建的线程为核心线程，如果当前线程总个数 >= `corePoolSize`，那么新建的线程为非核心线程。 核心线程默认会一直存活下去，即便是空闲状态，但是如果设置了`allowCoreThreadTimeOut(true)`的话，那么核心线程空闲时间达到`keepAliveTime`也将关闭。
 
@@ -1070,12 +1068,12 @@ GC时，key一定会被回收吗？
 
 在`java.util.concurrent.Executors`线程工厂类里面提供了一些静态工厂，实现了以下4种类型的 `ThreadPoolExecutor`：
 
-| 类型                      | 特性                                                                                                                                                                                                           |
-| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `newSingleThreadExecutor` | 创建一个单线程的线程池。这个线程池只有一个线程在工作，也就是相当于单线程串行执行所有任务。如果这个唯一的线程因为异常结束，那么会有一个新的线程来替代它。此线程池保证所有任务的执行顺序按照任务的提交顺序执行。 |
-| `newFixedThreadPool`      | 创建固定大小的线程池。每次提交一个任务就创建一个线程，直到线程达到线程池的最大大小。线程池的大小一旦达到最大值就会保持不变，如果某个线程因为执行异常而结束，那么线程池会补充一个新线程。                       |
-| `newCachedThreadPool`     | 创建一个可缓存的线程池。如果线程池的大小超过了处理任务所需要的线程，那么就会回收部分空闲（60秒不执行任务）的线程，当任务数增加时，此线程池又可以智能的添加新线程来处理任务。                                   |
-| `newScheduledThreadPool`  | 创建一个大小无限的线程池，此线程池支持定时以及周期性执行任务的需求。                                                                                                                                           |
+| 类型                   | 特性                                                         |
+| ---------------------- | ------------------------------------------------------------ |
+| `SingleThreadExecutor` | 创建一个单线程的线程池。这个线程池只有一个线程在工作，也就是相当于单线程串行执行所有任务。如果这个唯一的线程因为异常结束，那么会有一个新的线程来替代它。此线程池保证所有任务的执行顺序按照任务的提交顺序执行。 |
+| `FixedThreadPool`      | 创建固定大小的线程池。每次提交一个任务就创建一个线程，直到线程达到线程池的最大大小。线程池的大小一旦达到最大值就会保持不变，如果某个线程因为执行异常而结束，那么线程池会补充一个新线程。 |
+| `CachedThreadPool`     | 创建一个可缓存的线程池。如果线程池的大小超过了处理任务所需要的线程，那么就会回收部分空闲（60秒不执行任务）的线程，当任务数增加时，此线程池又可以智能的添加新线程来处理任务。 |
+| `ScheduledThreadPool`  | 创建一个大小无限的线程池，此线程池支持定时以及周期性执行任务的需求。 |
 
 在实际生产环境中，一般不使用它们。因为选择使用 Executors 提供的工厂类实现的四种线程池，将会忽略很多线程池的参数设置，工厂类一旦选择设置默认参数，就很容易导致无法调优参数设置，从而产生性能问题或者资源浪费。
 

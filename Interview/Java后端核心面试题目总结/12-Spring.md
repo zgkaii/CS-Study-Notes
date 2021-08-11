@@ -81,7 +81,6 @@ Spring Framework是分层的 Java SE/EE 应用 full-stack **轻量级开源框�
 <div align="center">  
 <img src="http://static.iocoder.cn/images/Spring/2018-12-24/01.jpg" width="600px"/>
 </div>
-
 **Spring 核心容器——Core Container**是 Spring Framework 的核心。它包含以下模块：
 
 - Spring Core：提供了框架的基本组成部分，包括控制反转（Inversion of Control，IOC）和依赖注入（Dependency Injection，DI）功能。
@@ -345,7 +344,7 @@ Spring 提供了以下五种标准的事件：
 2. 上下文开始事件（ContextStartedEvent）：当容器调用ConfigurableApplicationContext 的 `#start()` 方法开始/重新开始容器时触发该事件。
 3. 上下文停止事件（ContextStoppedEvent）：当容器调用 ConfigurableApplicationContext 的 `#stop()` 方法停止容器时触发该事件。
 4. 上下文关闭事件（ContextClosedEvent）：当ApplicationContext 被关闭时触发该事件。容器被关闭时，其管理的所有单例 Bean 都被销毁。
-5. 请求处理事件（RequestHandledEvent）：在 We b应用中，当一个HTTP 请求（request）结束触发该事件。
+5. 请求处理事件（RequestHandledEvent）：在 Web应用中，当一个HTTP 请求（request）结束触发该事件。
 
 ------
 
@@ -1202,7 +1201,7 @@ Spring并不会对所有类型异常都进行事务回滚操作，默认是只�
 - 有一点需要注意，事务的传播级别，并不是数据库事务规范中的名词，**而是 Spring 自身所定义的**。通过事务的传播级别，Spring 才知道如何处理事务，是创建一个新事务呢，还是继续使用当前的事务。
 
 
-在 TransactionDefinition 接口中，定义了**三类七种**传播级别。代码如下：
+在 TransactionDefinition 接口中，定义了**三类七种**传播级别。
 
 | 传播行为                      | 含义                                                                                                                                                                                         |
 | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

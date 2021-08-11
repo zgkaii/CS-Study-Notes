@@ -884,7 +884,7 @@ Read View（一致性视图）主要是用来做**可见性**判断的，即当�
 
 ## redo log（重做日志）
 
-为什么会有redo log?
+为什么会有?
 
 * 保证`InnoDB` 的持久性；
 * redo log 要进行磁盘操作是与Buffer Pool `磁盘随机写入`比， redo log 的磁盘操作有几个优势：`1.引入redo log buffer，按组写入，不是一条条写。2.磁盘为顺序写入。`这样， redo log 日志的磁盘操作比起 Buffer Pool 的磁盘操作性能要好很多。
