@@ -642,8 +642,6 @@ hash2 =  0000 0000 0000 0000 0000 1111 0001 1110
 <div align="center">  
 <img src="../../05-JAVA/images/collection/resize2.png" width="650px"/>
 </div>
-
-
 也就是说，HashMap在扩容时，会将原table中的节点re-hash到新的table中，但节点在新旧table中的位置存在一定联系，**要么下标相同，要么相差一个`oldCap`(原table的大小)**。这里也体现了 HashMap 中容量⼀定的是 2 的整数次幂带来的好处。
 
 ## HashMap多线程操作导致死循环问题
