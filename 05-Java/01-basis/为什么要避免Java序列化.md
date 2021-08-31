@@ -38,6 +38,10 @@ JDK 提供的两个输入、输出流对象 `ObjectInputStream` 和 `ObjectOutpu
 
 在实现了 Serializable 接口的类的对象中，会生成一个 `serialVersionUID` 的版本号，这个版本号有什么用呢？它会在反序列化过程中来验证序列化对象是否加载了反序列化的类，如果是具有相同类名的不同版本号的类，在反序列化中是无法获取对象的。
 
+> serialVersionUID的作用是，在进行反序列化时，JVM会把传来的字节流中的serialVersionUID与本地相应实体（类）的serialVersionUID进行比较，如果相同就认为是一致的，可以进行反序列化，否则就会出现序列化版本不一致的异常InvalidCastException。
+
+如果一个对象既不是**字符串**、**数组**、**枚举**，而且也没有实现`Serializable`接口的话，在序列化时就会抛出`NotSerializableException`异常！
+
 具体实现序列化的是 `writeObject` 和 `readObject`，通常这两个方法是默认的，当然我们也可以在实现 Serializable 接口的类中对其进行重写，定制一套属于自己的序列化与反序列化机制。
 
 另外，Java 序列化的类中还定义了两个重写方法：`writeReplace()` 和 `readResolve()`，前者是用来在序列化之前替换序列化对象的，后者是用来在反序列化之后对返回对象进行处理的。
