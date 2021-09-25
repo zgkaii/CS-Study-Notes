@@ -505,7 +505,5 @@ public class AIOEchoServer {
 
 # 参考资料
 
-- [Java NIO浅析](https://zhuanlan.zhihu.com/p/23488863)
 - [详解 Java NIO](https://juejin.cn/post/6844903620454924301)
-- [Buffer的4个属性及重要方法](https://zhuanlan.zhihu.com/p/23488863)
-- [零拷贝介绍及对比](https://houbb.github.io/2018/09/22/java-nio-09-16-zero-copy-compare) / [Java NIO零拷贝实现](https://houbb.github.io/2018/09/22/java-nio-09-17-zero-copy-java-impl)
+- [Java NIO零拷贝实现](https://houbb.github.io/2018/09/22/java-nio-09-17-zero-copy-java-impl)
