@@ -151,7 +151,7 @@ transient 关键字修饰该字段则表示该属性不会被序列化，但 Arr
 * 无参构造函数
   * 初始化一个未指定容量的空数组（`DEFAULTCAPACITY_EMPTY_ELEMENTDATA`），当调用`add()`方法添加第一个元素，才会将空数组容量扩容至`DEFAULT_CAPACITY=10`；
   * 继续添加元素，当添加元素数量大于10后，调用`grow()`方法进行扩容；
-  * `ArrayList`默认扩容大小是原大小的**1.5倍左右**，如果扩容后的容量仍小于最小需求容量，就将数组大小直接调整为最小需求容量大小；如果最小需求容量的值在`MAX_ARRAY_SIZE`和`Integer.MAX_VALUE`之间，那么新数组分配`Integer.MAX_VALUE`大小，否则分配`MAX_ARRAY_SIZE`。
+  * `ArrayList`默认扩容大小是原大小的**1.5倍左右**，如果扩容后的容量仍小于最小需求容量，就将数组大小直接调整为最小需求容量大小；如果最小需求容量的值在`MAX_ARRAY_SIZE`和`Integer.MAX_VALUE`之间，那么新数组分配`Integer.MAX_VALUE`大小，否则分配`MAX_ARRAY_SIZE`。ArrayList每次扩容都是通过Arrays.copyof(elementData, newCapacity)来实现的。
 
 ```java
     private void grow(int minCapacity) {//11
@@ -193,6 +193,8 @@ transient 关键字修饰该字段则表示该属性不会被序列化，但 Arr
 
 * `EMPTY_ELEMENTDATA`表示实例化对象时指定了容量为0，当添加1个元素后，那么`elementData.length=1`。
 * `DEFAULTCAPACITY_EMPTY_ELEMENTDATA`表示实例化时是无参构造，未指定容量，在调用add方法添加第1个元素后会默认扩容容量为10，即`elementData.length=10`。
+
+**JDK 1.7和JDK 1.8的初始化区别**：JDK 1.7在初始化方法中调用this(10)，默认为10；JDK 1.8默认是0，只有在添加元素的时候才会初始化为10。
 
 > 上面仅简述了`ArrayList`的扩容机制，详细分析见[`ArrayList`源码分析](https://blog.csdn.net/KAIZ_LEARN/article/details/109555269)
 
@@ -486,8 +488,6 @@ tab[i = (n - 1) & hash]
 <div align="center">  
 <img src="../../03-Programming-Language/Java/images/collection/hash.png" width="600px"/>
 </div>
-
-
 右位移16位，正好是32的一半，自己的高半区与低半区做异或，就是**为了混合原始哈希码的高位与低位，以此来加大低位随机性**。而混合后的低位参杂了高位部分特征，高位信息也参入了寻址计算（进行扰动）。
 
 ## HashMap的长度为什么是 2 的幂次方

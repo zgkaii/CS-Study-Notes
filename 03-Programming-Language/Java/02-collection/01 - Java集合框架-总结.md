@@ -216,6 +216,12 @@ JDK1.6 之前LinkedList为循环链表，JDK1.7 取消了循环，成了双向�
 
 <div align="center"> <img src="../images/collection/doubly-linkedlist.png" width="400px"></div>
 
+在 JDK1.7 之后，LinkedList 做了很大的改动，对链表进行了优化。链表的 Entry 结构换成了 Node，内部组成基本没有改变，但 LinkedList 里面的 header 属性去掉了，新增了一个 Node 结构的 first 属性和一个 Node 结构的 last 属性。这样做有以下几点好处：
+
+* first/last 属性能更清晰地表达链表的链头和链尾概念；
+* first/last 方式可以在初始化 LinkedList 的时候节省 new 一个 Entry；
+* first/last 方式最重要的性能优化是链头和链尾的插入删除操作更加快捷了。
+
 ## 2.6 ArrayList实现了序列化接口，为什么很多字段还被transient修饰？
 
 使用 transient 修饰数组，是防止对象数组被其他外部方法序列化。
