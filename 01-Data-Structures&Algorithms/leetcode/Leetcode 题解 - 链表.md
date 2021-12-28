@@ -1,4 +1,5 @@
 <!-- MarkdownTOC -->
+
 - [1. 找出两个链表的交点](#1-找出两个链表的交点)
 - [2. 链表反转](#2-链表反转)
 - [3. 归并两个有序的链表](#3-归并两个有序的链表)
@@ -17,11 +18,41 @@
 
 <!-- /MarkdownTOC -->
 
-#  1. 找出两个链表的交点
+# 1. 找出两个链表的交点
 
 160\. Intersection of Two Linked Lists (Easy)
 
 [Leetcode](https://leetcode.com/problems/intersection-of-two-linked-lists/description/) / [力扣](https://leetcode-cn.com/problems/intersection-of-two-linked-lists/description/)
+
+**解法一**：哈希集合，时间复杂度O(m+n)，空间复杂度O(n)
+
+遍历链表A并将链表A中每个节点加入Set集合中，再遍历链表B，对于每个节点，判断该节点是否在哈希集合中：
+
+- 如果当前节点不在哈希集合中，继续遍历下一个节点；
+- 如果当前节点在哈希集合中，则后面所有节点都在哈希集合中，返回相交的第一个节点。
+
+如果链表 headB中的所有节点都不在哈希集合中，则两个链表不相交，返回 null。
+
+```java
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        Set<ListNode> visited = new HashSet<>();
+        ListNode pA = headA;
+        while (pA != null) {
+            visited.add(pA);
+            pA= pA.next;
+        } 
+        ListNode pB= headB;
+        while (pB != null) {
+            if (visited.contains(pB)) {
+                return pB;
+            }
+            pB = pB.next;
+        }
+        return null;
+    }
+```
+
+**解法二**：双指针法，时间复杂度O(m+n)，**空间复杂度O(1)**
 
 设 A 的长度为 a + c，B 的长度为 b + c，其中 c 为尾部公共部分长度，可知 a + c + b = b + c + a。
 
@@ -50,7 +81,7 @@
 
 [Leetcode](https://leetcode.com/problems/reverse-linked-list/description/) / [力扣](https://leetcode-cn.com/problems/reverse-linked-list/description/)
 
-递归：
+递归：时间复杂度O(n)，空间复杂度O(n)
 
 ```java
 public ListNode reverseList(ListNode head) {
@@ -65,7 +96,7 @@ public ListNode reverseList(ListNode head) {
 }
 ```
 
-头插法：
+头插法：时间复杂度O(n)，空间复杂度O(n)
 
 ```java
 public ListNode reverseList(ListNode head) {
@@ -80,7 +111,7 @@ public ListNode reverseList(ListNode head) {
 }
 ```
 
-双指针：
+**双指针**：时间复杂度O(n)，**空间复杂度O(1)**
 
 ```java
     public ListNode reverseList(ListNode head) {
@@ -102,7 +133,7 @@ public ListNode reverseList(ListNode head) {
 
 [Leetcode](https://leetcode.com/problems/merge-two-sorted-lists/description/) / [力扣](https://leetcode-cn.com/problems/merge-two-sorted-lists/description/)
 
-递归：
+递归：时间复杂度O(m+n)，空间复杂度O(m+n)
 
 ```java
     public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
@@ -118,7 +149,7 @@ public ListNode reverseList(ListNode head) {
     }
 ```
 
-迭代：
+迭代：时间复杂度O(m+n)，空间复杂度O(1)
 
 ```java
     public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
@@ -147,6 +178,24 @@ public ListNode reverseList(ListNode head) {
 141\. Linked List Cycle（Easy）
 
 [Leetcode](https://leetcode.com/problems/linked-list-cycle/) / [力扣](https://leetcode-cn.com/problems/linked-list-cycle/)
+
+HashSet：时间复杂度O(n)，空间复杂度O(n)
+
+```java
+    public boolean hasCycle(ListNode head) {
+        Set<ListNode> visited = new HashSet<>();
+        while (head != null) {
+            // 如果该节点已经存在于哈希表中，则说明该链表是环形链表
+            if (!visited.add(head)) {
+                return true;
+            }
+            head = head.next;
+        }
+        return false;
+    }
+```
+
+快慢指针：时间复杂度O(n)，**空间复杂度O(1)**
 
 ```java
     public boolean hasCycle(ListNode head) {
@@ -450,7 +499,8 @@ return 1->3->5->2->4->NULL.
         //         |w         
         // 距离: head->p: A, p->w: B, w->p: C
         // slow : A + B, fast = A + 2B + C => A = C
-        // 所以在相遇后,slow继续运行,从与fast的相遇点到环入口点(C),另一个 slow2 刚好与slow在环入口点相遇(A)
+        // 所以在相遇后,slow继续运行,从与fast的相遇点到环入口点(C),
+        // 另一个 slow2 刚好与slow在环入口点相遇(A)
         ListNode slow = head, fast = head;
         while (fast != null && fast.next != null) {
             slow = slow.next;
