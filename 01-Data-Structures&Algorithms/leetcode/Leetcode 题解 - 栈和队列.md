@@ -138,19 +138,21 @@ Output : true
 ```
 
 ```java
+    public boolean isValid(String s) {
         Stack<Character> stack = new Stack<Character>();
-        for (char c : s.toCharArray()) {
-            if (c == '(') {
+        for (char ch : s.toCharArray()) {
+            if (ch == '(') {
                 stack.push(')');
-            } else if (c == '{') {
+            } else if (ch == '{') {
                 stack.push('}');
-            } else if (c == '[') {
+            } else if (ch == '[') {
                 stack.push(']');
-            } else if (stack.isEmpty() || stack.pop() != c) {
+            } else if (stack.isEmpty() || stack.pop() != ch) {
                 return false;
             }
         }
         return stack.isEmpty();
+    }
 ```
 
 # 5. 每日温度
@@ -348,3 +350,66 @@ Output: [1, 1, 4, 2, 1, 1, 0, 0]
         return res;
     }
 ```
+
+# 9. 滑动窗口最大值
+
+239\. Sliding-Window-Maximum (Hard)
+
+[LeetCode](https://leetcode.com/problems/sliding-window-maximum/) / [力扣](https://leetcode-cn.com/problems/sliding-window-maximum/)
+
+单调队列：时间复杂度O(n)
+
+```java
+    public int[] maxSlidingWindow(int[] nums, int k) {
+        if (nums == null || nums.length < 0) {
+            return null;
+        }
+        int len = nums.length, j = 0;
+        int[] result = new int[len - k + 1];
+
+        // 单调递减栈保存数组的 下标位置
+        Deque<Integer> queue = new LinkedList<>();
+        for (int i = 0; i < len; i++) {
+            // 删除队列中最小的元素
+            while (!queue.isEmpty() && nums[queue.peekLast()] <= nums[i]) {
+                queue.pollLast();
+            }
+            queue.offer(i);
+
+            // 判断队首是否在窗口中
+            if (i - queue.peek() >= k) {
+                queue.poll();
+            }
+            // 当窗口长度为k时 保存当前窗口中最大值
+            if (i >= k - 1) {
+                result[j++] = nums[queue.peek()];
+            }
+        }
+        return result;
+    }
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
