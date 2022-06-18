@@ -36,8 +36,8 @@
         if (root == null) return;
         
         res.add(root.val);
-        res.add(root.left, res);
-        res.add(root.right, res);
+        preorder(root.left, res);
+        preorder(root.right, res);
     }
 ```
 
